@@ -398,7 +398,7 @@
 .ld-hub-copy p {
   margin: 5px 0 0;
   color: #bed8de;
-  font-size: clamp(.72rem, .88cqw, .86rem);
+  font-size: clamp(.75rem, .88cqw, .86rem);
   line-height: 1.45;
   overflow-wrap: anywhere;
 }
