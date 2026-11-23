@@ -1,14 +1,23 @@
 /* Shared surfaces used by the visitor workspace, the operations console and the settings editor. */
 :root {
-  --ea-paper: #f2f6f4;
-  --ea-surface: #fcfefc;
-  --ea-ink: #132e2b;
-  --ea-muted: #485f59;
-  --ea-accent: #006c5c;
-  --ea-line: #c1d0c7;
-  --ea-wash: #dcece4;
-  --ea-panel: #0c2b28;
-  --ea-light: #c6ffe0;
+  /* Shared E20E palette, aligned with Technology Radar (radar.e20e.tools, "hub" colour theme):
+     one green hue (160) for surfaces, text and actions, amber as the only warm accent. */
+  --ea-paper: oklch(95.5% 0.006 160);
+  --ea-surface: oklch(98.5% 0.004 160);
+  --ea-ink: oklch(24% 0.06 160);
+  --ea-muted: oklch(42% 0.05 160);
+  --ea-accent: oklch(45% 0.12 160);
+  --ea-line: oklch(85% 0.03 160);
+  --ea-wash: oklch(92% 0.02 160);
+  --ea-panel: oklch(24% 0.06 160);
+  --ea-light: oklch(80% 0.17 160);
+  --ea-amber: oklch(72% 0.15 70);
+  --ea-amber-wash: oklch(93% 0.05 80);
+  /* Status colours: each is paired with an icon or label in the UI, never colour alone. */
+  --ea-success: oklch(50% 0.13 158);
+  --ea-warning: oklch(58% 0.14 70);
+  --ea-info: oklch(55% 0.11 240);
+  --ea-danger: oklch(55% 0.2 20);
   --ea-on-accent: #fff;
   --ea-on-panel: #fff;
   --ea-panel-muted: color-mix(in srgb, var(--ea-light) 45%, white);
@@ -69,7 +78,7 @@
   --library-surface: var(--ea-surface);
 }
 :root:root [data-surface="site"] {
-  --ea-accent: var(--ea-brand, #006c5c);
+  --ea-accent: var(--ea-brand, oklch(45% 0.12 160));
   --ea-on-accent: var(--ea-on-brand, #fff);
   --s-ink: var(--ea-ink);
   --s-sheet: var(--ea-paper);
@@ -151,7 +160,7 @@
   margin-inline-start: auto;
 }
 .nx-request {
-  color: #12271f;
+  color: oklch(25.2% 0.031 160);
   background: var(--ea-light);
   padding: 8px 13px;
   border-radius: var(--ea-rule);

@@ -249,14 +249,14 @@
   border-color: var(--settings-line);
 }
 .settings-identity-preview {
-  color: #f2fff8;
+  color: oklch(98.8% 0.016 160);
   padding: 1.2rem 1.5rem;
   border-radius: 0.8rem;
-  background: radial-gradient(ellipse at top right, #244e49, transparent 64%), #152f30;
+  background: radial-gradient(ellipse at top right, oklch(39.2% 0.048 160), transparent 64%), oklch(28.5% 0.032 160);
 }
 .settings-identity-preview small {
   display: block;
-  color: #a7d2be;
+  color: oklch(82.7% 0.053 160);
   font-size: 0.75rem;
 }
 .settings-identity-preview > div {
@@ -277,7 +277,7 @@
   font-size: 1.35rem;
 }
 .settings-identity-preview p {
-  color: #dcebe3;
+  color: oklch(92.7% 0.019 160);
   font-size: 0.9rem;
   overflow-wrap: anywhere;
 }

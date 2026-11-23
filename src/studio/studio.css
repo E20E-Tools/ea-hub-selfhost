@@ -118,7 +118,7 @@
 .s-actions .site-search-trigger {
   display: grid;
   place-items: center;
-  border: 1px solid #49585b !important;
+  border: 1px solid oklch(44.9% 0.019 160) !important;
   border-radius: 5px !important;
   height: 37px;
   min-width: 38px;
@@ -198,7 +198,7 @@
   padding: 8px 16px;
   justify-content: space-between;
   background: #e6e9e0;
-  color: #263b3b;
+  color: oklch(33.5% 0.027 160);
   gap: 10px;
   font-size: 13px;
 }
@@ -241,15 +241,15 @@
     600 11px/1.3 "Geist",
     sans-serif;
   letter-spacing: 0.12em;
-  color: #536663;
+  color: oklch(49.4% 0.023 160);
 }
 .s-filter {
   gap: 10px;
-  border: 1px solid #b6c0b8;
+  border: 1px solid oklch(79.8% 0.016 160);
   border-radius: 5px;
   padding: 8px 12px;
   background: #fff;
-  color: #536663;
+  color: oklch(49.4% 0.023 160);
 }
 .s-filter input {
   background: transparent;
@@ -272,15 +272,15 @@
   border-radius: 4px;
   padding: 5px 12px;
   background: transparent;
-  color: #263937;
+  color: oklch(32.8% 0.025 160);
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
 }
 .s-tabs button[aria-pressed="true"] {
-  background: #263937;
+  background: oklch(32.8% 0.025 160);
   color: #fff;
-  border-color: #263937;
+  border-color: oklch(32.8% 0.025 160);
 }
 .s-tabs span {
   margin-inline-start: auto;
@@ -304,7 +304,7 @@
   transition: border-color 0.2s;
 }
 .s-card:hover {
-  border-color: #74877f;
+  border-color: oklch(60.6% 0.025 160);
 }
 .s-art {
   height: clamp(165px, 15vw, 232px);
@@ -325,7 +325,7 @@
 }
 .s-art span {
   background: #fffbf2;
-  color: #283c38;
+  color: oklch(33.8% 0.027 160);
   position: absolute;
   top: 10px;
   inset-inline-start: 12px;
@@ -424,7 +424,7 @@
 .s-footer > div > span {
   display: block;
   margin-top: 12px;
-  color: #4e625d;
+  color: oklch(47.8% 0.026 160);
   font-size: 13px;
 }
 .s-footer nav {

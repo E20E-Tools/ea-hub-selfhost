@@ -62,6 +62,10 @@
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
+  /* Status colours shared with Technology Radar (defined in studio/workspace.css). */
+  --color-success: var(--ea-success);
+  --color-warning: var(--ea-warning);
+  --color-info: var(--ea-info);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);

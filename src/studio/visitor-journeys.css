@@ -1,11 +1,11 @@
 /* Shared work surfaces for the visitor's decisions, requests and tool records. */
 :root:root [data-surface="site"] .site-content > main.ea-workspace {
   --ws-ink: var(--ea-ink, #172c32);
-  --ws-muted: var(--ea-muted, #526765);
+  --ws-muted: var(--ea-muted, oklch(49.6% 0.025 160));
   --ws-paper: var(--ea-paper, #f0f3ee);
   --ws-surface: var(--ea-surface, #ffffff);
   --ws-line: var(--ea-line, #c2cdca);
-  --ws-accent: var(--ea-accent, #077a6c);
+  --ws-accent: var(--ea-accent, oklch(45% 0.12 160));
   --primary: var(--ws-accent);
   --card: var(--ws-surface);
   --card-foreground: var(--ws-ink);
