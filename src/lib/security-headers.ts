@@ -16,20 +16,7 @@ export const CSP_REPORT_ONLY = [
 /** Enforced policy: only framing is blocked, so existing scripts/styles keep working. */
 export const CSP_ENFORCED = "frame-ancestors 'none'";
 
-/** Editor previews must stay embeddable by the Lovable editor and nothing else. */
-export const CSP_PREVIEW = "frame-ancestors 'self' https://lovable.dev https://*.lovable.dev";
-
-const UUID = "[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}";
-const PREVIEW_HOST = new RegExp(`^(?:id-preview(?:-[a-z0-9]+)?|project|live)--${UUID}`, "i");
-
-/** True only for Lovable editor preview hosts; published domains are never previews. */
-export function isEditorPreviewHost(hostname: string): boolean {
-  const host = hostname.toLowerCase();
-  if (host.endsWith(".lovableproject.com") || host.endsWith(".lovableproject-dev.com")) return true;
-  return host.endsWith(".lovable.app") && PREVIEW_HOST.test(host);
-}
-
-export function applySecurityHeaders(h: Headers, hostname: string, dev: boolean): void {
+export function applySecurityHeaders(h: Headers): void {
   if (!h.has("x-content-type-options")) h.set("x-content-type-options", "nosniff");
   if (!h.has("referrer-policy")) h.set("referrer-policy", "strict-origin-when-cross-origin");
   if (!h.has("permissions-policy"))
@@ -39,9 +26,6 @@ export function applySecurityHeaders(h: Headers, hostname: string, dev: boolean)
   // Report-only: observes violations of the broader policy without blocking anything.
   if (!h.has("content-security-policy-report-only"))
     h.set("content-security-policy-report-only", CSP_REPORT_ONLY);
-  const preview = dev || isEditorPreviewHost(hostname);
-  if (!h.has("content-security-policy"))
-    h.set("content-security-policy", preview ? CSP_PREVIEW : CSP_ENFORCED);
-  // X-Frame-Options cannot allow-list the editor, so it is omitted on previews only.
-  if (!preview && !h.has("x-frame-options")) h.set("x-frame-options", "DENY");
+  if (!h.has("content-security-policy")) h.set("content-security-policy", CSP_ENFORCED);
+  if (!h.has("x-frame-options")) h.set("x-frame-options", "DENY");
 }

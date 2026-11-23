@@ -1,3 +1,4 @@
+import { WorkCard } from "@/components/work-cards";
 import { StepHelp } from "@/components/step-help";
 import { productPractice } from "@/lib/product-practice";
 import { ProductCase } from "@/components/product-case";
@@ -224,6 +225,7 @@ function ProductDetail() {
           <a href="#resources">{ar ? "المساعدة والموارد" : "Help and resources"}</a>
         </nav>
         <div className="ea-dossier-sections">
+          <WorkCard key={product.id} id={product.id} name={product.name} ar={ar}/>
           <ProductCase product={product} language={language}/>
           <section className="bx-panel" id="operating-requirements"><h2>{ar?"متطلبات التشغيل":"Operating requirements"}</h2>
           <dl>{(["account","inputs","exchange"] as const).map((key,i)=><div key={key}><dt>{(ar?["الحساب","البيانات المطلوبة للبدء","الاستيراد والتصدير"]:["Account","Starting data","Import and export"])[i]}</dt><dd>{product.beneficiaryDetails?.operations?.[key][language] || (ar?"لم تُنشر تفاصيل مؤكدة بعد.":"Verified details have not been published yet.")}</dd></div>)}</dl>

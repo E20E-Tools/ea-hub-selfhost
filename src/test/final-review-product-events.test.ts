@@ -12,10 +12,10 @@ const track = vi.fn();
 beforeEach(() => {
   window.localStorage.clear();
   track.mockReset();
-  (window as unknown as { __lovableEvents: unknown }).__lovableEvents = { track };
+  window.addEventListener("e20e-product-event", track);
 });
 afterEach(() => {
-  delete (window as unknown as { __lovableEvents?: unknown }).__lovableEvents;
+  window.removeEventListener("e20e-product-event", track);
 });
 
 describe("optional product events follow the privacy choice", () => {
@@ -27,14 +27,15 @@ describe("optional product events follow the privacy choice", () => {
 
   it("sends when allowed", () => {
     trackProductEvent("project.request_receipt_confirmed");
-    expect(track).toHaveBeenCalledWith("project.request_receipt_confirmed", undefined);
+    expect(track).toHaveBeenCalledWith(expect.objectContaining({ detail: { name: "project.request_receipt_confirmed", properties: undefined } }));
   });
 
   it("contains a collector failure", () => {
-    track.mockImplementation(() => {
+    const dispatch = vi.spyOn(window, "dispatchEvent").mockImplementation(() => {
       throw new Error("collector down");
     });
     expect(() => trackProductEvent("project.archy_tour_started")).not.toThrow();
+    dispatch.mockRestore();
   });
 
   it("follows a choice changed in another tab instead of this tab's earlier choice", () => {

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { AskRecords } from "@/components/work-cards";
 import { TeamTrials } from "@/components/team-trials";
 import { SavedExercises } from "@/components/saved-exercises";
 import {SavedDecisions} from "@/components/comparison-decision";
@@ -143,6 +144,7 @@ function MyToolsPage() {
           </div>
         )}
       </section>
+<AskRecords ar={language === "ar"}/>
 <TeamTrials ar={language === "ar"}/>
 <SavedExercises ar={language === "ar"}/>
 <SavedDecisions/>

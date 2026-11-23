@@ -50,7 +50,7 @@ export function setMetricsOptOut(optOut: boolean): boolean {
 export function trackProductEvent(name: string, properties?: Record<string, unknown>): void {
   try {
     if (!metricsAllowed()) return;
-    window.__lovableEvents?.track?.(name, properties);
+    window.dispatchEvent(new CustomEvent("e20e-product-event", { detail: { name, properties } }));
   } catch {
     /* analytics is optional */
   }

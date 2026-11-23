@@ -19,11 +19,11 @@ const errorMiddleware = createMiddleware().server(async ({ next }) => {
   }
 });
 
-const securityHeaders = createMiddleware().server(async ({ next, request }) => {
+const securityHeaders = createMiddleware().server(async ({ next }) => {
   const result = await next();
   const response = (result as { response?: Response }).response;
   if (response instanceof Response) {
-    applySecurityHeaders(response.headers, new URL(request.url).hostname, import.meta.env.DEV);
+    applySecurityHeaders(response.headers);
   }
   return result;
 });

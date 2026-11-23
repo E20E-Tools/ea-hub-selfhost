@@ -1,3 +1,4 @@
+import { WorkControls } from "../work-assistant";
 import { useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -23,7 +24,7 @@ import { BilingualField, Card, SaveBar, SettingRow, useAdminCopy, useDraft } fro
 
 /** Admin preview and editor for Archy's greeting text and voice. */
 export function ArchySettings({ catalog }: { catalog: Catalog }) {
-  const { t } = useAdminCopy();
+  const { t,language } = useAdminCopy();
   const queryClient = useQueryClient();
   const save = useServerFn(saveArchyGreeting);
   const saved = catalog.settings.archyGreeting;
@@ -72,6 +73,7 @@ export function ArchySettings({ catalog }: { catalog: Catalog }) {
 
   return (
     <div className="grid gap-5">
+      <WorkControls ar={language==="ar"}/>
       <Card title={t("archyPreview")}>
         <div className="grid gap-4 sm:grid-cols-[96px_minmax(0,1fr)] sm:items-center">
           <img src={archyPoster} alt="" className="mx-auto h-24 w-24 object-contain" />

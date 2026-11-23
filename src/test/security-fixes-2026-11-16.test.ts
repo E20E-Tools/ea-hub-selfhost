@@ -5,41 +5,30 @@ import {
   applySecurityHeaders,
   CSP_ENFORCED,
   CSP_REPORT_ONLY,
-  isEditorPreviewHost,
 } from "@/lib/security-headers";
 import { turnsFromMessages } from "@/lib/live-chat.server";
 
-const headersFor = (host: string, dev = false) => {
+const headersFor = () => {
   const h = new Headers();
-  applySecurityHeaders(h, host, dev);
+  applySecurityHeaders(h);
   return h;
 };
 const migration = (tag: string) => readFileSync(`drizzle/migrations/${tag}.sql`, "utf8");
 
 describe("anti-framing headers", () => {
   it("enforces frame-ancestors 'none' and X-Frame-Options DENY on the public domain", () => {
-    const h = headersFor("www.e20e.tools");
+    const h = headersFor();
     expect(h.get("content-security-policy")).toBe("frame-ancestors 'none'");
     expect(CSP_ENFORCED).toContain("frame-ancestors 'none'");
     expect(h.get("x-frame-options")).toBe("DENY");
   });
   it("keeps the existing report-only policy unchanged", () => {
-    expect(headersFor("www.e20e.tools").get("content-security-policy-report-only")).toBe(
+    expect(headersFor().get("content-security-policy-report-only")).toBe(
       CSP_REPORT_ONLY,
     );
     expect(CSP_REPORT_ONLY).toContain("default-src 'self'");
   });
-  it("applies DENY on the published lovable.app address too", () => {
-    expect(headersFor("grid-sparkle-dance.lovable.app").get("x-frame-options")).toBe("DENY");
-    expect(isEditorPreviewHost("grid-sparkle-dance.lovable.app")).toBe(false);
-  });
-  it("lets only the Lovable editor frame preview hosts", () => {
-    const h = headersFor("id-preview--fad10e52-b5a5-4817-8b4b-28ba3778d2c7.lovable.app");
-    expect(h.get("x-frame-options")).toBeNull();
-    expect(h.get("content-security-policy")).toBe(
-      "frame-ancestors 'self' https://lovable.dev https://*.lovable.dev",
-    );
-  });
+
 });
 
 describe("assistant context mapping", () => {

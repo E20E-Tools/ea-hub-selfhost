@@ -1,3 +1,4 @@
+import { IssueEditor } from "./work-issue";
 import { adminDictionaries } from "@/lib/admin-copy";
 import { useState } from "react";
 import {
@@ -17,10 +18,13 @@ export function NewsletterPreview({ ar }: { ar: boolean }) {
     [draft, setDraft] = useState<{
       ar: string;
       en: string;
+      source:{ar:string;en:string};
+      locked:boolean;
       ready: boolean;
     } | null>(null),
     [busy, setBusy] = useState(false),
-    [note, setNote] = useState("");
+    [note, setNote] = useState(""),
+    [recipient, setRecipient] = useState<"admin" | "editorial">("admin");
   const body = draft?.[lang] ?? "";
   return (
     <details className="mt-3">
@@ -70,6 +74,7 @@ export function NewsletterPreview({ ar }: { ar: boolean }) {
                 <option value="en">English</option>
               </select>
             </label>
+            {body && !draft.locked && <IssueEditor key={month+lang+body} ar={ar} lang={lang} month={month} body={body} source={draft.source[lang]} onSaved={v=>setDraft({...draft,[lang]:v})}/>}
             <article
               className="rounded border p-3"
               dir={lang === "ar" ? "rtl" : "ltr"}
@@ -105,14 +110,20 @@ export function NewsletterPreview({ ar }: { ar: boolean }) {
                 </p>
               )}
             </article>
+            <label>{ar ? "مستلم المعاينة" : "Preview recipient"}{" "}
+              <select value={recipient} onChange={e => setRecipient(e.target.value === "editorial" ? "editorial" : "admin")}>
+                <option value="admin">{ar ? "بريدي الإداري" : "My admin email"}</option>
+                <option value="editorial">EA@E20E.Tools</option>
+              </select>
+            </label>
             <Button
               disabled={busy || !body || !draft.ready}
               onClick={async () => {
                 setBusy(true);
                 try {
-                  await emailNewsletterPreview({ data: { month, lang } });
+                  await emailNewsletterPreview({ data: { month, lang, recipient } });
                   setNote(
-                    adminDictionaries[ar ? "ar" : "en"].consoleTheProviderAcceptedTheTestEmailFor,
+                    recipient === "editorial" ? (ar ? "قَبِل مزوّد البريد المعاينة إلى " : "Provider accepted the preview for ") + "EA@E20E.Tools" : adminDictionaries[ar ? "ar" : "en"].consoleTheProviderAcceptedTheTestEmailFor,
                   );
                 } catch {
                   setNote(adminDictionaries[ar ? "ar" : "en"].consoleTestDeliveryFailed);
@@ -121,7 +132,7 @@ export function NewsletterPreview({ ar }: { ar: boolean }) {
                 }
               }}
             >
-              {adminDictionaries[ar ? "ar" : "en"].consoleEmailACopyToMe}
+              {recipient === "admin" ? adminDictionaries[ar ? "ar" : "en"].consoleEmailACopyToMe : (ar ? "أرسل معاينة إلى " : "Send preview to ") + "EA@E20E.Tools"}
             </Button>
             {!draft.ready && (
               <small>

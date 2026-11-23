@@ -13,7 +13,7 @@ function database() {
   }));
 }
 const origin = () =>
-  process.env["NEWSLETTER_ORIGIN"] || "https://ea-hub-mu.vercel.app";
+  process.env["NEWSLETTER_ORIGIN"] || "https://www.e20e.tools";
 const configured = () =>
   Boolean(process.env["RESEND_API_KEY"] && process.env["NEWSLETTER_FROM"]);
 type Member = { id: string; email: string; language: string; token: string };
@@ -149,6 +149,12 @@ async function issueEntries(
 function issueText(entries: Entry[], lang: "ar" | "en") {
   return entries.map((r) => r[lang] + "\n" + origin() + r.path).join("\n\n");
 }
+function editorialBody(entries: Entry[], lang: "ar" | "en", approved?: string | null) {
+  if (!approved) return issueText(entries, lang);
+  const links = new Set(approved.match(/https?:\/\/[^\s]+/g) ?? []);
+  const added = entries.filter(entry => !links.has(origin() + entry.path));
+  return [approved, issueText(added, lang)].filter(Boolean).join("\n\n");
+}
 function footer(member: Member) {
   const ar = member.language === "ar";
   return (
@@ -172,9 +178,12 @@ export async function previewIssue(month: string) {
   const rows = saved
     ? []
     : await issueEntries(from, next.toISOString().slice(0, 10));
+  const [editorial] = await database()< {body_ar:string|null;body_en:string|null}[] >`select body_ar,body_en from newsletter_editorial where month=${from}`;
   return {
-    ar: saved?.body_ar ?? issueText(rows, "ar"),
-    en: saved?.body_en ?? issueText(rows, "en"),
+    source: {ar:issueText(rows,"ar"),en:issueText(rows,"en")},
+    locked: Boolean(saved),
+    ar: saved?.body_ar ?? editorialBody(rows,"ar",editorial?.body_ar),
+    en: saved?.body_en ?? editorialBody(rows,"en",editorial?.body_en),
     ready: configured(),
   };
 }
@@ -235,26 +244,6 @@ export async function sendDue() {
   const sql = database();
   const deadline = Date.now() + 42000;
   await launchAlerts(deadline);
-  const [period] = await sql<
-    { start: string; end: string }[]
-  >`select (date_trunc('month',now() at time zone 'Asia/Riyadh')-interval '1 month')::date::text as start,date_trunc('month',now() at time zone 'Asia/Riyadh')::date::text as end`;
-  if (!period) throw Error("No newsletter month");
-  const from = period.start,
-    to = period.end;
-  await sql.begin(async (tx) => {
-    if (
-      (await tx`select month from newsletter_issues where month=${from}`).length
-    )
-      return;
-    const rows = await issueEntries(from, to, tx);
-    if (!rows.length) return;
-    const body = (language: "ar" | "en") =>
-      rows.map((r) => r[language] + "\n" + origin() + r.path).join("\n\n");
-    const inserted =
-      await tx`insert into newsletter_issues(month,body_ar,body_en,entries) values(${from},${body("ar")},${body("en")},${JSON.stringify(rows)}::jsonb) on conflict do nothing returning month`;
-    if (inserted.length)
-      await tx`insert into newsletter_deliveries(month,member_id) select ${from},id from newsletter_members where state='active' and confirmed_at < ${to}::date::timestamp at time zone 'Asia/Riyadh'`;
-  });
   let confirmed = 0,
     delivered = 0;
   for (const m of await sql<
@@ -263,6 +252,30 @@ export async function sendDue() {
     if (Date.now() > deadline) break;
     if (await confirmation(m.id).catch(() => false)) confirmed++;
   }
+  if (process.env["NEWSLETTER_MONTHLY_ENABLED"] !== "true")
+    return { configured: true, awaitingApproval: true, confirmed, delivered };
+  const [period] = await sql<
+    { start: string; end: string }[]
+  >`select (date_trunc('month',now() at time zone 'Asia/Riyadh')-interval '1 month')::date::text as start,date_trunc('month',now() at time zone 'Asia/Riyadh')::date::text as end`;
+  if (!period) throw Error("No newsletter month");
+  const from = period.start,
+    to = period.end;
+  await sql.begin(async (tx) => {
+    await tx`select pg_advisory_xact_lock(hashtext(${from}))`;
+    if (
+      (await tx`select month from newsletter_issues where month=${from}`).length
+    )
+      return;
+    const rows = await issueEntries(from, to, tx);
+    if (!rows.length) return;
+    const [editorial] = await tx<{body_ar:string|null;body_en:string|null}[]>`select body_ar,body_en from newsletter_editorial where month=${from}`;
+    const body = (language: "ar" | "en") =>
+      editorialBody(rows,language,language==="ar"?editorial?.body_ar:editorial?.body_en);
+    const inserted =
+      await tx`insert into newsletter_issues(month,body_ar,body_en,entries) values(${from},${body("ar")},${body("en")},${JSON.stringify(rows)}::jsonb) on conflict do nothing returning month`;
+    if (inserted.length)
+      await tx`insert into newsletter_deliveries(month,member_id) select ${from},id from newsletter_members where state='active' and confirmed_at < ${to}::date::timestamp at time zone 'Asia/Riyadh'`;
+  });
   // Take a bounded work list so one rejected address cannot block other deliveries.
   const pending = await sql<
     { member_id: string; month: string }[]
@@ -315,4 +328,18 @@ export async function sendDue() {
     if (sent) delivered++;
   }
   return { configured: true, confirmed, delivered };
+}
+export async function approveEditorial(month:string, lang:"ar"|"en", body:string){
+  const from=month+"-01",next=new Date(from+"T00:00:00Z");
+  next.setUTCMonth(next.getUTCMonth()+1);
+  await database().begin(async tx=>{
+    await tx`select pg_advisory_xact_lock(hashtext(${from}))`;
+    if((await tx`select month from newsletter_issues where month=${from}`).length)throw Error("Issue already finalized");
+    const entries=await issueEntries(from,next.toISOString().slice(0,10),tx);
+    const urls=new Set(entries.map(e=>origin()+e.path));
+    const included=new Set(body.match(/https?:\/\/[^\s]+/g)??[]);
+    if(!urls.size||urls.size!==included.size||[...urls].some(u=>!included.has(u)))throw Error("Keep source links");
+    if(lang==="ar")await tx`insert into newsletter_editorial(month,body_ar) values(${from},${body}) on conflict(month) do update set body_ar=excluded.body_ar`;
+    else await tx`insert into newsletter_editorial(month,body_en) values(${from},${body}) on conflict(month) do update set body_en=excluded.body_en`;
+  });
 }

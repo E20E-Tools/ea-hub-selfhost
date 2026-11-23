@@ -14,6 +14,7 @@ export type Database = {
   }
   public: {
     Tables: {
+      archy_work_policy: { Row:{id:boolean;policy:Json}; Insert:{id?:boolean;policy:Json}; Update:{id?:boolean;policy?:Json}; Relationships:[] }
       admin_activity: {
         Row: {
           action: string

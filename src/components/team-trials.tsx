@@ -1,3 +1,4 @@
+import { TrialBrief } from "./trial-brief";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -107,7 +108,7 @@ function TrialCard({ t, ar }: { t: Trial; ar: boolean }) {
     no: label("لم ينجز المهمة", "Could not complete"),
   };
   return (
-    <article className="bx-panel ea-team-space">
+    <article id={"trial-"+t.id} className="bx-panel ea-team-space">
       <h2>
         {label("تجربة الفريق", "Team trial")} · {t.tool}
       </h2>
@@ -137,7 +138,7 @@ function TrialCard({ t, ar }: { t: Trial; ar: boolean }) {
       <section>
         <h3>{label("سجل المحاولات", "Attempt log")}</h3>
         {t.attempts.map((a) => (
-          <div key={a.id}>
+          <div key={a.id} id={"attempt-"+a.id}>
             <strong dir="auto">{a.task}</strong>
             <p dir="auto">{a.result}</p>
             {a.link && (
@@ -254,7 +255,7 @@ function TrialCard({ t, ar }: { t: Trial; ar: boolean }) {
             </Button>
             {t.feedback.length ? (
               t.feedback.map((r, i) => (
-                <blockquote key={i}>
+                <blockquote key={i} id={"feedback-"+t.id+"-"+i}>
                   <strong>{outcomes[r.outcome]}</strong>
                   <p dir="auto">{r.note}</p>
                 </blockquote>
@@ -278,6 +279,7 @@ function TrialCard({ t, ar }: { t: Trial; ar: boolean }) {
           </strong>{" "}
           · {t.criterion}
         </p>
+        <TrialBrief t={t} ar={ar}/>
         {t.reviews.map((r, i) => (
           <p key={i}>
             <strong>{verdicts[r.choice]}</strong> · {r.reason}

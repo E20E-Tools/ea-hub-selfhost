@@ -95,13 +95,21 @@ export const getNewsletterPreview = createServerFn({ method: "POST" })
   });
 export const emailNewsletterPreview = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator(z.object({ month: monthSchema, lang: z.enum(["en", "ar"]) }))
+  .inputValidator(z.object({ month: monthSchema, lang: z.enum(["en", "ar"]), recipient: z.enum(["admin", "editorial"]).optional() }))
   .handler(async ({ context, data }) => {
     await (await import("./admin-guard.server")).requireAdmin(context);
-    const email = z.string().email().parse(context.claims.email);
+    const email = data.recipient === "editorial" ? "EA@E20E.Tools" : z.string().email().parse(context.claims.email);
     return (await import("./newsletter.server")).sendPreview(
       data.month,
       data.lang,
       email,
     );
   });
+export const approveIssue=createServerFn({method:"POST"}).middleware([requireSupabaseAuth])
+.inputValidator(z.object({month:monthSchema,lang:z.enum(["ar","en"]),body:z.string().trim().min(5).max(30000)}))
+.handler(async({context,data})=>{
+  await (await import("./admin-guard.server")).requireAdmin(context);
+  if(!(await (await import("./work-assistant.server")).readPolicy()).issue.enabled)throw Error("Feature disabled");
+  await (await import("./newsletter.server")).approveEditorial(data.month,data.lang,data.body);
+  return true;
+});

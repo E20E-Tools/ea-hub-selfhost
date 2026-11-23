@@ -149,6 +149,11 @@ function About() {
             {ar ? "ساعدني في اختيار أداة" : "Help me choose a tool"} →
           </Link>
         </section>
+        <section className="about-section" aria-labelledby="archy-services-report">
+          <h2 id="archy-services-report">{ar ? "كيف يساعدك Archy؟" : "How can Archy help?"}</h2>
+          <p>{ar ? "اطّلع على خدمات المحادثة ومراجعة بطاقات العمل وتلخيص تجارب الفريق، وكيف تتحكم المنصة في مشاركة البيانات." : "Explore tool guidance, work card reviews and team trial summaries, including how data sharing is controlled."}</p>
+          <a className="underline" href="/guide/EA-Hub-AI-Services-AR.pdf">{ar ? "تقرير خدمات الذكاء الاصطناعي (PDF بالعربية)" : "AI services report (PDF in Arabic)"}</a>
+        </section>
         <details className="about-section about-card" id="decision-record">
           <summary>{ar ? "من سجل المنصة: تحديث حالة إطلاق ArchONE" : "Platform notes: updating the ArchONE launch status"}</summary>
           <p>{ar?"عند مراجعة الإطلاق، كان رابط ArchONE يفتح لوحة المنتج، بينما ظل الدليل يعرض حالة «قريبًا». تحقّق الفريق من رابط التشغيل ثم حدّث سجل المنتج الذي تستخدمه صفحات الموقع. ويمكن الآن ضبط إتاحة التدريب والتنفيذ بصورة مستقلة عن حالة الإطلاق.":"During the launch review, ArchONE’s public URL opened its dashboard while the directory still showed Coming soon. The team verified the launch URL and updated the product record used by the site. Professional service availability can now be managed independently of the launch status."}</p>
