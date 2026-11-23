@@ -43,11 +43,6 @@
   gap: 28px;
   border-radius: 0;
 }
-/* The studio shell paints every site <main> with the light sheet; Mission keeps its dark stage. */
-:root:root [data-surface="site"] .site-content > main.pl-mission {
-  background-color: var(--pl-ink);
-  color: var(--pl-text);
-}
 .pl-mission > *:not(.plm-bar) {
   inline-size: min(1240px, calc(100% - 40px));
   margin-inline: auto;

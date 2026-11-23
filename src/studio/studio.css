@@ -439,6 +439,9 @@
 }
 :root:root [data-surface="site"] .site-content > main:not(.s-home) {
   font-family: var(--s-font);
+}
+/* Product layouts paint their own stage (Mission is dark), so the shared sheet skips them. */
+:root:root [data-surface="site"] .site-content > main:not(.s-home, .pl-mission, .pl-spec, .pl-journey) {
   background-color: var(--s-sheet);
   color: var(--s-ink);
 }

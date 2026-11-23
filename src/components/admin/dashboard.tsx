@@ -19,7 +19,7 @@ import type { Go } from "./shell";
 import { EmptyBlock, ErrorBlock, PageHeader, useAdminCopy } from "./ui";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ApplicationHealth } from "./operations";
-import { CustomerFunnel } from "./funnel";
+import { CustomerFunnel, WeeklyFunnel } from "./funnel";
 
 export const dashboardQuery = {
   queryKey: ["admin", "dashboard"],
@@ -293,6 +293,7 @@ export function DashboardSection({
         </div>
       ) : null}
       <CustomerFunnel />
+      <WeeklyFunnel />
       <ApplicationHealth />
     </div>
   );

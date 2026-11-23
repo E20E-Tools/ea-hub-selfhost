@@ -68,3 +68,32 @@ export function summarizeContacts(
     contacts,
   };
 }
+
+export type WeeklyFunnelRow = {
+  /** First Riyadh day of the 7-day window (inclusive). */
+  from: string;
+  /** Last Riyadh day of the window (inclusive). */
+  to: string;
+  productViewers: number;
+  waitlistAnswers: number;
+};
+export type WeeklyFunnel = {
+  weeks: WeeklyFunnelRow[];
+  /** Current waitlist size per coming-soon product (active or pending members). */
+  waitlists: { id: string; name: string; members: number }[];
+};
+
+/** The last `count` 7-day Riyadh windows ending today, newest first. */
+export function weekWindows(count: number, today: string = riyadhDay()): { from: string; to: string }[] {
+  const end = new Date(`${today}T00:00:00Z`).getTime();
+  return Array.from({ length: count }, (_, i) => {
+    const to = new Date(end - i * 7 * 86_400_000);
+    const from = new Date(to.getTime() - 6 * 86_400_000);
+    return { from: from.toISOString().slice(0, 10), to: to.toISOString().slice(0, 10) };
+  });
+}
+
+/** Waitlist answers per 100 product-page viewers, rounded; null when nobody viewed a product. */
+export function waitlistRate(row: Pick<WeeklyFunnelRow, "productViewers" | "waitlistAnswers">) {
+  return row.productViewers > 0 ? Math.round((row.waitlistAnswers / row.productViewers) * 100) : null;
+}

@@ -6,6 +6,8 @@ import {
   riyadhDay,
   summarizeContacts,
   type Funnel,
+  type WeeklyFunnel,
+  weekWindows,
   type VisitStats,
 } from "./site-visits.shared";
 
@@ -95,11 +97,12 @@ export const getVisitStats = createServerFn({ method: "GET" })
   });
 
 /** Distinct keys in site_visits since a day, either site visitors or product-page viewers. */
-async function distinctKeys(since: string, product: boolean): Promise<number> {
+async function distinctKeys(since: string, product: boolean, until?: string): Promise<number> {
   const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
   const seen = new Set<string>();
   for (let offset = 0; offset < 50_000; offset += 1000) {
     let query = supabaseAdmin.from("site_visits").select("visitor_key").gte("day", since);
+    if (until) query = query.lte("day", until);
     query = product
       ? query.like("visitor_key", `${PRODUCT_VIEW_PREFIX}%`)
       : query.not("visitor_key", "like", `${PRODUCT_VIEW_PREFIX}%`);
@@ -156,4 +159,40 @@ export const getFunnel = createServerFn({ method: "GET" })
       ],
       waitlistRequests: waitlist.error ? 0 : (waitlist.count ?? 0),
     };
+  });
+
+/**
+ * Admin-only weekly view of the last four Riyadh weeks: browsers that opened a product page,
+ * and waitlist answers filed as requests in the same week, plus today's waitlist size per
+ * coming-soon product. Product views are not stored per product, so the rate is site-wide.
+ */
+export const getWeeklyFunnel = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }): Promise<WeeklyFunnel> => {
+    const { requireAdmin } = await import("./admin-guard.server");
+    await requireAdmin(context as never);
+    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const weeks = await Promise.all(
+      weekWindows(4).map(async ({ from, to }) => {
+        const start = new Date(`${from}T00:00:00+03:00`).toISOString();
+        const end = new Date(new Date(`${to}T00:00:00+03:00`).getTime() + 86_400_000).toISOString();
+        const [productViewers, answers] = await Promise.all([
+          distinctKeys(from, true, to),
+          supabaseAdmin
+            .from("suggestion_requests")
+            .select("id", { count: "exact", head: true })
+            .gte("created_at", start)
+            .lt("created_at", end)
+            .eq("details->>source", "waitlist"),
+        ]);
+        return { from, to, productViewers, waitlistAnswers: answers.error ? 0 : (answers.count ?? 0) };
+      }),
+    );
+    let waitlists: WeeklyFunnel["waitlists"] = [];
+    try {
+      waitlists = await (await import("./newsletter.server")).waitlistSizes();
+    } catch {
+      /* the weekly table still renders when the newsletter database is unreachable */
+    }
+    return { weeks, waitlists };
   });

@@ -185,7 +185,6 @@ export function ControlCenter({
   open: (id: AdminTab, focus?: string) => void;
 }) {
   const { t, language, dir } = useAdminCopy();
-  const ar = language === "ar";
   const Next = dir === "rtl" ? ChevronLeft : ChevronRight;
   const s = catalog.settings;
   const flags = Object.values(s.featureFlags ?? {});
@@ -316,8 +315,7 @@ export function CommandConsole({
   open: (id: AdminTab, focus?: string) => void;
   editor: ReactNode;
 }) {
-  const { t, language } = useAdminCopy();
-  const ar = language === "ar";
+  const { t } = useAdminCopy();
   const owning = SETTINGS_GROUPS.findIndex((g) =>
     (g.tabs as readonly string[]).includes(current),
   );

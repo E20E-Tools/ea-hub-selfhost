@@ -2,14 +2,17 @@ import { useEffect } from "react";
 import { CatalogWorkbench } from "./catalog-workbench";
 import { BoardFrame } from "./board-frame";
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { getRouteApi } from "@tanstack/react-router";
 import { ArrowUpRight, Boxes, Compass, Map } from "lucide-react";
-import { Route } from "@/routes/index";
 
 import { useLanguage } from "@/lib/language";
 import { catalogQueryOptions } from "@/lib/catalog.functions";
 import { filterCatalog, localizedProduct, localizedSettings } from "@/lib/catalog";
 import { archyTour } from "@/lib/archy-tour";
 import { featureEnabled } from "@/lib/site-features";
+
+// Read the home route through its id so this module never imports the route file (which imports it).
+const Route = getRouteApi("/");
 
 export function StudioHome() {
   const { data } = useSuspenseQuery(catalogQueryOptions);

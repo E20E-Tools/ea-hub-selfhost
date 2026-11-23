@@ -351,6 +351,12 @@ export async function waitlistCount(productId: string): Promise<number> {
   return row?.n ?? 0;
 }
 
+/** Waitlist size for every coming-soon product, largest first. */
+export async function waitlistSizes(): Promise<{ id: string; name: string; members: number }[]> {
+  const sql = database();
+  return sql<{ id: string; name: string; members: number }[]>`select p.id, p.name, (select count(*)::int from newsletter_members m where p.id=any(m.products) and m.state in ('active','pending')) as members from products p where p.coming_soon order by members desc, p.sort_order`;
+}
+
 /**
  * Adds an email to a coming-soon product's waitlist. Active subscribers get the product
  * added straight away (they already confirmed their address); everyone else goes through
