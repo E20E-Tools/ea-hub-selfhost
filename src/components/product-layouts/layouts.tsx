@@ -12,6 +12,9 @@ import { ProductCase } from "@/components/product-case";
 import { WorkCard } from "@/components/work-cards";
 import { StepHelp } from "@/components/step-help";
 import { AcquisitionGuidePanel } from "@/components/acquisition-guide";
+import { ProductScreenshots } from "@/components/product-screenshots";
+import { ProductWaitlist } from "@/components/product-waitlist";
+import { ProductTestimonial } from "@/components/product-testimonial";
 import {
   readiness,
   reviewedLabel,
@@ -382,12 +385,14 @@ export function MissionLayout({
             </a>
             <ProductToolsActions product={product} compact />
           </div>
+          <ProductTestimonial product={product} ar={ar} className="plm-test" />
         </div>
         <div className="plm-visual" aria-hidden="true">
           <i className="plm-sweep" />
           <img src={image(product)} alt="" width={640} height={416} />
         </div>
       </header>
+      <ProductWaitlist product={product} ar={ar} className="plm-waitlist" />
 
       {kpis.length > 0 && (
         <section
@@ -497,6 +502,7 @@ export function MissionLayout({
           </div>
         )}
       </section>
+      <ProductScreenshots shots={beneficiary.screenshots} productName={product.name} ar={ar} className="plm-shots" />
 
       <Interactive product={product} salesEmail={salesEmail} />
       <Practice product={product} className="plm-practice" />
@@ -585,6 +591,7 @@ export function SpecLayout({
         </div>
         <p className="pls-lead">{product.overview || product.description}</p>
       </header>
+      <ProductWaitlist product={product} ar={ar} className="pls-waitlist" />
       <dl className="pls-specs">
         {specs.map((s) => (
           <div key={s.k}>
@@ -658,6 +665,7 @@ export function SpecLayout({
                 {beneficiary.exampleOutput}
               </p>
             )}
+            <ProductScreenshots shots={beneficiary.screenshots} productName={product.name} ar={ar} className="pls-shots" heading={<h3>{ar ? "من داخل الأداة" : "Inside the tool"}</h3>} />
           </section>
 
           <section id="operations" className="pls-sec">
@@ -716,6 +724,7 @@ export function SpecLayout({
             </small>
           )}
           <PrimaryCta product={product} className="pls-cta" />
+          <ProductTestimonial product={product} ar={ar} className="pls-test" />
           <ProductToolsActions product={product} />
           <HelpLinks product={product} className="pls-help" />
         </aside>
@@ -777,6 +786,7 @@ export function JourneyLayout({
               </span>
               <h1 dir="ltr">{product.name}</h1>
               <p>{product.description}</p>
+              <ProductTestimonial product={product} ar={ar} className="plj-test" />
             </div>
             {prereqs.length > 0 && (
               <div className="plj-meter">
@@ -802,6 +812,7 @@ export function JourneyLayout({
               </div>
             )}
           </div>
+          <ProductWaitlist product={product} ar={ar} className="plj-waitlist" />
           <div
             className="plj-steps"
             role="tablist"
@@ -853,6 +864,7 @@ export function JourneyLayout({
               </div>
             )}
           </div>
+          <ProductScreenshots shots={beneficiary.screenshots} productName={product.name} ar={ar} className="plj-shots" />
         </section>
 
         <section

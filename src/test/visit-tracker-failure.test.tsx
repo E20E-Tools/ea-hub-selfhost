@@ -1,7 +1,7 @@
 import { act, cleanup, render } from "@testing-library/react";
 import { afterEach, expect, it, vi } from "vitest";
 const record = vi.hoisted(() => vi.fn());
-vi.mock("@tanstack/react-router", () => ({ useRouterState: () => false }));
+vi.mock("@tanstack/react-router", () => ({ useRouterState: () => "/" }));
 vi.mock("@tanstack/react-start", () => ({ useServerFn: (fn: unknown) => fn }));
 vi.mock("@/lib/site-visits.functions", () => ({ recordVisit: record }));
 import { VisitTracker } from "@/components/visit-tracker";

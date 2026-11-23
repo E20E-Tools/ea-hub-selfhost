@@ -531,3 +531,45 @@
   margin-top: 3px;
   accent-color: var(--primary);
 }
+
+/* Screenshots from inside the tool (all product layouts) */
+.ea-shots { display: grid; gap: 0.9rem; margin-block: 1.5rem; }
+.ea-shots-title { font-size: 1.15rem; font-weight: 700; }
+.ea-shots-grid { display: grid; gap: 0.9rem; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); list-style: none; margin: 0; padding: 0; }
+.ea-shots-grid[data-count="1"] { grid-template-columns: minmax(0, 720px); }
+.ea-shots-grid li { display: grid; gap: 0.4rem; min-width: 0; }
+.ea-shots-grid button { display: block; width: 100%; aspect-ratio: 16 / 10; overflow: hidden; border-radius: 0.7rem; border: 1px solid color-mix(in oklab, currentColor 18%, transparent); background: color-mix(in oklab, currentColor 6%, transparent); cursor: zoom-in; padding: 0; }
+.ea-shots-grid img { width: 100%; height: 100%; object-fit: cover; object-position: top; transition: transform 0.25s ease; }
+.ea-shots-grid button:hover img { transform: scale(1.03); }
+.ea-shots-grid button:focus-visible { outline: 2px solid currentColor; outline-offset: 3px; }
+.ea-shots-grid p { font-size: 0.85rem; opacity: 0.8; margin: 0; }
+.ea-shots-nav { display: inline-grid; place-items: center; width: 2.5rem; height: 2.5rem; border-radius: 999px; border: 1px solid var(--border); }
+@media (prefers-reduced-motion: reduce) { .ea-shots-grid img { transition: none; } .ea-shots-grid button:hover img { transform: none; } }
+
+/* Waitlist for coming-soon products (all product layouts) */
+.ea-waitlist { display: grid; gap: 0.9rem; margin-block: 1.25rem; padding: 1.1rem 1.2rem; border: 1px solid var(--border); border-radius: 0.9rem; background: color-mix(in oklab, currentColor 4%, transparent); max-width: 760px; }
+.ea-waitlist-head { display: grid; gap: 0.35rem; }
+.ea-waitlist h2 { display: flex; align-items: center; gap: 0.5rem; font-size: 1.1rem; font-weight: 700; margin: 0; }
+.ea-waitlist-meta { display: flex; flex-wrap: wrap; gap: 0.4rem 1.2rem; font-size: 0.9rem; opacity: 0.85; margin: 0; }
+.ea-waitlist-meta span { display: inline-flex; align-items: center; gap: 0.35rem; }
+.ea-waitlist-form { display: grid; gap: 0.45rem; }
+.ea-waitlist-form label { font-size: 0.88rem; font-weight: 600; }
+.ea-waitlist-form textarea, .ea-waitlist-form input { width: 100%; border: 1px solid var(--border); border-radius: 0.55rem; padding: 0.55rem 0.7rem; background: transparent; color: inherit; font: inherit; }
+.ea-waitlist-form textarea:focus-visible, .ea-waitlist-form input:focus-visible, .ea-waitlist-form button:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+.ea-waitlist-row { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.ea-waitlist-row input { flex: 1 1 220px; min-height: 2.75rem; }
+.ea-waitlist-row button { min-height: 2.75rem; padding-inline: 1.1rem; border-radius: 0.55rem; font-weight: 700; background: var(--primary); color: var(--primary-foreground); }
+.ea-waitlist-row button:disabled { opacity: 0.6; }
+.ea-waitlist-error { color: var(--destructive); font-size: 0.88rem; margin: 0; }
+.ea-waitlist-fine { font-size: 0.78rem; opacity: 0.7; margin: 0; }
+.ea-waitlist-done { display: flex; align-items: center; gap: 0.5rem; font-weight: 600; margin: 0; }
+
+/* A customer quote about the product next to the main call to action */
+.ea-ptest { display: grid; gap: 0.55rem; margin: 1rem 0 0; padding-inline-start: 0.9rem; border-inline-start: 3px solid color-mix(in oklab, currentColor 35%, transparent); max-width: 560px; }
+.ea-ptest blockquote { margin: 0; }
+.ea-ptest p { margin: 0; font-size: 0.95rem; line-height: 1.6; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
+.ea-ptest p::before { content: "“"; } .ea-ptest p::after { content: "”"; }
+.ea-ptest figcaption { display: flex; align-items: center; gap: 0.55rem; font-size: 0.85rem; }
+.ea-ptest figcaption img, .ea-ptest figcaption > span[aria-hidden] { width: 36px; height: 36px; border-radius: 999px; object-fit: cover; display: inline-grid; place-items: center; background: color-mix(in oklab, currentColor 12%, transparent); font-weight: 700; }
+.ea-ptest figcaption > span:last-child { display: grid; }
+.ea-ptest small { opacity: 0.75; }

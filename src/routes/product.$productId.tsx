@@ -29,6 +29,9 @@ import type { ReactNode } from "react";
 import { isProductLayout, PRODUCT_LAYOUT_META, type ProductLayout } from "@/lib/design-themes";
 import { JourneyLayout, MissionLayout, SpecLayout } from "@/components/product-layouts/layouts";
 import { operationRows } from "@/components/product-layouts/model";
+import { ProductScreenshots } from "@/components/product-screenshots";
+import { ProductWaitlist } from "@/components/product-waitlist";
+import { ProductTestimonial } from "@/components/product-testimonial";
 import "@/components/product-layouts/layouts.css";
 
 type ProductSearch = {
@@ -220,6 +223,7 @@ function ClassicProductDetail() {
               </a>
             </Button>
           ) : null}
+          <ProductTestimonial product={product} ar={ar} />
         </div>
         <div className="detail-visual">
           <img
@@ -232,6 +236,7 @@ function ClassicProductDetail() {
           />
         </div>
       </header>
+      <ProductWaitlist product={product} ar={ar} />
       <div className="detail-product-actions">
       <a className="ea-guide-step" href={`/guide/${language}.html#s1`}>{language === "ar" ? "كيف أراجع تفاصيل الأداة؟" : "How do I review a tool?"}</a>
         <ProductToolsActions product={product} />
@@ -363,6 +368,12 @@ function ClassicProductDetail() {
               unknown={t("bxNotProvided")}
             />
           </section>
+
+          {beneficiary.screenshots.length > 0 && (
+            <div className="bx-panel">
+              <ProductScreenshots shots={beneficiary.screenshots} productName={product.name} ar={ar} className="!my-0" />
+            </div>
+          )}
 
           {practice && <section id="practice" className="bx-panel ea-practice">
             <h2>{ar ? "تمرين مقترح لفريقك" : "A first exercise for your team"}</h2>

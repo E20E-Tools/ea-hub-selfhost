@@ -343,3 +343,38 @@ export async function approveEditorial(month:string, lang:"ar"|"en", body:string
     else await tx`insert into newsletter_editorial(month,body_en) values(${from},${body}) on conflict(month) do update set body_en=excluded.body_en`;
   });
 }
+
+/** People following a coming-soon product (confirmed or awaiting confirmation). */
+export async function waitlistCount(productId: string): Promise<number> {
+  const sql = database();
+  const [row] = await sql<{ n: number }[]>`select count(*)::int as n from newsletter_members where ${productId}=any(products) and state in ('active','pending')`;
+  return row?.n ?? 0;
+}
+
+/**
+ * Adds an email to a coming-soon product's waitlist. Active subscribers get the product
+ * added straight away (they already confirmed their address); everyone else goes through
+ * the normal double opt-in with only this product selected.
+ */
+export async function joinWaitlist(
+  email: string,
+  lang: string,
+  productId: string,
+): Promise<{ ok: boolean; confirm: boolean }> {
+  const sql = database();
+  const [product] = await sql<{ id: string }[]>`select id from products where id=${productId} and coming_soon`;
+  if (!product) return { ok: false, confirm: false };
+  const [active] = await sql<{ id: string }[]>`update newsletter_members set products=array(select distinct unnest(products||array[${productId}]::text[])) where email=${email} and state='active' returning id`;
+  if (active) {
+    await scheduleLaunches(active.id);
+    return { ok: true, confirm: false };
+  }
+  // A recent pending signup keeps its confirmation link; just add the product to it.
+  const [pending] = await sql<{ id: string }[]>`update newsletter_members set products=array(select distinct unnest(products||array[${productId}]::text[])) where email=${email} and state='pending' and requested_at >= now()-interval '1 day' returning id`;
+  if (pending) {
+    await scheduleLaunches(pending.id);
+    return { ok: true, confirm: true };
+  }
+  await subscribe(email, lang, { general: false, products: [productId] });
+  return { ok: true, confirm: true };
+}

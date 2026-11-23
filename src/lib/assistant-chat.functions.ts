@@ -190,6 +190,11 @@ export const getAssistantChallenge = createServerFn({ method: "GET" }).handler(
   },
 );
 
+/** Display name for visitors who start without leaving their name. */
+export function guestName(language: ReplyLanguage): string {
+  return language === "ar" ? "زائر" : "Visitor";
+}
+
 /** Validity of the arithmetic token; a used token is refused until it would have expired. */
 export const CHALLENGE_REUSE_WINDOW_SECONDS = 10 * 60;
 
@@ -239,7 +244,7 @@ export const registerAssistantVisitor = createServerFn({ method: "POST" })
     const secret = await gate.gateSecret();
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
     const {data: retryAt,error} = await supabaseAdmin.rpc("register_archy_guest", {
-      _subject:await hashSubject(browser), _name:data.name, _email:data.email, _question:data.question
+      _subject:await hashSubject(browser), _name:data.name || guestName(data.language), _email:data.email, _question:data.question
     });
     if (error) {
       console.error("assistant registration failed", error.code);
@@ -247,12 +252,13 @@ export const registerAssistantVisitor = createServerFn({ method: "POST" })
     }
     if (typeof retryAt !== "number") return {ok:false,message:text.failed};
     if (retryAt > 0) return {ok:false,message:text.limit,retryAt};
+    const name = data.name || guestName(data.language);
     const access = await gate.issueAccessToken(
       secret,
-      data.name,
+      name,
       data.email,
       Date.now(),
       crypto.randomUUID(),
     );
-    return { ok: true, token: access.token, name: data.name, exp: access.exp };
+    return { ok: true, token: access.token, name, exp: access.exp };
   });

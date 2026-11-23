@@ -37,7 +37,30 @@ export type BeneficiaryDetails = {
   problem: LocalText;
   /** Optional EA layer override for the ea-layers design. */
   eaLayer: EaLayer | "";
+  /** Real screenshots from inside the tool, shown on the product page (HTTPS images, max 6). */
+  screenshots: Screenshot[];
 };
+
+/**
+ * `url` is what the admin saved (library path or https link). `src` is the displayable
+ * link the catalog adds on read (a signed link for library paths); it is never stored.
+ */
+export type Screenshot = { url: string; caption: LocalText; src?: string };
+export const MAX_SCREENSHOTS = 6;
+
+/**
+ * A screenshot is an absolute HTTPS image link or a path in the site's image library
+ * (e.g. "products/radar-1.png", signed when the catalog is read). Anything else is dropped.
+ */
+export function isScreenshotUrl(value: unknown): value is string {
+  if (typeof value !== "string" || value.length > 1000) return false;
+  if (/^[a-z0-9-]+\/[\w.-]+(?:\/[\w.-]+)*$/i.test(value) && !value.includes("..")) return true;
+  try {
+    return new URL(value).protocol === "https:";
+  } catch {
+    return false;
+  }
+}
 
 const text = z.object({ ar: z.string().trim().max(800), en: z.string().trim().max(800) });
 const list = z.object({
@@ -60,6 +83,17 @@ export const beneficiaryDetailsSchema = z.object({
     .object({ ar: z.string().trim().max(200), en: z.string().trim().max(200) })
     .default({ ar: "", en: "" }),
   eaLayer: z.enum(["", ...EA_LAYERS]).default(""),
+  screenshots: z
+    .array(
+      z.object({
+        url: z.string().trim().refine(isScreenshotUrl, "https image link"),
+        caption: z
+          .object({ ar: z.string().trim().max(160), en: z.string().trim().max(160) })
+          .default({ ar: "", en: "" }),
+      }),
+    )
+    .max(MAX_SCREENSHOTS)
+    .default([]),
 });
 
 export const EMPTY_BENEFICIARY_DETAILS: BeneficiaryDetails = {
@@ -75,6 +109,7 @@ export const EMPTY_BENEFICIARY_DETAILS: BeneficiaryDetails = {
   purchaseSteps: { ar: [], en: [] },
   problem: { ar: "", en: "" },
   eaLayer: "",
+  screenshots: [],
 };
 
 function stringList(value: unknown): string[] {
@@ -143,6 +178,22 @@ export function normalizeBeneficiaryDetails(value: unknown): BeneficiaryDetails 
       return { ar: v.ar.slice(0, 200), en: v.en.slice(0, 200) };
     })(),
     eaLayer: EA_LAYERS.includes(row["eaLayer"] as EaLayer) ? (row["eaLayer"] as EaLayer) : "",
+    screenshots: Array.isArray(row["screenshots"])
+      ? (row["screenshots"] as unknown[])
+          .map((item) => {
+            const shot =
+              item && typeof item === "object" ? (item as Record<string, unknown>) : {};
+            const caption = localText(shot["caption"]);
+            const src = shot["src"];
+            return {
+              url: typeof shot["url"] === "string" ? shot["url"].trim() : "",
+              caption: { ar: caption.ar.slice(0, 160), en: caption.en.slice(0, 160) },
+              ...(typeof src === "string" && /^https:\/\//i.test(src) ? { src } : {}),
+            };
+          })
+          .filter((shot) => isScreenshotUrl(shot.url))
+          .slice(0, MAX_SCREENSHOTS)
+      : [],
   };
 }
 
@@ -157,6 +208,7 @@ export type LocalizedBeneficiaryDetails = {
   limitations: string[];
   exampleOutput: string;
   purchaseSteps: string[];
+  screenshots: { url: string; caption: string }[];
 };
 export function localizeBeneficiaryDetails(
   value: unknown,
@@ -174,5 +226,11 @@ export function localizeBeneficiaryDetails(
     limitations: pickList(language, details.limitations.ar, details.limitations.en),
     exampleOutput: pick(language, details.exampleOutput.ar, details.exampleOutput.en),
     purchaseSteps: pickList(language, details.purchaseSteps.ar, details.purchaseSteps.en),
+    screenshots: details.screenshots
+      .map((shot) => ({
+        url: shot.src || (/^https:\/\//i.test(shot.url) ? shot.url : ""),
+        caption: pick(language, shot.caption.ar, shot.caption.en),
+      }))
+      .filter((shot) => shot.url),
   };
 }

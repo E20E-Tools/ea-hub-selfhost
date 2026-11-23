@@ -101,3 +101,18 @@ export function testimonialsSeo(list: Testimonial[]): {
     },
   };
 }
+
+/**
+ * Testimonials that talk about one product: the quote (in either language) names the product
+ * or its id as a whole word. Published only, in display order.
+ */
+export function testimonialsForProduct(
+  list: Testimonial[],
+  product: { id: string; name: string },
+): Testimonial[] {
+  const escape = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const terms = [product.name, product.id].map((s) => s.trim()).filter((s) => s.length >= 3);
+  if (!terms.length) return [];
+  const pattern = new RegExp(`(^|[^\\p{L}\\p{N}])(${terms.map(escape).join("|")})(?=$|[^\\p{L}\\p{N}])`, "iu");
+  return list.filter((t) => t.published && pattern.test(`${t.quoteAr}\n${t.quoteEn}`));
+}

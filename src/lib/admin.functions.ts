@@ -121,6 +121,7 @@ const productSchema = z.object({
     purchaseSteps: { ar: [], en: [] },
     problem: { ar: "", en: "" },
     eaLayer: "",
+    screenshots: [],
   }),
 });
 
@@ -250,6 +251,8 @@ export const setRequestStatus = createServerFn({ method: "POST" })
       .maybeSingle();
     if (error || !row) return { ok: false, message: "errRequestStatus" };
     await logActivity(context, `request.${data.status}`, data.id);
+    const { notifyCustomer } = await import("./customer-notify.server");
+    await notifyCustomer({ kind: "status", requestId: data.id, status: data.status });
     return { ok: true };
   });
 
@@ -1132,13 +1135,19 @@ export const addRequestReply = createServerFn({ method: "POST" })
     await requireAdmin(context);
     const { actorEmail } = await import("./admin-guard.server");
     const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { error } = await supabaseAdmin.from("request_replies").insert({
-      request_id: data.id,
-      body: data.body,
-      needs_reply:data.needsReply===true,
-      author_email: actorEmail(context.claims as never),
-    });
-    if (error) return { ok: false, message: "errReplySave" };
+    const { data: saved, error } = await supabaseAdmin
+      .from("request_replies")
+      .insert({
+        request_id: data.id,
+        body: data.body,
+        needs_reply: data.needsReply === true,
+        author_email: actorEmail(context.claims as never),
+      })
+      .select("id")
+      .single();
+    if (error || !saved) return { ok: false, message: "errReplySave" };
+    const { notifyCustomer } = await import("./customer-notify.server");
+    await notifyCustomer({ kind: "reply", requestId: data.id, replyId: saved.id, body: data.body });
     await supabaseAdmin
       .from("suggestion_requests")
       .update({ status: "in_progress", status_updated_at: new Date().toISOString() })

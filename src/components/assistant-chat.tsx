@@ -571,6 +571,16 @@ export function AssistantChat() {
     }
   };
 
+  // The question typed before starting is sent automatically once the chat opens.
+  const autoSendRef = useRef(false);
+  useEffect(() => {
+    if (!autoSendRef.current || !session || !input.trim() || busy) return;
+    autoSendRef.current = false;
+    void submit();
+    // submit reads the latest state; re-run only when the session or input arrives.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [session, input]);
+
   const submitGate = async (event: FormEvent) => {
     event.preventDefault();
     const owner = accountRef.current;
@@ -618,7 +628,10 @@ export function AssistantChat() {
       window.dispatchEvent(new Event(ASSISTANT_SESSION_EVENT));
       const first: ChatMessage[] = [];
       save(first, gen);
-      if (gateQuestion) setInput(gateQuestion);
+      if (gateQuestion.trim()) {
+        setInput(gateQuestion);
+        autoSendRef.current = true; // send the prepared question as soon as the session is set
+      }
       setGateQuestion("");
       setGateAnswer("");
       setShowOptions(false);
@@ -742,33 +755,34 @@ export function AssistantChat() {
                 </h2>
                 <p>
                   {language === "ar"
-                    ? "اسأل عن أداة أو صف احتياج فريقك. أدخل بياناتك لبدء المحادثة."
-                    : "Ask about a tool or describe what your team needs. Enter your details to start."}
+                    ? "اسأل مباشرة عن أداة أو صف احتياج فريقك. لا يلزم تسجيل."
+                    : "Ask straight away about a tool or what your team needs. No sign-up needed."}
                 </p>
               </div>
               {suggestions.length>0 && <div className="ea-archy-prompts">{suggestions.map(q=><button key={q} aria-pressed={gateQuestion===q} type="button" onClick={()=>setGateQuestion(q)}>{q}</button>)}</div>}
-              <Label htmlFor="gate-name">{t("gateName")}</Label>
-              <Input
-                autoComplete="name"
-                minLength={2}
-                id="gate-name"
-                value={gateName}
-                maxLength={80}
-                required
-                onChange={(e) => setGateName(e.target.value)}
-              />
-              <Label htmlFor="gate-email">{t("gateEmail")}</Label>
-              <Input
-                autoComplete="email"
-                id="gate-email"
-                type="email"
-                value={gateEmail}
-                maxLength={200}
-                required
-                onChange={(e) => setGateEmail(e.target.value)}
-              />
-              <details open={comparison.length > 0 || Boolean(gateQuestion) || undefined}><summary>{language==="ar"?"اكتب سؤالك الآن (اختياري)":"Prepare your question (optional)"}</summary>
-                <Textarea aria-label={language==="ar"?"سؤالك":"Your question"} maxLength={1200} value={gateQuestion} onChange={e=>setGateQuestion(e.target.value)}/></details>
+              <Label htmlFor="gate-question">{language==="ar"?"سؤالك":"Your question"}</Label>
+              <Textarea id="gate-question" maxLength={1200} value={gateQuestion} placeholder={language==="ar"?"مثال: نحتاج خريطة لتطبيقاتنا وتكرارها":"e.g. We need a map of our applications and their overlap"} onChange={e=>setGateQuestion(e.target.value)}/>
+              <details className="ea-gate-contact" open={Boolean(gateName || gateEmail) || undefined}>
+                <summary>{language==="ar"?"أضف اسمك وبريدك ليتابع معك الفريق (اختياري)":"Add your name and email so the team can follow up (optional)"}</summary>
+                <Label htmlFor="gate-name">{t("gateName")}</Label>
+                <Input
+                  autoComplete="name"
+                  minLength={2}
+                  id="gate-name"
+                  value={gateName}
+                  maxLength={80}
+                  onChange={(e) => setGateName(e.target.value)}
+                />
+                <Label htmlFor="gate-email">{t("gateEmail")}</Label>
+                <Input
+                  autoComplete="email"
+                  id="gate-email"
+                  type="email"
+                  value={gateEmail}
+                  maxLength={200}
+                  onChange={(e) => setGateEmail(e.target.value)}
+                />
+              </details>
               {challenge?.mode === "turnstile" ? (
                 <TurnstileWidget
                   siteKey={challenge.siteKey}

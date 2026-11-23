@@ -87,9 +87,13 @@ describe("assistant registration input", () => {
       language: "en",
     });
   });
-  it("rejects a missing name or bad email", () => {
-    expect(() => validateRegistration({ ...valid, name: " " })).toThrow();
+  it("rejects a one-letter name or bad email, but allows both to be left empty", () => {
+    expect(() => validateRegistration({ ...valid, name: "K" })).toThrow();
     expect(() => validateRegistration({ ...valid, email: "not-an-email" })).toThrow();
+    expect(validateRegistration({ ...valid, name: " ", email: "" })).toMatchObject({
+      name: "",
+      email: "",
+    });
   });
   it("accepts name, email and arithmetic answer without a first question or confirmation", () => {
     const { question, ...input } = valid;

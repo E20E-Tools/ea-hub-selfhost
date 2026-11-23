@@ -238,6 +238,7 @@ export function TestimonialsSettings() {
                 />
                 <BilingualField
                   label={t("testimonialQuote")}
+                  hint={t("testimonialQuoteHint")}
                   ar={row.quoteAr}
                   en={row.quoteEn}
                   multiline

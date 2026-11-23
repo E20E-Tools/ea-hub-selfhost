@@ -96,7 +96,20 @@ async function buildCatalog(): Promise<{ catalog: Catalog; complete: boolean }> 
     });
     const settings = mapSettings(settingsRow, logo ?? "", themeAssetUrls);
     const products = await Promise.all(
-      rows.map(async (row) => mapProduct(row, await resolveAsset(client, row.image_url))),
+      rows.map(async (row) => {
+        const product = mapProduct(row, await resolveAsset(client, row.image_url));
+        const shots = product.beneficiaryDetails?.screenshots ?? [];
+        if (!shots.length) return product;
+        // Library paths are signed like the product image. The saved path stays in `url`
+        // so the admin editor never stores an expiring link; pages show `src`.
+        const resolved = await Promise.all(
+          shots.map(async (shot) => ({ ...shot, src: await resolveAsset(client, shot.url) })),
+        );
+        return {
+          ...product,
+          beneficiaryDetails: { ...product.beneficiaryDetails!, screenshots: resolved },
+        };
+      }),
     );
 
     const complete = !productsResult.error && !settingsResult.error;

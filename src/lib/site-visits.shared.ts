@@ -5,6 +5,33 @@ export function riyadhDay(at: Date = new Date()): string {
 
 export const VISITOR_KEY_STORAGE = "e20e-visitor-key-v1";
 export const VISIT_DAY_STORAGE = "e20e-visit-day-v1";
+export const PRODUCT_VIEW_DAY_STORAGE = "e20e-product-view-day-v1";
+/**
+ * A browser that opened at least one product page on a day is stored as a second row in
+ * site_visits with this prefix on the same random key. Visitor totals exclude these rows.
+ */
+export const PRODUCT_VIEW_PREFIX = "p:";
+
+export type FunnelStage = "visitors" | "productViewers" | "chats" | "requests";
+export type Funnel = {
+  days: number;
+  since: string;
+  stages: { stage: FunnelStage; count: number }[];
+  /** Requests that came from a coming-soon waitlist answer (part of `requests`). */
+  waitlistRequests: number;
+};
+
+/** Percentage of the previous stage, rounded; null when the previous stage is empty. */
+export function funnelSteps(stages: Funnel["stages"]) {
+  return stages.map((s, i) => {
+    const prev = i === 0 ? null : stages[i - 1]!.count;
+    return {
+      ...s,
+      ofPrevious: prev === null ? null : prev > 0 ? Math.round((s.count / prev) * 100) : null,
+      ofFirst: i === 0 || !stages[0]!.count ? null : Math.round((s.count / stages[0]!.count) * 100),
+    };
+  });
+}
 
 export function isVisitorKey(value: unknown): value is string {
   return typeof value === "string" && /^[0-9a-f-]{36}$/i.test(value);

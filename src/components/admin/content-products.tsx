@@ -26,6 +26,7 @@ import {
   type BeneficiaryDetails,
 } from "@/lib/beneficiary-metadata";
 import { ProductFitFields } from "./product-fit-fields";
+import { ProductScreenshotsField } from "./product-screenshots";
 import { ImagePicker, useImageUpload } from "./media";
 import {
   BilingualField,
@@ -562,6 +563,12 @@ function Editor({
               </div>
             </div>
           </Card>
+          <ProductScreenshotsField
+            value={draft.beneficiaryDetails.screenshots}
+            onChange={(screenshots) =>
+              set({ beneficiaryDetails: { ...draft.beneficiaryDetails, screenshots } })
+            }
+          />
         </TabsContent>
         <TabsContent value="links">
           <Card title={t("sectionLinks")}>
