@@ -150,7 +150,7 @@ export function Field({
 export function LangTag({ lang }: { lang: "ar" | "en" }) {
   return (
     <span
-      className="rounded border border-border px-1.5 py-px text-[10px] font-semibold tracking-wide text-muted-foreground"
+      className="rounded border border-border px-1.5 py-px text-xs font-semibold tracking-wide text-muted-foreground"
       aria-hidden="true"
     >
       {lang === "ar" ? "AR" : "EN"}
@@ -223,7 +223,7 @@ export function BilingualField({
           <input {...props} className={cn(props.className, "h-9")} />
         )}
         {!value.trim() && other.trim() ? (
-          <p className="text-[11px] text-muted-foreground">
+          <p className="text-xs text-muted-foreground">
             {t("missingTranslation")}
           </p>
         ) : null}

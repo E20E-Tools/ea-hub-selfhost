@@ -57,7 +57,7 @@ export function CatalogWorkbench({ products }: { products: Product[] }) {
               >
                 <div className="nx-card-visual">
                   {image && (
-                    <img src={image} alt={product.imageAlt} loading="lazy" decoding="async" />
+                    <img src={image} alt={product.imageAlt} width={1280} height={832} loading="lazy" decoding="async" />
                   )}
                   <span className="nx-card-state" data-available={!product.comingSoon}>
                     {product.comingSoon ? (

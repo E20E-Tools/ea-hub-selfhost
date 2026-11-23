@@ -163,7 +163,7 @@ export function ChatHistory({
                 className={`assistant-msg ${m.sender === "visitor" ? "user" : "assistant"}`}
               >
                 {m.sender !== "visitor" && (
-                  <span className="block text-[11px] text-muted-foreground">
+                  <span className="block text-xs text-muted-foreground">
                     {m.sender === "admin" ? t("humanTeam") : t("chatTitle")}
                   </span>
                 )}

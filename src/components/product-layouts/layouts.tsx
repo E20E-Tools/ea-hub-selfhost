@@ -227,7 +227,7 @@ function Practice({
       <ol>
         {practice[lang].map((step, i) => (
           <li key={step} data-step={i + 1}>
-            <small dir="ltr">STEP {i + 1}</small>
+            <small>{ar ? `الخطوة ${i + 1}` : `STEP ${i + 1}`}</small>
             <strong>{names[i]}</strong>
             <p>{step}</p>
           </li>
@@ -518,9 +518,9 @@ export function SpecLayout({
     lang,
   );
   const specs = [
-    { k: "CATEGORY", v: product.label },
+    { k: ar ? "الفئة" : "CATEGORY", v: product.label },
     {
-      k: "STATUS",
+      k: ar ? "الحالة" : "STATUS",
       v: product.comingSoon
         ? ar
           ? "قريبًا"
@@ -529,12 +529,12 @@ export function SpecLayout({
           ? "متاحة الآن"
           : "Available now",
     },
-    product.version ? { k: "VERSION", v: product.version } : null,
-    practice ? { k: "METHOD", v: practice.source } : null,
+    product.version ? { k: ar ? "الإصدار" : "VERSION", v: product.version } : null,
+    practice ? { k: ar ? "المنهجية" : "METHOD", v: practice.source } : null,
     beneficiary.integrations?.length
-      ? { k: "INTEGRATIONS", v: String(beneficiary.integrations.length) }
+      ? { k: ar ? "التكاملات" : "INTEGRATIONS", v: String(beneficiary.integrations.length) }
       : null,
-    reviewed ? { k: "REVIEWED", v: reviewed } : null,
+    reviewed ? { k: ar ? "آخر مراجعة" : "REVIEWED", v: reviewed } : null,
   ].filter(Boolean) as { k: string; v: string }[];
   const sections = [
     { id: "summary", t: ar ? "في سطرين" : "In short" },
@@ -567,7 +567,7 @@ export function SpecLayout({
           <p className="pls-meta" dir="ltr">
             <span>DATASHEET / E20E-{product.id.toUpperCase()}</span>
             <span data-live={product.comingSoon ? undefined : ""}>
-              ● {product.comingSoon ? "COMING SOON" : "AVAILABLE"}
+              ● {product.comingSoon ? (ar ? "قريبًا" : "COMING SOON") : ar ? "متاحة" : "AVAILABLE"}
             </span>
           </p>
           <h1 dir="ltr">
@@ -817,7 +817,7 @@ export function JourneyLayout({
                 data-done={i < step ? "" : undefined}
                 onClick={() => setStep(i)}
               >
-                <small dir="ltr">STEP 0{i + 1}</small>
+                <small>{ar ? `الخطوة ${i + 1}` : `STEP 0${i + 1}`}</small>
                 <strong>{s.t}</strong>
                 <span>{s.s}</span>
               </button>

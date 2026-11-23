@@ -853,7 +853,7 @@ export function InboxSection({
   const { t, dir } = useAdminCopy();
   const count = (n: number | undefined) =>
     n ? (
-      <span className="min-w-5 rounded-full bg-brand px-1.5 text-[11px] font-semibold leading-5 text-foreground">
+      <span className="min-w-5 rounded-full bg-brand px-1.5 text-xs font-semibold leading-5 text-foreground">
         {n}
       </span>
     ) : null;

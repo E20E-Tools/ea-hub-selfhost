@@ -370,7 +370,7 @@ function ChatThread({ chat, onChanged }: { chat: Chat; onChanged: () => void }) 
                     : "bg-muted text-foreground",
                 )}
               >
-                <span className="mb-1 block text-[11px] opacity-75">
+                <span className="mb-1 block text-xs opacity-75">
                   {t(`lcSender_${m.sender}`)} ·{" "}
                   {date(m.created_at, { dateStyle: "short", timeStyle: "short" })}
                 </span>

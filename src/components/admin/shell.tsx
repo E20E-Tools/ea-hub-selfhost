@@ -99,7 +99,7 @@ function NavList({
                       .replace("{items}", String(badge))
                       .replace("{live}", String(liveBadge))}
                     className={cn(
-                      "ea-rail-count min-w-5 rounded-full px-1.5 text-center text-[11px] font-semibold leading-5",
+                      "ea-rail-count min-w-5 rounded-full px-1.5 text-center text-xs font-semibold leading-5",
                       collapsed && "absolute -top-1 end-0",
                     )}
                   >
@@ -196,7 +196,7 @@ export function AdminShell({
                   <p className="truncate text-sm font-semibold" dir="auto">
                     {siteTitle}
                   </p>
-                  <p className="truncate text-[11px] ea-rail-caption">
+                  <p className="truncate text-xs ea-rail-caption">
                     {t("consoleTitle")}
                   </p>
                 </div>
@@ -305,7 +305,7 @@ export function AdminShell({
               <Search className="size-4" aria-hidden="true" />
               <span>{t("commandOpen")}</span>
               <kbd
-                className="rounded border border-border px-1 text-[10px]"
+                className="rounded border border-border px-1 text-xs"
                 dir="ltr"
               >
                 Ctrl K

@@ -177,11 +177,22 @@
   font-weight: 400;
   font-display: swap;
 }
+/* Geist variable (100-900, SIL OFL, see /fonts/geist/OFL.txt): real bold weights instead of
+   faux-bold from the 400-only TTF, at about a third of the bytes. */
 @font-face {
   font-family: "Geist";
-  src: url("/__l5e/assets-v1/07c1ad8a-2c07-4bf6-805d-ba06f940e20f/geist.ttf") format("truetype");
-  font-weight: 400;
+  src: url("/fonts/geist/geist-latin-wght-normal.woff2") format("woff2-variations"),
+    url("/fonts/geist/geist-latin-wght-normal.woff2") format("woff2");
+  font-weight: 100 900;
   font-display: swap;
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+@font-face {
+  font-family: "Geist";
+  src: url("/fonts/geist/geist-latin-ext-wght-normal.woff2") format("woff2");
+  font-weight: 100 900;
+  font-display: swap;
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 :root {
   --glass: oklch(0.93 0.002 106 / 67%);
@@ -266,7 +277,7 @@ footer {
   display: flex;
   gap: 30px;
   align-items: center;
-  font-size: 11px;
+  font-size: 12px;
   color: var(--muted-foreground);
 }
 .footer-brand {
@@ -367,7 +378,7 @@ footer {
 .library-eyebrow,
 .collection-marker,
 .footer-collection {
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0;
   color: var(--muted-foreground);
 }
@@ -507,7 +518,7 @@ footer {
   color: var(--foreground);
 }
 .assistant-head span {
-  font-size: 11px;
+  font-size: 12px;
   margin-inline-start: 5px;
   padding-inline-start: 9px;
   border-inline-start: 1px solid var(--library-rule);
@@ -568,7 +579,7 @@ footer {
   margin: 0;
 }
 .assistant-pick p {
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.7;
   margin: 3px 0 0;
   color: var(--muted-foreground);
@@ -579,7 +590,7 @@ footer {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 11px;
+  font-size: 12px;
   color: var(--foreground);
   border: 1px solid var(--library-rule);
   border-radius: 30px;
@@ -854,7 +865,7 @@ footer {
   inset-inline-end: 11px;
   color: var(--foreground);
   opacity: 0.55;
-  font-size: 11px;
+  font-size: 12px;
 }
 .product-badge {
   position: absolute;
@@ -867,7 +878,7 @@ footer {
   border-radius: 20px;
   background: var(--foreground);
   color: var(--background);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 500;
   letter-spacing: 0;
   box-shadow: var(--library-shadow);
@@ -914,7 +925,7 @@ footer {
   flex: 1;
 }
 .product-category {
-  font-size: 11px;
+  font-size: 12px;
   color: color-mix(in oklab, var(--product-color) 65%, var(--muted-foreground));
 }
 .product-info h3 {
@@ -938,7 +949,7 @@ footer {
   border-top: 1px solid var(--library-rule);
   border-radius: 0;
   justify-content: space-between;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 500;
   transition:
     color 0.2s,
@@ -1015,11 +1026,11 @@ footer {
     font-size: 18px;
   }
   .library-brand-row .library-intro-copy p {
-    font-size: 11px;
+    font-size: 12px;
     max-width: 230px;
   }
   .library-intro-copy p {
-    font-size: 11px;
+    font-size: 12px;
   }
   .library-logo {
     width: 120px;
@@ -1327,7 +1338,7 @@ footer {
   background: var(--background);
 }
 .release-version-label {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--muted-foreground);
 }
 .release-version strong {
@@ -1339,7 +1350,7 @@ footer {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 11px;
+  font-size: 12px;
   color: var(--muted-foreground);
   border: 1px solid var(--library-rule);
   border-radius: 999px;
@@ -1507,7 +1518,7 @@ footer {
   gap: 8px;
 }
 .request-eyebrow {
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0;
   color: var(--library-muted);
   font-weight: 600;
@@ -1737,7 +1748,7 @@ footer {
   gap: 12px;
 }
 .request-upload-row > span {
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.8;
   color: var(--library-muted);
 }
@@ -1763,7 +1774,7 @@ footer {
 }
 .request-image-grid figcaption {
   padding: 8px;
-  font-size: 11px;
+  font-size: 12px;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -1830,7 +1841,7 @@ footer {
   border-radius: 8px;
 }
 .admin-password legend {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--muted-foreground);
   padding: 0 6px;
 }
@@ -2364,12 +2375,12 @@ footer {
     font-size: 16px;
   }
   .library-brand-row .library-intro-copy p {
-    font-size: 11px;
+    font-size: 12px;
     margin-top: 6px;
   }
   .library-request-link {
     padding-inline: 10px;
-    font-size: 11px;
+    font-size: 12px;
   }
   .library-nav-row {
     gap: 6px;
@@ -2444,7 +2455,7 @@ footer {
   gap: 9px;
   direction: ltr;
   justify-content: flex-end;
-  font-size: 11px;
+  font-size: 12px;
   color: var(--muted-foreground);
 }
 .roadmap-heading h1 {
@@ -2468,7 +2479,7 @@ footer {
   padding-inline-start: 24px;
 }
 .roadmap-stats dt {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--muted-foreground);
   white-space: nowrap;
 }
@@ -2537,7 +2548,7 @@ footer {
   flex: 1 1 100%;
 }
 .roadmap-categories button {
-  font-size: 11px;
+  font-size: 12px;
   white-space: normal;
   height: auto;
   min-height: 32px;
@@ -2568,7 +2579,7 @@ footer {
   border-inline-end: 1px solid var(--library-rule);
   border-bottom: 1px solid var(--library-rule);
   padding: 16px 8px;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 400;
 }
 .roadmap-table tr:last-child td,
@@ -2631,7 +2642,7 @@ footer {
 }
 .roadmap-product em {
   font-style: normal;
-  font-size: 11px;
+  font-size: 12px;
   display: block;
   margin-top: 5px;
 }
@@ -2648,7 +2659,7 @@ footer {
   border-bottom: 2px solid var(--phase-color);
   background: color-mix(in oklab, var(--phase-color) 14%, var(--background));
   color: var(--foreground);
-  font-size: 11px;
+  font-size: 12px;
   white-space: nowrap;
 }
 .roadmap-phase-plan {
@@ -2704,7 +2715,7 @@ footer {
 }
 .roadmap-footnote {
   color: var(--muted-foreground);
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.9;
   margin-top: 20px;
 }
@@ -2735,7 +2746,7 @@ footer {
     font-size: 28px;
   }
   .roadmap-eyebrow {
-    font-size: 11px;
+    font-size: 12px;
   }
   .roadmap-stats {
     gap: 18px;
@@ -2747,7 +2758,7 @@ footer {
     font-size: 26px;
   }
   .roadmap-stats dt {
-    font-size: 11px;
+    font-size: 12px;
   }
   .roadmap-search {
     width: 100%;
@@ -2805,7 +2816,7 @@ footer {
   gap: 20px;
 }
 .feature-summary dt {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--muted-foreground);
 }
 .feature-summary dd {
@@ -2828,7 +2839,7 @@ footer {
   margin-bottom: 20px;
 }
 .feature-filters button {
-  font-size: 11px;
+  font-size: 12px;
 }
 .feature-table-scroll {
   overflow-x: auto;
@@ -2849,7 +2860,7 @@ footer {
   vertical-align: top;
 }
 .feature-table thead th {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--muted-foreground);
   background: var(--library-surface);
   font-weight: 400;
@@ -2953,7 +2964,7 @@ footer {
   margin: 0;
 }
 .feature-report time {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--muted-foreground);
 }
 .feature-report .feature-controls label {
@@ -3001,7 +3012,7 @@ footer {
   .feature-report-table th,
   .feature-report-table td {
     padding-block: 9px;
-    font-size: 11px;
+    font-size: 12px;
   }
   .feature-report-table thead {
     display: table-header-group;
@@ -3034,7 +3045,7 @@ footer {
 }
 .feature-periods time,
 .feature-periods small {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--muted-foreground);
 }
 .feature-periods span {
@@ -3273,7 +3284,7 @@ html[data-design-theme="transformation-board"] .tb-readout {
 }
 .archy-ready {
   padding-inline: 4px;
-  font-size: 11px;
+  font-size: 12px;
   white-space: nowrap;
 }
 .archy-sound-button,
@@ -3290,7 +3301,7 @@ html[data-design-theme="transformation-board"] .tb-readout {
   background: transparent;
   color: var(--foreground);
   font: inherit;
-  font-size: 10px;
+  font-size: 12px;
   cursor: pointer;
 }
 .archy-sound-button:hover,
@@ -3315,7 +3326,7 @@ html[data-design-theme="transformation-board"] .tb-readout {
   border-radius: 0.65rem;
   background: var(--card);
   color: var(--muted-foreground);
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.6;
 }
 @media (max-width: 600px) {
@@ -3938,7 +3949,7 @@ footer,
 .collection-marker,
 .footer-collection,
 .assistant-head span {
-  font-size: 11px;
+  font-size: 12px;
   letter-spacing: 0.02em;
 }
 .assistant-pick p,
@@ -4184,7 +4195,7 @@ button:focus-visible,
   border-radius: 6px;
   background: var(--foreground);
   color: var(--background);
-  font-size: 11.5px;
+  font-size: 12px;
   font-weight: 500;
   line-height: 1.3;
   white-space: nowrap;
@@ -4299,7 +4310,7 @@ button:focus-visible,
 }
 .site-search-kbd {
   font: inherit;
-  font-size: 11px;
+  font-size: 12px;
   padding: 1px 5px;
   border: 1px solid var(--library-rule);
   border-radius: 4px;
@@ -5181,7 +5192,7 @@ footer.site-footer {
   gap: 0.5rem;
 }
 .chat-history-badge {
-  font-size: 0.7rem;
+  font-size: 0.75rem;
   padding: 0.1rem 0.5rem;
   border-radius: 999px;
   background: var(--muted);

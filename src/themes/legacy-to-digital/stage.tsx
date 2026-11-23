@@ -847,7 +847,7 @@ export default function LegacyDigitalStage({ products, settings }: StageProps) {
       >
         <div className="ld-hub-face">
           {settings.logoUrl && (
-            <span className="ld-hub-emblem"><img src={settings.logoUrl} alt="" /></span>
+            <span className="ld-hub-emblem"><img src={settings.logoUrl} alt="" width={62} height={46} decoding="async" /></span>
           )}
           <div className="ld-hub-copy">
             <h1 dir="auto">{settings.displayTitle}</h1>

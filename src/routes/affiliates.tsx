@@ -112,6 +112,7 @@ function AffiliatesPage() {
                   >
                     <a href={affiliate.url} target="_blank" rel="noopener noreferrer">
                       {t("affiliatesVisit")}
+                      <span className="sr-only">: {title(affiliate)}</span>
                       <ExternalLink size={16} aria-hidden="true" />
                       <span className="sr-only">{t("affiliatesNewTab")}</span>
                     </a>

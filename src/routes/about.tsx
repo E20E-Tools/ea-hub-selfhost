@@ -138,7 +138,7 @@ function About() {
                   <div className="about-tool-links">
                     <a href={"/product/" + encodeURIComponent(product.id)}>{ar ? "استكشف" : "Explore"} {product.name}</a>
                     {!product.comingSoon && /^https?:\/\//i.test(product.url) && (
-                      <a href={product.url}>{ar ? "افتح الأداة" : "Launch tool"} ↗</a>
+                      <a href={product.url}>{ar ? "افتح الأداة" : "Launch tool"} <span className="sr-only"><bdi>{product.name}</bdi></span> ↗</a>
                     )}
                   </div>
                 </article>

@@ -131,7 +131,7 @@
 }
 .nx-brand small {
   line-height: 1.5;
-  font-size: 11px;
+  font-size: 12px;
   max-width: 31ch;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -357,7 +357,7 @@
   border-radius: 6px;
   color:#fff;
   background:#26312af0;
-  font-size:.7rem;
+  font-size:0.75rem;
   font-weight:600;
   line-height:1.4;
 }
@@ -792,3 +792,50 @@ img[src*="archy-atlas"] {
 .ea-team-space summary {cursor:pointer;font-weight:650;padding-block:.5rem}
 .ea-team-space blockquote {border-inline-start:3px solid var(--primary);padding-inline-start:.75rem;margin-block:.75rem}
 .ea-team-space button {margin-block:.35rem;margin-inline-end:.5rem}
+
+/* ===== Design audit pass (2026-11-23): measured fixes, see the audit report ===== */
+
+/* Every clickable control shows the hand cursor (Tailwind's preflight resets buttons to default). */
+:is(button, [role="button"], [role="tab"], summary, select, label:has(> input[type="checkbox"], > input[type="radio"])):not(:disabled, [aria-disabled="true"]) {
+  cursor: pointer;
+}
+
+/* Arabic is a joined script: tracking breaks the joins, and tight leading clips marks. */
+:root[lang|="ar"] :is(h1, h2, h3, h4, h5, h6, p, li, a, button, label, span, small, strong, b, dt, dd, th, td, summary, legend) {
+  letter-spacing: normal !important;
+}
+:root[lang|="ar"] :is(h1, h2, h3) {
+  line-height: 1.4 !important;
+}
+:root[lang|="ar"] main :is(p, li, dd) {
+  line-height: 1.75;
+}
+
+/* One checkbox and radio size site-wide, tinted with the brand. The wrapping label is the target. */
+:is(.ea-workspace, .bx-page, .request-form, .s-home, .pl-mission, .pl-spec, .pl-journey, .library-page) input:is([type="checkbox"], [type="radio"]) {
+  inline-size: 20px;
+  block-size: 20px;
+  accent-color: var(--ea-accent, var(--primary));
+  flex-shrink: 0;
+}
+
+/* Template decoration left over from earlier passes: flat surfaces, no side stripes. */
+.ea-journey-intro,
+:root:root [data-surface="site"] .ea-dossier .detail-hero {
+  background: var(--ea-surface);
+}
+:root:root [data-surface="site"] .site-content > main:not(.s-home) header:has(h1) {
+  border-inline-start: 0;
+  padding-inline-start: 0;
+}
+:root:root [data-surface="site"] .ea-workspace header.ea-journey-heading,
+:root:root [data-surface="site"] .ea-dossier .detail-hero,
+.s-enterprise .s-disciplines,
+.ea-about .about-hero {
+  border-radius: 12px;
+}
+
+/* The eyebrow on the dark enterprise hero was grey on dark green (2.65:1). */
+.s-enter-hero .s-section .s-eyebrow {
+  color: var(--ea-panel-muted);
+}
