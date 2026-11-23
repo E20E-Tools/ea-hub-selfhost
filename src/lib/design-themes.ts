@@ -16,15 +16,59 @@ export const DESIGN_THEME_IDS = [
   "particle-forge",
   "flip-deck",
   "ea-layers",
+  "time-scanner",
+  "orbital-portal",
+  "terminal-migration",
 ] as const;
 
 export type DesignThemeId = (typeof DESIGN_THEME_IDS)[number];
 export type AnimationIntensity = "low" | "medium" | "high";
 
+/** Layouts for the product detail page; "classic" is the original dossier. */
+export const PRODUCT_LAYOUTS = ["classic", "mission", "spec", "journey"] as const;
+export type ProductLayout = (typeof PRODUCT_LAYOUTS)[number];
+
+export const PRODUCT_LAYOUT_META: Record<
+  ProductLayout,
+  { name: { en: string; ar: string }; description: { en: string; ar: string } }
+> = {
+  classic: {
+    name: { en: "Classic dossier", ar: "الملف الكلاسيكي" },
+    description: { en: "The original single-column dossier.", ar: "الملف الأصلي بعمود واحد." },
+  },
+  mission: {
+    name: { en: "Mission control", ar: "غرفة التحكم" },
+    description: {
+      en: "Dark bento dashboard: key numbers, fit verdict and numbered panels.",
+      ar: "لوحة داكنة: أرقام أساسية، حكم الملاءمة، وأقسام مرقّمة ملوّنة.",
+    },
+  },
+  spec: {
+    name: { en: "Spec sheet", ar: "ورقة المواصفات" },
+    description: {
+      en: "Editorial datasheet with a sticky index and an action card.",
+      ar: "ورقة مواصفات تحريرية بفهرس ثابت وبطاقة إجراءات.",
+    },
+  },
+  journey: {
+    name: { en: "Decision journey", ar: "مسار القرار" },
+    description: {
+      en: "Four steps — understand, fit, try, start — with a team-readiness meter.",
+      ar: "أربع خطوات: افهم، الملاءمة، جرّب، ابدأ، مع مؤشر جاهزية الفريق.",
+    },
+  },
+};
+
+export function isProductLayout(v: unknown): v is ProductLayout {
+  return typeof v === "string" && (PRODUCT_LAYOUTS as readonly string[]).includes(v);
+}
+
 export type DesignThemeSetting = {
   theme: DesignThemeId;
   animations: boolean;
   intensity: AnimationIntensity;
+  /** Product detail page layout; absent means the classic dossier. */
+  productLayout?: ProductLayout;
 };
 
 export const defaultDesignTheme: DesignThemeSetting = {
@@ -183,6 +227,33 @@ export const DESIGN_THEMES: DesignThemeMeta[] = [
     },
     dark: false,
   },
+  {
+    id: "time-scanner",
+    name: { en: "Time Scanner", ar: "ماسح الزمن" },
+    description: {
+      en: "A light beam splits a paper office from a live grid; every file that crosses becomes a connected module.",
+      ar: "شعاع ضوئي يفصل مكتبًا ورقيًا عن شبكة حيّة، وكل ملف يعبره يتحول إلى وحدة متصلة.",
+    },
+    dark: true,
+  },
+  {
+    id: "orbital-portal",
+    name: { en: "Orbital Portal", ar: "البوابة المدارية" },
+    description: {
+      en: "Legacy files are pulled into an orbit and come out as the tools circling one core.",
+      ar: "تُسحب الملفات القديمة إلى مدار وتخرج منه الأدوات تدور حول نواة واحدة.",
+    },
+    dark: true,
+  },
+  {
+    id: "terminal-migration",
+    name: { en: "Terminal Migration", ar: "ترحيل الطرفية" },
+    description: {
+      en: "An old terminal runs the migration while a modern dashboard fills up, stage by stage.",
+      ar: "طرفية قديمة تنفّذ الترحيل بينما تمتلئ لوحة حديثة مرحلة بعد مرحلة.",
+    },
+    dark: false,
+  },
 ];
 
 export function themeMeta(id: DesignThemeId): DesignThemeMeta {
@@ -201,12 +272,14 @@ export function normalizeDesignTheme(value: unknown): DesignThemeSetting {
     value && typeof value === "object" && !Array.isArray(value)
       ? (value as Record<string, unknown>)
       : {};
-  return {
+  const setting: DesignThemeSetting = {
     theme: isDesignThemeId(src["theme"]) ? src["theme"] : "classic",
     animations: typeof src["animations"] === "boolean" ? src["animations"] : true,
     intensity:
       src["intensity"] === "low" || src["intensity"] === "high" ? src["intensity"] : "medium",
   };
+  if (isProductLayout(src["productLayout"])) setting.productLayout = src["productLayout"];
+  return setting;
 }
 
 /** Element budget / speed multiplier per intensity level. */
@@ -257,6 +330,9 @@ export const THEME_FONT_FAMILIES: Record<DesignThemeId, readonly ThemeFontFamily
   "particle-forge": ["Sora", "IBM Plex Sans Arabic", "VT323", "IBM Plex Mono"],
   "flip-deck": ["Sora", "IBM Plex Sans Arabic", "VT323", "IBM Plex Mono"],
   "ea-layers": ["Sora", "IBM Plex Sans Arabic", "VT323", "IBM Plex Mono"],
+  "time-scanner": ["Sora", "IBM Plex Sans Arabic", "JetBrains Mono"],
+  "orbital-portal": ["Sora", "IBM Plex Sans Arabic", "JetBrains Mono"],
+  "terminal-migration": ["Sora", "IBM Plex Sans Arabic", "JetBrains Mono", "VT323"],
 };
 
 function fontsHrefFor(families: readonly ThemeFontFamily[]): string {

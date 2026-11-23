@@ -50,6 +50,12 @@ import { GeneralSettings } from "./settings-general";
 import { NavigationSettings } from "./settings-navigation";
 import { TestimonialsSettings } from "./settings-testimonials";
 import { useAdminCopy } from "./ui";
+import {
+  CommandConsole,
+  ControlCenter,
+  LayoutSwitcher,
+  useSettingsLayout,
+} from "./settings-layouts";
 
 const DESCRIPTIONS: Partial<Record<AdminTab, AdminCopyKey>> = {
   general: "tabGeneralDesc",
@@ -108,6 +114,7 @@ export function SettingsSection({
   const resultsList = useRef<HTMLUListElement>(null);
   const searchInput = useRef<HTMLInputElement>(null);
   const [customizeTheme, setCustomizeTheme] = useState<DesignThemeId>();
+  const layout = useSettingsLayout();
   const current = tab && Object.hasOwn(icons, tab) ? (tab as WorkspaceTab) : "overview";
   const group = SETTINGS_GROUPS.find((g) => (g.tabs as readonly string[]).includes(current));
   const matches = searchSettings(query);
@@ -172,6 +179,39 @@ export function SettingsSection({
     open("customize");
   };
   const Icon = current === "overview" ? LayoutGrid : icons[current];
+  const formBody = (
+          <div className="settings-form-body" ref={body}>
+            {current === "general" ? <GeneralSettings catalog={catalog} /> : null}
+            {current === "appearance" ? (
+              <AppearanceSettings catalog={catalog} onCustomize={openCustomize} />
+            ) : null}
+            {current === "customize" && (
+              <CustomizeSettings catalog={catalog} initialTheme={customizeTheme} />
+            )}
+            {current === "terms" && <TermsSettings catalog={catalog} />}
+            {current === "notifications" && (
+              <ContactSettings key="notifications" catalog={catalog} mode="notifications" />
+            )}
+            {current === "testimonials" ? <TestimonialsSettings /> : null}
+            {current === "navigation" ? <NavigationSettings catalog={catalog} /> : null}
+            {current === "features" ? <FeatureSettings catalog={catalog} /> : null}
+            {current === "status" ? (
+              <FeatureStatus
+                catalog={catalog}
+                onManage={(key) => open("features", "feature-" + key)}
+              />
+            ) : null}
+            {current === "contact" ? (
+              <ContactSettings key="public" catalog={catalog} mode="public" />
+            ) : null}
+            {current === "ai" ? <AiSettings /> : null}
+            {current === "archy" ? <ArchySettings catalog={catalog} /> : null}
+            {current === "health" ? <ApplicationHealth /> : null}
+            {current === "history" ? <SettingsHistory /> : null}
+            {current === "retention" ? <RetentionManagement /> : null}
+            {current === "journey" ? <JourneyOverview /> : null}
+          </div>
+  );
   return (
     <div className="settings-workspace">
       <header className="settings-head">
@@ -230,6 +270,7 @@ export function SettingsSection({
             )}
           </div>
         </div>
+        <LayoutSwitcher state={layout} />
       </header>
       {searching && (
         <section className="settings-results" aria-label={t("opsSettingsSearch")}>
@@ -258,7 +299,7 @@ export function SettingsSection({
           {!matches.length && <p role="status">{t("opsSearchEmpty")}</p>}
         </section>
       )}
-      {current === "overview" && !searching && (
+      {current === "overview" && !searching && layout.active === "classic" && (
         <section className="settings-quick" aria-labelledby="settings-quick-title">
           <h2 id="settings-quick-title">{t("quickSettingsTitle")}</h2>
           <div>
@@ -268,7 +309,19 @@ export function SettingsSection({
           </div>
         </section>
       )}
-      {current === "overview" ? (
+      {layout.active === "command" && !searching ? (
+        <CommandConsole
+          catalog={catalog}
+          current={current}
+          icons={icons}
+          open={open}
+          editor={formBody}
+        />
+      ) : current === "overview" && layout.active === "control" ? (
+        <div hidden={searching}>
+          <ControlCenter catalog={catalog} icons={icons} descriptions={DESCRIPTIONS} open={open} />
+        </div>
+      ) : current === "overview" ? (
         <div className="settings-directory" hidden={searching}>
           {SETTINGS_GROUPS.map((g, i) => {
             const GroupIcon = groupIcons[i] ?? Workflow;
@@ -337,37 +390,7 @@ export function SettingsSection({
               <ChevronDown size={14} />
             </label>
           </nav>
-          <div className="settings-form-body" ref={body}>
-            {current === "general" ? <GeneralSettings catalog={catalog} /> : null}
-            {current === "appearance" ? (
-              <AppearanceSettings catalog={catalog} onCustomize={openCustomize} />
-            ) : null}
-            {current === "customize" && (
-              <CustomizeSettings catalog={catalog} initialTheme={customizeTheme} />
-            )}
-            {current === "terms" && <TermsSettings catalog={catalog} />}
-            {current === "notifications" && (
-              <ContactSettings key="notifications" catalog={catalog} mode="notifications" />
-            )}
-            {current === "testimonials" ? <TestimonialsSettings /> : null}
-            {current === "navigation" ? <NavigationSettings catalog={catalog} /> : null}
-            {current === "features" ? <FeatureSettings catalog={catalog} /> : null}
-            {current === "status" ? (
-              <FeatureStatus
-                catalog={catalog}
-                onManage={(key) => open("features", "feature-" + key)}
-              />
-            ) : null}
-            {current === "contact" ? (
-              <ContactSettings key="public" catalog={catalog} mode="public" />
-            ) : null}
-            {current === "ai" ? <AiSettings /> : null}
-            {current === "archy" ? <ArchySettings catalog={catalog} /> : null}
-            {current === "health" ? <ApplicationHealth /> : null}
-            {current === "history" ? <SettingsHistory /> : null}
-            {current === "retention" ? <RetentionManagement /> : null}
-            {current === "journey" ? <JourneyOverview /> : null}
-          </div>
+          {formBody}
         </div>
       )}
     </div>

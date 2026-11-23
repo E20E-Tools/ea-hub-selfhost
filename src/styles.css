@@ -19,6 +19,9 @@
 @import "./themes/particle-forge/theme.css";
 @import "./themes/flip-deck/theme.css";
 @import "./themes/ea-layers/theme.css";
+@import "./themes/time-scanner/theme.css";
+@import "./themes/orbital-portal/theme.css";
+@import "./themes/terminal-migration/theme.css";
 
 @custom-variant dark (&:is(.dark *));
 

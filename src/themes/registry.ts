@@ -28,6 +28,9 @@ export const THEME_STAGES: Partial<
   "particle-forge": lazy(() => import("./particle-forge/stage")),
   "flip-deck": lazy(() => import("./flip-deck/stage")),
   "ea-layers": lazy(() => import("./ea-layers/stage")),
+  "time-scanner": lazy(() => import("./time-scanner/stage")),
+  "orbital-portal": lazy(() => import("./orbital-portal/stage")),
+  "terminal-migration": lazy(() => import("./terminal-migration/stage")),
 };
 
 export function hasStage(id: DesignThemeId): boolean {

@@ -27,6 +27,8 @@ import { isEmptyCustomization } from "@/lib/theme-customization";
 import { ensureFontStylesheet, useFontStylesheet } from "@/themes/use-theme-fonts";
 import {
   DESIGN_THEMES,
+  PRODUCT_LAYOUTS,
+  PRODUCT_LAYOUT_META,
   themeFontsHref,
   THEME_FONTS_HREF,
   type DesignThemeId,
@@ -368,6 +370,76 @@ export function AppearanceSettings({
               </div>
             </div>
           </SettingRow>
+        </div>
+      </Card>
+
+      <Card
+        title={t("sl24")}
+        description={
+          t("sl25")
+        }
+      >
+        <div
+          className="grid grid-cols-1 items-stretch gap-3 sm:grid-cols-2 lg:grid-cols-4"
+          role="radiogroup"
+          aria-label={t("sl26")}
+        >
+          {PRODUCT_LAYOUTS.map((id) => {
+            const meta = PRODUCT_LAYOUT_META[id];
+            const current = draft.designTheme.productLayout ?? "classic";
+            const selected = current === id;
+            const live = (catalog.settings.designTheme.productLayout ?? "classic") === id;
+            const sample =
+              catalog.products.find((p) => !p.comingSoon)?.id ?? catalog.products[0]?.id ?? "";
+            return (
+              <div key={id} className="theme-pick" data-selected={selected ? "" : undefined}>
+                <button
+                  type="button"
+                  role="radio"
+                  aria-checked={selected}
+                  className="theme-pick-main"
+                  onClick={() => {
+                    const { productLayout: _previous, ...rest } = draft.designTheme;
+                    set({ designTheme: id === "classic" ? rest : { ...rest, productLayout: id } });
+                  }}
+                >
+                  <span className="theme-pick-thumb pl-thumb" data-layout={id} aria-hidden="true">
+                    <i />
+                    <i />
+                    <i />
+                  </span>
+                  <span className="theme-pick-body">
+                    <span className="flex min-h-6 flex-wrap items-center gap-1.5">
+                      <strong className="text-sm">{meta.name[language]}</strong>
+                      {live ? <Badge variant="secondary">{t("themeLive")}</Badge> : null}
+                      {selected ? (
+                        <Badge>
+                          <Check className="size-3" aria-hidden="true" />
+                          {t("themeSelected")}
+                        </Badge>
+                      ) : null}
+                    </span>
+                    <small className="line-clamp-3 min-h-12 text-xs text-muted-foreground">
+                      {meta.description[language]}
+                    </small>
+                  </span>
+                </button>
+                {sample ? (
+                  <div className="theme-pick-foot">
+                    <a
+                      href={`/product/${encodeURIComponent(sample)}?layout=${id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 text-xs font-medium text-foreground underline underline-offset-4 hover:text-primary"
+                    >
+                      {t("sl27")}
+                      <ExternalLink className="size-3" aria-hidden="true" />
+                    </a>
+                  </div>
+                ) : null}
+              </div>
+            );
+          })}
         </div>
       </Card>
 

@@ -1,7 +1,7 @@
 import { OPEN_REQUEST_STATUSES } from "./requests.shared";
 import { archyGreetingSchema } from "./archy-settings";
 import { termsSchema } from "./terms";
-import { DESIGN_THEME_IDS } from "./design-themes";
+import { DESIGN_THEME_IDS, PRODUCT_LAYOUTS } from "./design-themes";
 import { contactInfoSchema } from "./contact-info";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import type { Database } from "@/integrations/supabase/types";
@@ -763,6 +763,7 @@ export const designThemeSchema = z.object({
   theme: z.enum(DESIGN_THEME_IDS),
   animations: z.boolean(),
   intensity: z.enum(["low", "medium", "high"]),
+  productLayout: z.enum(PRODUCT_LAYOUTS).optional(),
 });
 
 export const appearanceSettingsSchema = z

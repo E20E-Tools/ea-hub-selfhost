@@ -26,6 +26,10 @@ import { discoverProducts } from "@/lib/discovery";
 import { ProductToolsActions } from "@/components/product-tools";
 import { AcquisitionGuidePanel } from "@/components/acquisition-guide";
 import type { ReactNode } from "react";
+import { isProductLayout, PRODUCT_LAYOUT_META, type ProductLayout } from "@/lib/design-themes";
+import { JourneyLayout, MissionLayout, SpecLayout } from "@/components/product-layouts/layouts";
+import { operationRows } from "@/components/product-layouts/model";
+import "@/components/product-layouts/layouts.css";
 
 type ProductSearch = {
   from?: "discover" | undefined;
@@ -33,6 +37,7 @@ type ProductSearch = {
   organizationSize?: OrganizationSize | undefined;
   resume?: "exercise" | undefined;
   maturity?: MaturityLevel | undefined;
+  layout?: ProductLayout | undefined;
 };
 
 function allowed<T extends string>(value: unknown, values: readonly T[]): T | undefined {
@@ -48,6 +53,7 @@ export const Route = createFileRoute("/product/$productId")({
     goal: allowed(search["goal"], DISCOVERY_GOALS),
     organizationSize: allowed(search["organizationSize"], ORGANIZATION_SIZES),
     maturity: allowed(search["maturity"], MATURITY_LEVELS),
+    layout: isProductLayout(search["layout"]) ? search["layout"] : undefined,
   }),
   loader: async ({ context, params }) => {
     const catalog = await context.queryClient.ensureQueryData(catalogQueryOptions);
@@ -57,6 +63,7 @@ export const Route = createFileRoute("/product/$productId")({
       product,
       others: catalog.products.filter((item) => item.id !== product.id),
       salesEmail: catalog.settings.contactInfo.email,
+      layout: catalog.settings.designTheme.productLayout ?? ("classic" as ProductLayout),
     };
   },
   head: ({ loaderData, params }) => {
@@ -84,6 +91,59 @@ export const Route = createFileRoute("/product/$productId")({
 });
 
 function ProductDetail() {
+  const { layout: saved, product: stored, others, salesEmail } = Route.useLoaderData();
+  const search = Route.useSearch();
+  const { language } = useLanguage();
+  const art = useThemeArt();
+  const layout = search.layout ?? saved;
+  if (layout === "classic") {
+    return (
+      <>
+        {search.layout && search.layout !== saved ? <LayoutPreviewBar layout={layout} /> : null}
+        <ClassicProductDetail />
+      </>
+    );
+  }
+  const lang = language === "ar" ? "ar" : "en";
+  const product = localizedProduct(stored, lang);
+  const beneficiary = localizeBeneficiaryDetails(product.beneficiaryDetails, lang);
+  const props = {
+    product,
+    beneficiary,
+    ops: operationRows(product, beneficiary, lang),
+    others,
+    salesEmail,
+    image: (p: typeof product) => art.image(p),
+  };
+  return (
+    <>
+      {search.layout && search.layout !== saved ? <LayoutPreviewBar layout={layout} /> : null}
+      {layout === "mission" ? <MissionLayout {...props} /> : null}
+      {layout === "spec" ? <SpecLayout {...props} /> : null}
+      {layout === "journey" ? <JourneyLayout {...props} /> : null}
+    </>
+  );
+}
+
+function LayoutPreviewBar({ layout }: { layout: ProductLayout }) {
+  const { language } = useLanguage();
+  const ar = language === "ar";
+  const meta = PRODUCT_LAYOUT_META[layout];
+  return (
+    <div className="pl-preview-bar" role="status">
+      <span>
+        {ar ? "معاينة تخطيط صفحة المنتج: " : "Previewing product layout: "}
+        <b>{meta.name[ar ? "ar" : "en"]}</b>
+        {ar ? " · الزوار يرون التخطيط المحفوظ." : " · Visitors still see the saved layout."}
+      </span>
+      <a href={typeof window === "undefined" ? "?" : window.location.pathname}>
+        {ar ? "إنهاء المعاينة" : "End preview"}
+      </a>
+    </div>
+  );
+}
+
+function ClassicProductDetail() {
   const art = useThemeArt();
   const { product: stored, others, salesEmail } = Route.useLoaderData();
   const { language, dir, t } = useLanguage();

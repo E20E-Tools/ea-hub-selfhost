@@ -1,0 +1,396 @@
+/* Time Scanner — a light beam splits a paper office from a live grid. Site skin keeps the radar palette. */
+:root:root[data-design-theme="time-scanner"] {
+  --tscan-ink: #04110c;
+  --tscan-panel: #0b2a1f;
+  --tscan-glow: #3ee39a;
+  --tscan-soft: #a9cfbe;
+  --tscan-paper: #e9e1cf;
+  --tscan-amber: #e6b25c;
+  --tscan-sans: "Sora", "IBM Plex Sans Arabic", sans-serif;
+  --tscan-mono: "JetBrains Mono", monospace;
+}
+
+.theme-stage[data-stage="time-scanner"] {
+  min-height: 720px;
+}
+
+.tscan-stage {
+  position: relative;
+  border-radius: 24px;
+  overflow: hidden;
+  background: var(--tscan-ink);
+  color: #e9f7f0;
+  font-family: var(--tscan-sans);
+  isolation: isolate;
+}
+
+.tscan-visual {
+  position: relative;
+  height: 480px;
+  overflow: hidden;
+  touch-action: pan-y;
+  cursor: ew-resize;
+}
+.tscan-grid {
+  position: absolute;
+  inset: 0;
+  background-color: #05160f;
+  background-image:
+    linear-gradient(rgb(62 227 154 / 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(62 227 154 / 0.07) 1px, transparent 1px);
+  background-size: 44px 44px;
+}
+
+/* Paper office, on the reading-start side */
+.tscan-legacy {
+  position: absolute;
+  inset-block: 0;
+  inset-inline-start: 0;
+  background: var(--tscan-paper);
+  background-image: repeating-linear-gradient(
+    0deg,
+    rgb(60 45 20 / 0.05) 0 2px,
+    transparent 2px 5px
+  );
+  overflow: hidden;
+  z-index: 1;
+  box-shadow: 8px 0 24px rgb(0 0 0 / 0.35);
+  transition: inline-size 0.25s ease-out;
+}
+.tscan-legacy-tag {
+  position: absolute;
+  top: 20px;
+  inset-inline-start: 24px;
+  font-family: var(--tscan-mono);
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  color: #5b4a2c;
+  background: #d8ccb0;
+  border: 1px solid #b8a983;
+  padding: 7px 12px;
+  white-space: nowrap;
+}
+.tscan-files {
+  position: absolute;
+  top: 80px;
+  inset-inline-start: 24px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px 22px;
+  inline-size: min(560px, calc(100% - 48px));
+}
+.tscan-file {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 8px;
+  max-inline-size: 240px;
+  padding: 12px 14px;
+  background: #fbf7ec;
+  border: 1px dashed #8b7b58;
+  box-shadow: 6px 8px 0 rgb(60 45 20 / 0.18);
+  font-family: var(--tscan-mono);
+  font-size: 12px;
+  color: #3d311b;
+  overflow-wrap: anywhere;
+  transform: rotate(var(--r, 0deg));
+  animation: tscan-drift 6s ease-in-out infinite;
+}
+.tscan-file:nth-child(2n) {
+  animation-delay: -2s;
+}
+.tscan-file:nth-child(3n) {
+  animation-delay: -4s;
+}
+.tscan-file-junk {
+  opacity: 0.75;
+}
+.tscan-file i {
+  display: block;
+  inline-size: 40px;
+  block-size: 6px;
+  background: #6b9e57;
+}
+.tscan-file i[data-kind="1"] {
+  background: #7a62b8;
+}
+.tscan-file i[data-kind="2"] {
+  background: #c9973f;
+}
+.tscan-file i[data-kind="3"] {
+  background: #b85c4a;
+}
+
+/* Live grid, on the reading-end side */
+.tscan-digital {
+  position: absolute;
+  inset: 0;
+}
+.tscan-hub {
+  position: absolute;
+  top: 50%;
+  inset-inline-end: 30%;
+  translate: 0 -50%;
+  inline-size: 150px;
+  padding: 18px 12px;
+  border-radius: 18px;
+  text-align: center;
+  background: var(--tscan-panel);
+  border: 1px solid rgb(62 227 154 / 0.6);
+  box-shadow:
+    0 0 0 6px rgb(62 227 154 / 0.08),
+    0 0 60px rgb(62 227 154 / 0.25);
+}
+.tscan-hub strong {
+  display: block;
+  font-family: var(--tscan-mono);
+  font-size: 18px;
+  color: #8ff5c4;
+}
+.tscan-hub small {
+  font-size: 12px;
+  color: var(--tscan-soft);
+}
+.tscan-node {
+  position: absolute;
+  inline-size: 178px;
+  padding: 11px 13px;
+  border-radius: 14px;
+  background: rgb(11 42 31 / 0.5);
+  border: 1px dashed rgb(169 207 190 / 0.35);
+  color: #e9f7f0;
+  text-decoration: none;
+  opacity: 0.55;
+  transition:
+    opacity 0.3s,
+    border-color 0.3s,
+    background 0.3s,
+    transform 0.3s;
+}
+.tscan-node[data-live] {
+  opacity: 1;
+  background: rgb(11 42 31 / 0.94);
+  border: 1px solid rgb(62 227 154 / 0.55);
+}
+.tscan-node[data-live][data-soon] {
+  border-color: rgb(230 178 92 / 0.5);
+}
+.tscan-node:hover,
+.tscan-node:focus-visible {
+  transform: translateY(-3px);
+  outline: 2px solid var(--tscan-glow);
+  outline-offset: 3px;
+}
+.tscan-node-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+.tscan-node-head b {
+  font-family: var(--tscan-mono);
+  font-size: 14px;
+}
+.tscan-node-head em {
+  font-style: normal;
+  font-size: 11px;
+  color: var(--tscan-glow);
+}
+.tscan-node[data-soon] .tscan-node-head em {
+  color: var(--tscan-amber);
+}
+.tscan-node-label {
+  display: block;
+  margin-top: 5px;
+  font-size: 12px;
+  color: var(--tscan-soft);
+}
+
+/* The beam */
+.tscan-beam {
+  position: absolute;
+  inset-block: 0;
+  inline-size: 2px;
+  margin-inline-start: -1px;
+  background: var(--tscan-glow);
+  box-shadow: 0 0 18px 4px rgb(62 227 154 / 0.55);
+  z-index: 2;
+  animation: tscan-pulse 2.4s ease-in-out infinite;
+  transition: inset-inline-start 0.25s ease-out;
+}
+.tscan-handle {
+  position: absolute;
+  top: 50%;
+  inset-inline-start: 50%;
+  translate: -50% -50%;
+  inline-size: 60px;
+  block-size: 60px;
+  border-radius: 50%;
+  border: 2px solid var(--tscan-glow);
+  background: var(--tscan-ink);
+  color: var(--tscan-glow);
+  display: grid;
+  place-items: center;
+  cursor: ew-resize;
+  box-shadow: 0 0 0 8px rgb(62 227 154 / 0.12);
+}
+[dir="rtl"] .tscan-handle {
+  translate: 50% -50%;
+}
+.tscan-handle:focus-visible {
+  outline: 3px solid #e9f7f0;
+  outline-offset: 4px;
+}
+.tscan-readout {
+  position: absolute;
+  top: calc(50% + 42px);
+  inset-inline-start: 50%;
+  translate: -50% 0;
+  font-family: var(--tscan-mono);
+  font-size: 12px;
+  color: var(--tscan-ink);
+  background: var(--tscan-glow);
+  padding: 5px 9px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+[dir="rtl"] .tscan-readout {
+  translate: 50% 0;
+}
+
+/* Copy row */
+.tscan-copy {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+  gap: 8px 32px;
+  align-items: end;
+  padding: 28px 36px 24px;
+  border-top: 1px solid rgb(62 227 154 / 0.18);
+}
+.tscan-kicker {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-family: var(--tscan-mono);
+  font-size: 12px;
+  letter-spacing: 0.16em;
+  color: var(--tscan-glow);
+}
+.tscan-copy h1 {
+  margin: 0;
+  font-size: clamp(30px, 4vw, 46px);
+  line-height: 1.15;
+  font-weight: 700;
+}
+.tscan-lead {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.8;
+  color: #b7d9c9;
+}
+.tscan-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 8px;
+}
+.tscan-cta,
+.tscan-ghost {
+  display: inline-flex;
+  align-items: center;
+  min-height: 48px;
+  padding: 0 22px;
+  border-radius: 12px;
+  font-weight: 600;
+  text-decoration: none;
+}
+.tscan-cta {
+  background: var(--tscan-glow);
+  color: var(--tscan-ink);
+}
+.tscan-ghost {
+  border: 1px solid rgb(62 227 154 / 0.5);
+  color: #e9f7f0;
+}
+.tscan-cta:focus-visible,
+.tscan-ghost:focus-visible {
+  outline: 3px solid #e9f7f0;
+  outline-offset: 3px;
+}
+.tscan-caret {
+  animation: tscan-blink 1s steps(1) infinite;
+}
+
+.tscan-timeline {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding: 14px 36px;
+  background: #020a07;
+  border-top: 1px solid rgb(62 227 154 / 0.18);
+  font-family: var(--tscan-mono);
+  font-size: 12px;
+  color: #8fb8a6;
+}
+.tscan-timeline i {
+  flex: 1;
+  block-size: 2px;
+  background: linear-gradient(90deg, #8b7b58, var(--tscan-glow));
+}
+.tscan-timeline b {
+  color: var(--tscan-glow);
+  font-weight: 500;
+}
+
+.tscan-stage[data-paused] *,
+.tscan-stage[data-motion="off"] * {
+  animation-play-state: paused !important;
+}
+.tscan-stage[data-motion="off"] * {
+  transition: none !important;
+}
+
+@keyframes tscan-drift {
+  50% {
+    transform: rotate(var(--r, 0deg)) translateY(-8px);
+  }
+}
+@keyframes tscan-pulse {
+  50% {
+    opacity: 0.8;
+  }
+}
+@keyframes tscan-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+@media (max-width: 760px) {
+  .theme-stage[data-stage="time-scanner"] {
+    min-height: 900px;
+  }
+  .tscan-visual {
+    height: 560px;
+  }
+  .tscan-node {
+    inline-size: 136px;
+    padding: 9px 10px;
+  }
+  .tscan-hub {
+    display: none;
+  }
+  .tscan-file {
+    max-inline-size: 150px;
+    font-size: 11px;
+  }
+  .tscan-copy {
+    grid-template-columns: 1fr;
+    padding: 22px 20px;
+  }
+  .tscan-timeline span {
+    display: none;
+  }
+  .tscan-timeline span:first-child {
+    display: inline;
+  }
+}

@@ -78,7 +78,8 @@ it("lists Classic plus nine experience themes, each previewing its own homepage"
       />
     </QueryClientProvider>,
   );
-  expect(screen.getAllByRole("radio")).toHaveLength(16);
+  // 19 homepage designs plus 4 product-page layouts.
+  expect(screen.getAllByRole("radio")).toHaveLength(23);
   expect(screen.getByRole("radio", { name: "Transformation Board" })).toBeTruthy();
   const hrefs = [...document.querySelectorAll("a[href*='preview-theme=']")].map((a) =>
     a.getAttribute("href"),

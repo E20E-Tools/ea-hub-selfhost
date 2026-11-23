@@ -15,6 +15,9 @@ import { ProblemToToolThumb } from "./problem-to-tool/thumb";
 import { ParticleForgeThumb } from "./particle-forge/thumb";
 import { FlipDeckThumb } from "./flip-deck/thumb";
 import { EaLayersThumb } from "./ea-layers/thumb";
+import { TimeScannerThumb } from "./time-scanner/thumb";
+import { OrbitalPortalThumb } from "./orbital-portal/thumb";
+import { TerminalMigrationThumb } from "./terminal-migration/thumb";
 
 function ClassicThumb() {
   return (
@@ -59,4 +62,7 @@ export const THEME_THUMBS: Record<DesignThemeId, ComponentType> = {
   "particle-forge": ParticleForgeThumb,
   "flip-deck": FlipDeckThumb,
   "ea-layers": EaLayersThumb,
+  "time-scanner": TimeScannerThumb,
+  "orbital-portal": OrbitalPortalThumb,
+  "terminal-migration": TerminalMigrationThumb,
 };

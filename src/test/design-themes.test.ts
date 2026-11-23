@@ -36,6 +36,9 @@ describe("design themes", () => {
       "particle-forge",
       "flip-deck",
       "ea-layers",
+      "time-scanner",
+      "orbital-portal",
+      "terminal-migration",
     ]);
   });
   it.each(retired)("falls back to Classic for retired theme %s", (theme) => {
