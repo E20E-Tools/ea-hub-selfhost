@@ -1,0 +1,1 @@
+COMMENT ON COLUMN public.products.pricing IS 'DEPRECATED: pricing removed from the product data model and admin editor; column kept only to avoid breaking older deployed code.';

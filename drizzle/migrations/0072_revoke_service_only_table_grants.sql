@@ -1,0 +1,1 @@
+REVOKE ALL ON TABLE public.rate_limit_events, public.request_identities, public.request_replies, public.user_roles, public.ai_assistant_settings, public.application_telemetry, public.assistant_registrations, public.assistant_replies, public.journey_event_receipts, public.site_visits, public.suggestion_requests, public.support_offers FROM anon, authenticated;

@@ -1,0 +1,2 @@
+ALTER TABLE public.site_settings ADD COLUMN IF NOT EXISTS terms_content jsonb NOT NULL DEFAULT '{}'::jsonb;
+ALTER TABLE public.site_settings ADD CONSTRAINT site_settings_terms_content_object CHECK (jsonb_typeof(terms_content) = 'object' AND pg_column_size(terms_content) < 65536);

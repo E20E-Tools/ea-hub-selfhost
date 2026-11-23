@@ -1,0 +1,538 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1791907220509,
+      "tag": "0000_create_suggestion_requests",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1791907369282,
+      "tag": "0001_tighten_suggestion_requests_insert",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1791910209656,
+      "tag": "0002_create_admin_roles_products_settings",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1791910245881,
+      "tag": "0003_library_assets_storage_policies",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1791910322447,
+      "tag": "0004_add_settings_categories_map",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1791914353479,
+      "tag": "0005_footer_text",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1791915893272,
+      "tag": "0006_product_version_and_release_notes",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1791916685285,
+      "tag": "0007_add_phone_to_suggestion_requests",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1791916818035,
+      "tag": "0008_deprecate_product_pricing",
+      "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1791918365530,
+      "tag": "0009_migration",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1791920412256,
+      "tag": "0010_make_arabic_subtitle_optional",
+      "breakpoints": true
+    },
+    {
+      "idx": 11,
+      "version": "7",
+      "when": 1791922121804,
+      "tag": "0011_suggestion_image_attachments",
+      "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1791923523857,
+      "tag": "0012_fill_itfm_and_innovation_products",
+      "breakpoints": true
+    },
+    {
+      "idx": 13,
+      "version": "7",
+      "when": 1791924001629,
+      "tag": "0013_point_site_logo_to_recolored_mark",
+      "breakpoints": true
+    },
+    {
+      "idx": 14,
+      "version": "7",
+      "when": 1792234940996,
+      "tag": "0014_admin_team_lockdown",
+      "breakpoints": true
+    },
+    {
+      "idx": 15,
+      "version": "7",
+      "when": 1792234975091,
+      "tag": "0015_durable_rate_limits",
+      "breakpoints": true
+    },
+    {
+      "idx": 16,
+      "version": "7",
+      "when": 1792235708031,
+      "tag": "0016_admin_activity_log",
+      "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "7",
+      "when": 1792235882136,
+      "tag": "0017_admin_policies_require_second_step",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "7",
+      "when": 1792235928769,
+      "tag": "0018_storage_admin_policies_require_second_step",
+      "breakpoints": true
+    },
+    {
+      "idx": 19,
+      "version": "7",
+      "when": 1792239102500,
+      "tag": "0019_feature_task_completion",
+      "breakpoints": true
+    },
+    {
+      "idx": 20,
+      "version": "7",
+      "when": 1792255194360,
+      "tag": "0020_suggestion_status",
+      "breakpoints": true
+    },
+    {
+      "idx": 21,
+      "version": "7",
+      "when": 1792255427463,
+      "tag": "0021_workshop_bookings",
+      "breakpoints": true
+    },
+    {
+      "idx": 22,
+      "version": "7",
+      "when": 1792256535091,
+      "tag": "0022_workshop_bookings_admin_access",
+      "breakpoints": true
+    },
+    {
+      "idx": 23,
+      "version": "7",
+      "when": 1792260345236,
+      "tag": "0023_participant_booking_status",
+      "breakpoints": true
+    },
+    {
+      "idx": 24,
+      "version": "7",
+      "when": 1792261584415,
+      "tag": "0024_restrict_feature_completion_reads",
+      "breakpoints": true
+    },
+    {
+      "idx": 25,
+      "version": "7",
+      "when": 1792265349458,
+      "tag": "0025_ai_assistant_settings",
+      "breakpoints": true
+    },
+    {
+      "idx": 26,
+      "version": "7",
+      "when": 1792265941635,
+      "tag": "0026_add_english_content_fields",
+      "breakpoints": true
+    },
+    {
+      "idx": 27,
+      "version": "7",
+      "when": 1792266818120,
+      "tag": "0027_add_english_content_fields",
+      "breakpoints": true
+    },
+    {
+      "idx": 28,
+      "version": "7",
+      "when": 1792491633164,
+      "tag": "0028_migration",
+      "breakpoints": true
+    },
+    {
+      "idx": 29,
+      "version": "7",
+      "when": 1792491723498,
+      "tag": "0029_migration",
+      "breakpoints": true
+    },
+    {
+      "idx": 30,
+      "version": "7",
+      "when": 1792497279829,
+      "tag": "0030_create_assistant_registrations",
+      "breakpoints": true
+    },
+    {
+      "idx": 31,
+      "version": "7",
+      "when": 1792498444574,
+      "tag": "0031_create_assistant_replies",
+      "breakpoints": true
+    },
+    {
+      "idx": 32,
+      "version": "7",
+      "when": 1792668235546,
+      "tag": "0032_create_contact_messages",
+      "breakpoints": true
+    },
+    {
+      "idx": 33,
+      "version": "7",
+      "when": 1792669394740,
+      "tag": "0033_create_contact_settings",
+      "breakpoints": true
+    },
+    {
+      "idx": 34,
+      "version": "7",
+      "when": 1792699994510,
+      "tag": "0034_admin_policies_without_second_step",
+      "breakpoints": true
+    },
+    {
+      "idx": 35,
+      "version": "7",
+      "when": 1793734552435,
+      "tag": "0035_harden_storage_and_contact_public_email",
+      "breakpoints": true
+    },
+    {
+      "idx": 36,
+      "version": "7",
+      "when": 1793735293787,
+      "tag": "0036_remove_events_and_workshop_bookings",
+      "breakpoints": true
+    },
+    {
+      "idx": 37,
+      "version": "7",
+      "when": 1793735857972,
+      "tag": "0037_unified_requests_and_support_offers",
+      "breakpoints": true
+    },
+    {
+      "idx": 38,
+      "version": "7",
+      "when": 1793739155117,
+      "tag": "0038_editable_site_navigation",
+      "breakpoints": true
+    },
+    {
+      "idx": 39,
+      "version": "7",
+      "when": 1793740457976,
+      "tag": "0039_header_tagline_style",
+      "breakpoints": true
+    },
+    {
+      "idx": 40,
+      "version": "7",
+      "when": 1793742061841,
+      "tag": "0040_product_motion_settings",
+      "breakpoints": true
+    },
+    {
+      "idx": 41,
+      "version": "7",
+      "when": 1793742930217,
+      "tag": "0041_product_image_display_settings",
+      "breakpoints": true
+    },
+    {
+      "idx": 42,
+      "version": "7",
+      "when": 1793815157257,
+      "tag": "0042_drop_unused_contact_messages",
+      "breakpoints": true
+    },
+    {
+      "idx": 43,
+      "version": "7",
+      "when": 1793816293071,
+      "tag": "0043_affiliates_editable_content",
+      "breakpoints": true
+    },
+    {
+      "idx": 44,
+      "version": "7",
+      "when": 1793816959645,
+      "tag": "0044_site_feature_flags",
+      "breakpoints": true
+    },
+    {
+      "idx": 45,
+      "version": "7",
+      "when": 1793820757985,
+      "tag": "0045_feature_details",
+      "breakpoints": true
+    },
+    {
+      "idx": 46,
+      "version": "7",
+      "when": 1793822035325,
+      "tag": "0046_site_contact_info",
+      "breakpoints": true
+    },
+    {
+      "idx": 47,
+      "version": "7",
+      "when": 1793823713214,
+      "tag": "0047_site_design_theme",
+      "breakpoints": true
+    },
+    {
+      "idx": 48,
+      "version": "7",
+      "when": 1794001023733,
+      "tag": "0048_admin_cleanup_phase1",
+      "breakpoints": true
+    },
+    {
+      "idx": 49,
+      "version": "7",
+      "when": 1794264458146,
+      "tag": "0049_product_github_url",
+      "breakpoints": true
+    },
+    {
+      "idx": 50,
+      "version": "7",
+      "when": 1794348408120,
+      "tag": "0050_product_publication_date",
+      "breakpoints": true
+    },
+    {
+      "idx": 51,
+      "version": "7",
+      "when": 1794348786792,
+      "tag": "0051_footer_site_links",
+      "breakpoints": true
+    },
+    {
+      "idx": 52,
+      "version": "7",
+      "when": 1794393086713,
+      "tag": "0052_site_settings_theme_customizations",
+      "breakpoints": true
+    },
+    {
+      "idx": 53,
+      "version": "7",
+      "when": 1794397811858,
+      "tag": "0053_customer_testimonials",
+      "breakpoints": true
+    },
+    {
+      "idx": 54,
+      "version": "7",
+      "when": 1794400821537,
+      "tag": "0054_enterprise_service_requests",
+      "breakpoints": true
+    },
+    {
+      "idx": 55,
+      "version": "7",
+      "when": 1794402008026,
+      "tag": "0055_terms_of_service_content",
+      "breakpoints": true
+    },
+    {
+      "idx": 56,
+      "version": "7",
+      "when": 1794499944056,
+      "tag": "0056_bind_has_role_to_caller",
+      "breakpoints": true
+    },
+    {
+      "idx": 57,
+      "version": "7",
+      "when": 1794501173018,
+      "tag": "0057_live_chats",
+      "breakpoints": true
+    },
+    {
+      "idx": 58,
+      "version": "7",
+      "when": 1794503221151,
+      "tag": "0058_chat_ratings_and_faq",
+      "breakpoints": true
+    },
+    {
+      "idx": 59,
+      "version": "7",
+      "when": 1794586328157,
+      "tag": "0059_archy_greeting_settings",
+      "breakpoints": true
+    },
+    {
+      "idx": 60,
+      "version": "7",
+      "when": 1794592410007,
+      "tag": "0060_live_chat_start_page",
+      "breakpoints": true
+    },
+    {
+      "idx": 61,
+      "version": "7",
+      "when": 1794593272486,
+      "tag": "0061_request_replies",
+      "breakpoints": true
+    },
+    {
+      "idx": 62,
+      "version": "7",
+      "when": 1794593301793,
+      "tag": "0062_live_chat_last_page",
+      "breakpoints": true
+    },
+    {
+      "idx": 63,
+      "version": "7",
+      "when": 1794593755146,
+      "tag": "0063_site_visits",
+      "breakpoints": true
+    },
+    {
+      "idx": 64,
+      "version": "7",
+      "when": 1794611904639,
+      "tag": "0064_archy_tour_visitors",
+      "breakpoints": true
+    },
+    {
+      "idx": 65,
+      "version": "7",
+      "when": 1794612853174,
+      "tag": "0065_archy_transformation_followthrough",
+      "breakpoints": true
+    },
+    {
+      "idx": 66,
+      "version": "7",
+      "when": 1794616185012,
+      "tag": "0066_phase_six_operations_history_retention",
+      "breakpoints": true
+    },
+    {
+      "idx": 67,
+      "version": "7",
+      "when": 1794616598114,
+      "tag": "0067_phase_six_policy_consistency",
+      "breakpoints": true
+    },
+    {
+      "idx": 68,
+      "version": "7",
+      "when": 1794616799716,
+      "tag": "0068_phase_six_restore_atomic_safety",
+      "breakpoints": true
+    },
+    {
+      "idx": 69,
+      "version": "7",
+      "when": 1794650266380,
+      "tag": "0069_beneficiary_experience",
+      "breakpoints": true
+    },
+    {
+      "idx": 70,
+      "version": "7",
+      "when": 1794860892407,
+      "tag": "0070_chat_retention_reads_policy",
+      "breakpoints": true
+    },
+    {
+      "idx": 71,
+      "version": "7",
+      "when": 1794860895675,
+      "tag": "0071_drop_noop_signup_trigger",
+      "breakpoints": true
+    },
+    {
+      "idx": 72,
+      "version": "7",
+      "when": 1794860898405,
+      "tag": "0072_revoke_service_only_table_grants",
+      "breakpoints": true
+    },
+    {
+      "idx": 73,
+      "version": "7",
+      "when": 1794860941474,
+      "tag": "0073_drop_deprecated_product_pricing",
+      "breakpoints": true
+    },
+    {
+      "idx": 74,
+      "version": "7",
+      "when": 1794863235085,
+      "tag": "0074_daily_maintenance_and_retire_assistant_replies",
+      "breakpoints": true
+    },
+    {
+      "idx": 75,
+      "version": "7",
+      "when": 1795040001109,
+      "tag": "0075_fill_tool_beneficiary_details",
+      "breakpoints": true
+    }
+  ]
+}

@@ -1,0 +1,2 @@
+ALTER TABLE public.site_settings ADD COLUMN IF NOT EXISTS navigation_items jsonb;
+COMMENT ON COLUMN public.site_settings.navigation_items IS 'Ordered bilingual visitor navigation; null uses application defaults, an empty array hides all menu links.';

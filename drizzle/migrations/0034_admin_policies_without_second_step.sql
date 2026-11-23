@@ -1,0 +1,15 @@
+ALTER POLICY "admins read request attachments" ON storage.objects USING (bucket_id = 'request-attachments' AND public.has_role(auth.uid(), 'admin'));
+ALTER POLICY "admins read library assets" ON storage.objects USING (bucket_id = 'library-assets' AND public.has_role(auth.uid(), 'admin'));
+ALTER POLICY "admins remove library assets" ON storage.objects USING (bucket_id = 'library-assets' AND public.has_role(auth.uid(), 'admin'));
+ALTER POLICY "admins replace library assets" ON storage.objects USING (bucket_id = 'library-assets' AND public.has_role(auth.uid(), 'admin'));
+ALTER POLICY "admins upload library assets" ON storage.objects WITH CHECK (bucket_id = 'library-assets' AND public.has_role(auth.uid(), 'admin'));
+ALTER POLICY "admins manage products" ON public.products USING (public.has_role(auth.uid(), 'admin')) WITH CHECK (public.has_role(auth.uid(), 'admin'));
+ALTER POLICY "admins manage settings" ON public.site_settings USING (public.has_role(auth.uid(), 'admin')) WITH CHECK (public.has_role(auth.uid(), 'admin'));
+ALTER POLICY "Admins read activity" ON public.admin_activity USING (public.has_role(auth.uid(), 'admin'));
+ALTER POLICY "Verified admins add completion" ON public.feature_task_completion WITH CHECK (public.has_role(auth.uid(), 'admin'));
+ALTER POLICY "Verified admins update completion" ON public.feature_task_completion USING (public.has_role(auth.uid(), 'admin')) WITH CHECK (public.has_role(auth.uid(), 'admin'));
+ALTER POLICY "Verified admins read completion" ON public.feature_task_completion USING (public.has_role(auth.uid(), 'admin'));
+ALTER POLICY "Verified admins read bookings" ON public.workshop_bookings USING (public.has_role(auth.uid(), 'admin'));
+ALTER POLICY "Verified admins cancel bookings" ON public.workshop_bookings USING (public.has_role(auth.uid(), 'admin'));
+ALTER POLICY "Verified admins update bookings" ON public.workshop_bookings USING (public.has_role(auth.uid(), 'admin')) WITH CHECK (public.has_role(auth.uid(), 'admin'));
+ALTER POLICY "admins manage events" ON public.events USING (public.has_role(auth.uid(), 'admin')) WITH CHECK (public.has_role(auth.uid(), 'admin'));

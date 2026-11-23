@@ -1,0 +1,1 @@
+ALTER TABLE public.site_settings ADD COLUMN IF NOT EXISTS design_theme jsonb NOT NULL DEFAULT '{"theme":"classic","animations":true,"intensity":"medium"}'::jsonb;

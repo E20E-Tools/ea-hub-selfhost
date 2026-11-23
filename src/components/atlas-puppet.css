@@ -1,0 +1,312 @@
+.atlas-stage,
+.atlas-body,
+.atlas-limb,
+.atlas-joint,
+.atlas-head,
+.atlas-stage img,
+.atlas-object,
+.atlas-face {
+  display: block;
+  position: absolute;
+  pointer-events: none;
+}
+.atlas-stage {
+  inset: 2% 0 0;
+  direction: ltr;
+  isolation: isolate;
+}
+.atlas-body,
+.atlas-joint,
+.atlas-stage img:not(.atlas-torso) {
+  inset: 0;
+  width: 100%;
+  height: 100%;
+}
+.atlas-stage img {
+  object-fit: fill;
+  max-width: none;
+  user-select: none;
+}
+.atlas-head {
+  left: 30%;
+  top: 0;
+  width: 40%;
+  height: 40%;
+  transform-origin: 50% 90%;
+  z-index: 3;
+}
+.atlas-torso {
+  left: 35.5%;
+  top: 34%;
+  width: 29%;
+  height: 36%;
+  z-index: 1;
+}
+.atlas-arm {
+  width: 15%;
+  height: 36%;
+  top: 36%;
+  z-index: 4;
+  --cut: 46%;
+}
+.atlas-arm.atlas-l {
+  left: 24%;
+  transform-origin: 80% 8%;
+  --pivot: 22%;
+}
+.atlas-arm.atlas-r {
+  left: 61%;
+  transform-origin: 18% 8%;
+  --pivot: 72%;
+}
+.atlas-leg {
+  width: 11.7%;
+  height: 35%;
+  top: 64%;
+  transform-origin: 50% 6%;
+  --cut: 45%;
+  --pivot: 51%;
+}
+.atlas-leg.atlas-l {
+  left: 37.8%;
+}
+.atlas-leg.atlas-r {
+  left: 50.5%;
+}
+.atlas-joint {
+  transform-origin: var(--pivot) var(--cut);
+}
+.atlas-upper {
+  clip-path: inset(0 0 calc(98% - var(--cut)) 0);
+}
+.atlas-lower {
+  clip-path: inset(calc(var(--cut) - 2%) 0 0 0);
+}
+.atlas-object {
+  bottom: -5%;
+  left: 30%;
+  width: 95%;
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  background: #e9c87b;
+  border: 1px solid #6b4f26;
+  color: #332819;
+  border-radius: 24%;
+  transform: rotate(var(--object-turn, 0deg));
+}
+.atlas-object svg {
+  width: 85%;
+  height: 85%;
+}
+[data-gesture="Eat"] .atlas-object {
+  background: #e68765;
+}
+.atlas-face {
+  left: 29%;
+  top: 44%;
+  width: 48%;
+  height: 23%;
+  border-radius: 30%;
+  background: #1b211c;
+}
+.atlas-face i,
+.atlas-face b {
+  position: absolute;
+  border-radius: 50%;
+  border-bottom: 2px solid #c3ffd2;
+  width: 24%;
+  height: 20%;
+  top: 20%;
+  left: 8%;
+}
+.atlas-face i + i {
+  left: 68%;
+}
+.atlas-face b {
+  left: 38%;
+  top: 65%;
+  width: 23%;
+}
+[data-gesture="Laugh"] .atlas-face b {
+  height: 40%;
+  top: 53%;
+  background: #b4ffcb;
+}
+.atlas-actions {
+  position: absolute;
+  bottom: 100%;
+  right: 0;
+  z-index: 8;
+  width: min(230px, 80vw);
+  padding: 0.6rem;
+  border-radius: 0.85rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.3rem;
+  background: var(--ea-surface, #fff);
+  color: var(--ea-ink, #173531);
+  border: 1px solid var(--ea-line, #a9bbb4);
+  box-shadow: 0 0.5rem 2rem #18242326;
+  pointer-events: auto;
+}
+.atlas-actions button {
+  font: inherit;
+  font-size: 0.8rem;
+  padding: 0.45rem;
+  border-radius: 0.4rem;
+  text-align: start;
+}
+.atlas-actions button:is(:hover, :focus-visible) {
+  background: var(--ea-paper, #e5eeea);
+  outline: 1px solid currentColor;
+}
+@keyframes atlas-turn {
+  from {
+    transform: rotate(var(--from, 0deg));
+  }
+  to {
+    transform: rotate(var(--to, 0deg));
+  }
+}
+@keyframes atlas-bob {
+  from {
+    transform: translateY(0) rotate(0);
+  }
+  to {
+    transform: translateY(var(--rise, -1%)) rotate(var(--lean, 0deg));
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .archy-dock:not([data-archy-lightweight]):not([data-atlas-paused])
+    .atlas-body {
+    animation: atlas-bob var(--tempo, 1.7s) ease-in-out infinite alternate;
+    transform-origin: 50% 93%;
+  }
+  .archy-dock:not([data-archy-lightweight]):not([data-atlas-paused])
+    :is(.atlas-head, .atlas-limb, .atlas-joint) {
+    animation: atlas-turn var(--tempo, 1.7s) ease-in-out infinite alternate;
+  }
+  .atlas-head {
+    --from: -2deg;
+    --to: 2deg;
+  }
+  .atlas-arm.atlas-l {
+    --from: 1deg;
+    --to: 6deg;
+  }
+  .atlas-arm.atlas-r {
+    --from: -4deg;
+    --to: -1deg;
+  }
+  .atlas-joint {
+    --from: 0deg;
+    --to: 1deg;
+  }
+  [data-gesture="Wave"] {
+    --tempo: 0.45s;
+  }
+  [data-gesture="Wave"] .atlas-arm.atlas-r {
+    --from: -58deg;
+    --to: -70deg;
+  }
+  [data-gesture="Wave"] .atlas-arm.atlas-r .atlas-joint {
+    --from: -56deg;
+    --to: -103deg;
+  }
+  [data-gesture="Think"] .atlas-arm.atlas-r,
+  [data-gesture="Eat"] .atlas-arm.atlas-r,
+  [data-gesture="Phone"] .atlas-arm.atlas-r {
+    --from: -27deg;
+    --to: -37deg;
+  }
+  [data-gesture="Think"] .atlas-arm.atlas-r .atlas-joint,
+  [data-gesture="Eat"] .atlas-arm.atlas-r .atlas-joint,
+  [data-gesture="Phone"] .atlas-arm.atlas-r .atlas-joint {
+    --from: 144deg;
+    --to: 154deg;
+  }
+  [data-gesture="Think"] .atlas-head,
+  [data-gesture="Phone"] .atlas-head {
+    --from: 9deg;
+    --to: 16deg;
+  }
+  [data-gesture="Eat"] {
+    --tempo: 0.56s;
+    --object-turn: -110deg;
+  }
+  [data-gesture="Eat"] .atlas-head {
+    --from: -7deg;
+    --to: 5deg;
+  }
+  [data-gesture="Sleep"] {
+    --rise: 3%;
+    --lean: -6deg;
+  }
+  [data-gesture="Sleep"] .atlas-head {
+    --from: -12deg;
+    --to: -20deg;
+  }
+  [data-gesture="Sleep"] .atlas-leg .atlas-joint {
+    --from: 8deg;
+    --to: 14deg;
+  }
+  [data-gesture="Read"] {
+    --object-turn: -110deg;
+  }
+  [data-gesture="Read"] .atlas-arm.atlas-r .atlas-joint {
+    --from: 97deg;
+    --to: 107deg;
+  }
+  [data-gesture="Read"] .atlas-arm.atlas-l .atlas-joint {
+    --from: -83deg;
+    --to: -97deg;
+  }
+  [data-gesture="Read"] .atlas-head {
+    --from: -9deg;
+    --to: 7deg;
+  }
+  [data-gesture="Exercise"],
+  [data-gesture="Hop"] {
+    --tempo: 0.45s;
+    --rise: -6%;
+  }
+  [data-gesture="Exercise"] .atlas-arm.atlas-l,
+  [data-gesture="Hop"] .atlas-arm.atlas-l {
+    --from: 5deg;
+    --to: 97deg;
+  }
+  [data-gesture="Exercise"] .atlas-arm.atlas-r,
+  [data-gesture="Hop"] .atlas-arm.atlas-r {
+    --from: -5deg;
+    --to: -97deg;
+  }
+  [data-gesture="Exercise"] .atlas-leg.atlas-l,
+  [data-gesture="Hop"] .atlas-leg.atlas-l {
+    --from: 2deg;
+    --to: 24deg;
+  }
+  [data-gesture="Exercise"] .atlas-leg.atlas-r,
+  [data-gesture="Hop"] .atlas-leg.atlas-r {
+    --from: -2deg;
+    --to: -24deg;
+  }
+  [data-gesture="Exercise"] .atlas-leg .atlas-joint,
+  [data-gesture="Hop"] .atlas-leg .atlas-joint {
+    --from: 0deg;
+    --to: 12deg;
+  }
+  [data-gesture="Laugh"] {
+    --tempo: 0.22s;
+    --rise: 3%;
+    --lean: 3deg;
+  }
+  [data-gesture="Laugh"] .atlas-head {
+    --from: -8deg;
+    --to: 8deg;
+  }
+  [data-gesture="Laugh"] .atlas-arm.atlas-l .atlas-joint {
+    --from: -75deg;
+    --to: -110deg;
+  }
+}

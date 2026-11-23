@@ -1,0 +1,10 @@
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS label_en text NOT NULL DEFAULT '';
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS description_en text NOT NULL DEFAULT '';
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS overview_en text NOT NULL DEFAULT '';
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS features_en text[] NOT NULL DEFAULT '{}'::text[];
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS whats_new_en text NOT NULL DEFAULT '';
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS image_alt_en text NOT NULL DEFAULT '';
+ALTER TABLE public.site_settings ADD COLUMN IF NOT EXISTS display_title_en text NOT NULL DEFAULT '';
+ALTER TABLE public.site_settings ADD COLUMN IF NOT EXISTS description_en text NOT NULL DEFAULT '';
+ALTER TABLE public.site_settings ADD COLUMN IF NOT EXISTS footer_text_en text NOT NULL DEFAULT '';
+ALTER TABLE public.site_settings ADD COLUMN IF NOT EXISTS categories_en jsonb NOT NULL DEFAULT '{}'::jsonb;

@@ -1,0 +1,691 @@
+/* Circuit Core — colour tokens apply everywhere (admin included); decorative skin only on the visitor surface. */
+:root:root[data-design-theme="circuit-core"] {
+  --cc-board: oklch(0.19 0.026 208.5);
+  --cc-surface: oklch(0.241 0.034 205);
+  --cc-raised: oklch(0.293 0.042 205.1);
+  --cc-lime: oklch(0.844 0.159 114.1);
+  --cc-cyan: oklch(0.728 0.128 219.8);
+  --cc-amber: oklch(0.806 0.147 79);
+  --cc-green: oklch(0.8 0.19 140);
+  --cc-text: oklch(0.946 0.017 164.7);
+  --cc-mono: "IBM Plex Mono", ui-monospace, monospace;
+  --cc-display: "Handjet", "IBM Plex Sans Arabic", sans-serif;
+
+  color-scheme: dark;
+  --background: var(--cc-board);
+  --foreground: var(--cc-text);
+  --card: var(--cc-surface);
+  --card-foreground: var(--cc-text);
+  --popover: var(--cc-surface);
+  --popover-foreground: var(--cc-text);
+  --primary: var(--cc-lime);
+  --primary-foreground: var(--cc-board);
+  --secondary: var(--cc-raised);
+  --secondary-foreground: var(--cc-text);
+  --muted: var(--cc-raised);
+  --muted-foreground: oklch(0.712 0.032 172.4);
+  --accent: var(--cc-raised);
+  --accent-foreground: var(--cc-text);
+  --destructive: oklch(0.626 0.193 23);
+  --destructive-foreground: var(--cc-text);
+  --border: oklch(0.844 0.159 114.1 / 0.22);
+  --input: oklch(0.844 0.159 114.1 / 0.3);
+  --ring: var(--cc-cyan);
+  --sidebar: var(--cc-surface);
+  --sidebar-foreground: var(--cc-text);
+  --sidebar-primary: var(--cc-lime);
+  --sidebar-primary-foreground: var(--cc-board);
+  --sidebar-accent: var(--cc-raised);
+  --sidebar-accent-foreground: var(--cc-text);
+  --sidebar-border: oklch(0.844 0.159 114.1 / 0.22);
+  --sidebar-ring: var(--cc-cyan);
+  --glass: oklch(0.241 0.034 205 / 0.85);
+  --glass-edge: oklch(0.844 0.159 114.1 / 0.25);
+  --glass-shadow: 0 18px 40px -18px oklch(0 0 0 / 0.7);
+  --library-surface: var(--cc-surface);
+  --library-art: var(--cc-raised);
+  --library-rule: oklch(0.844 0.159 114.1 / 0.2);
+  --library-highlight: var(--cc-cyan);
+  --library-shadow: 0 18px 40px -18px oklch(0 0 0 / 0.75);
+  background: var(--cc-board);
+}
+
+/* ---------- Visitor surface skin ---------- */
+:root[data-design-theme="circuit-core"] [data-surface="site"] {
+  --font-sans: "IBM Plex Sans Arabic", "Alexandria", sans-serif;
+  --font-display: var(--cc-display);
+  font-family: var(--font-sans);
+  background-color: var(--cc-board);
+  background-image:
+    radial-gradient(circle at 1px 1px, oklch(0.844 0.159 114.1 / 0.12) 1px, transparent 1.4px),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='360' height='360'%3E%3Cg fill='none' stroke='rgb(203,215,77)' stroke-opacity='0.07' stroke-width='1.5'%3E%3Cpath d='M0 60H90L110 80V150'/%3E%3Cpath d='M360 240H260L240 220V170'/%3E%3Cpath d='M180 360V300L200 280H300'/%3E%3C/g%3E%3Cg fill='rgb(203,215,77)' fill-opacity='0.12'%3E%3Ccircle cx='110' cy='150' r='3'/%3E%3Ccircle cx='240' cy='170' r='3'/%3E%3Ccircle cx='300' cy='280' r='3'/%3E%3C/g%3E%3C/svg%3E");
+  background-size:
+    18px 18px,
+    360px 360px;
+
+  & :is(h1, h2, h3, .home-section-title) {
+    font-family: var(--cc-display);
+    letter-spacing: 0.02em;
+  }
+
+  /* Header = PCB strip with solder dots. */
+  & .site-header {
+    background:
+      radial-gradient(circle, var(--cc-amber) 1.6px, transparent 2.2px) left 6px bottom 5px / 26px
+        8px repeat-x,
+      color-mix(in oklab, var(--cc-surface) 92%, transparent);
+    border-bottom: 2px solid oklch(0.844 0.159 114.1 / 0.4);
+  }
+  & .site-brand-text bdi {
+    font-family: var(--cc-display);
+    letter-spacing: 0.04em;
+  }
+  & .site-brand-tagline,
+  & .site-nav-link {
+    font-family: var(--cc-mono);
+  }
+  & .site-nav-link {
+    border-radius: 0 !important;
+  }
+
+  /* Product cards as chips. */
+  & .product-card {
+    border-radius: 0;
+    border: 1px solid oklch(0.844 0.159 114.1 / 0.35);
+    background:
+      repeating-linear-gradient(90deg, oklch(0.844 0.159 114.1 / 0.55) 0 6px, transparent 6px 14px)
+        left 20px top 0 / calc(100% - 40px) 4px no-repeat,
+      repeating-linear-gradient(90deg, oklch(0.844 0.159 114.1 / 0.55) 0 6px, transparent 6px 14px)
+        left 20px bottom 0 / calc(100% - 40px) 4px no-repeat,
+      var(--cc-surface);
+    clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 0 100%);
+  }
+  & .product-card::before {
+    inset-block: auto 14px;
+    inset-inline: auto 14px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    opacity: 1;
+    background: var(--cc-green);
+    box-shadow: 0 0 8px var(--cc-green);
+  }
+  & .product-soon::before {
+    background: var(--cc-amber);
+    box-shadow: 0 0 8px var(--cc-amber);
+    animation: cc-blink 1.4s steps(2, jump-none) infinite;
+  }
+  & .product-card:hover,
+  & .product-card:focus-within {
+    border-color: var(--cc-lime);
+  }
+  & .product-art {
+    background: var(--cc-raised);
+    border-bottom-color: oklch(0.844 0.159 114.1 / 0.25);
+  }
+  & :is(.product-number, .product-category) {
+    font-family: var(--cc-mono);
+  }
+
+  /* Square, mono buttons and inputs. */
+  &
+    :is(
+      .product-open,
+      .product-launch,
+      .detail-cta,
+      .home-action,
+      .library-empty a,
+      .library-empty button
+    ) {
+    border-radius: 0 !important;
+    font-family: var(--cc-mono);
+    letter-spacing: 0.03em;
+  }
+  & :is(input, textarea, select) {
+    border-radius: 0;
+    background-color: var(--cc-board);
+  }
+  & .detail-features {
+    padding: 20px 22px;
+  }
+  & :is(.detail-hero, .detail-visual, .detail-features, .home-action) {
+    border-radius: 0;
+  }
+
+  & :is(.request-form, .request-success) {
+    --request-surface: var(--cc-surface);
+    border-radius: 0;
+  }
+
+  /* Footer = edge connector. */
+  & .site-footer {
+    position: relative;
+    border-top: 1px solid oklch(0.844 0.159 114.1 / 0.35);
+    background: var(--cc-surface);
+  }
+  & .site-footer::before {
+    content: "";
+    position: absolute;
+    top: -1px;
+    inset-inline: 24px;
+    height: 12px;
+    background: repeating-linear-gradient(
+      90deg,
+      oklch(0.806 0.147 79 / 0.75) 0 16px,
+      transparent 16px 24px
+    );
+  }
+}
+
+@supports (animation-timeline: view()) {
+  :root[data-design-theme="circuit-core"][data-motion="on"] [data-surface="site"] .product-card {
+    animation: cc-power linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 70%;
+  }
+}
+@keyframes cc-power {
+  0% {
+    opacity: 0.2;
+  }
+  30% {
+    opacity: 0.9;
+  }
+  40% {
+    opacity: 0.35;
+  }
+  55%,
+  100% {
+    opacity: 1;
+  }
+}
+@keyframes cc-blink {
+  50% {
+    opacity: 0.25;
+  }
+}
+
+/* ---------- Homepage stage ---------- */
+.theme-stage[data-stage="circuit-core"] {
+  min-height: 720px;
+}
+@media (max-width: 639px) {
+  .theme-stage[data-stage="circuit-core"] {
+    min-height: 1180px;
+  }
+}
+.cc-stage {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 0.75fr) minmax(0, 1.6fr);
+  align-items: center;
+  gap: clamp(20px, 3vw, 48px);
+  padding-block: 28px 12px;
+  color: var(--cc-text);
+}
+.cc-stage[data-mobile] {
+  grid-template-columns: minmax(0, 1fr);
+}
+/* Below 1024px the board gets the full width so chips are never squeezed beside the intro. */
+@media (max-width: 1023px) {
+  .cc-stage {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+.cc-eyebrow {
+  font-family: var(--cc-mono);
+  font-size: 13px;
+  color: var(--cc-lime);
+}
+.cc-caret {
+  color: var(--cc-lime);
+  animation: cc-blink 1s steps(2, jump-none) infinite;
+}
+.cc-title {
+  margin-top: 14px;
+  font-family: var(--cc-display);
+  font-size: clamp(44px, 6vw, 84px);
+  font-weight: 800;
+  line-height: 0.95;
+  letter-spacing: 0.02em;
+}
+.cc-tagline {
+  margin-top: 12px;
+  font-family: var(--cc-mono);
+  font-size: 14px;
+  color: oklch(0.712 0.032 172.4);
+}
+.cc-board-wrap {
+  min-width: 0;
+  /* cqw below = board width, so the console overlap tracks the board's bottom margin. */
+  container-type: inline-size;
+}
+.cc-board {
+  position: relative;
+  width: 100%;
+  container-type: inline-size;
+  background: var(--cc-surface);
+  border: 1px solid oklch(0.844 0.159 114.1 / 0.25);
+  border-radius: 6px;
+  background-image: radial-gradient(
+    circle at 1px 1px,
+    oklch(0.844 0.159 114.1 / 0.14) 1px,
+    transparent 1.4px
+  );
+  background-size: 14px 14px;
+}
+.cc-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.cc-bus {
+  fill: none;
+  stroke: oklch(0.844 0.159 114.1 / 0.45);
+  stroke-width: 3;
+}
+.cc-trace-line {
+  fill: none;
+  stroke: var(--cc-lime);
+  stroke-width: 2.4;
+  stroke-opacity: 0.16;
+  transition: stroke-opacity 0.25s;
+}
+.cc-via {
+  fill: var(--cc-board);
+  stroke: var(--cc-lime);
+  stroke-width: 1.6;
+  stroke-opacity: 0.3;
+}
+.cc-trace[data-state="on"] .cc-trace-line {
+  stroke-opacity: 0.45;
+}
+.cc-trace[data-state="hot"] .cc-trace-line {
+  stroke-opacity: 1;
+  filter: drop-shadow(0 0 4px var(--cc-lime));
+}
+.cc-trace[data-state="hot"] .cc-via {
+  stroke-opacity: 1;
+}
+.cc-trace[data-state="dim"] {
+  opacity: 0.25;
+}
+.cc-pulse {
+  fill: none;
+  stroke: var(--cc-cyan);
+  stroke-width: 3.2;
+  stroke-linecap: round;
+  stroke-dasharray: 7 93;
+  stroke-dashoffset: 100;
+  filter: drop-shadow(0 0 3px var(--cc-cyan));
+  animation: cc-flow calc(2.6s / var(--cc-speed, 1)) linear infinite;
+}
+.cc-trace[data-soon] .cc-pulse {
+  stroke: var(--cc-amber);
+  stroke-dasharray: 2 3 2 93;
+  filter: none;
+  animation-duration: calc(5.2s / var(--cc-speed, 1));
+}
+@keyframes cc-flow {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.cc-core {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  text-align: center;
+  background: var(--cc-board);
+  border: 2px solid var(--cc-cyan);
+  outline: 1px solid oklch(0.728 0.128 219.8 / 0.5);
+  outline-offset: 5px;
+  animation: cc-heart calc(3.2s / var(--cc-speed, 1)) ease-in-out infinite;
+}
+.cc-core strong {
+  font-family: var(--cc-display);
+  font-size: clamp(14px, 3.6cqw, 34px);
+  font-weight: 800;
+  letter-spacing: 0.06em;
+}
+.cc-core small {
+  font-family: var(--cc-mono);
+  font-size: clamp(8px, 1.25cqw, 12px);
+  color: oklch(0.712 0.032 172.4);
+  padding-inline: 8px;
+}
+.cc-core-logo {
+  max-height: 28%;
+  max-width: 50%;
+  object-fit: contain;
+}
+@keyframes cc-heart {
+  0%,
+  100% {
+    box-shadow: 0 0 14px -4px var(--cc-cyan);
+  }
+  50% {
+    box-shadow: 0 0 34px 2px oklch(0.728 0.128 219.8 / 0.55);
+  }
+}
+
+.cc-chip {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3px;
+  padding-inline: 14px;
+  text-align: start;
+  color: var(--cc-text);
+  background: var(--cc-board);
+  border: 1px solid oklch(0.844 0.159 114.1 / 0.22);
+  cursor: pointer;
+  transition:
+    transform 0.2s,
+    border-color 0.3s,
+    box-shadow 0.3s,
+    opacity 0.3s;
+  opacity: 0.6;
+}
+.cc-chip::before,
+.cc-chip::after {
+  content: "";
+  position: absolute;
+  inset-inline: 12%;
+  height: 5px;
+  background: repeating-linear-gradient(
+    90deg,
+    oklch(0.844 0.159 114.1 / 0.6) 0 4px,
+    transparent 4px 9px
+  );
+}
+.cc-chip::before {
+  top: -6px;
+}
+.cc-chip::after {
+  bottom: -6px;
+}
+.cc-chip[data-powered] {
+  opacity: 1;
+  border-color: var(--cc-lime);
+}
+.cc-chip[data-soon][data-powered] {
+  border-color: oklch(0.806 0.147 79 / 0.7);
+}
+.cc-chip:hover,
+.cc-chip:focus-visible {
+  transform: translateY(-3px);
+  opacity: 1;
+}
+.cc-chip:focus-visible {
+  outline: 2px solid var(--cc-cyan);
+  outline-offset: 4px;
+}
+.cc-chip[data-selected] {
+  transform: translateY(-6px);
+  box-shadow:
+    0 16px 28px -10px oklch(0 0 0 / 0.8),
+    0 0 0 1px var(--cc-cyan);
+}
+.cc-stage[data-focus] .cc-chip:not(:hover):not(:focus-visible):not([data-selected]) {
+  opacity: 0.4;
+}
+.cc-led,
+.cc-dot {
+  position: absolute;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+.cc-led {
+  top: 8px;
+  right: 8px;
+  background: oklch(0.4 0.03 140);
+}
+.cc-chip[data-powered] .cc-led {
+  background: var(--cc-green);
+  box-shadow: 0 0 8px var(--cc-green);
+}
+.cc-chip[data-powered][data-soon] .cc-led {
+  background: var(--cc-amber);
+  box-shadow: 0 0 8px var(--cc-amber);
+  animation: cc-blink 1.2s steps(2, jump-none) infinite;
+}
+.cc-dot {
+  bottom: 8px;
+  left: 8px;
+  width: 4px;
+  height: 4px;
+  background: oklch(0.844 0.159 114.1 / 0.6);
+}
+.cc-code {
+  font-family: var(--cc-mono);
+  font-weight: 600;
+  font-size: clamp(9px, 1.75cqw, 16px);
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+}
+.cc-sub {
+  font-size: clamp(8px, 1.2cqw, 12px);
+  color: oklch(0.712 0.032 172.4);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* Sits on the chip's top edge (over the pins), never over the code or subtitle. */
+.cc-stamp {
+  position: absolute;
+  top: 0;
+  right: 10px;
+  z-index: 1;
+  line-height: 1.35;
+  background: var(--cc-board);
+  font-family: var(--cc-mono);
+  font-size: clamp(7px, 0.95cqw, 10px);
+  letter-spacing: 0.12em;
+  color: var(--cc-amber);
+  border: 1px solid oklch(0.806 0.147 79 / 0.7);
+  padding: 0 4px;
+  transform: translateY(-62%) rotate(-4deg);
+}
+.cc-stage[data-mobile] .cc-code {
+  font-size: 4.2cqw;
+}
+.cc-stage[data-mobile] .cc-sub {
+  font-size: 3cqw;
+}
+.cc-stage[data-mobile] .cc-core strong {
+  font-size: 7cqw;
+}
+.cc-stage[data-mobile] .cc-core small {
+  font-size: 2.8cqw;
+}
+.cc-stage[data-mobile] .cc-stamp {
+  font-size: 2.3cqw;
+}
+
+.cc-console {
+  position: relative;
+  z-index: 2;
+  /* Only overlaps the board's bottom frame (24 of 840 units, minus pin + gap), never a chip. */
+  margin: calc(-1 * max(0px, 2.857cqw - 14px)) 6% 0;
+  background: oklch(0.13 0.02 208 / 0.96);
+  border: 1px solid oklch(0.844 0.159 114.1 / 0.35);
+  box-shadow: 0 20px 40px -20px oklch(0 0 0 / 0.9);
+  font-family: var(--cc-mono);
+  font-size: 12.5px;
+}
+.cc-stage[data-mobile] .cc-console {
+  margin: 16px 0 0;
+}
+.cc-console-bar {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 10px;
+  border-bottom: 1px solid oklch(0.844 0.159 114.1 / 0.2);
+  color: oklch(0.712 0.032 172.4);
+  font-size: 11px;
+}
+.cc-console-bar i {
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: oklch(0.844 0.159 114.1 / 0.35);
+}
+.cc-console-bar span {
+  margin-inline-start: auto;
+}
+.cc-console pre {
+  margin: 0;
+  padding: 10px 12px 12px;
+  min-height: 9.5em;
+  white-space: pre-wrap;
+  font: inherit;
+  line-height: 1.6;
+}
+.cc-line-cmd {
+  color: var(--cc-cyan);
+}
+.cc-line-ok {
+  color: var(--cc-text);
+}
+.cc-line-soon {
+  color: var(--cc-amber);
+}
+.cc-line-sum {
+  color: var(--cc-lime);
+  font-weight: 600;
+}
+
+.cc-probe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 4;
+  overflow: visible;
+}
+.cc-probe path {
+  fill: none;
+  stroke: var(--cc-cyan);
+  stroke-width: 1.5;
+  stroke-dasharray: 100;
+  stroke-dashoffset: 100;
+  animation: cc-probe 0.45s ease-out forwards;
+}
+.cc-probe circle {
+  fill: var(--cc-cyan);
+}
+@keyframes cc-probe {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.cc-inspect-wrap {
+  position: absolute;
+  z-index: 5;
+  top: 24px;
+  inset-inline-start: 0;
+  width: min(420px, 38%);
+}
+.cc-stage[data-mobile] .cc-inspect-wrap {
+  position: static;
+  width: auto;
+}
+.product-inspector.cc-inspect {
+  background: oklch(0.13 0.02 208 / 0.98);
+  border: 1px solid var(--cc-cyan);
+  font-family: var(--cc-mono);
+  font-size: 12.5px;
+  color: var(--cc-text);
+  border-radius: 0;
+}
+.cc-inspect .inspector-head {
+  padding: 8px 10px;
+  border-bottom: 1px solid oklch(0.728 0.128 219.8 / 0.35);
+  color: var(--cc-cyan);
+}
+.cc-inspect-body {
+  padding: 12px;
+  display: grid;
+  gap: 10px;
+}
+.cc-inspect-body dl {
+  display: grid;
+  gap: 4px;
+}
+.cc-inspect-body dl > div {
+  display: grid;
+  grid-template-columns: 9ch minmax(0, 1fr);
+  gap: 8px;
+}
+.cc-inspect-body dt,
+.cc-key {
+  color: var(--cc-lime);
+}
+.cc-inspect-desc {
+  font-family: "IBM Plex Sans Arabic", sans-serif;
+  line-height: 1.6;
+  color: oklch(0.85 0.02 170);
+}
+.cc-inspect-features ul {
+  margin-top: 4px;
+  display: grid;
+  gap: 3px;
+}
+.cc-inspect-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.cc-inspect-actions .inspector-btn {
+  padding: 6px 10px;
+  border: 1px solid var(--cc-lime);
+  color: var(--cc-lime);
+  letter-spacing: 0.06em;
+}
+.cc-inspect-actions .inspector-btn:hover,
+.cc-inspect-actions .inspector-btn:focus-visible {
+  background: var(--cc-lime);
+  color: var(--cc-board);
+}
+
+/* Motion contract. */
+.cc-stage[data-paused] *,
+.cc-stage[data-paused] *::before,
+.cc-stage[data-paused] *::after {
+  animation-play-state: paused !important;
+}
+.cc-stage[data-motion="off"] *,
+.cc-stage[data-motion="off"] *::before,
+.cc-stage[data-motion="off"] *::after {
+  animation: none !important;
+}
+.cc-stage[data-motion="off"] .cc-pulse {
+  stroke-dashoffset: 55;
+}
+.cc-stage[data-motion="off"] .cc-probe path {
+  stroke-dashoffset: 0;
+}
+:root[data-design-theme="circuit-core"][data-motion="off"]
+  [data-surface="site"]
+  .product-soon::before {
+  animation: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  :root[data-design-theme="circuit-core"]
+    [data-surface="site"]
+    :is(.product-card, .product-soon::before) {
+    animation: none !important;
+  }
+}

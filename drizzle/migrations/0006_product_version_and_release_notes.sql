@@ -1,0 +1,2 @@
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS version text NOT NULL DEFAULT '';
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS whats_new text NOT NULL DEFAULT '';

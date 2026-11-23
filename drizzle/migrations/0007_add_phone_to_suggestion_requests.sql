@@ -1,0 +1,2 @@
+ALTER TABLE public.suggestion_requests ADD COLUMN phone text NOT NULL DEFAULT '';
+COMMENT ON COLUMN public.suggestion_requests.phone IS 'Visitor phone number collected by the suggestion request form.';

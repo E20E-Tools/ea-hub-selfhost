@@ -1,0 +1,13 @@
+.local
+local-backend/media
+local-backend/node_modules
+!local-backend/package.json
+!local-backend/package-lock.json
+!local-backend/semantic.mjs
+scripts/local.mjs
+design-lab.html
+node_modules
+.output
+.env*
+*.log
+

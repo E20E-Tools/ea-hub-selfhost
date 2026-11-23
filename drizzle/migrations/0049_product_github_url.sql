@@ -1,0 +1,1 @@
+ALTER TABLE public.products ADD COLUMN IF NOT EXISTS github_url text NOT NULL DEFAULT 'https://github.com/e20etools/';

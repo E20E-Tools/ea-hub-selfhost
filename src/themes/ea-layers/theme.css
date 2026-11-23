@@ -1,0 +1,117 @@
+/* EA Layers: homepage design; skin is scoped to this design and the stage only. */
+:root:root[data-design-theme="ea-layers"] {
+  color-scheme: light;
+  --background: oklch(0.985 0.004 250);
+  --foreground: oklch(0.22 0.03 265);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.22 0.03 265);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.22 0.03 265);
+  --primary: oklch(0.56 0.22 264);
+  --primary-foreground: oklch(0.99 0 0);
+  --secondary: oklch(0.95 0.015 90);
+  --secondary-foreground: oklch(0.3 0.02 85);
+  --muted: oklch(0.95 0.012 250);
+  --muted-foreground: oklch(0.45 0.03 265);
+  --accent: oklch(0.94 0.04 220);
+  --accent-foreground: oklch(0.25 0.03 265);
+  --border: oklch(0.89 0.015 255);
+  --input: oklch(0.88 0.02 255);
+  --ring: oklch(0.6 0.2 264);
+  --library-highlight: oklch(0.56 0.22 264);
+}
+:root[data-design-theme="ea-layers"] [data-surface="site"] {
+  --font-sans: "Sora", "IBM Plex Sans Arabic", sans-serif;
+  font-family: "Sora", "IBM Plex Sans Arabic", sans-serif;
+}
+
+.el-stage {
+  position: relative;
+  width: 100%;
+  height: 620px;
+  border-radius: 22px;
+  overflow: hidden;
+  isolation: isolate;
+  font-family: "Sora", "IBM Plex Sans Arabic", sans-serif;
+  border: 1px solid var(--border);
+}
+.el-stage canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.el-stage .el-inspector {
+  position: absolute;
+  inset-inline-end: 16px;
+  top: 16px;
+  width: min(340px, calc(100% - 32px));
+  max-height: calc(100% - 32px);
+  overflow-y: auto;
+  padding: 16px;
+  border-radius: 16px;
+  font-size: 14px;
+}
+.el-stage .inspector-btn {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  font-size: 13px;
+}
+.el-stage .inspector-btn-open {
+  background: #2f6bff;
+  color: #fff;
+  border-color: #2f6bff;
+}
+.el-stage button:focus-visible,
+.el-stage a:focus-visible,
+.el-stage input:focus-visible {
+  outline: 3px solid #00d4ff;
+  outline-offset: 2px;
+}
+.theme-stage[data-stage="ea-layers"] {
+  min-height: 620px;
+}
+@media (max-width: 639px) {
+  .el-stage {
+    height: 600px;
+    border-radius: 16px;
+  }
+  .theme-stage[data-stage="ea-layers"] {
+    min-height: 600px;
+  }
+  .el-stage .el-inspector {
+    position: fixed;
+    inset-inline: 0;
+    top: auto;
+    bottom: 0;
+    width: 100%;
+    max-height: 78vh;
+  }
+}
+
+.el-stage {
+  background: radial-gradient(circle at 50% 60%, #ffffff, #eef2fb);
+}
+.el-hint {
+  position: relative;
+  z-index: 2;
+  margin: 4px 22px 0;
+  color: #4a4536;
+  font-size: 13px;
+}
+.el-hit {
+  left: 0;
+  top: 0;
+  height: 30px;
+  border-radius: 8px;
+  will-change: transform;
+}
+.el-hit:hover,
+.el-hit:focus-visible {
+  box-shadow: 0 0 0 2px #00d4ff;
+}

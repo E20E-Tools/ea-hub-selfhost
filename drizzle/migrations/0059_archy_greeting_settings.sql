@@ -1,0 +1,2 @@
+ALTER TABLE public.site_settings ADD COLUMN IF NOT EXISTS archy_greeting jsonb NOT NULL DEFAULT '{}'::jsonb;
+ALTER TABLE public.site_settings ADD CONSTRAINT site_settings_archy_greeting_object CHECK (jsonb_typeof(archy_greeting) = 'object' AND pg_column_size(archy_greeting) < 4096);

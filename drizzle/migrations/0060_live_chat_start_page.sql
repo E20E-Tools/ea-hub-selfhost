@@ -1,0 +1,1 @@
+ALTER TABLE public.live_chats ADD COLUMN IF NOT EXISTS start_page text NOT NULL DEFAULT '';

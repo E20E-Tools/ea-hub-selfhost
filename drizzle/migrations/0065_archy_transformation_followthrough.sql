@@ -1,0 +1,1 @@
+ALTER TABLE public.archy_tour_visits ADD COLUMN transformation_opened_at timestamptz;

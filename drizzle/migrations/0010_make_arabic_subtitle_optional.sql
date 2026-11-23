@@ -1,0 +1,2 @@
+ALTER TABLE public.site_settings ALTER COLUMN arabic_title SET DEFAULT '';
+COMMENT ON COLUMN public.site_settings.arabic_title IS 'Optional Arabic subtitle shown under the latin title. An empty string hides the subtitle.';

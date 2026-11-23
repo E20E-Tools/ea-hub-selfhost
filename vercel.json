@@ -1,0 +1,9 @@
+{
+  "buildCommand": "npm run test:release && npm run build && node scripts/package-production-model.mjs",
+  "crons": [
+    {
+      "path": "/api/public/jobs/newsletter",
+      "schedule": "0 6 * * *"
+    }
+  ]
+}

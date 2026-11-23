@@ -1,0 +1,11 @@
+{
+  "name": "ea-hub-local-search",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@huggingface/transformers": "^3.8.0"
+  },
+  "overrides": {
+    "sharp": "0.35.5"
+  }
+}

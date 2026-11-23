@@ -1,0 +1,166 @@
+/* Untangle the Chaos: homepage design; skin is scoped to this design and the stage only. */
+:root:root[data-design-theme="untangle-chaos"] {
+  color-scheme: light;
+  --background: oklch(0.985 0.004 250);
+  --foreground: oklch(0.22 0.03 265);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.22 0.03 265);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.22 0.03 265);
+  --primary: oklch(0.56 0.22 264);
+  --primary-foreground: oklch(0.99 0 0);
+  --secondary: oklch(0.95 0.015 90);
+  --secondary-foreground: oklch(0.3 0.02 85);
+  --muted: oklch(0.95 0.012 250);
+  --muted-foreground: oklch(0.45 0.03 265);
+  --accent: oklch(0.94 0.04 220);
+  --accent-foreground: oklch(0.25 0.03 265);
+  --border: oklch(0.89 0.015 255);
+  --input: oklch(0.88 0.02 255);
+  --ring: oklch(0.6 0.2 264);
+  --library-highlight: oklch(0.56 0.22 264);
+}
+:root[data-design-theme="untangle-chaos"] [data-surface="site"] {
+  --font-sans: "Sora", "IBM Plex Sans Arabic", sans-serif;
+  font-family: "Sora", "IBM Plex Sans Arabic", sans-serif;
+}
+
+.uc-stage {
+  position: relative;
+  width: 100%;
+  height: 640px;
+  border-radius: 22px;
+  overflow: hidden;
+  isolation: isolate;
+  font-family: "Sora", "IBM Plex Sans Arabic", sans-serif;
+  border: 1px solid var(--border);
+}
+.uc-stage canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+.uc-stage .uc-inspector {
+  position: absolute;
+  inset-inline-end: 16px;
+  top: 16px;
+  width: min(340px, calc(100% - 32px));
+  max-height: calc(100% - 32px);
+  overflow-y: auto;
+  padding: 16px;
+  border-radius: 16px;
+  font-size: 14px;
+}
+.uc-stage .inspector-btn {
+  display: inline-flex;
+  min-height: 40px;
+  align-items: center;
+  padding: 0 14px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  font-size: 13px;
+}
+.uc-stage .inspector-btn-open {
+  background: #2f6bff;
+  color: #fff;
+  border-color: #2f6bff;
+}
+.uc-stage button:focus-visible,
+.uc-stage a:focus-visible,
+.uc-stage input:focus-visible {
+  outline: 3px solid #00d4ff;
+  outline-offset: 2px;
+}
+.theme-stage[data-stage="untangle-chaos"] {
+  min-height: 640px;
+}
+@media (max-width: 639px) {
+  .uc-stage {
+    height: 760px;
+    border-radius: 16px;
+  }
+  .theme-stage[data-stage="untangle-chaos"] {
+    min-height: 760px;
+  }
+  .uc-stage .uc-inspector {
+    position: fixed;
+    inset-inline: 0;
+    top: auto;
+    bottom: 0;
+    width: 100%;
+    max-height: 78vh;
+  }
+}
+
+.uc-title,
+.rl-title,
+.el-title,
+.fd-title,
+.pt-title {
+  position: relative;
+  z-index: 2;
+  margin: 0;
+  padding: 18px 22px 0;
+  font-size: clamp(18px, 2.4vw, 26px);
+  font-weight: 700;
+  color: #0f1730;
+}
+.uc-hit,
+.rl-hit,
+.pf-hit,
+.el-hit {
+  position: absolute;
+  z-index: 3;
+  border: 0;
+  background: transparent;
+  border-radius: 12px;
+  cursor: pointer;
+  touch-action: manipulation;
+}
+.uc-hit:hover {
+  box-shadow: 0 0 0 2px #00d4ff;
+}
+.uc-bar {
+  position: absolute;
+  z-index: 4;
+  inset-inline: 0;
+  bottom: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  padding: 0 12px;
+}
+.uc-counter {
+  padding: 6px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.92);
+  color: #4a4536;
+  font:
+    600 13px "IBM Plex Mono",
+    monospace;
+}
+.uc-btn {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: 999px;
+  border: 1.5px solid #2f6bff;
+  background: #fff;
+  color: #1d3fa8;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.uc-btn-primary {
+  background: linear-gradient(110deg, #2f6bff, #1b9fd6);
+  color: #fff;
+  border-color: transparent;
+}
+.uc-stage {
+  background: #ece5d3;
+}

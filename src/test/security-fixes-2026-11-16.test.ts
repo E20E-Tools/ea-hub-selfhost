@@ -1,0 +1,116 @@
+// @vitest-environment node
+import { readFileSync, existsSync } from "node:fs";
+import { describe, expect, it } from "vitest";
+import {
+  applySecurityHeaders,
+  CSP_ENFORCED,
+  CSP_REPORT_ONLY,
+  isEditorPreviewHost,
+} from "@/lib/security-headers";
+import { turnsFromMessages } from "@/lib/live-chat.server";
+
+const headersFor = (host: string, dev = false) => {
+  const h = new Headers();
+  applySecurityHeaders(h, host, dev);
+  return h;
+};
+const migration = (tag: string) => readFileSync(`drizzle/migrations/${tag}.sql`, "utf8");
+
+describe("anti-framing headers", () => {
+  it("enforces frame-ancestors 'none' and X-Frame-Options DENY on the public domain", () => {
+    const h = headersFor("www.e20e.tools");
+    expect(h.get("content-security-policy")).toBe("frame-ancestors 'none'");
+    expect(CSP_ENFORCED).toContain("frame-ancestors 'none'");
+    expect(h.get("x-frame-options")).toBe("DENY");
+  });
+  it("keeps the existing report-only policy unchanged", () => {
+    expect(headersFor("www.e20e.tools").get("content-security-policy-report-only")).toBe(
+      CSP_REPORT_ONLY,
+    );
+    expect(CSP_REPORT_ONLY).toContain("default-src 'self'");
+  });
+  it("applies DENY on the published lovable.app address too", () => {
+    expect(headersFor("grid-sparkle-dance.lovable.app").get("x-frame-options")).toBe("DENY");
+    expect(isEditorPreviewHost("grid-sparkle-dance.lovable.app")).toBe(false);
+  });
+  it("lets only the Lovable editor frame preview hosts", () => {
+    const h = headersFor("id-preview--fad10e52-b5a5-4817-8b4b-28ba3778d2c7.lovable.app");
+    expect(h.get("x-frame-options")).toBeNull();
+    expect(h.get("content-security-policy")).toBe(
+      "frame-ancestors 'self' https://lovable.dev https://*.lovable.dev",
+    );
+  });
+});
+
+describe("assistant context mapping", () => {
+  it("keeps only visitor/ai messages, oldest first, capped at 12", () => {
+    const rows = Array.from({ length: 20 }, (_, i) => ({
+      id: `m${String(i).padStart(2, "0")}`,
+      sender: i % 2 ? "ai" : "visitor",
+      body: `b${i}`,
+      created_at: new Date(Date.UTC(2026, 10, 16, 10, i)).toISOString(),
+    })).reverse();
+    const turns = turnsFromMessages([
+      ...rows,
+      { id: "x", sender: "admin", body: "team", created_at: "2026-11-16T11:00:00Z" },
+    ]);
+    expect(turns).toHaveLength(12);
+    expect(turns[0]).toEqual({ role: "user", content: "b8" });
+    expect(turns[11]).toEqual({ role: "assistant", content: "b19" });
+  });
+});
+
+describe("database changes", () => {
+  it("chat purge reads the chats retention days with a 90-day fallback", () => {
+    const sql = migration("0070_chat_retention_reads_policy");
+    expect(sql).toContain("FROM public.retention_policies p WHERE p.data_type='chats'");
+    expect(sql).toContain("COALESCE(days_value, 90)");
+    expect(sql).toContain("retention_candidates('chats',days_value,100)");
+    expect(sql).not.toContain("retention_candidates('chats',90,100)");
+  });
+  it("drops the no-op signup trigger and its function", () => {
+    const sql = migration("0071_drop_noop_signup_trigger");
+    expect(sql).toContain("DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users");
+    expect(sql).toContain("DROP FUNCTION IF EXISTS public.handle_new_user()");
+  });
+  it("revokes visitor access only on the twelve service-only tables", () => {
+    const sql = migration("0072_revoke_service_only_table_grants");
+    const revoked = [
+      "rate_limit_events",
+      "request_identities",
+      "request_replies",
+      "user_roles",
+      "ai_assistant_settings",
+      "application_telemetry",
+      "assistant_registrations",
+      "assistant_replies",
+      "journey_event_receipts",
+      "site_visits",
+      "suggestion_requests",
+      "support_offers",
+    ];
+    for (const table of revoked) expect(sql).toContain(`public.${table}`);
+    expect(sql).toContain("FROM anon, authenticated");
+    for (const kept of ["products", "site_settings", "live_chats", "retention_policies"])
+      expect(sql).not.toMatch(new RegExp(`public\\.${kept}\\b`));
+  });
+  it("drops both deprecated price columns and the types no longer list them", () => {
+    const sql = migration("0073_drop_deprecated_product_pricing");
+    expect(sql).toContain("DROP COLUMN IF EXISTS pricing,");
+    expect(sql).toContain("DROP COLUMN IF EXISTS pricing_en");
+    expect(readFileSync("src/integrations/supabase/types.ts", "utf8")).not.toMatch(/\bpricing/);
+  });
+});
+
+describe("site files", () => {
+  it("hides admin, my-requests and reset-password from all crawlers", () => {
+    const robots = readFileSync("public/robots.txt", "utf8");
+    const star = robots.slice(robots.indexOf("User-agent: *"));
+    for (const path of ["/admin", "/my-requests", "/reset-password"])
+      expect(star).toContain(`Disallow: ${path}\n`);
+  });
+  it("removes the archived October plan page and every link to it", () => {
+    expect(existsSync("src/routes/october-plan.tsx")).toBe(false);
+    expect(readFileSync("src/routes/index.tsx", "utf8")).not.toContain("october-plan");
+  });
+});

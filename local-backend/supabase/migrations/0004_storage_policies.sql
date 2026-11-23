@@ -1,0 +1,5 @@
+CREATE POLICY "admins read library assets" ON storage.objects FOR SELECT TO authenticated USING (((bucket_id = 'library-assets'::text) AND public.has_role(auth.uid(), 'admin'::public.app_role)));
+CREATE POLICY "admins read request attachments" ON storage.objects FOR SELECT TO authenticated USING (((bucket_id = 'request-attachments'::text) AND public.has_role(auth.uid(), 'admin'::public.app_role)));
+CREATE POLICY "admins remove library assets" ON storage.objects FOR DELETE TO authenticated USING (((bucket_id = 'library-assets'::text) AND public.has_role(auth.uid(), 'admin'::public.app_role)));
+CREATE POLICY "admins replace library assets" ON storage.objects FOR UPDATE TO authenticated USING (((bucket_id = 'library-assets'::text) AND public.has_role(auth.uid(), 'admin'::public.app_role))) WITH CHECK (((bucket_id = 'library-assets'::text) AND public.has_role(auth.uid(), 'admin'::public.app_role)));
+CREATE POLICY "admins upload library assets" ON storage.objects FOR INSERT TO authenticated WITH CHECK (((bucket_id = 'library-assets'::text) AND public.has_role(auth.uid(), 'admin'::public.app_role)));

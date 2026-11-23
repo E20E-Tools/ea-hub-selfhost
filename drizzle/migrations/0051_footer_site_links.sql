@@ -1,0 +1,2 @@
+ALTER TABLE public.site_settings ADD COLUMN footer_links jsonb NOT NULL DEFAULT '[]'::jsonb;
+ALTER TABLE public.site_settings ADD CONSTRAINT footer_links_array CHECK (jsonb_typeof(footer_links) = 'array');

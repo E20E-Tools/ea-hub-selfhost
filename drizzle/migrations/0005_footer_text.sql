@@ -1,0 +1,1 @@
+ALTER TABLE public.site_settings ADD COLUMN IF NOT EXISTS footer_text text NOT NULL DEFAULT 'Build with ♥ By E20E.Tools & DT.Guide';
