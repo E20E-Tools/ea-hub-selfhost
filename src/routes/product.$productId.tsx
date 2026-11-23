@@ -1,7 +1,5 @@
-import { WorkCard } from "@/components/work-cards";
 import { StepHelp } from "@/components/step-help";
 import { productPractice } from "@/lib/product-practice";
-import { ProductCase } from "@/components/product-case";
 import { archoneLaunchLabel } from "@/lib/archone-launch";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { shareImageMeta } from "@/lib/share";
@@ -290,8 +288,6 @@ function ClassicProductDetail() {
           <a href="#resources">{ar ? "المساعدة والموارد" : "Help and resources"}</a>
         </nav>
         <div className="ea-dossier-sections">
-          <WorkCard key={product.id} id={product.id} name={product.name} ar={ar}/>
-          <ProductCase product={product} language={language}/>
           <section className="bx-panel" id="operating-requirements"><h2>{ar?"متطلبات التشغيل":"Operating requirements"}</h2>
           {(() => {
             const labels = ar

@@ -8,8 +8,6 @@ import { fill } from "@/lib/copy";
 import { archoneLaunchLabel } from "@/lib/archone-launch";
 import { productPractice } from "@/lib/product-practice";
 import { ProductToolsActions } from "@/components/product-tools";
-import { ProductCase } from "@/components/product-case";
-import { WorkCard } from "@/components/work-cards";
 import { StepHelp } from "@/components/step-help";
 import { AcquisitionGuidePanel } from "@/components/acquisition-guide";
 import { ProductScreenshots } from "@/components/product-screenshots";
@@ -271,18 +269,8 @@ function Interactive({
   product: Product;
   salesEmail: string;
 }) {
-  const { lang, ar } = useBits();
   return (
     <>
-      <Island id="try">
-        <WorkCard
-          key={product.id}
-          id={product.id}
-          name={product.name}
-          ar={ar}
-        />
-        <ProductCase product={product} language={lang} />
-      </Island>
       {product.comingSoon && (
         <Island id="access">
           <AcquisitionGuidePanel
@@ -356,7 +344,6 @@ export function MissionLayout({
         <span className="plm-jumps">
           <a href="#fit">{ar ? "الملاءمة" : "Fit"}</a>
           <a href="#capabilities">{ar ? "ما تحصل عليه" : "What you get"}</a>
-          <a href="#try">{ar ? "جرّبها" : "Try it"}</a>
           <a href="#help">{ar ? "المساعدة" : "Help"}</a>
         </span>
       </nav>
@@ -380,9 +367,6 @@ export function MissionLayout({
           <p>{product.overview || product.description}</p>
           <div className="plm-actions">
             <PrimaryCta product={product} className="plm-cta" />
-            <a href="#try" className="plm-ghost">
-              {ar ? "جرّب الحالة" : "Try the case"}
-            </a>
             <ProductToolsActions product={product} compact />
           </div>
           <ProductTestimonial product={product} ar={ar} className="plm-test" />
@@ -559,7 +543,9 @@ export function SpecLayout({
       : null,
     { id: "capabilities", t: ar ? "ما تحصل عليه" : "What you get" },
     { id: "operations", t: ar ? "التشغيل" : "Operations" },
-    { id: "try", t: ar ? "جرّبها" : "Try it" },
+    product.comingSoon
+      ? { id: "access", t: ar ? "الحصول عليها" : "Getting access" }
+      : null,
     practice
       ? { id: "practice", t: ar ? "تمرين لفريقك" : "Team exercise" }
       : null,
@@ -705,13 +691,15 @@ export function SpecLayout({
             )}
           </section>
 
-          <section className="pls-sec">
-            <h2>
-              <b dir="ltr">{num("try")}</b>
-              {ar ? "جرّبها" : "Try it"}
-            </h2>
-            <Interactive product={product} salesEmail={salesEmail} />
-          </section>
+          {product.comingSoon && (
+            <section className="pls-sec">
+              <h2>
+                <b dir="ltr">{num("access")}</b>
+                {ar ? "الحصول عليها" : "Getting access"}
+              </h2>
+              <Interactive product={product} salesEmail={salesEmail} />
+            </section>
+          )}
 
           <Practice product={product} className="pls-sec pls-practice" />
           <Release product={product} className="pls-sec" />
@@ -760,7 +748,7 @@ export function JourneyLayout({
     },
     {
       t: ar ? "جرّب" : "Try",
-      s: ar ? "حالة وتمرين" : "A case and an exercise",
+      s: ar ? "تمرين لفريقك" : "A team exercise",
     },
     { t: ar ? "ابدأ" : "Start", s: ar ? "افتح النظام" : "Open the system" },
   ];
