@@ -435,7 +435,10 @@
 }
 .plm-practice .ea-step-help {
   margin-top: 14px;
+  /* Its text is dark, so it sits on the paper surface rather than the dark practice panel. */
+  background: var(--pl-paper);
   color: var(--pl-dark-text);
+  border-color: var(--pl-line);
 }
 .plm-help {
   display: flex;
