@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { FeatureOnly } from "@/components/feature-gate";
 import { Link } from "@tanstack/react-router";
 import { useLanguage } from "@/lib/language";
 import { fill, fill2 } from "@/lib/copy";
@@ -420,9 +421,11 @@ export default function UntangleChaosStage({ products, settings }: StageProps) {
         </span>
         {finished ? (
           <>
-            <Link to="/discover" className="uc-btn uc-btn-primary">
-              {t("ucDiscover")}
-            </Link>
+            <FeatureOnly feature="discover">
+              <Link to="/discover" className="uc-btn uc-btn-primary">
+                {t("ucDiscover")}
+              </Link>
+            </FeatureOnly>
             <Link to="/request" className="uc-btn">
               {t("ucRequest")}
             </Link>

@@ -1,4 +1,5 @@
 import { StepHelp } from "@/components/step-help";
+import { FeatureOnly } from "@/components/feature-gate";
 import { productPractice } from "@/lib/product-practice";
 import { archoneLaunchLabel } from "@/lib/archone-launch";
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
@@ -424,10 +425,12 @@ function ClassicProductDetail() {
 
           {!product.comingSoon ? (
             <p className="detail-request-links">
-              <Link to="/try/$productId" params={{ productId: product.id }}>
-                {t("bxTryDemo")}
-              </Link>
-              <span aria-hidden="true">·</span>
+              <FeatureOnly feature="trials">
+                <Link to="/try/$productId" params={{ productId: product.id }}>
+                  {t("bxTryDemo")}
+                </Link>
+                <span aria-hidden="true">·</span>
+              </FeatureOnly>
               <Link to="/my-requests">{t("bxTrackRequests")}</Link>
             </p>
           ) : null}

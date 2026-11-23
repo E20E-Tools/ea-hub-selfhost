@@ -1,4 +1,5 @@
 import { ProductExercise } from "./product-exercise";
+import { FeatureOnly } from "./feature-gate";
 import { useEffect, useRef } from "react";
 import type { Product } from "@/lib/products";
 import { cases } from "@/lib/product-cases";
@@ -72,7 +73,11 @@ export function ProductCase({
           {ar ? "تدريب على هذه الحالة" : "Training for this use case"}
         </a>
       )}
-      {!product.comingSoon && <ProductExercise key={product.id+language} product={product} language={language}/>}
+      {!product.comingSoon && (
+        <FeatureOnly feature="trials">
+          <ProductExercise key={product.id + language} product={product} language={language} />
+        </FeatureOnly>
+      )}
     </section>
   );
 }

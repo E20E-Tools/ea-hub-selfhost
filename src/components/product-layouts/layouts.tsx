@@ -1,4 +1,5 @@
 import { useState, type ReactNode } from "react";
+import { FeatureOnly } from "@/components/feature-gate";
 import { Link } from "@tanstack/react-router";
 import { ArrowUpLeft, ArrowUpRight, Check, Clock, X } from "lucide-react";
 import type { Product } from "@/lib/catalog";
@@ -117,9 +118,11 @@ function HelpLinks({
         {t("productRequestFeature")}
       </Link>
       {!product.comingSoon && (
-        <Link to="/try/$productId" params={{ productId: product.id }}>
-          {t("bxTryDemo")}
-        </Link>
+        <FeatureOnly feature="trials">
+          <Link to="/try/$productId" params={{ productId: product.id }}>
+            {t("bxTryDemo")}
+          </Link>
+        </FeatureOnly>
       )}
       <Link to="/my-requests">{t("bxTrackRequests")}</Link>
       {product.githubUrl ? (

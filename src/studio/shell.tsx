@@ -19,6 +19,7 @@ import { localizedSettings } from "@/lib/catalog";
 import { linkedFooterParts } from "@/lib/footer-links";
 import { placedNavigation, navigationLabel } from "@/lib/navigation.shared";
 import { isDisabledFeaturePath } from "@/lib/site-features";
+import { useFeature } from "@/lib/use-feature";
 import {
   chooseDirection,
   directions,
@@ -101,6 +102,7 @@ export function StudioHeader() {
   const ar = language === "ar";
   const path = useRouterState({ select: (s) => s.location.pathname });
   const [open, setOpen] = useState(false);
+  const showSearch = useFeature("search");
   const button = useRef<HTMLButtonElement>(null);
   const header = useRef<HTMLElement>(null);
   const direction = useDirection();
@@ -150,11 +152,13 @@ export function StudioHeader() {
           ))}
         </nav>
         <div className="nx-actions s-actions">
-          <SiteSearch
-            pages={entries.filter(
-              (item) => item.topBar || item.group !== "none",
-            )}
-          />
+          {showSearch && (
+            <SiteSearch
+              pages={entries.filter(
+                (item) => item.topBar || item.group !== "none",
+              )}
+            />
+          )}
           {arabicAvailable && (
             <button
               className="s-language"

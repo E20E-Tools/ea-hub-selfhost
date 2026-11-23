@@ -11,9 +11,19 @@ export const FEATURE_KEYS = [
   "terms",
   "contact",
   "arabic",
+  "discover",
+  "compare",
+  "myTools",
+  "trials",
+  "waitlist",
+  "newsletter",
+  "search",
 ] as const;
 
 export type FeatureKey = (typeof FEATURE_KEYS)[number];
+
+/** Switches that existed before the 2026-11 additions; settings saved earlier always carry these. */
+export const LEGACY_FEATURE_KEYS: readonly FeatureKey[] = FEATURE_KEYS.slice(0, 11);
 
 export const FEATURE_LABELS: Record<FeatureKey, { ar: string; en: string }> = {
   assistant: { ar: "المساعد الذكي أرشي", en: "Archy smart assistant" },
@@ -27,6 +37,13 @@ export const FEATURE_LABELS: Record<FeatureKey, { ar: string; en: string }> = {
   terms: { ar: "شروط الخدمة", en: "Terms of service" },
   contact: { ar: "صفحة اتصل بنا", en: "Contact us page" },
   arabic: { ar: "اللغة العربية للزوار", en: "Arabic for visitors" },
+  discover: { ar: "ابدأ باحتياجك", en: "Start with your need" },
+  compare: { ar: "مقارنة الأدوات", en: "Tool comparison" },
+  myTools: { ar: "أدواتي المحفوظة", en: "Saved tools" },
+  trials: { ar: "تمارين التخطيط", en: "Planning exercises" },
+  waitlist: { ar: "قائمة انتظار الأدوات القادمة", en: "Coming-soon waitlist" },
+  newsletter: { ar: "الاشتراك في النشرة", en: "Newsletter sign-up" },
+  search: { ar: "البحث في الموقع", en: "Site search" },
 };
 
 /** Public pages a feature toggle controls; a disabled feature hides its menu link too. */
@@ -39,6 +56,11 @@ export const FEATURE_PATHS: Partial<Record<FeatureKey, string>> = {
   testimonials: "/testimonials",
   terms: "/terms",
   contact: "/contact",
+  discover: "/discover",
+  compare: "/compare",
+  myTools: "/my-tools",
+  trials: "/try",
+  newsletter: "/newsletter",
 };
 
 export type FeatureFlags = Record<FeatureKey, boolean>;
@@ -55,6 +77,13 @@ export const defaultFeatureFlags: FeatureFlags = {
   terms: true,
   contact: true,
   arabic: true,
+  discover: true,
+  compare: true,
+  myTools: true,
+  trials: true,
+  waitlist: true,
+  newsletter: true,
+  search: true,
 };
 
 /** Unknown or missing keys fall back to enabled; only an explicit false turns a feature off. */

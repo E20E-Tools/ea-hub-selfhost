@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { FeatureOnly } from "@/components/feature-gate";
 import { Link } from "@tanstack/react-router";
 import { useLanguage } from "@/lib/language";
 import type { StageProps } from "../registry";
@@ -154,9 +155,11 @@ export default function TerminalMigrationStage({
             </div>
           </div>
           <div className="tmig-actions">
-            <a href="/discover">
-              {ar ? "ابدأ باحتياجك" : "Start with your need"}
-            </a>
+            <FeatureOnly feature="discover">
+              <a href="/discover">
+                {ar ? "ابدأ باحتياجك" : "Start with your need"}
+              </a>
+            </FeatureOnly>
             <a href="#catalog">{ar ? "كل الأدوات" : "All tools"}</a>
           </div>
         </div>

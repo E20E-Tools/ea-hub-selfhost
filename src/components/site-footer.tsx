@@ -3,6 +3,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { Heart } from "lucide-react";
 import { catalogQueryOptions } from "@/lib/catalog.functions";
 import { localizedSettings } from "@/lib/catalog";
+import { featureEnabled } from "@/lib/site-features";
 import { useLanguage } from "@/lib/language";
 import { linkedFooterParts } from "@/lib/footer-links";
 import { useState } from "react";
@@ -19,7 +20,7 @@ export function SiteFooter() {
   const { footerText } = localizedSettings(catalog.settings, language);
   return (
     <>
-    <aside className="mx-auto my-4 text-center"><a className="underline underline-offset-4" href="/newsletter">{language==="ar"?"اشترك في النشرة الشهرية":"Subscribe to monthly updates"}</a></aside>
+    {featureEnabled(catalog.settings.featureFlags, "newsletter") && <aside className="mx-auto my-4 text-center"><a className="underline underline-offset-4" href="/newsletter">{language==="ar"?"اشترك في النشرة الشهرية":"Subscribe to monthly updates"}</a></aside>}
     <footer
       className="site-footer"
       dir={dir}

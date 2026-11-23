@@ -4,6 +4,7 @@ import { Bell, Check, Users } from "lucide-react";
 import type { Product } from "@/lib/catalog";
 import { launchDayLabel, launchInstantFor } from "@/lib/archone-launch";
 import { getWaitlistCount, joinWaitlist } from "@/lib/newsletter.functions";
+import { useFeature } from "@/lib/use-feature";
 
 /** Visitor-facing count text; small numbers are shown as-is, zero invites the first signup. */
 export function waitlistCountText(count: number, ar: boolean): string {
@@ -31,7 +32,8 @@ export function ProductWaitlist({
 }) {
   const id = useId();
   const client = useQueryClient();
-  const enabled = Boolean(product.comingSoon);
+  const allowed = useFeature("waitlist");
+  const enabled = Boolean(product.comingSoon) && allowed;
   const count = useQuery({
     queryKey: ["waitlist-count", product.id],
     queryFn: () => getWaitlistCount({ data: { productId: product.id } }),

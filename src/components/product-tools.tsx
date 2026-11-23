@@ -6,6 +6,7 @@ import { useLanguage } from "@/lib/language";
 import { useMyTools } from "@/lib/use-my-tools";
 import { encodeComparisonIds } from "@/lib/my-tools";
 import { trackJourney } from "@/lib/journey-client";
+import { useFeature } from "@/lib/use-feature";
 
 export function ProductToolsActions({
   product,
@@ -18,8 +19,12 @@ export function ProductToolsActions({
   const tools = useMyTools();
   const favorite = tools.favorites.includes(product.id);
   const comparing = tools.compare.includes(product.id);
+  const canSave = useFeature("myTools");
+  const canCompare = useFeature("compare") && !product.comingSoon;
+  if (!canSave && !canCompare) return null;
   return (
     <div className="bx-product-tools" aria-label={t("bxMyTools")}>
+      {canSave && (
       <Button
         type="button"
         variant={favorite ? "secondary" : "outline"}
@@ -33,7 +38,8 @@ export function ProductToolsActions({
         <Heart size={16} fill={favorite ? "currentColor" : "none"} aria-hidden="true" />
         {!compact && <span>{favorite ? t("bxSavedTool") : t("bxSaveTool")}</span>}
       </Button>
-      {!product.comingSoon && (
+      )}
+      {canCompare && (
         <Button
           type="button"
           variant={comparing ? "secondary" : "outline"}
@@ -69,7 +75,8 @@ export function ProductToolsActions({
 export function CompareTray({ goal }: { goal?: import("@/lib/beneficiary-metadata").DiscoveryGoal | undefined } = {}) {
   const { t, language } = useLanguage();
   const tools = useMyTools();
-  if (!tools.compare.length) return null;
+  const enabled = useFeature("compare");
+  if (!enabled || !tools.compare.length) return null;
   const ids = encodeComparisonIds(tools.compare);
   return (
     <section className="bx-compare-tray" aria-label={t("bxCompare")}>

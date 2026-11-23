@@ -1,3 +1,4 @@
+import { FeatureOnly } from "@/components/feature-gate";
 import {
   useMemo,
   useRef,
@@ -213,9 +214,11 @@ export default function TimeScannerStage({ products, settings }: StageProps) {
               ? `استكشف الأدوات (${products.length})`
               : `Explore the tools (${products.length})`}
           </a>
-          <a href="/discover" className="tscan-ghost">
-            {ar ? "ابدأ باحتياجك" : "Start with your need"}
-          </a>
+          <FeatureOnly feature="discover">
+            <a href="/discover" className="tscan-ghost">
+              {ar ? "ابدأ باحتياجك" : "Start with your need"}
+            </a>
+          </FeatureOnly>
         </div>
       </div>
 

@@ -1,4 +1,5 @@
 import {startTrial} from "@/lib/team-trials";
+import { FeatureOnly } from "@/components/feature-gate";
 import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { encodeComparisonIds } from "@/lib/my-tools";
@@ -228,11 +229,13 @@ export function SavedDecisions() {
           <a href={"/product/" + encodeURIComponent(d.chosen) + "#practice"}>{ar ? "المهمة الأولى للأداة المختارة" : "First task for the selected tool"}</a>
           <TeamTrial decision={d} ar={ar}/>
           <CopyDecision decision={d} ar={ar} />
-          <Button asChild variant="outline">
-            <Link to="/compare" search={{ ids: encodeComparisonIds(d.items.map((item) => item.id)) }}>
-              {ar ? "إعادة فتح المقارنة" : "Reopen comparison"}
-            </Link>
-          </Button>
+          <FeatureOnly feature="compare">
+            <Button asChild variant="outline">
+              <Link to="/compare" search={{ ids: encodeComparisonIds(d.items.map((item) => item.id)) }}>
+                {ar ? "إعادة فتح المقارنة" : "Reopen comparison"}
+              </Link>
+            </Button>
+          </FeatureOnly>
           <Button
             className="mx-auto flex w-full max-w-xs"
             variant="outline"

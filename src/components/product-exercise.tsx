@@ -1,4 +1,5 @@
 import { exerciseKey, readExercise } from "./saved-exercises";
+import { useFeature } from "@/lib/use-feature";
 import { StepHelp } from "./step-help";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -15,6 +16,7 @@ export function ProductExercise({
   const ar = language === "ar",
     radar = product.id === "radar",
     apm = product.id === "landscape";
+  const showMyTools = useFeature("myTools");
   const [result, setResult] = useState(""),
     [error, setError] = useState(""),
     [started, setStarted] = useState(false);
@@ -196,7 +198,7 @@ export function ProductExercise({
           <pre className="whitespace-pre-wrap">{result}</pre>
           <div className="bx-actions">
             <Button onClick={save}>{ar ? "حفظ على هذا الجهاز" : "Save on this device"}</Button>
-            {saved && <a href="/my-tools">{ar ? "تم الحفظ · عرض تماريني" : "Saved · View my exercises"}</a>}
+            {saved && (showMyTools ? <a href="/my-tools">{ar ? "تم الحفظ · عرض تماريني" : "Saved · View my exercises"}</a> : <span role="status">{ar ? "تم الحفظ" : "Saved"}</span>)}
             <Button onClick={download}>
               {ar ? "تنزيل النتيجة" : "Download result"}
             </Button>

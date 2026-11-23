@@ -1,4 +1,5 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
+import { FeatureGate } from "@/components/feature-gate";
 import { catalogQueryOptions } from "@/lib/catalog.functions";
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
@@ -9,7 +10,7 @@ import {
   newsletterPreferences,
 } from "@/lib/newsletter.functions";
 import { Button } from "@/components/ui/button";
-export const Route = createFileRoute("/newsletter")({ component: Newsletter });
+export const Route = createFileRoute("/newsletter")({ component: GatedNewsletter });
 function Newsletter() {
   const { language } = useLanguage();
   const [params, setParams] = useState<URLSearchParams | null>(null),
@@ -217,5 +218,13 @@ function Newsletter() {
         <p role="status">{invalidPreferences ? t("رابط التفضيلات غير صالح.", "Invalid preferences link.") : note}</p>
       </section>
     </main>
+  );
+}
+
+function GatedNewsletter() {
+  return (
+    <FeatureGate featureKey="newsletter">
+      <Newsletter />
+    </FeatureGate>
   );
 }

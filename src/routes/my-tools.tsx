@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { FeatureGate, FeatureOnly } from "@/components/feature-gate";
 import { AskRecords } from "@/components/work-cards";
 import { TeamTrials } from "@/components/team-trials";
 import { SavedExercises } from "@/components/saved-exercises";
@@ -37,7 +38,7 @@ export const Route = createFileRoute("/my-tools")({
     ],
     links: [{ rel: "canonical", href: pageUrl("/my-tools") }],
   }),
-  component: MyToolsPage,
+  component: GatedMyToolsPage,
 });
 
 function MyToolsPage() {
@@ -67,9 +68,11 @@ function MyToolsPage() {
       )}
       <CompareTray />
       <div className="bx-actions">
-        <Button asChild>
-          <Link to="/discover">{t("bxStartNeed")}</Link>
-        </Button>
+        <FeatureOnly feature="discover">
+          <Button asChild>
+            <Link to="/discover">{t("bxStartNeed")}</Link>
+          </Button>
+        </FeatureOnly>
         <Button asChild variant="outline">
           <Link to="/my-requests">{t("bxTrackRequests")}</Link>
         </Button>
@@ -132,11 +135,13 @@ function MyToolsPage() {
                     </Link>
                   </Button>
                   {!product.comingSoon && (
-                    <Button asChild variant="ghost">
-                      <Link to="/try/$productId" params={{ productId: product.id }}>
-                        {t("bxTryDemo")}
-                      </Link>
-                    </Button>
+                    <FeatureOnly feature="trials">
+                      <Button asChild variant="ghost">
+                        <Link to="/try/$productId" params={{ productId: product.id }}>
+                          {t("bxTryDemo")}
+                        </Link>
+                      </Button>
+                    </FeatureOnly>
                   )}
                 </div>
               </article>
@@ -149,5 +154,13 @@ function MyToolsPage() {
 <SavedExercises ar={language === "ar"}/>
 <SavedDecisions/>
     </main>
+  );
+}
+
+function GatedMyToolsPage() {
+  return (
+    <FeatureGate featureKey="myTools">
+      <MyToolsPage />
+    </FeatureGate>
   );
 }

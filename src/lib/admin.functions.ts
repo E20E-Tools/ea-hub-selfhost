@@ -20,7 +20,7 @@ import {
   type RequestType,
 } from "./requests.shared";
 import type { AdminImage } from "./admin-gallery.shared";
-import { FEATURE_KEYS, type FeatureKey } from "./site-features";
+import { FEATURE_KEYS, LEGACY_FEATURE_KEYS, normalizeFeatureFlags, type FeatureKey } from "./site-features";
 import { navigationSchema } from "./navigation.shared";
 import { isPublicationDate } from "./publication-date";
 import { beneficiaryDetailsSchema } from "./beneficiary-metadata";
@@ -664,12 +664,18 @@ export const deleteAffiliate = createServerFn({ method: "POST" })
   });
 
 /** Built from FEATURE_KEYS so the flag list has a single source of truth. */
-export const featureFlagsSchema = z.object(
-  Object.fromEntries(FEATURE_KEYS.map((key) => [key, z.boolean()])) as Record<
-    FeatureKey,
-    z.ZodBoolean
-  >,
-);
+// The original switches are required; newer ones are optional so settings saved (and backed up)
+// before they existed still validate, and a missing switch keeps its enabled default.
+export const featureFlagsSchema = z
+  .object(
+    Object.fromEntries(
+      FEATURE_KEYS.map((key) => [
+        key,
+        LEGACY_FEATURE_KEYS.includes(key) ? z.boolean() : z.boolean().optional(),
+      ]),
+    ) as Record<FeatureKey, z.ZodBoolean>,
+  )
+  .transform((value) => normalizeFeatureFlags(value));
 
 export const saveFeatureFlags = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])

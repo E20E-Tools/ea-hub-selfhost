@@ -1,4 +1,5 @@
 import { useMemo, useRef, useState } from "react";
+import { FeatureOnly } from "@/components/feature-gate";
 import { Link } from "@tanstack/react-router";
 import { useLanguage } from "@/lib/language";
 import type { StageProps } from "../registry";
@@ -54,9 +55,11 @@ export default function OrbitalPortalStage({ products, settings }: StageProps) {
               : "Everything scattered across your enterprise, in one orbit.")}
         </p>
         <div className="orb-actions">
-          <a href="/discover" className="orb-cta">
-            {ar ? "ابدأ باحتياجك" : "Start with your need"}
-          </a>
+          <FeatureOnly feature="discover">
+            <a href="/discover" className="orb-cta">
+              {ar ? "ابدأ باحتياجك" : "Start with your need"}
+            </a>
+          </FeatureOnly>
           <a href="#catalog" className="orb-ghost">
             {ar ? "استكشف المدار" : "Explore the orbit"}
           </a>

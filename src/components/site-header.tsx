@@ -52,10 +52,13 @@ export function SiteHeader() {
   const visibleNavigation = navigation.filter(
     (item) => item.hidden !== true && !isDisabledFeaturePath(settings.featureFlags, item.url),
   );
+  const flags = settings.featureFlags;
+  const showDiscover = featureEnabled(flags, "discover");
+  const showMyTools = featureEnabled(flags, "myTools");
   const searchPages = [
     ...visibleNavigation.map((item) => ({ to: item.url, label: navigationLabel(item, language) })),
-    { to: "/discover", label: t("bxStartNeed") },
-    { to: "/my-tools", label: t("bxMyTools") },
+    ...(showDiscover ? [{ to: "/discover", label: t("bxStartNeed") }] : []),
+    ...(showMyTools ? [{ to: "/my-tools", label: t("bxMyTools") }] : []),
     { to: "/my-requests", label: t("bxTrackRequests") },
   ];
 
@@ -105,18 +108,22 @@ export function SiteHeader() {
           <div className="site-actions">
             {/* Journey shortcuts sit beside the search and the introduction film. */}
             <div className="site-journey-links" aria-label={t("bxJourneyLinks")}>
-              <Button asChild size="sm" className="site-journey-link">
-                <Link to="/discover" aria-label={t("bxStartNeed")}>
-                  <Compass size={14} aria-hidden="true" />
-                  <span className="site-journey-label">{t("bxStartNeed")}</span>
-                </Link>
-              </Button>
-              <Button asChild size="sm" variant="outline" className="site-journey-link">
-                <Link to="/my-tools" aria-label={t("bxMyTools")}>
-                  <Bookmark size={14} aria-hidden="true" />
-                  <span className="site-journey-label">{t("bxMyTools")}</span>
-                </Link>
-              </Button>
+              {showDiscover ? (
+                <Button asChild size="sm" className="site-journey-link">
+                  <Link to="/discover" aria-label={t("bxStartNeed")}>
+                    <Compass size={14} aria-hidden="true" />
+                    <span className="site-journey-label">{t("bxStartNeed")}</span>
+                  </Link>
+                </Button>
+              ) : null}
+              {showMyTools ? (
+                <Button asChild size="sm" variant="outline" className="site-journey-link">
+                  <Link to="/my-tools" aria-label={t("bxMyTools")}>
+                    <Bookmark size={14} aria-hidden="true" />
+                    <span className="site-journey-label">{t("bxMyTools")}</span>
+                  </Link>
+                </Button>
+              ) : null}
               <Button asChild size="sm" variant="outline" className="site-journey-link">
                 <Link to="/my-requests" aria-label={t("bxTrackRequests")}>
                   <MessagesSquare size={14} aria-hidden="true" />
@@ -127,7 +134,7 @@ export function SiteHeader() {
             <span className="site-actions-divider" aria-hidden="true" />
             <div className="site-tools">
               {showsIntroVideo(settings.featureFlags) ? <IntroVideoButton /> : null}
-              <SiteSearch pages={searchPages} />
+              {featureEnabled(flags, "search") ? <SiteSearch pages={searchPages} /> : null}
               {arabicAvailable ? (
                 <div className="site-lang">
                   <LanguageSwitcher inline />

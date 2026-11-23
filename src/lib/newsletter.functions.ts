@@ -24,6 +24,9 @@ export const joinNewsletter = createServerFn({ method: "POST" })
     }),
   )
   .handler(async ({ data }) => {
+    // Checked before the rate limit so a switched-off sign-up spends no quota and writes nothing.
+    const { serverFeatureEnabled } = await import("./site-features.server");
+    if (!(await serverFeatureEnabled("newsletter"))) throw Error("Newsletter sign-up is unavailable");
     const { getRequest } = await import("@tanstack/react-start/server");
     const { clientIp, consumeLimits } = await import("./rate-limit.server");
     if (
@@ -142,6 +145,8 @@ export const waitlistInputSchema = z.object({
 export const joinWaitlist = createServerFn({ method: "POST" })
   .inputValidator(waitlistInputSchema)
   .handler(async ({ data }) => {
+    const { serverFeatureEnabled } = await import("./site-features.server");
+    if (!(await serverFeatureEnabled("waitlist"))) return { ok: false as const, message: "product" as const };
     const { getRequest } = await import("@tanstack/react-start/server");
     const { clientIp, consumeLimits } = await import("./rate-limit.server");
     if (

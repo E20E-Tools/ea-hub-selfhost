@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { catalogQueryOptions } from "@/lib/catalog.functions";
 import { useLanguage } from "@/lib/language";
 import { featureEnabled, type FeatureKey } from "@/lib/site-features";
+import { useFeature } from "@/lib/use-feature";
 
 /**
  * Wraps a public page's content: when the admin switched the feature off the
@@ -17,7 +18,7 @@ export function FeatureGate({
 }) {
   const { data: catalog } = useSuspenseQuery(catalogQueryOptions);
   const { dir, t } = useLanguage();
-  if (featureEnabled(catalog.settings.featureFlags, featureKey)) return <>{children}</>;
+  if (featureEnabled(catalog.settings?.featureFlags, featureKey)) return <>{children}</>;
   return (
     <main className="library-page" dir={dir}>
       <section className="mx-auto w-full max-w-3xl px-4 py-20 text-center">
@@ -26,4 +27,9 @@ export function FeatureGate({
       </section>
     </main>
   );
+}
+
+/** Renders a link or control only while its feature is switched on. */
+export function FeatureOnly({ feature, children }: { feature: FeatureKey; children: ReactNode }) {
+  return useFeature(feature) ? <>{children}</> : null;
 }

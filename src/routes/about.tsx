@@ -3,7 +3,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { Info, Mail, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/lib/language";
-import { FeatureGate } from "@/components/feature-gate";
+import { FeatureGate, FeatureOnly } from "@/components/feature-gate";
 import { IntroVideoCard } from "@/components/intro-video";
 import { PlatformMark } from "@/components/platform-mark";
 import { catalogQueryOptions } from "@/lib/catalog.functions";
@@ -145,9 +145,11 @@ function About() {
               );
             })}
           </div>
-          <Link to="/discover">
-            {ar ? "ساعدني في اختيار أداة" : "Help me choose a tool"} →
-          </Link>
+          <FeatureOnly feature="discover">
+            <Link to="/discover">
+              {ar ? "ساعدني في اختيار أداة" : "Help me choose a tool"} →
+            </Link>
+          </FeatureOnly>
         </section>
         <section className="about-section" aria-labelledby="archy-services-report">
           <h2 id="archy-services-report">{ar ? "كيف يساعدك Archy؟" : "How can Archy help?"}</h2>

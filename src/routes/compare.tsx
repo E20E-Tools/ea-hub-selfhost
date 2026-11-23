@@ -1,4 +1,5 @@
 import { openAssistantWindow } from "@/lib/assistant-events";
+import { FeatureGate, FeatureOnly } from "@/components/feature-gate";
 import { DISCOVERY_GOALS, type DiscoveryGoal } from "@/lib/beneficiary-metadata";
 import { featureEnabled } from "@/lib/site-features";
 import {SaveDecision} from "@/components/comparison-decision";
@@ -49,7 +50,7 @@ export const Route = createFileRoute("/compare")({
     ],
     links: [{ rel: "canonical", href: pageUrl("/compare") }],
   }),
-  component: ComparePage,
+  component: GatedComparePage,
 });
 
 function ListOrUnknown({ values, unknown }: { values: string[]; unknown: string }) {
@@ -236,9 +237,11 @@ function ComparePage() {
         <span role="status">
           {products.length} / {tools.maxCompare} {t("bxSelected")}
         </span>
-        <Button asChild variant="outline">
-          <Link to="/discover">{t("bxStartNeed")}</Link>
-        </Button>
+        <FeatureOnly feature="discover">
+          <Button asChild variant="outline">
+            <Link to="/discover">{t("bxStartNeed")}</Link>
+          </Button>
+        </FeatureOnly>
         <Button
           type="button"
           variant="ghost"
@@ -349,5 +352,13 @@ function ComparePage() {
       <MetricsPreference />
 {products.length>=2&&<SaveDecision items={products}/>}
     </main>
+  );
+}
+
+function GatedComparePage() {
+  return (
+    <FeatureGate featureKey="compare">
+      <ComparePage />
+    </FeatureGate>
   );
 }

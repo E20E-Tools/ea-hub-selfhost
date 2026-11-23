@@ -1,4 +1,5 @@
 import { ProductExercise } from "@/components/product-exercise";
+import { FeatureGate } from "@/components/feature-gate";
 import { cases } from "@/lib/product-cases";
 import { useState, type FormEvent } from "react";
 import { MetricsPreference } from "@/components/metrics-preference";
@@ -44,7 +45,7 @@ export const Route = createFileRoute("/try/$productId")({
       links: [{ rel: "canonical", href: url }],
     };
   },
-  component: PlanningDemo,
+  component: GatedPlanningDemo,
 });
 
 function PlanningDemo() {
@@ -179,5 +180,13 @@ function PlanningDemo() {
       </div>
       <MetricsPreference />
     </main>
+  );
+}
+
+function GatedPlanningDemo() {
+  return (
+    <FeatureGate featureKey="trials">
+      <PlanningDemo />
+    </FeatureGate>
   );
 }

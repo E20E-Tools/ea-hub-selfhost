@@ -43,12 +43,16 @@ export function StudioHome() {
     }
   }, [forced, navigate]);
   const services = [
-    {
-      href: "/discover",
-      Icon: Compass,
-      title: ar ? "اكتشف الأداة المناسبة" : "Find the right tool",
-      body: ar ? "ابدأ بالتحدّي الذي يواجه فريقك." : "Start with the challenge facing your team.",
-    },
+    ...(featureEnabled(s.featureFlags, "discover")
+      ? [
+          {
+            href: "/discover",
+            Icon: Compass,
+            title: ar ? "اكتشف الأداة المناسبة" : "Find the right tool",
+            body: ar ? "ابدأ بالتحدّي الذي يواجه فريقك." : "Start with the challenge facing your team.",
+          },
+        ]
+      : []),
     ...(featureEnabled(s.featureFlags, "enterprise")
       ? [
           {

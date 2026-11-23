@@ -843,6 +843,20 @@ const ar = {
   feature_arabic: "اللغة العربية للزوار",
   feature_arabicDesc:
     "عند الإيقاف يظهر الموقع بالإنجليزية فقط ويختفي زر اختيار اللغة؛ تبقى لوحة التحكم بلغتيها.",
+  feature_discover: "ابدأ باحتياجك",
+  feature_discoverDesc: "عند الإيقاف تختفي صفحة الأسئلة الموجّهة وروابطها من القائمة والبحث والصفحة الرئيسية.",
+  feature_compare: "مقارنة الأدوات",
+  feature_compareDesc: "عند الإيقاف تختفي أزرار «قارن» وشريط المقارنة، وتعرض صفحة المقارنة إشعارًا قصيرًا.",
+  feature_myTools: "أدواتي المحفوظة",
+  feature_myToolsDesc: "عند الإيقاف يختفي زر حفظ الأداة وصفحة «أدواتي»؛ ما حفظه الزائر يبقى في متصفحه.",
+  feature_trials: "تمارين التخطيط",
+  feature_trialsDesc: "عند الإيقاف يختفي رابط «جرّب» من صفحات الأدوات وتعرض صفحة التمرين إشعارًا قصيرًا.",
+  feature_waitlist: "قائمة انتظار الأدوات القادمة",
+  feature_waitlistDesc: "عند الإيقاف يختفي نموذج «أبلغني عند الإطلاق» من الأدوات القادمة ويرفض الخادم التسجيلات الجديدة؛ القائمة المحفوظة لا تُحذف.",
+  feature_newsletter: "الاشتراك في النشرة",
+  feature_newsletterDesc: "عند الإيقاف تختفي صفحة الاشتراك ورابطها أسفل الموقع ويرفض الخادم الاشتراكات الجديدة؛ المشتركون الحاليون وإرسال النشرة لا يتأثران.",
+  feature_search: "البحث في الموقع",
+  feature_searchDesc: "عند الإيقاف يختفي زر البحث من الترويسة.",
 
   // Feature overview (read-only)
   tabFeatureStatus: "حالة الميزات",
@@ -867,6 +881,13 @@ const ar = {
   featureAbout_terms: "صفحة شروط الخدمة والرابط إليها أسفل النماذج.",
   featureAbout_contact: "صفحة «اتصل بنا» ببيانات التواصل العامة.",
   featureAbout_arabic: "يتيح للزوار عرض الموقع بالعربية واختيار اللغة من زر اللغة في الترويسة.",
+  featureAbout_discover: "أسئلة قصيرة عن احتياج الزائر تقترح عليه الأدوات المناسبة.",
+  featureAbout_compare: "مقارنة أداتين أو ثلاث جنبًا إلى جنب من بطاقات الأدوات.",
+  featureAbout_myTools: "حفظ الأدوات والتمارين في متصفح الزائر وعرضها في صفحة «أدواتي».",
+  featureAbout_trials: "تمرين تخطيط تفاعلي لكل أداة متاحة يجرّبه الزائر قبل استخدامها.",
+  featureAbout_waitlist: "نموذج «أبلغني عند الإطلاق» في صفحات الأدوات القادمة.",
+  featureAbout_newsletter: "صفحة الاشتراك في النشرة الشهرية والرابط إليها أسفل الموقع.",
+  featureAbout_search: "زر البحث في الترويسة للوصول السريع إلى الأدوات والصفحات.",
 
   // Contact
   publicContact: "بيانات التواصل العامة",
@@ -2067,6 +2088,20 @@ const en: Record<AdminCopyKey, string> = {
   feature_arabic: "Arabic for visitors",
   feature_arabicDesc:
     "When off, the site shows English only and the language switcher is hidden; the admin console keeps both languages.",
+  feature_discover: "Start with your need",
+  feature_discoverDesc: "When off, the guided questions page and its links leave the menu, search and home page.",
+  feature_compare: "Tool comparison",
+  feature_compareDesc: "When off, the Compare buttons and tray disappear and the comparison page shows a short notice.",
+  feature_myTools: "Saved tools",
+  feature_myToolsDesc: "When off, the save button and the My tools page disappear; what visitors saved stays in their browser.",
+  feature_trials: "Planning exercises",
+  feature_trialsDesc: "When off, the Try link leaves the tool pages and the exercise page shows a short notice.",
+  feature_waitlist: "Coming-soon waitlist",
+  feature_waitlistDesc: "When off, the notify-me form leaves coming-soon tools and the server refuses new sign-ups; the saved list is kept.",
+  feature_newsletter: "Newsletter sign-up",
+  feature_newsletterDesc: "When off, the sign-up page and its footer link disappear and the server refuses new sign-ups; current subscribers and sending are unaffected.",
+  feature_search: "Site search",
+  feature_searchDesc: "When off, the search button leaves the header.",
 
   tabFeatureStatus: "Feature status",
   tabFeatureStatusDesc:
@@ -2094,6 +2129,13 @@ const en: Record<AdminCopyKey, string> = {
   featureAbout_contact: "The Contact us page with the public contact details.",
   featureAbout_arabic:
     "Lets visitors view the site in Arabic and choose the language from the header language button.",
+  featureAbout_discover: "Short questions about the visitor's need that suggest matching tools.",
+  featureAbout_compare: "Side-by-side comparison of two or three tools from the tool cards.",
+  featureAbout_myTools: "Saving tools and exercises in the visitor's browser, shown on the My tools page.",
+  featureAbout_trials: "An interactive planning exercise for each available tool, to try before using it.",
+  featureAbout_waitlist: "The notify-me-at-launch form on coming-soon tool pages.",
+  featureAbout_newsletter: "The monthly newsletter sign-up page and its footer link.",
+  featureAbout_search: "The header search button for quick access to tools and pages.",
 
   publicContact: "Public contact details",
   publicContactDesc: "Shown on the Contact us page. Leave a field empty to hide it.",

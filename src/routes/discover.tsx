@@ -1,4 +1,5 @@
 import { JourneyHeading } from "@/studio/journey-heading";
+import { FeatureGate, FeatureOnly } from "@/components/feature-gate";
 import { z } from "zod";
 import { useEffect, useRef, useState } from "react";
 import { createFileRoute, Link } from "@tanstack/react-router";
@@ -57,7 +58,7 @@ export const Route = createFileRoute("/discover")({
     ],
     links: [{ rel: "canonical", href: pageUrl("/discover") }],
   }),
-  component: DiscoverPage,
+  component: GatedDiscoverPage,
 });
 
 function ChoiceStep<T extends string>({
@@ -355,6 +356,7 @@ function DiscoverPage() {
                             p.id ===
                             (product.id === "radar" ? "landscape" : "radar"),
                         ) && (
+                          <FeatureOnly feature="compare">
                           <Link
                             to="/compare"
                             search={{ ids: "radar,landscape", goal: answers.goal || undefined }}
@@ -363,6 +365,7 @@ function DiscoverPage() {
                               ? "قارن الأداتين"
                               : "Compare both tools"}
                           </Link>
+                          </FeatureOnly>
                         )}
                       </div>
                     )}
@@ -504,5 +507,13 @@ function DiscoverPage() {
       </details>
       )}
     </main>
+  );
+}
+
+function GatedDiscoverPage() {
+  return (
+    <FeatureGate featureKey="discover">
+      <DiscoverPage />
+    </FeatureGate>
   );
 }

@@ -1,4 +1,5 @@
 import { scopeDetails } from "@/lib/product-cases";
+import { featureEnabled } from "@/lib/site-features";
 import { trackJourney } from "@/lib/journey-client";
 import { useEffect, useState } from "react";
 import { useHydrated } from "@tanstack/react-router";
@@ -36,6 +37,8 @@ function EnterpriseContent() {
   const { language, t } = useLanguage();
   const ar = language === "ar";
   const { data } = useSuspenseQuery(catalogQueryOptions);
+  // With newsletter sign-up off, coming-soon tools link to their own page instead.
+  const newsletterOn = featureEnabled(data.settings.featureFlags, "newsletter");
   const theme = useActiveTheme(data.settings.designTheme.theme);
   const contact = consultantContact(
     data.settings.themeCustomizations?.[theme],
@@ -202,7 +205,9 @@ function EnterpriseContent() {
                         onClick={soon ? undefined : startSelection}
                         href={
                           soon
-                            ? "/newsletter#product=" + encodeURIComponent(p.id)
+                            ? newsletterOn
+                              ? "/newsletter#product=" + encodeURIComponent(p.id)
+                              : "/product/" + encodeURIComponent(p.id)
                             : "/enterprise-services/request?service=" +
                               serviceIds[active] +
                               "&tool=" +
