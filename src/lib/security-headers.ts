@@ -1,20 +1,26 @@
 /** Response security headers shared by the request middleware (browser-safe, no imports). */
 
-export const CSP_REPORT_ONLY = [
+/**
+ * Enforced Content-Security-Policy. Inline script/style stay allowed (framework hydration
+ * and component styles); everything else is limited to the site, Supabase (HTTPS + realtime
+ * websockets), Google Fonts and Cloudflare Turnstile. blob:/data: cover the 3D model's
+ * embedded textures and local image previews/downloads.
+ */
+export const CSP_ENFORCED = [
   "default-src 'self'",
   "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com",
   "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
-  "font-src https://fonts.gstatic.com https://cdn.jsdelivr.net data:",
-  "img-src 'self' https: data:",
-  "connect-src 'self' https://*.supabase.co https://api.groq.com",
+  "font-src 'self' https://fonts.gstatic.com https://cdn.jsdelivr.net data:",
+  "img-src 'self' https: data: blob:",
+  "media-src 'self' blob:",
+  "connect-src 'self' https://*.supabase.co wss://*.supabase.co https://api.groq.com https://challenges.cloudflare.com data: blob:",
+  "worker-src 'self' blob:",
   "frame-src https://challenges.cloudflare.com",
   "frame-ancestors 'none'",
   "object-src 'none'",
   "base-uri 'self'",
+  "form-action 'self'",
 ].join("; ");
-
-/** Enforced policy: only framing is blocked, so existing scripts/styles keep working. */
-export const CSP_ENFORCED = "frame-ancestors 'none'";
 
 export function applySecurityHeaders(h: Headers): void {
   if (!h.has("x-content-type-options")) h.set("x-content-type-options", "nosniff");
@@ -23,9 +29,6 @@ export function applySecurityHeaders(h: Headers): void {
     h.set("permissions-policy", "camera=(), microphone=(), geolocation=()");
   if (!h.has("strict-transport-security"))
     h.set("strict-transport-security", "max-age=31536000; includeSubDomains");
-  // Report-only: observes violations of the broader policy without blocking anything.
-  if (!h.has("content-security-policy-report-only"))
-    h.set("content-security-policy-report-only", CSP_REPORT_ONLY);
   if (!h.has("content-security-policy")) h.set("content-security-policy", CSP_ENFORCED);
   if (!h.has("x-frame-options")) h.set("x-frame-options", "DENY");
 }

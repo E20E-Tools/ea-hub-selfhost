@@ -4,7 +4,6 @@ import { describe, expect, it } from "vitest";
 import {
   applySecurityHeaders,
   CSP_ENFORCED,
-  CSP_REPORT_ONLY,
 } from "@/lib/security-headers";
 import { turnsFromMessages } from "@/lib/live-chat.server";
 
@@ -18,17 +17,28 @@ const migration = (tag: string) => readFileSync(`drizzle/migrations/${tag}.sql`,
 describe("anti-framing headers", () => {
   it("enforces frame-ancestors 'none' and X-Frame-Options DENY on the public domain", () => {
     const h = headersFor();
-    expect(h.get("content-security-policy")).toBe("frame-ancestors 'none'");
+    expect(h.get("content-security-policy")).toBe(CSP_ENFORCED);
     expect(CSP_ENFORCED).toContain("frame-ancestors 'none'");
     expect(h.get("x-frame-options")).toBe("DENY");
   });
-  it("keeps the existing report-only policy unchanged", () => {
-    expect(headersFor().get("content-security-policy-report-only")).toBe(
-      CSP_REPORT_ONLY,
-    );
-    expect(CSP_REPORT_ONLY).toContain("default-src 'self'");
+  it("enforces the full content policy instead of report-only", () => {
+    const h = headersFor();
+    expect(h.get("content-security-policy-report-only")).toBeNull();
+    for (const d of [
+      "default-src 'self'",
+      "object-src 'none'",
+      "base-uri 'self'",
+      "form-action 'self'",
+    ])
+      expect(CSP_ENFORCED).toContain(d);
+    expect(CSP_ENFORCED).not.toContain("unsafe-eval");
   });
-
+  it("allows what the site really loads: own fonts, Supabase realtime and model textures", () => {
+    expect(CSP_ENFORCED).toMatch(/font-src 'self'/);
+    expect(CSP_ENFORCED).toContain("wss://*.supabase.co");
+    expect(CSP_ENFORCED).toMatch(/img-src [^;]*blob:/);
+    expect(CSP_ENFORCED).toMatch(/connect-src [^;]*blob:/);
+  });
 });
 
 describe("assistant context mapping", () => {

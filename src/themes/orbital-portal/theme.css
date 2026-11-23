@@ -153,6 +153,7 @@
 }
 
 .orb-visual {
+  --orb-edge: 100px;
   position: relative;
   min-height: 560px;
 }

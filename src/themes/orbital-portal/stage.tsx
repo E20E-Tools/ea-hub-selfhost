@@ -103,7 +103,8 @@ export default function OrbitalPortalStage({ products, settings }: StageProps) {
               data-live={live ? "" : undefined}
               data-soon={p.comingSoon ? "" : undefined}
               style={{
-                left: `${spot.x}%`,
+                // Keep the whole pill inside the stage on narrow screens.
+                left: `clamp(var(--orb-edge), ${spot.x}%, calc(100% - var(--orb-edge)))`,
                 top: `${spot.y}%`,
                 animationDelay: `${-i * 0.9}s`,
               }}
