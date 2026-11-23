@@ -720,7 +720,7 @@
   align-items: center;
   gap: 4px;
   color: var(--ld-node-light);
-  font-size: 10px;
+  font-size: 12px;
   line-height: 1.25;
 }
 .ld-module-status::before {
@@ -744,7 +744,7 @@
 }
 .ld-module small {
   color: #bed1de;
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.25;
   overflow-wrap: anywhere;
   text-align: match-parent;
@@ -1098,7 +1098,7 @@
   block-size: 13px;
 }
 .ld-stage[data-vertical] .ld-module[data-dense] .ld-module-status {
-  font-size: 9px;
+  font-size: 12px;
 }
 .ld-stage[data-vertical] .ld-crt {
   inline-size: 170px;
