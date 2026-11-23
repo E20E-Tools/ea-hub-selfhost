@@ -141,11 +141,11 @@
   block-size: 760px;
 }
 /* Reserve the stage height before the lazy stage mounts, so the catalog below does not jump (CLS). */
-.theme-stage[data-stage="legacy-to-digital"] {
+:is(.s-board, body) .theme-stage[data-stage="legacy-to-digital"] {
   min-block-size: max(520px, min(74vh, 680px));
 }
 @media (max-width: 639px) {
-  .theme-stage[data-stage="legacy-to-digital"] {
+  :is(.s-board, body) .theme-stage[data-stage="legacy-to-digital"] {
     min-block-size: 760px;
   }
 }
