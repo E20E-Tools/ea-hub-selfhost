@@ -311,6 +311,7 @@ export function ToolRequestDialog({
               <label className="grid gap-1 text-sm">
                 <span>{t("requestNameLabel")}</span>
                 <Input
+                  autoComplete="name"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   maxLength={100}
@@ -323,6 +324,7 @@ export function ToolRequestDialog({
               <label className="grid gap-1 text-sm">
                 <span>{t("requestEmailLabel")}</span>
                 <Input
+                  autoComplete="email"
                   type="email"
                   dir="ltr"
                   value={email}
@@ -337,6 +339,7 @@ export function ToolRequestDialog({
               <label className="grid gap-1 text-sm">
                 <span>{t("requestCompanyLabel")}</span>
                 <Input
+                  autoComplete="organization"
                   value={company}
                   onChange={(e) => setCompany(e.target.value)}
                   maxLength={150}
@@ -346,6 +349,7 @@ export function ToolRequestDialog({
                 <label className="grid gap-1 text-sm">
                   <span>{t("rqPhoneSupport")}</span>
                   <Input
+                    autoComplete="tel"
                     type="tel"
                     dir="ltr"
                     value={phone}

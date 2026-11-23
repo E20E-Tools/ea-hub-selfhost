@@ -5494,3 +5494,64 @@ footer.site-footer {
     .archy-character { width: 56px; height: 56px; }
   }
 }
+
+/* Audit 01: the open site menu must never sit under Archy. */
+body:has(.s-menu[aria-expanded="true"]) .assistant-chat {
+  display: none;
+}
+
+/* Audit 05 / D9: Arabic is cursive, so tracking breaks the joins between letters. */
+html[lang|="ar"] :is(h1, h2, h3, h4, .ld-world-label),
+html[lang|="ar"] [dir="rtl"] :is(h1, h2, h3, h4) {
+  letter-spacing: normal;
+}
+
+/* Audit 10: standalone text links need a 24px target (WCAG 2.5.8). */
+.detail-request-links a,
+.detail-crumbs a,
+.ea-auth-tools > a,
+.ea-auth-form .text-xs[type="button"] {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+}
+input[type="checkbox"] {
+  min-width: 18px;
+  min-height: 18px;
+}
+
+/* Footer directory links. */
+.nx-foot-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.25rem 1rem;
+  margin: 0 0 0.5rem;
+  padding: 0;
+  list-style: none;
+}
+.nx-foot-links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  color: inherit;
+}
+
+/* Audit 06: primary action on the hub card. */
+.ld-hub-cta {
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  margin-top: 0.5rem;
+  padding: 0 0.85rem;
+  border-radius: 999px;
+  background: var(--ea-light, oklch(80% 0.17 160));
+  color: var(--ea-ink, oklch(24% 0.06 160));
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-decoration: none;
+}
+.ld-hub-cta:focus-visible {
+  outline: 2px solid var(--ea-light, oklch(80% 0.17 160));
+  outline-offset: 2px;
+}

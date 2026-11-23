@@ -17,7 +17,10 @@ describe("admin dictionary", () => {
     expect(adminText("en", "editProduct", { name: "Radar" })).toBe("Edit Radar");
     expect(actionLabel("en", "product.save")).toBe("Saved a product");
     expect(actionLabel("ar", "product.save")).toBe("حفظ منتج");
-    expect(actionLabel("en", "unknown.thing")).toBe("unknown.thing");
+    expect(actionLabel("en", "unknown.thing")).toBe("Unknown thing");
+    expect(actionLabel("en", "ai.registration-policy")).toBe(
+      "Changed the Archy visitor registration limit",
+    );
   });
 
   it("resolves every message key returned by admin server functions", () => {

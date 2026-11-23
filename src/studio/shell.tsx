@@ -159,6 +159,7 @@ export function StudioHeader() {
             <button
               className="s-language"
               lang={ar ? "en" : "ar"}
+              aria-label={ar ? "English" : "العربية"}
               onClick={() => setLanguage(ar ? "en" : "ar")}
             >
               {ar ? "EN" : "عربي"}
@@ -247,8 +248,24 @@ export function StudioFooter() {
   const { data } = useSuspenseQuery(catalogQueryOptions);
   const { language } = useLanguage();
   const s = localizedSettings(data.settings, language);
+  const ar = language === "ar";
+  const links = [
+    { to: "/about", label: ar ? "من نحن" : "About" },
+    { to: "/contact", label: ar ? "اتصل بنا" : "Contact" },
+    { to: "/terms", label: ar ? "شروط الخدمة" : "Terms of service" },
+    { to: "/privacy", label: ar ? "سياسة الخصوصية" : "Privacy policy" },
+  ];
   return (
     <footer className="nx-foot">
+      <nav aria-label={ar ? "روابط الموقع" : "Site links"}>
+        <ul className="nx-foot-links">
+          {links.map((link) => (
+            <li key={link.to}>
+              <a href={link.to}>{link.label}</a>
+            </li>
+          ))}
+        </ul>
+      </nav>
       <p dir="auto">
         {linkedFooterParts(s.footerText, s.footerLinks ?? []).map((part, i) =>
           part.url ? (

@@ -26,6 +26,7 @@ import { Route as EnterpriseServicesRouteImport } from './routes/enterprise-serv
 import { Route as MyRequestsRouteImport } from './routes/my-requests'
 import { Route as MyToolsRouteImport } from './routes/my-tools'
 import { Route as NewsletterRouteImport } from './routes/newsletter'
+import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ReleasesRouteImport } from './routes/releases'
 import { Route as RequestRouteImport } from './routes/request'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
@@ -126,6 +127,11 @@ const MyToolsRoute = MyToolsRouteImport.update({
 const NewsletterRoute = NewsletterRouteImport.update({
   id: '/newsletter',
   path: '/newsletter',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ReleasesRoute = ReleasesRouteImport.update({
@@ -229,6 +235,7 @@ export interface FileRoutesByFullPath {
   '/my-requests': typeof MyRequestsRoute
   '/my-tools': typeof MyToolsRoute
   '/newsletter': typeof NewsletterRoute
+  '/privacy': typeof PrivacyRoute
   '/releases': typeof ReleasesRoute
   '/request': typeof RequestRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -264,6 +271,7 @@ export interface FileRoutesByTo {
   '/my-requests': typeof MyRequestsRoute
   '/my-tools': typeof MyToolsRoute
   '/newsletter': typeof NewsletterRoute
+  '/privacy': typeof PrivacyRoute
   '/releases': typeof ReleasesRoute
   '/request': typeof RequestRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -300,6 +308,7 @@ export interface FileRoutesById {
   '/my-requests': typeof MyRequestsRoute
   '/my-tools': typeof MyToolsRoute
   '/newsletter': typeof NewsletterRoute
+  '/privacy': typeof PrivacyRoute
   '/releases': typeof ReleasesRoute
   '/request': typeof RequestRoute
   '/reset-password': typeof ResetPasswordRoute
@@ -337,6 +346,7 @@ export interface FileRouteTypes {
     | '/my-requests'
     | '/my-tools'
     | '/newsletter'
+    | '/privacy'
     | '/releases'
     | '/request'
     | '/reset-password'
@@ -372,6 +382,7 @@ export interface FileRouteTypes {
     | '/my-requests'
     | '/my-tools'
     | '/newsletter'
+    | '/privacy'
     | '/releases'
     | '/request'
     | '/reset-password'
@@ -407,6 +418,7 @@ export interface FileRouteTypes {
     | '/my-requests'
     | '/my-tools'
     | '/newsletter'
+    | '/privacy'
     | '/releases'
     | '/request'
     | '/reset-password'
@@ -443,6 +455,7 @@ export interface RootRouteChildren {
   MyRequestsRoute: typeof MyRequestsRoute
   MyToolsRoute: typeof MyToolsRoute
   NewsletterRoute: typeof NewsletterRoute
+  PrivacyRoute: typeof PrivacyRoute
   ReleasesRoute: typeof ReleasesRoute
   RequestRoute: typeof RequestRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
@@ -582,6 +595,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof NewsletterRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/releases': {
       id: '/releases'
       path: '/releases'
@@ -715,6 +735,7 @@ const rootRouteChildren: RootRouteChildren = {
   MyRequestsRoute: MyRequestsRoute,
   MyToolsRoute: MyToolsRoute,
   NewsletterRoute: NewsletterRoute,
+  PrivacyRoute: PrivacyRoute,
   ReleasesRoute: ReleasesRoute,
   RequestRoute: RequestRoute,
   ResetPasswordRoute: ResetPasswordRoute,

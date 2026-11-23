@@ -113,6 +113,7 @@ export function CustomersSection({
           </Button>
         ))}
       </div>
+      <p className="-mt-3 mb-5 text-xs text-muted-foreground">{t("cwTilesScope")}</p>
       <section
         aria-label={t("vsTitle")}
         className="mb-5 rounded-lg border border-border bg-card p-4"

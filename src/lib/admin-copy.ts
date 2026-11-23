@@ -224,6 +224,12 @@ const ar = {
     "تنبيه: تراجع وقت الرد — الوسيط {median} مللي ثانية في الساعة الأخيرة ({samples} ردًا).",
   opsChatAlertLow: "تنبيه: انخفضت الردود الناجحة — {success} من {samples} في الساعة الأخيرة.",
   act_ai_failure_alert: "تنبيه فشل الذكاء الاصطناعي",
+  act_ai_registration_policy: "عدّل حد تسجيل زوار Archy",
+  act_retention_daily_cleanup_failed: "تعذّر التنظيف اليومي للبيانات القديمة",
+  actorSystem: "النظام",
+  opsMethodNote: "كيف تُقاس هذه القيم",
+  cwTilesScope: "إجماليات كل الفترات للزوار المسجّلين في Archy، وليست أرقام اليوم.",
+  navWaitingBreakdown: "بانتظار الفريق: {items} طلبات وعروض جديدة · {live} محادثات مباشرة",
   act_ai_chat_degraded: "تنبيه تراجع أداء محادثة الذكاء الاصطناعي",
   opsDelivery: "التحقق من التسليم",
   opsRefresh: "تحديث الحالة",
@@ -1380,6 +1386,12 @@ const en: Record<AdminCopyKey, string> = {
     "Alert: reply time dropped — median {median} ms over the last hour ({samples} replies).",
   opsChatAlertLow: "Alert: successful replies fell to {success} of {samples} in the last hour.",
   act_ai_failure_alert: "AI failure alert",
+  act_ai_registration_policy: "Changed the Archy visitor registration limit",
+  act_retention_daily_cleanup_failed: "Daily cleanup of old data failed",
+  actorSystem: "System",
+  opsMethodNote: "How these are measured",
+  cwTilesScope: "All-time totals for visitors registered with Archy, not today's figures.",
+  navWaitingBreakdown: "Waiting for the team: {items} new requests and offers · {live} live chats",
   act_ai_chat_degraded: "AI chat performance alert",
   opsDelivery: "Delivery verification",
   opsRefresh: "Refresh status",
@@ -1506,17 +1518,17 @@ const en: Record<AdminCopyKey, string> = {
   tabGeneralDesc: "Site name, tagline, description, footer and logo.",
   tabAppearance: "Appearance",
   tabAppearanceDesc: "Site theme, colors, fonts and product images.",
-  tabCustomize: "Design customisation",
+  tabCustomize: "Design customization",
   tabCustomizeDesc:
-    "Colours, sizes and pictures for each design, saved from here without manual changes.",
-  customizeDesign: "Design to customise",
+    "Colors, sizes and pictures for each design, saved from here without manual changes.",
+  customizeDesign: "Design to customize",
   customizeDesignHint: "Changes apply only to this design; the other designs stay as they are.",
-  customizeEdited: "Customised",
+  customizeEdited: "Customized",
   customizeOpenPreview: "Open this design in a new tab",
   customizePreviewNote: "The new tab shows the last saved version.",
   customizePreview: "Quick preview",
-  customizeColors: "Design colours",
-  customizeColorsDesc: "Leave a colour empty to keep the design's own colour.",
+  customizeColors: "Design colors",
+  customizeColorsDesc: "Leave a color empty to keep the design's own color.",
   customizeSizes: "Sizes",
   customizeSizesDesc: "100% is the design's own size.",
   size_logo: "Logo and site name",
@@ -1535,7 +1547,7 @@ const en: Record<AdminCopyKey, string> = {
   customAboutImage: "About page picture",
   customAboutImageHint:
     "Shown under the platform numbers on the About page. Without one, the connected-platform picture is shown.",
-  customizeThisDesign: "Customise this design",
+  customizeThisDesign: "Customize this design",
   customProductImages: "Product pictures",
   usingDesignImage: "Design's own picture",
   usingCustomImage: "Custom picture",
@@ -2090,7 +2102,7 @@ const en: Record<AdminCopyKey, string> = {
     "Add, edit and hide customer testimonials; they show on the Testimonials page in Arabic and English.",
   testimonialsTitle: "Customer testimonials",
   testimonialsDesc:
-    "Each testimonial has a name, role, organisation, text and an optional photo. Save to show it to visitors straight away.",
+    "Each testimonial has a name, role, organization, text and an optional photo. Save to show it to visitors straight away.",
   testimonialsOpenPage: "Open page",
   addTestimonial: "Add testimonial",
   testimonialsCount: "Testimonials shown to visitors: {count}.",
@@ -2102,7 +2114,7 @@ const en: Record<AdminCopyKey, string> = {
   deleteTestimonialTitle: "Delete {name}'s testimonial?",
   testimonialName: "Name",
   testimonialRole: "Role",
-  testimonialOrganization: "Organisation",
+  testimonialOrganization: "Organization",
   testimonialQuote: "Testimonial text",
   testimonialPhoto: "Photo",
   testimonialPhotoHint: "Optional. Without one, the first letter of the name is shown.",
@@ -2126,7 +2138,7 @@ const en: Record<AdminCopyKey, string> = {
   consultantsOpenPage: "Open the Enterprise Services page in this design",
   termsTitle: "Terms of service",
   termsHint:
-    'One text for every design; the page uses the chosen design\'s colours. Start a line with "## " for a section title and leave a blank line between paragraphs. An empty field shows the default draft.',
+    'One text for every design; the page uses the chosen design\'s colors. Start a line with "## " for a section title and leave a blank line between paragraphs. An empty field shows the default draft.',
   termsDraftNote:
     "The current text is a general draft; have it reviewed by a legal adviser before relying on it.",
   termsOpenPage: "Open the terms page",
@@ -2297,7 +2309,7 @@ const en: Record<AdminCopyKey, string> = {
   errSaveContact: "Couldn't save the contact details.",
   errSaveGeneral: "Couldn't save the general settings.",
   errSaveAppearance: "Couldn't save the appearance.",
-  errSaveCustomize: "Couldn't save the design customisation.",
+  errSaveCustomize: "Couldn't save the design customization.",
   errSaveNavigation: "Couldn't save the menu.",
   errSaveCategories: "Couldn't save the categories.",
   errSaveContactSettings: "Couldn't save the notification settings.",
@@ -2335,6 +2347,9 @@ export function adminText(
 
 /** Human-readable label for an audit-log action such as "product.save". */
 export function actionLabel(language: Language, action: string): string {
-  const key = `act_${action.replace(/\./g, "_")}`;
-  return isAdminCopyKey(key) ? adminDictionaries[language][key] : action;
+  const key = `act_${action.replace(/[.-]/g, "_")}`;
+  if (isAdminCopyKey(key)) return adminDictionaries[language][key];
+  // Unknown event keys read as words rather than code ("ai.foo-bar" → "Ai foo bar").
+  const words = action.replace(/[._-]+/g, " ").trim();
+  return words.charAt(0).toUpperCase() + words.slice(1);
 }

@@ -43,7 +43,6 @@ export function ApplicationHealth() {
           {t("opsRefresh")}
         </Button>
       </header>
-      <p className="my-2 text-sm text-muted-foreground">{t("opsHealthHint")}</p>
       <QueryState query={q} empty={t("opsUnknown")} isEmpty={false}>
         {q.data && (
           <>
@@ -74,7 +73,6 @@ export function ApplicationHealth() {
             {q.data.chatHealth ? (
               <section className="mb-4 border-y border-border py-3" aria-label={t("opsChatHealth")}>
                 <h3 className="font-medium">{t("opsChatHealth")}</h3>
-                <p className="my-1 text-sm text-muted-foreground">{t("opsChatHealthHint")}</p>
                 {q.data.chatHealth.alert ? (
                   <p
                     role="alert"
@@ -168,9 +166,6 @@ export function ApplicationHealth() {
                 <dd>{date(q.data.checkedAt)}</dd>
               </div>
             </dl>
-            <p className="mt-3 text-sm text-muted-foreground">{t("opsProviderHelp")}</p>
-            <p className="text-sm text-muted-foreground">{t("opsObservationHint")}</p>
-            <p className="text-sm text-muted-foreground">{t("opsMailHelp")}</p>
             <div className="mt-4 grid gap-4 sm:grid-cols-3">
               {q.data.measurements?.map((m) => (
                 <dl key={m.operation} className="border-s border-border ps-3">
@@ -192,6 +187,24 @@ export function ApplicationHealth() {
                 </dl>
               )) ?? <p>{t("opsUnknown")}</p>}
             </div>
+            <details className="mt-4 text-sm text-muted-foreground">
+              <summary className="cursor-pointer font-medium text-foreground">
+                {t("opsMethodNote")}
+              </summary>
+              <ul className="mt-2 grid list-disc gap-1 ps-5">
+                {(
+                  [
+                    "opsHealthHint",
+                    "opsChatHealthHint",
+                    "opsProviderHelp",
+                    "opsObservationHint",
+                    "opsMailHelp",
+                  ] as const
+                ).map((key) => (
+                  <li key={key}>{t(key)}</li>
+                ))}
+              </ul>
+            </details>
           </>
         )}
       </QueryState>

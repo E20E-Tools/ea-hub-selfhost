@@ -95,6 +95,9 @@ function NavList({
                 ) : null}
                 {count > 0 ? (
                   <span
+                    title={t("navWaitingBreakdown")
+                      .replace("{items}", String(badge))
+                      .replace("{live}", String(liveBadge))}
                     className={cn(
                       "ea-rail-count min-w-5 rounded-full px-1.5 text-center text-[11px] font-semibold leading-5",
                       collapsed && "absolute -top-1 end-0",

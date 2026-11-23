@@ -156,12 +156,6 @@ function AdminConsole() {
       });
     }
   }, [pending, t, navigate]);
-  useEffect(() => {
-    if (typeof document === "undefined") return;
-    const base = `${t("consoleTitle")} — ${siteTitle}`;
-    document.title =
-      pending !== null && pending > 0 ? `(${pending}) ${base}` : base;
-  }, [pending, siteTitle, t]);
 
   const checkAccess = async () => {
     try {
@@ -213,6 +207,14 @@ function AdminConsole() {
     [navigate],
   );
   const liveWaiting = useLiveChatAlerts(state === "admin", openLiveChat);
+  // The tab title shows the same "waiting for the team" count as the sidebar badge.
+  const waiting = pending === null ? null : pending + (liveWaiting ?? 0);
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    const base = `${t("consoleTitle")} — ${siteTitle}`;
+    document.title =
+      waiting !== null && waiting > 0 ? `(${waiting}) ${base}` : base;
+  }, [waiting, siteTitle, t]);
 
   const brand = {
     logoUrl: catalog.settings.logoUrl,

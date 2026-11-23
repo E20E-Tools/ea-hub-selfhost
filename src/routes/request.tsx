@@ -493,6 +493,7 @@ function RequestPage() {
                       <span>{t("requestNameLabel")}</span>
                       <Input
                         id="request-name"
+                        autoComplete="name"
                         value={name}
                         aria-invalid={Boolean(fieldErrors["name"])}
                         aria-describedby={fieldErrors["name"] ? "request-name-error" : undefined}
@@ -508,6 +509,7 @@ function RequestPage() {
                       <Input
                         id="request-email"
                         type="email"
+                        autoComplete="email"
                         dir="ltr"
                         value={email}
                         aria-invalid={Boolean(fieldErrors["email"])}
@@ -525,6 +527,7 @@ function RequestPage() {
                         <Input
                           id="request-phone"
                           type="tel"
+                          autoComplete="tel"
                           dir="ltr"
                           value={phone}
                           aria-invalid={Boolean(fieldErrors["phone"])}
@@ -543,6 +546,7 @@ function RequestPage() {
                     <label className="request-field">
                       <span>{t("requestCompanyLabel")}</span>
                       <Input
+                        autoComplete="organization"
                         value={company}
                         onChange={(e) => setCompany(e.target.value)}
                         placeholder={t("requestCompanyPlaceholder")}

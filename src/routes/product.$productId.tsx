@@ -228,7 +228,35 @@ function ProductDetail() {
           <WorkCard key={product.id} id={product.id} name={product.name} ar={ar}/>
           <ProductCase product={product} language={language}/>
           <section className="bx-panel" id="operating-requirements"><h2>{ar?"متطلبات التشغيل":"Operating requirements"}</h2>
-          <dl>{(["account","inputs","exchange"] as const).map((key,i)=><div key={key}><dt>{(ar?["الحساب","البيانات المطلوبة للبدء","الاستيراد والتصدير"]:["Account","Starting data","Import and export"])[i]}</dt><dd>{product.beneficiaryDetails?.operations?.[key][language] || (ar?"لم تُنشر تفاصيل مؤكدة بعد.":"Verified details have not been published yet.")}</dd></div>)}</dl>
+          {(() => {
+            const labels = ar
+              ? { account: "الحساب", inputs: "البيانات المطلوبة للبدء", exchange: "الاستيراد والتصدير" }
+              : { account: "Account", inputs: "Starting data", exchange: "Import and export" };
+            const rows = (["account", "inputs", "exchange"] as const)
+              .map((key) => {
+                const text = product.beneficiaryDetails?.operations?.[key]?.[language]?.trim();
+                // Import/export falls back to the documented integrations so the page never
+                // says "unconfirmed" while listing Excel/CSV further down.
+                const fallback =
+                  key === "exchange" && beneficiary.integrations?.length
+                    ? beneficiary.integrations.join(ar ? "، " : ", ")
+                    : "";
+                return { key, text: text || fallback };
+              })
+              .filter((row) => row.text);
+            return rows.length ? (
+              <dl>
+                {rows.map((row) => (
+                  <div key={row.key}>
+                    <dt>{labels[row.key]}</dt>
+                    <dd>{row.text}</dd>
+                  </div>
+                ))}
+              </dl>
+            ) : (
+              <p>{ar ? "سننشر تفاصيل التشغيل بعد التحقق منها." : "Operating details will be published once verified."}</p>
+            );
+          })()}
           <small>{ar?"آخر مراجعة":"Last verified"} · {product.beneficiaryDetails?.operations?.reviewed || (ar?"غير مسجّلة":"Not recorded")}</small></section>
           <section id="capabilities" className="detail-features">
             <h2>{t("productFeatures")}</h2>

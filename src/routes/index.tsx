@@ -24,13 +24,13 @@ export const Route = createFileRoute("/")({
   notFoundComponent: LibraryNotFound,
   head: () => ({
     meta: [
-      { title: "EA-Hub | أدوات البنية المؤسسية من E20E" },
+      { title: "E20E Tools | أدوات البنية المؤسسية — Enterprise architecture tools" },
       {
         name: "description",
         content:
           "مكتبة أدوات E20E للبنية المؤسسية وإدارة التقنيات. Explore E20E tools for enterprise architecture and technology management.",
       },
-      { property: "og:title", content: "EA-Hub | Enterprise architecture tools" },
+      { property: "og:title", content: "E20E Tools | Enterprise architecture tools" },
       {
         property: "og:description",
         content:
@@ -41,6 +41,28 @@ export const Route = createFileRoute("/")({
       ...shareImageMeta("home"),
     ],
     links: [{ rel: "canonical", href: pageUrl("/") }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@graph": [
+            {
+              "@type": "Organization",
+              name: "E20E Tools",
+              url: pageUrl("/"),
+              email: "ea@e20e.tools",
+            },
+            {
+              "@type": "WebSite",
+              name: "E20E Tools",
+              url: pageUrl("/"),
+              inLanguage: ["ar", "en"],
+            },
+          ],
+        }),
+      },
+    ],
   }),
   component: StudioHome,
 });

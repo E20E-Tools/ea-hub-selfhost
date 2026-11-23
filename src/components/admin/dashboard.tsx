@@ -285,7 +285,7 @@ export function DashboardSection({
               <Row
                 key={r.id}
                 title={actionLabel(language, r.action)}
-                meta={`${r.actor_email} · ${date(r.created_at, short)}`}
+                meta={`${r.actor_email === "system" ? t("actorSystem") : r.actor_email} · ${date(r.created_at, short)}`}
               />
             ))}
           </MiniList>

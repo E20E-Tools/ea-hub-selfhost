@@ -65,7 +65,7 @@ export function CatalogWorkbench({ products }: { products: Product[] }) {
                     ) : (
                       <Check size={13} aria-hidden="true" />
                     )}
-                    {product.comingSoon ? t("comingSoonBadge") : ar ? "متاحة الآن" : "Available"}
+                    {product.comingSoon ? t("comingSoonBadge") : ar ? "متاحة الآن" : "Available now"}
                   </span>
                 </div>
                 <div className="nx-card-copy">

@@ -77,7 +77,7 @@ export const defaultSettings: SiteSettings = {
   displayTitle: "E20E Tools.",
   arabicTitle: "",
   description: "Built by EA, for EA - All EA Tools In  1 Place",
-  footerText: "Build with ♥ By TAQNIA.ME & DT.Guide",
+  footerText: "Built with ♥ by TAQNIA.ME & DT.Guide",
   footerLinks: [
     { name: "TAQNIA.ME", url: "https://taqnia.me/" },
     { name: "DT.Guide", url: "https://dt.guide/" },
