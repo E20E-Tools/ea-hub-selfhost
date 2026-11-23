@@ -884,9 +884,10 @@
 }
 .ld-stage[data-vertical] .ld-readout {
   inset-block: auto 14px;
-  left: auto;
-  /* Opposite side to the Archy assistant, which sits at inline-start. */
-  inset-inline-end: 10px;
+  /* Archy docks bottom-right in both languages, so keep the readout bottom-left. */
+  inset-inline: auto;
+  left: 10px;
+  right: auto;
   transform: none;
   min-inline-size: 0;
   max-inline-size: calc(50% - 49px);
@@ -899,6 +900,9 @@
 }
 .ld-stage[data-vertical] .ld-world-digital {
   inset-block: auto 92px;
+  inset-inline: auto;
+  left: 18px;
+  right: auto;
 }
 
 .ld-converting {
