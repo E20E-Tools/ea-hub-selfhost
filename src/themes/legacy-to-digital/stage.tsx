@@ -1,5 +1,6 @@
 import {
   useEffect,
+  useLayoutEffect,
   useMemo,
   useRef,
   useState,
@@ -51,7 +52,10 @@ function x0Edge(x: number, bus: number, edge: number): number {
 }
 
 function useMobile(): boolean {
-  const [mobile, setMobile] = useState(false);
+  // The stage mounts client-side only, so read the query up front instead of flipping layouts after mount.
+  const [mobile, setMobile] = useState(
+    () => typeof window !== "undefined" && window.matchMedia("(max-width: 639px)").matches,
+  );
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 639px)");
     const on = () => setMobile(mq.matches);
@@ -176,9 +180,11 @@ export default function LegacyDigitalStage({ products, settings }: StageProps) {
   // Once the visitor moves the handle, scrolling never drifts it again.
   const userMoved = useRef(false);
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     const el = root.current;
     if (!el) return;
+    // Measure before the first paint so items are never drawn at the 1200px default.
+    setSize({ w: el.clientWidth, h: el.clientHeight });
     const ro = new ResizeObserver(
       ([e]) =>
         e && setSize({ w: e.contentRect.width, h: e.contentRect.height }),
