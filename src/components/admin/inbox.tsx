@@ -745,7 +745,7 @@ export function OffersTab() {
   );
 }
 
-function AssistantTab() {
+export function AssistantTab() {
   const { t, date } = useAdminCopy();
   const read = useServerFn(listAssistantReplies);
   const query = useQuery({

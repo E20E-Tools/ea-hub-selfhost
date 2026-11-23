@@ -3316,9 +3316,16 @@ html[data-design-theme="transformation-board"] .tb-readout {
     right: max(0.65rem, env(safe-area-inset-right));
     bottom: max(0.65rem, env(safe-area-inset-bottom));
   }
+  /* Phones: a compact launcher that does not cover page content. Mute stays visible so a
+     visitor can always silence Archy; the other controls appear on keyboard focus. */
   .archy-character {
-    width: 120px;
-    height: 120px;
+    width: 84px;
+    height: 84px;
+  }
+  .archy-dock:not(:focus-within):not([data-archy-tour])
+    .archy-toolbar
+    > :not(.archy-mute-button, .sr-only) {
+    display: none;
   }
   .archy-toolbar {
     margin-top: -9px;

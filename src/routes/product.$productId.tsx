@@ -116,7 +116,7 @@ function ProductDetail() {
           <bdi dir="ltr">{product.name}</bdi>
         </nav>
         <span className="detail-count">
-          {String(others.length + 1).padStart(2, "0")} {t("toolsInLibrary")}
+          {others.length + 1} {t("toolsInLibrary")}
         </span>
       </div>
 

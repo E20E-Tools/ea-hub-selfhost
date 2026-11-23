@@ -199,7 +199,7 @@ export function DashboardSection({
           <button
             className="ea-queue-open"
             type="button"
-            onClick={() => go("inbox", "requests")}
+            onClick={() => go("customers", "requests")}
           >
             {t("quickReviewRequests")}
             <span aria-hidden="true">↗</span>
@@ -247,7 +247,7 @@ export function DashboardSection({
         <div className="mt-6 grid gap-4 lg:grid-cols-3">
           <MiniList
             title={t("latestRequests")}
-            onAll={() => go("inbox", "requests")}
+            onAll={() => go("customers", "requests")}
             empty={t("noRequestsYet")}
             count={d.latestRequests.length}
           >
@@ -262,7 +262,7 @@ export function DashboardSection({
           </MiniList>
           <MiniList
             title={t("latestOffers")}
-            onAll={() => go("inbox", "offers")}
+            onAll={() => go("customers", "offers")}
             empty={t("noOffersYet")}
             count={d.latestOffers.length}
           >

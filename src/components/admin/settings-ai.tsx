@@ -517,16 +517,14 @@ function EngineSelector({
 }
 
 function RegistrationPolicy({settings}: {settings:AiSettingsView}) {
-  const {language,t}=useAdminCopy();
-  const ar=language==="ar";
+  const {t}=useAdminCopy();
   const qc=useQueryClient();
   const savePolicy=useServerFn(saveRegistrationPolicy);
   const draft=useDraft({limit:String(settings.registrationLimit),minutes:String(settings.registrationWaitMinutes)});
   const [busy,setBusy]=useState(false);
   if(!draft.value) return null;
   const {limit,minutes}=draft.value;
-  return <Card title={ar?"حد تسجيل زوار Archy":"Archy visitor registration limit"}
-    description={ar?"يُحسب الحد لكل متصفح بعد نجاح التحقق البشري. يبدأ الانتظار عند اكتمال العدد خلال الفترة المحددة، ويستطيع زملاء الزائر التسجيل من متصفحاتهم.":"Successful registrations are counted per browser. Reaching the limit within the chosen period starts the cooldown. Colleagues can still register from their own browsers."}>
+  return <Card title={t("regLimitTitle")} description={t("regLimitDesc")}>
     <form className="grid gap-4" onSubmit={async e=>{
       e.preventDefault();setBusy(true);
       try {
@@ -536,14 +534,14 @@ function RegistrationPolicy({settings}: {settings:AiSettingsView}) {
       } catch {toast.error(t("errSaveAi"));} finally {setBusy(false);}
     }}>
     <div className="grid gap-3 sm:grid-cols-2">
-      <label>{ar?"عدد التسجيلات المسموحة للزائر":"Registrations per visitor"}
+      <label>{t("regLimitCount")}
         <Input id="archy-registration-limit" type="number" required min={1} max={100} step={1} value={limit} disabled={busy} onChange={e=>draft.setValue({...draft.value!,limit:e.target.value})}/>
       </label>
-      <label>{ar?"مدة الانتظار بالدقائق":"Cooldown in minutes"}
+      <label>{t("regLimitWait")}
         <Input id="archy-registration-minutes" type="number" required min={1} max={1440} step={1} value={minutes} disabled={busy} onChange={e=>draft.setValue({...draft.value!,minutes:e.target.value})}/>
       </label>
     </div>
-    <Button className="justify-self-start" disabled={busy||!draft.dirty}>{ar?"حفظ حد التسجيل":"Save registration limit"}</Button>
+    <Button className="justify-self-start" disabled={busy||!draft.dirty}>{t("regLimitSave")}</Button>
     </form>
   </Card>;
 }

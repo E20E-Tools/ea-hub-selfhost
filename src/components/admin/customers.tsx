@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { RefreshCw, Users, Inbox, MessagesSquare, Star } from "lucide-react";
+import { RefreshCw, Users, Inbox, MessagesSquare, Star, Bot } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -12,7 +12,7 @@ import { getVisitStats } from "@/lib/site-visits.functions";
 import { listTourVisits } from "@/lib/archy-tour-visits.functions";
 import { summarizeTourVisits } from "@/lib/archy-tour-visits.shared";
 import { toast } from "sonner";
-import { RequestsTab, OffersTab } from "./inbox";
+import { RequestsTab, OffersTab, AssistantTab } from "./inbox";
 import { LiveChatSection } from "./live-chat";
 import { FeedbackSection } from "./feedback";
 import { PageHeader, QueryState, useAdminCopy } from "./ui";
@@ -176,6 +176,10 @@ export function CustomersSection({
             <MessagesSquare className="size-4" />
             {t("navLiveChat")}
           </TabsTrigger>
+          <TabsTrigger value="assistant">
+            <Bot className="size-4" />
+            {t("tabAssistant")}
+          </TabsTrigger>
           <TabsTrigger value="feedback">
             <Star className="size-4" />
             {t("navFeedback")}
@@ -193,6 +197,9 @@ export function CustomersSection({
         </TabsContent>
         <TabsContent value="conversations">
           <LiveChatSection email={email} embedded />
+        </TabsContent>
+        <TabsContent value="assistant">
+          <AssistantTab />
         </TabsContent>
         <TabsContent value="feedback">
           <FeedbackSection email={email} embedded />

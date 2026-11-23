@@ -1090,6 +1090,12 @@ const ar = {
   fbDeleteConfirm: "حذف هذه الإجابة؟",
   fbFilterAll: "الكل",
   navLiveChat: "المحادثة المباشرة",
+  regLimitTitle: "حد تسجيل زوار Archy",
+  regLimitDesc:
+    "يُحسب الحد لكل متصفح بعد نجاح التحقق البشري. يبدأ الانتظار عند اكتمال العدد خلال الفترة المحددة، ويستطيع زملاء الزائر التسجيل من متصفحاتهم.",
+  regLimitCount: "عدد التسجيلات المسموحة للزائر",
+  regLimitWait: "مدة الانتظار بالدقائق",
+  regLimitSave: "حفظ حد التسجيل",
   navLiveChatDesc:
     "محادثات الزوار مع مرشد الأدوات، وطلبات التحدث مع مسؤول، والرد عليها مباشرة. تُحفظ ثلاثة أشهر.",
   lcEmpty: "لا توجد محادثات بعد.",
@@ -2227,6 +2233,12 @@ const en: Record<AdminCopyKey, string> = {
   fbDeleteConfirm: "Delete this answer?",
   fbFilterAll: "All",
   navLiveChat: "Live chat",
+  regLimitTitle: "Archy visitor registration limit",
+  regLimitDesc:
+    "Successful registrations are counted per browser. Reaching the limit within the chosen period starts the cooldown. Colleagues can still register from their own browsers.",
+  regLimitCount: "Registrations per visitor",
+  regLimitWait: "Cooldown in minutes",
+  regLimitSave: "Save registration limit",
   navLiveChatDesc:
     "Visitor chats with the tool guide, requests to talk to a person, and live replies. Kept for three months.",
   lcEmpty: "No chats yet.",

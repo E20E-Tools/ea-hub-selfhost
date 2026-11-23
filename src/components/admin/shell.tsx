@@ -5,14 +5,11 @@ import {
   ContactRound,
   UserRound,
   ExternalLink,
-  Inbox,
   Languages,
   Layers,
   LayoutDashboard,
   LogOut,
   Menu,
-  MessagesSquare,
-  Star,
   PanelLeftClose,
   PanelLeftOpen,
   Search,
@@ -42,9 +39,6 @@ import { useAdminCopy } from "./ui";
 const ICONS: Record<AdminSection, LucideIcon> = {
   dashboard: LayoutDashboard,
   customers: ContactRound,
-  inbox: Inbox,
-  livechat: MessagesSquare,
-  feedback: Star,
   enterprise: Building2,
   content: Layers,
   settings: Settings,
@@ -77,12 +71,8 @@ function NavList({
           {group.items.map((item) => {
             const Icon = ICONS[item.id];
             const active = section === item.id;
-            const count =
-              item.id === "inbox"
-                ? badge
-                : item.id === "livechat"
-                  ? liveBadge
-                  : 0;
+            // The customer workspace holds the inbox and live chat, so it carries both counts.
+            const count = item.id === "customers" ? badge + liveBadge : 0;
             const button = (
               <button
                 type="button"

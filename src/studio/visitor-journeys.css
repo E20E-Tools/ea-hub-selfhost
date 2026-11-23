@@ -481,7 +481,26 @@
 }
 .ea-workspace .choice-card[data-selected="true"] {
   border-color: var(--ws-accent);
-  box-shadow: inset 0 -3px var(--ws-accent);
+  background: color-mix(in oklab, var(--ws-accent) 7%, var(--ws-surface));
+  box-shadow:
+    0 0 0 1px var(--ws-accent),
+    inset 0 -3px var(--ws-accent);
+}
+/* A visible check mark so the chosen card does not rely on colour alone. */
+.ea-workspace .choice-card[data-selected="true"]::after {
+  content: "";
+  position: absolute;
+  inset-block-start: 12px;
+  inset-inline-end: 12px;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  background: var(--ws-accent)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12l5 5L20 7'/%3E%3C/svg%3E")
+    center / 12px no-repeat;
+}
+.ea-workspace .choice-card[data-selected="true"] :is(strong, small) {
+  padding-inline-end: 26px;
 }
 .ea-workspace :is(.request-success, .bx-empty) {
   padding: clamp(20px, 3vw, 38px);

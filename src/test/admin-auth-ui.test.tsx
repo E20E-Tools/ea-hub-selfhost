@@ -201,7 +201,7 @@ describe("Admin access with mocked sessions only", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("opens the console for admins with the five sections", async () => {
+  it("opens the console for admins with the merged customer workspace", async () => {
     api.access.mockResolvedValue({ isAdmin: true, email: "owner@example.com" });
     openAdmin();
     const nav = await screen.findByRole("navigation", {
@@ -209,12 +209,14 @@ describe("Admin access with mocked sessions only", () => {
     });
     for (const name of [
       "Dashboard",
-      "Inbox",
+      "Customer workspace",
       "Content",
       "Settings",
       "Security",
     ])
       expect(nav).toHaveTextContent(name);
+    // Inbox, live chat and feedback are tabs of the customer workspace, not separate entries.
+    expect(nav).not.toHaveTextContent("Live chat");
   });
 
   it("removes admin controls on sign-out", async () => {

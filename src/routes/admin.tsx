@@ -27,10 +27,7 @@ import { fallbackCatalog } from "@/lib/catalog";
 import { pick } from "@/lib/language-core";
 import { catalogQueryOptions } from "@/lib/catalog.functions";
 import { DashboardSection, dashboardQuery } from "@/components/admin/dashboard";
-import {
-  LiveChatSection,
-  useLiveChatAlerts,
-} from "@/components/admin/live-chat";
+import { useLiveChatAlerts } from "@/components/admin/live-chat";
 import { AdminShell } from "@/components/admin/shell";
 import { NotAdminScreen, SignInScreen } from "@/components/admin/sign-in";
 import {
@@ -48,12 +45,6 @@ const CustomersSection = lazy(async () => ({
 }));
 const EnterpriseSection = lazy(async () => ({
   default: (await import("@/components/admin/inbox")).EnterpriseSection,
-}));
-const FeedbackSection = lazy(async () => ({
-  default: (await import("@/components/admin/feedback")).FeedbackSection,
-}));
-const InboxSection = lazy(async () => ({
-  default: (await import("@/components/admin/inbox")).InboxSection,
 }));
 const SecuritySection = lazy(async () => ({
   default: (await import("@/components/admin/security")).SecuritySection,
@@ -156,7 +147,10 @@ function AdminConsole() {
         action: {
           label: t("liveOpenInbox"),
           onClick: () =>
-            void navigate({ to: "/admin", search: { section: "inbox" } }),
+            void navigate({
+              to: "/admin",
+              search: { section: "customers", tab: "requests" },
+            }),
         },
         duration: 15_000,
       });
@@ -211,7 +205,11 @@ function AdminConsole() {
   };
 
   const openLiveChat = useCallback(
-    () => void navigate({ to: "/admin", search: { section: "livechat" } }),
+    () =>
+      void navigate({
+        to: "/admin",
+        search: { section: "customers", tab: "conversations" },
+      }),
     [navigate],
   );
   const liveWaiting = useLiveChatAlerts(state === "admin", openLiveChat);
@@ -259,22 +257,10 @@ function AdminConsole() {
         {location.section === "customers" ? (
           <CustomersSection tab={location.tab} onTab={onTab} />
         ) : null}
-        {location.section === "livechat" ? <LiveChatSection /> : null}
-        {location.section === "feedback" ? <FeedbackSection /> : null}
         {location.section === "dashboard" ? (
           <DashboardSection
             catalog={catalog}
             go={(s, tab) => void go(s, tab)}
-          />
-        ) : null}
-        {location.section === "inbox" ? (
-          <InboxSection
-            tab={location.tab}
-            onTab={onTab}
-            counts={{
-              requests: dashboard.data?.newRequests,
-              offers: dashboard.data?.newOffers,
-            }}
           />
         ) : null}
         {location.section === "enterprise" ? <EnterpriseSection /> : null}

@@ -7,10 +7,7 @@ import type { AdminCopyKey } from "./admin-copy";
 
 export const ADMIN_SECTION_TABS = {
   dashboard: [],
-  customers: ["requests", "offers", "conversations", "feedback", "visitors"],
-  inbox: ["requests", "offers", "assistant"],
-  livechat: [],
-  feedback: [],
+  customers: ["requests", "offers", "conversations", "assistant", "feedback", "visitors"],
   enterprise: [],
   content: ["products", "categories", "affiliates", "media"],
   settings: [
@@ -84,9 +81,6 @@ export const ADMIN_NAV: {
         label: "navCustomers",
         description: "navCustomersDesc",
       },
-      { id: "inbox", label: "navInbox", description: "navInboxDesc" },
-      { id: "livechat", label: "navLiveChat", description: "navLiveChatDesc" },
-      { id: "feedback", label: "navFeedback", description: "navFeedbackDesc" },
       {
         id: "enterprise",
         label: "navEnterprise",
@@ -146,12 +140,16 @@ export const TAB_LABELS: Record<AdminTab, AdminCopyKey> = {
 export const SECTION_ALIASES: Record<string, { section: AdminSection; tab?: AdminTab }> = {
   home: { section: "dashboard" },
   "enterprise-requests": { section: "enterprise" },
-  requests: { section: "inbox", tab: "requests" },
-  offers: { section: "inbox", tab: "offers" },
-  "ai-chats": { section: "inbox", tab: "assistant" },
-  "live-chat": { section: "livechat" },
-  ratings: { section: "feedback" },
-  faq: { section: "feedback" },
+  // Inbox, live chat and feedback now live inside the customer workspace.
+  inbox: { section: "customers", tab: "requests" },
+  livechat: { section: "customers", tab: "conversations" },
+  feedback: { section: "customers", tab: "feedback" },
+  requests: { section: "customers", tab: "requests" },
+  offers: { section: "customers", tab: "offers" },
+  "ai-chats": { section: "customers", tab: "assistant" },
+  "live-chat": { section: "customers", tab: "conversations" },
+  ratings: { section: "customers", tab: "feedback" },
+  faq: { section: "customers", tab: "feedback" },
   products: { section: "content", tab: "products" },
   releases: { section: "content", tab: "products" },
   gallery: { section: "content", tab: "media" },
