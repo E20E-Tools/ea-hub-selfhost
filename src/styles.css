@@ -191,7 +191,7 @@
   --network-yellow: oklch(0.68 0.135 103);
   --network-amber: oklch(0.76 0.155 80);
   --network-orange: oklch(0.72 0.177 45);
-  --status: oklch(0.59 0.13 151);
+  --status: oklch(0.48 0.13 151); /* 4.5:1+ for small status text on the light sheet */
   --panel-pad: 56px;
 }
 @theme inline {
@@ -3735,6 +3735,12 @@ html[data-design-theme="transformation-board"] .tb-readout {
 }
 .about-grid {
   grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+/* Stand-alone links in About sections get a 24px target (WCAG 2.5.8). */
+:is(.about-section, .about-card) > a {
+  display: inline-block;
+  min-block-size: 24px;
+  padding-block: 2px;
 }
 .about-card {
   min-width: 0;
