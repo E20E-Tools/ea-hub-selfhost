@@ -3267,10 +3267,9 @@ html[data-design-theme="transformation-board"] .tb-readout {
   padding: 4px 6px;
   border: 1px solid var(--border);
   border-radius: 999px;
-  background: color-mix(in oklab, var(--card) 92%, transparent);
+  background: var(--card);
   color: var(--card-foreground);
   box-shadow: 0 6px 20px color-mix(in oklab, var(--foreground) 12%, transparent);
-  backdrop-filter: blur(10px);
 }
 .archy-ready {
   padding-inline: 4px;
@@ -3472,8 +3471,7 @@ html[data-design-theme="transformation-board"] .tb-readout {
   font-size: 12px;
   letter-spacing: 0.02em;
   color: var(--muted-foreground);
-  background: color-mix(in oklab, var(--background) 88%, transparent);
-  backdrop-filter: blur(8px);
+  background: var(--background);
   border-bottom: 1px solid var(--library-rule);
 }
 
@@ -4003,8 +4001,7 @@ button:focus-visible,
   gap: 12px;
   padding-block: 10px;
   padding-inline: 24px;
-  background: color-mix(in oklab, var(--background) 86%, transparent);
-  backdrop-filter: blur(10px);
+  background: var(--background);
   border-bottom: 1px solid var(--library-rule);
 }
 /* Brand line: logo + title, with the search and language controls at its far end. */
@@ -4855,8 +4852,7 @@ footer.site-footer {
 /* glass */
 .site-nav[data-style="glass"] {
   padding: 5px;
-  background: color-mix(in oklab, var(--card) 55%, transparent);
-  backdrop-filter: blur(14px) saturate(1.4);
+  background: var(--card);
   box-shadow:
     0 1px 0 color-mix(in oklab, var(--card) 80%, transparent) inset,
     0 8px 24px -14px color-mix(in oklab, var(--foreground) 35%, transparent);

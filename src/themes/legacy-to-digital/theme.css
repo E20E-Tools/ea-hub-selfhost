@@ -1,35 +1,17 @@
 /* Legacy → Digital — light modern platform skin with a 1990s IT office on the other side of the handle. */
 :root:root[data-design-theme="legacy-to-digital"] {
-  --ld-white: #f8fafc;
-  --ld-blue: #2f6bff;
-  --ld-cyan: #00d4ff;
-  --ld-violet: #8b5cf6;
+  --ld-white: oklch(0.955 0.006 160);
+  --ld-blue: oklch(0.45 0.12 160);
+  --ld-cyan: oklch(0.8 0.17 160);
+  --ld-violet: oklch(0.32 0.07 160);
   --ld-beige: #c9c3b5;
   --ld-grey: #8e897d;
   --ld-phosphor: #39ff6a;
-  --ld-grad: linear-gradient(110deg, #2f6bff, #00d4ff 50%, #8b5cf6);
+  --ld-grad: linear-gradient(110deg, oklch(0.45 0.12 160), oklch(0.6 0.15 160));
   --ld-sans: "Sora", "IBM Plex Sans Arabic", sans-serif;
   --ld-mono: "VT323", "IBM Plex Mono", monospace;
 
   color-scheme: light;
-  --background: oklch(0.985 0.003 250);
-  --foreground: oklch(0.22 0.03 265);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.22 0.03 265);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.22 0.03 265);
-  --primary: oklch(0.55 0.22 265);
-  --primary-foreground: oklch(0.99 0 0);
-  --secondary: oklch(0.96 0.01 250);
-  --secondary-foreground: oklch(0.25 0.03 265);
-  --muted: oklch(0.96 0.01 250);
-  --muted-foreground: oklch(0.46 0.03 265);
-  --accent: oklch(0.95 0.03 230);
-  --accent-foreground: oklch(0.25 0.03 265);
-  --border: oklch(0.9 0.015 255);
-  --input: oklch(0.88 0.02 255);
-  --ring: oklch(0.6 0.2 265);
-  --library-highlight: oklch(0.55 0.22 265);
   background: var(--ld-white);
 }
 
@@ -40,19 +22,6 @@
   position: relative;
   isolation: isolate;
   background: var(--ld-white);
-
-  &::before {
-    content: "";
-    position: fixed;
-    inset: -10%;
-    z-index: -1;
-    pointer-events: none;
-    background:
-      radial-gradient(28% 34% at 15% 20%, oklch(0.62 0.2 265 / 0.14), transparent 70%),
-      radial-gradient(30% 30% at 85% 30%, oklch(0.8 0.14 215 / 0.16), transparent 70%),
-      radial-gradient(34% 30% at 55% 85%, oklch(0.62 0.2 295 / 0.12), transparent 70%);
-    animation: ld-blobs 28s ease-in-out infinite alternate;
-  }
 
   & :is(h1, h2, .home-section-title) {
     background-image: linear-gradient(90deg, var(--ea-accent), var(--ea-light));
@@ -67,63 +36,40 @@
   }
 
   & .site-header {
-    background: oklch(1 0 0 / 0.82);
-    backdrop-filter: blur(14px);
-  }
-  & .site-nav {
-    border-radius: 999px !important;
+    background: var(--card);
   }
 
   & .product-card {
-    border-radius: 22px;
-    border: 1.5px solid transparent;
-    background:
-      linear-gradient(var(--card), var(--card)) padding-box,
-      linear-gradient(90deg, var(--ea-accent), var(--ea-light)) border-box;
-    transition:
-      filter 0.6s ease,
-      transform 0.4s ease,
-      box-shadow 0.4s ease;
-  }
-  /* Scroll bloom only where scroll timelines exist; elsewhere cards stay full colour. */
-  @supports (animation-timeline: view()) {
-    & .product-card {
-      animation: ld-bloom linear both;
-      animation-timeline: view();
-      animation-range: entry 10% cover 40%;
-    }
+    border-radius: 10px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    transition: border-color 0.2s ease;
   }
   & .product-card:is(:hover, :focus-within) {
-    filter: none;
-    transform: translateY(-3px);
-    box-shadow: 0 18px 40px -18px oklch(0.55 0.22 265 / 0.45);
+    border-color: var(--ea-accent);
   }
   & .product-art {
-    border-radius: 16px;
+    border-radius: 8px;
   }
 
   & :is(.product-launch, .detail-cta, .request-form button[type="submit"]) {
     background: var(--ea-accent) !important;
     color: var(--ea-on-accent) !important;
     border: 0 !important;
-    border-radius: 999px !important;
+    border-radius: 8px !important;
   }
   & :is(.product-open, .library-empty a, .library-empty button) {
-    border-radius: 999px !important;
-    border: 1.5px solid transparent !important;
-    background:
-      linear-gradient(var(--ea-surface), var(--ea-surface)) padding-box,
-      linear-gradient(90deg, var(--ea-accent), var(--ea-light)) border-box !important;
+    border-radius: 8px !important;
+    border: 1px solid var(--ea-accent) !important;
+    background: var(--ea-surface) !important;
   }
   & :is(input, textarea, select) {
-    border-radius: 14px;
+    border-radius: 8px;
   }
   & :is(.home-action, .detail-hero, .detail-visual, .request-form, .request-success) {
-    border-radius: 24px;
-    border: 1.5px solid transparent;
-    background:
-      linear-gradient(var(--ea-surface), var(--ea-surface)) padding-box,
-      linear-gradient(90deg, var(--ea-accent), var(--ea-light)) border-box;
+    border-radius: 12px;
+    border: 1px solid var(--ea-line);
+    background: var(--ea-surface);
   }
 
   & .site-footer {
@@ -149,19 +95,6 @@
   }
 }
 
-@keyframes ld-blobs {
-  to {
-    transform: translate3d(3%, -4%, 0) scale(1.08) rotate(6deg);
-  }
-}
-@keyframes ld-bloom {
-  from {
-    filter: grayscale(0.75) saturate(0.7);
-  }
-  to {
-    filter: none;
-  }
-}
 
 .ld-crt-egg {
   display: block;
@@ -298,10 +231,10 @@
 }
 .ld-world-digital {
   inset-inline-end: 18px;
-  border-radius: 999px;
-  background: #fff;
-  color: #2b3a67;
-  box-shadow: 0 4px 14px -6px oklch(0.55 0.2 265 / 0.5);
+  border-radius: 4px;
+  background: var(--ea-surface);
+  color: var(--ea-ink);
+  border: 1px solid var(--ea-line);
 }
 
 /* CRT ↔ hub */
@@ -832,7 +765,7 @@
   transform: translateX(-50%);
   inline-size: 4px;
   background: linear-gradient(180deg, #4a4536, #141414 40%, var(--ld-blue) 60%, var(--ld-violet));
-  box-shadow: 0 0 18px oklch(0.6 0.2 260 / 0.6);
+  box-shadow: none;
 }
 .ld-grip-track {
   position: absolute;
@@ -1008,14 +941,11 @@
 
 /* Inspector: modern glass card with gradient border. */
 .product-inspector.ld-card {
-  border-radius: 24px;
-  border: 2px solid transparent;
-  background:
-    linear-gradient(oklch(1 0 0 / 0.95), oklch(1 0 0 / 0.95)) padding-box,
-    var(--ld-grad) border-box;
-  color: #141a33;
-  box-shadow: 0 30px 80px -30px oklch(0.45 0.2 265 / 0.6);
-  backdrop-filter: blur(16px);
+  border-radius: 12px;
+  border: 1px solid var(--ea-line);
+  background: var(--ea-surface);
+  color: var(--ea-ink);
+  box-shadow: 0 18px 40px -24px oklch(0.24 0.06 160 / 0.35);
   font-family: var(--ld-sans);
 }
 @media (min-width: 640px) {
@@ -1058,14 +988,14 @@
   font-size: 0.75rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: #5b3fd6;
+  color: var(--ea-accent);
   font-weight: 700;
 }
 .ld-card .inspector-close {
   border-radius: 50%;
-  border: 1px solid oklch(0.88 0.02 260);
-  background: #fff;
-  color: #141a33;
+  border: 1px solid var(--ea-line);
+  background: var(--ea-surface);
+  color: var(--ea-ink);
 }
 .ld-card-body {
   display: grid;
@@ -1129,14 +1059,14 @@
   font-size: 0.88rem;
 }
 .ld-card-actions :is(a, button):first-child {
-  background: var(--ld-grad);
-  color: #fff;
-  border-radius: 999px;
+  background: var(--ea-accent);
+  color: var(--ea-on-accent);
+  border-radius: 8px;
 }
 .ld-card-actions :is(a, button):not(:first-child) {
-  border-radius: 999px;
-  border: 1.5px solid var(--ld-blue);
-  color: #1f4fd6;
+  border-radius: 8px;
+  border: 1px solid var(--ea-accent);
+  color: var(--ea-accent);
 }
 
 /* Phone: compact chips. */

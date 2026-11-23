@@ -20,7 +20,7 @@
   display: grid;
   gap: 16px;
   padding: 20px;
-  border-radius: 22px;
+  border-radius: 12px;
   background: #ffffff;
   color: var(--pl-dark-text);
   border: 1px solid var(--pl-line);
@@ -110,8 +110,8 @@
 }
 .plm-badges > span {
   font-size: 13px;
-  padding: 6px 12px;
-  border-radius: 999px;
+  padding: 5px 10px;
+  border-radius: 6px;
   border: 1px solid rgb(143 184 166 / 0.35);
   color: #8fb8a6;
 }
@@ -189,10 +189,9 @@
   flex: 0 1 460px;
   inline-size: 100%;
   aspect-ratio: 16 / 11;
-  border-radius: 24px;
+  border-radius: 12px;
   overflow: hidden;
-  border: 1px solid rgb(62 227 154 / 0.35);
-  box-shadow: 0 0 80px rgb(62 227 154 / 0.15);
+  border: 1px solid rgb(255 255 255 / 0.18);
 }
 .plm-visual img {
   inline-size: 100%;
@@ -201,16 +200,7 @@
   display: block;
 }
 .plm-sweep {
-  position: absolute;
-  inset: -40%;
-  background: conic-gradient(
-    from 0deg,
-    rgb(62 227 154 / 0.25),
-    transparent 50deg
-  );
-  mix-blend-mode: screen;
-  animation: plm-sweep 7s linear infinite;
-  pointer-events: none;
+  display: none;
 }
 .plm-kpis {
   display: grid;
@@ -222,7 +212,7 @@
   flex-direction: column;
   gap: 6px;
   padding: 20px 22px;
-  border-radius: 18px;
+  border-radius: 10px;
   background: var(--pl-panel);
   border: 1px solid rgb(62 227 154 / 0.18);
 }
@@ -244,7 +234,7 @@
   flex-wrap: wrap;
   gap: 24px;
   padding: 28px;
-  border-radius: 24px;
+  border-radius: 12px;
   background: #e9f7f0;
   color: var(--pl-ink);
 }
@@ -274,7 +264,7 @@
 }
 .plm-fit-cards > div {
   padding: 20px;
-  border-radius: 16px;
+  border-radius: 10px;
   background: #ffffff;
   border: 2px solid var(--pl-glow);
 }
@@ -302,7 +292,7 @@
 }
 .plm-card {
   padding: 24px;
-  border-radius: 22px;
+  border-radius: 12px;
   background: var(--pl-panel);
   border: 1px solid rgb(62 227 154 / 0.18);
 }
@@ -371,7 +361,7 @@
   gap: 14px;
   align-items: flex-start;
   padding: 16px;
-  border-radius: 16px;
+  border-radius: 10px;
   background: var(--pl-panel-2);
   line-height: 1.7;
 }
@@ -400,7 +390,7 @@
 }
 .plm-practice {
   padding: 26px;
-  border-radius: 22px;
+  border-radius: 12px;
   background: var(--pl-panel);
   border: 1px solid rgb(62 227 154 / 0.18);
 }
@@ -419,7 +409,7 @@
 }
 .plm-practice li {
   padding: 18px;
-  border-radius: 16px;
+  border-radius: 10px;
   background: var(--pl-panel-2);
   border-top: 4px solid var(--pl-amber);
 }
@@ -454,7 +444,7 @@
   justify-content: space-between;
   gap: 12px;
   padding: 20px 24px;
-  border-radius: 20px;
+  border-radius: 12px;
   background: rgb(255 255 255 / 0.03);
   border: 1px solid rgb(255 255 255 / 0.08);
 }
@@ -503,7 +493,7 @@
   flex-direction: column;
   gap: 4px;
   padding: 12px;
-  border-radius: 16px;
+  border-radius: 10px;
   text-decoration: none;
 }
 .plm-others a {
@@ -933,8 +923,8 @@
 }
 .plj-tag {
   font-size: 13px;
-  padding: 6px 12px;
-  border-radius: 999px;
+  padding: 4px 10px;
+  border-radius: 6px;
   background: rgb(62 227 154 / 0.15);
   color: var(--pl-glow);
 }
@@ -952,7 +942,7 @@
 .plj-meter {
   flex: 0 1 340px;
   padding: 18px 20px;
-  border-radius: 18px;
+  border-radius: 10px;
   background: rgb(255 255 255 / 0.06);
 }
 .plj-meter > div:first-child {
@@ -1047,7 +1037,7 @@
 }
 .plj-card {
   padding: 24px;
-  border-radius: 22px;
+  border-radius: 12px;
   background: #ffffff;
 }
 .plj-span {
@@ -1167,7 +1157,7 @@
 }
 .plj-practice {
   padding: 24px;
-  border-radius: 22px;
+  border-radius: 12px;
   background: #ffffff;
 }
 .plj-practice h2 {
@@ -1176,7 +1166,7 @@
 }
 .plj-practice li {
   padding: 16px;
-  border-radius: 16px;
+  border-radius: 10px;
   background: #eef3f0;
 }
 .plj-practice li small {
