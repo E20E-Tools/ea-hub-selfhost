@@ -189,14 +189,14 @@
 
 /* ---------- Stage ---------- */
 .ld-stage {
-  --ld-substrate: #eaf1f1;
-  --ld-grid: #466f7919;
-  --ld-etched: #527a87;
-  --ld-trace: #058781;
-  --ld-packet: #70f7da;
+  --ld-substrate: oklch(95.5% 0.006 160);
+  --ld-grid: oklch(45% 0.1 160 / 10%);
+  --ld-etched: oklch(42% 0.05 160);
+  --ld-trace: oklch(45% 0.12 160);
+  --ld-packet: oklch(80% 0.17 160);
   position: relative;
-  block-size: min(88vh, 820px);
-  min-block-size: 560px;
+  block-size: min(74vh, 680px);
+  min-block-size: 520px;
   overflow: clip;
   user-select: none;
   touch-action: pan-y;

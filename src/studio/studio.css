@@ -7,11 +7,11 @@
 
 /* The instrument panel surrounds the original board. Its viewport and pointer geometry stay independent. */
 :root {
-  --s-ink: #122026;
-  --s-sheet: #f4f4ed;
-  --s-dim: #4a5b60;
-  --s-line: #cbd0c8;
-  --s-hot: #ff6b38;
+  --s-ink: oklch(24% 0.06 160);
+  --s-sheet: oklch(95.5% 0.006 160);
+  --s-dim: oklch(42% 0.05 160);
+  --s-line: oklch(85% 0.03 160);
+  --s-hot: oklch(45% 0.12 160);
   --s-font: "Geist", "IBM Plex Sans Arabic", Arial, sans-serif;
 }
 :root:root [data-surface="site"] {
@@ -35,9 +35,9 @@
 .s-header {
   position: relative;
   z-index: 45;
-  background: #101c21;
-  color: #eff2eb;
-  border-bottom: 1px solid #354349;
+  background: oklch(24% 0.06 160);
+  color: oklch(95.5% 0.006 160);
+  border-bottom: 1px solid oklch(36% 0.06 160);
 }
 .s-header-inner,
 .s-section,
@@ -124,7 +124,7 @@
   min-width: 38px;
   padding-inline: 8px;
   background: transparent !important;
-  color: #f4f4ed !important;
+  color: oklch(95.5% 0.006 160) !important;
   cursor: pointer;
   font: 600 12px var(--s-font);
 }
@@ -135,7 +135,7 @@
 .s-solid {
   gap: 12px;
   background: var(--s-hot);
-  color: #171b18;
+  color: oklch(24% 0.06 160);
   padding: 9px 17px;
   border-radius: 4px;
   font-size: 14px;
@@ -146,11 +146,11 @@
 .s-menu:hover,
 .s-language:hover,
 .s-actions .site-search-trigger:hover {
-  background: #334047 !important;
+  background: oklch(32% 0.06 160) !important;
 }
 .s-top-cta:hover,
 .s-solid:hover {
-  background: #ff885c;
+  background: oklch(80% 0.17 160);
 }
 .s-mega {
   position: absolute;
@@ -160,9 +160,9 @@
   grid-template-columns: repeat(3, 1fr);
   gap: 0 20px;
   padding: 20px;
-  background: #17272e;
-  box-shadow: 0 16px 24px #15232a40;
-  border: 1px solid #47565c;
+  background: oklch(20% 0.05 160);
+  box-shadow: 0 16px 24px oklch(24% 0.06 160 / 25%);
+  border: 1px solid oklch(40% 0.06 160);
   max-height: 65dvh;
   overflow: auto;
 }
@@ -171,7 +171,7 @@
   justify-content: space-between;
   align-items: center;
   padding: 12px 5px;
-  border-bottom: 1px solid #34434a;
+  border-bottom: 1px solid oklch(34% 0.06 160);
 }
 .s-eyebrow {
   gap: 9px;
@@ -189,7 +189,7 @@
 }
 .s-board {
   margin-top: 24px;
-  border: 1px solid #b9c1bb;
+  border: 1px solid oklch(85% 0.03 160);
   background: #fff;
   border-radius: 8px;
   overflow: clip;
@@ -197,7 +197,7 @@
 .s-board-cap {
   padding: 8px 16px;
   justify-content: space-between;
-  background: #e6e9e0;
+  background: oklch(92% 0.02 160);
   color: oklch(33.5% 0.027 160);
   gap: 10px;
   font-size: 13px;
@@ -268,7 +268,7 @@
   padding: 8px 0;
 }
 .s-tabs button {
-  border: 1px solid #bec8c2;
+  border: 1px solid oklch(85% 0.03 160);
   border-radius: 4px;
   padding: 5px 12px;
   background: transparent;
@@ -311,7 +311,7 @@
   display: block;
   position: relative;
   overflow: hidden;
-  background: #e9ece6;
+  background: oklch(92% 0.02 160);
   border-bottom: 1px solid var(--s-line);
 }
 .s-art img {
@@ -324,13 +324,13 @@
   transform: scale(1.035);
 }
 .s-art span {
-  background: #fffbf2;
+  background: oklch(98.5% 0.004 160);
   color: oklch(33.8% 0.027 160);
   position: absolute;
   top: 10px;
   inset-inline-start: 12px;
   padding: 4px 9px;
-  border: 1px solid #c6cdc5;
+  border: 1px solid oklch(85% 0.03 160);
   border-radius: 4px;
   font-size: 12px;
 }
@@ -458,7 +458,7 @@
 .s-header :focus-visible,
 .s-home :focus-visible,
 .s-footer :focus-visible {
-  outline: 3px solid #e87538;
+  outline: 3px solid oklch(50% 0.12 160);
   outline-offset: 3px;
 }
 @media (max-width: 900px) {
@@ -720,7 +720,7 @@
     margin: 0;
     border: 0;
     border-radius: 0;
-    background: #e5e8e1;
+    background: oklch(92% 0.02 160);
     padding: clamp(10px, 1.3vw, 22px);
   }
   .s-board-cap {

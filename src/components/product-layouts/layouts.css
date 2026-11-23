@@ -1,17 +1,17 @@
 /* Product detail layouts: mission control (A), spec sheet (B), decision journey (C). */
 :root {
-  --pl-ink: #04110c;
-  --pl-panel: #0b2a1f;
-  --pl-panel-2: #082319;
-  --pl-glow: #3ee39a;
-  --pl-soft: #a9cfbe;
-  --pl-text: #e9f7f0;
-  --pl-info: #7fd1ff;
-  --pl-amber: #e6b25c;
-  --pl-paper: #f4f6f2;
-  --pl-line: #d9e2dc;
-  --pl-dark-text: #0b2a1f;
-  --pl-muted: #4b6659;
+  --pl-ink: oklch(11% 0.015 160);
+  --pl-panel: oklch(24% 0.06 160);
+  --pl-panel-2: oklch(19% 0.045 160);
+  --pl-glow: oklch(80% 0.17 160);
+  --pl-soft: oklch(80% 0.05 160);
+  --pl-text: oklch(96% 0.02 160);
+  --pl-info: oklch(78% 0.11 190);
+  --pl-amber: oklch(82% 0.16 75);
+  --pl-paper: oklch(95.5% 0.006 160);
+  --pl-line: oklch(85% 0.03 160);
+  --pl-dark-text: oklch(24% 0.06 160);
+  --pl-muted: oklch(42% 0.05 160);
   --pl-mono: "JetBrains Mono", "IBM Plex Mono", ui-monospace, monospace;
 }
 
@@ -259,7 +259,7 @@
   color: var(--pl-glow);
 }
 .plm-fit small {
-  color: #0f6b47;
+  color: oklch(45% 0.12 160);
 }
 .plm-fit h2 {
   margin: 10px 0 0;
@@ -534,7 +534,7 @@
   padding-bottom: 72px;
 }
 .pl-spec a {
-  color: #0f6b47;
+  color: oklch(45% 0.12 160);
 }
 .pls-crumbs {
   display: flex;
@@ -572,7 +572,7 @@
   color: var(--pl-muted);
 }
 .pls-meta [data-live] {
-  color: #0f6b47;
+  color: oklch(45% 0.12 160);
 }
 .pls-mast h1 {
   margin: 12px 0 0;
@@ -697,7 +697,7 @@
 .pls-fit h3 {
   margin: 0;
   font-size: 15px;
-  color: #0f6b47;
+  color: oklch(45% 0.12 160);
 }
 .pls-fit [data-kind="no"] h3 {
   color: #8a5a12;
@@ -847,7 +847,7 @@
   color: var(--pl-muted);
 }
 .pl-spec :focus-visible {
-  outline: 3px solid #0f6b47;
+  outline: 3px solid oklch(45% 0.12 160);
   outline-offset: 3px;
 }
 @media (max-width: 900px) {
@@ -1140,7 +1140,7 @@
 .plj-check input {
   inline-size: 22px;
   block-size: 22px;
-  accent-color: #0f6b47;
+  accent-color: oklch(45% 0.12 160);
 }
 .plj-go {
   display: flex;
@@ -1163,7 +1163,7 @@
   display: inline-flex;
   align-items: center;
   min-height: 40px;
-  color: #0f6b47;
+  color: oklch(45% 0.12 160);
 }
 .plj-practice {
   padding: 24px;
@@ -1223,7 +1223,7 @@
   color: var(--pl-muted);
 }
 .pl-journey :focus-visible {
-  outline: 3px solid #0f6b47;
+  outline: 3px solid oklch(45% 0.12 160);
   outline-offset: 3px;
 }
 

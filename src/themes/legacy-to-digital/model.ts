@@ -173,7 +173,8 @@ export function l2dLayout(count: number, vertical: boolean): L2DItem[] {
     const col = Math.floor(i / 2);
     let u = 0.08 + (0.84 * (col + 0.5)) / Math.max(cols, 1);
     if (cols % 2 === 1 && col === (cols - 1) / 2) u += 0; // centre column straddles the hub vertically
-    return { u, c: i % 2 === 0 ? 0.3 : 0.76 };
+    // Rows sit close to the hub so the stage has no empty band above them.
+    return { u, c: i % 2 === 0 ? 0.24 : 0.8 };
   });
 }
 

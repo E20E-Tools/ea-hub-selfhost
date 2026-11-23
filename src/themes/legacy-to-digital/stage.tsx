@@ -852,9 +852,6 @@ export default function LegacyDigitalStage({ products, settings }: StageProps) {
           <div className="ld-hub-copy">
             <h1 dir="auto">{settings.displayTitle}</h1>
             {settings.tagline && <p dir="auto">{settings.tagline}</p>}
-            <a className="ld-hub-cta" href="/discover">
-              {t("ldStartCta")}
-            </a>
           </div>
         </div>
       </header>
