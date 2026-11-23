@@ -110,9 +110,9 @@ export function NewsletterPreview({ ar }: { ar: boolean }) {
                 </p>
               )}
             </article>
-            <label>{ar ? "مستلم المعاينة" : "Preview recipient"}{" "}
+            <label>{adminDictionaries[ar ? "ar" : "en"].nlPreviewRecipient}{" "}
               <select value={recipient} onChange={e => setRecipient(e.target.value === "editorial" ? "editorial" : "admin")}>
-                <option value="admin">{ar ? "بريدي الإداري" : "My admin email"}</option>
+                <option value="admin">{adminDictionaries[ar ? "ar" : "en"].nlMyAdminEmail}</option>
                 <option value="editorial">EA@E20E.Tools</option>
               </select>
             </label>
@@ -123,7 +123,7 @@ export function NewsletterPreview({ ar }: { ar: boolean }) {
                 try {
                   await emailNewsletterPreview({ data: { month, lang, recipient } });
                   setNote(
-                    recipient === "editorial" ? (ar ? "قَبِل مزوّد البريد المعاينة إلى " : "Provider accepted the preview for ") + "EA@E20E.Tools" : adminDictionaries[ar ? "ar" : "en"].consoleTheProviderAcceptedTheTestEmailFor,
+                    recipient === "editorial" ? adminDictionaries[ar ? "ar" : "en"].nlProviderAcceptedFor + "EA@E20E.Tools" : adminDictionaries[ar ? "ar" : "en"].consoleTheProviderAcceptedTheTestEmailFor,
                   );
                 } catch {
                   setNote(adminDictionaries[ar ? "ar" : "en"].consoleTestDeliveryFailed);
@@ -132,7 +132,7 @@ export function NewsletterPreview({ ar }: { ar: boolean }) {
                 }
               }}
             >
-              {recipient === "admin" ? adminDictionaries[ar ? "ar" : "en"].consoleEmailACopyToMe : (ar ? "أرسل معاينة إلى " : "Send preview to ") + "EA@E20E.Tools"}
+              {recipient === "admin" ? adminDictionaries[ar ? "ar" : "en"].consoleEmailACopyToMe : adminDictionaries[ar ? "ar" : "en"].nlSendPreviewTo + "EA@E20E.Tools"}
             </Button>
             {!draft.ready && (
               <small>

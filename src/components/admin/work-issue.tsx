@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Button } from "../ui/button";
 import { useWorkPolicy, CloudOption } from "../work-assistant";
 import { approveIssue } from "@/lib/newsletter.functions";
+import { adminDictionaries } from "@/lib/admin-copy";
 export function IssueEditor({
   ar,
   lang,
@@ -22,27 +23,27 @@ export function IssueEditor({
     [busy, wait] = useState(false),
     [msg, note] = useState("");
   if (!policy?.issue.enabled) return null;
+  // UI text follows the console language; the issue heading follows the issue language.
+  const ui = adminDictionaries[ar ? "ar" : "en"];
   return (
     <div className="rounded border p-3 grid gap-2">
       <Button
         variant="outline"
         onClick={() =>
           set(
-            (lang === "ar" ? "مستجدات EA-Hub لشهر " : "EA-Hub updates for ") +
+            adminDictionaries[lang].wiIssueHeading +
               month +
               "\n\n" +
               source,
           )
         }
       >
-        {ar ? "جهّز تحديث الشهر" : "Draft the monthly update"}
+        {ui.wiDraftMonthly}
       </Button>
       {draft && (
         <>
           <label>
-            {ar
-              ? "راجع نص النشرة قبل اعتماده"
-              : "Review the issue before approval"}
+            {ui.wiReviewIssue}
             <textarea
               rows={8}
               className="w-full border p-2"
@@ -64,22 +65,16 @@ export function IssueEditor({
               wait(true);
               try {
                 await approveIssue({ data: { month, lang, body: draft } });
-                note(ar ? "تم اعتماد النص" : "Draft approved");
+                note(ui.wiApproved);
                 onSaved(draft);
               } catch {
-                note(
-                  ar
-                    ? "تعذر الاعتماد. تحقق من بقاء جميع روابط التحديثات ومن أن النشرة ما زالت مفتوحة."
-                    : "Approval failed. Keep all original update links and check that the issue is still open.",
-                );
+                note(ui.wiApproveFailed);
               } finally {
                 wait(false);
               }
             }}
           >
-            {ar
-              ? "اعتماد هذه النسخة للإرسال المجدول"
-              : "Approve this version for scheduled delivery"}
+            {ui.wiApproveVersion}
           </Button>
         </>
       )}
