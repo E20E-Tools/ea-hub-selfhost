@@ -15,6 +15,14 @@ import { customizationPaths, normalizeThemeCustomizations } from "./theme-custom
 
 const ASSET_TTL = 60 * 60 * 6;
 
+// Library uploads are full-size originals (a 1342px logo shown at 60px). On Vercel the
+// built-in image optimizer serves a resized WebP; elsewhere the original is used as is.
+const STORAGE_URL = /^https:\/\/[a-z0-9-]+\.supabase\.co\/storage\/v1\/object\//i;
+export function optimizedImage(url: string, width: number): string {
+  if (!url || !process.env["VERCEL"] || !STORAGE_URL.test(url)) return url;
+  return `/_vercel/image?url=${encodeURIComponent(url)}&w=${width}&q=78`;
+}
+
 export function publishableClient() {
   const url = process.env["SUPABASE_URL"];
   const key = process.env["SUPABASE_PUBLISHABLE_KEY"];
@@ -94,10 +102,15 @@ async function buildCatalog(): Promise<{ catalog: Catalog; complete: boolean }> 
       const url = designUrls[i];
       if (url) themeAssetUrls[path] = url;
     });
-    const settings = mapSettings(settingsRow, logo ?? "", themeAssetUrls);
+    const settings = mapSettings(settingsRow, optimizedImage(logo ?? "", 256), themeAssetUrls);
     const products = await Promise.all(
       rows.map(async (row) => {
-        const product = mapProduct(row, await resolveAsset(client, row.image_url));
+        const signed = await resolveAsset(client, row.image_url);
+        const thumb = optimizedImage(signed, 640);
+        const product = {
+          ...mapProduct(row, optimizedImage(signed, 1080)),
+          ...(thumb !== signed ? { imageThumb: thumb } : {}),
+        };
         const shots = product.beneficiaryDetails?.screenshots ?? [];
         if (!shots.length) return product;
         // Library paths are signed like the product image. The saved path stays in `url`

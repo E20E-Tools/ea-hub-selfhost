@@ -22,6 +22,8 @@ export type Product = {
   image?: string;
   imageAlt?: string;
   imagePath?: string;
+  /** Smaller rendition of `image` for cards; absent when no resizer is available. */
+  imageThumb?: string;
   sortOrder?: number;
   /** English wording the admin can fill in; empty falls back to the Arabic field. */
   labelEn?: string;

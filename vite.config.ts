@@ -28,7 +28,26 @@ export default defineConfig(({ command }) => ({
     tanstackStart({ server: { entry: "server" } }),
     react(),
     ...(command === "build"
-      ? [nitro({ preset: process.env["VERCEL"] ? "vercel" : "node-server" })]
+      ? [
+          nitro({
+            preset: process.env["VERCEL"] ? "vercel" : "node-server",
+            // Vercel image optimizer for library uploads (see optimizedImage in catalog.functions).
+            vercel: {
+              config: {
+                version: 3,
+                images: {
+                  sizes: [256, 640, 1080],
+                  domains: [],
+                  formats: ["image/webp"],
+                  minimumCacheTTL: 86400,
+                  remotePatterns: [
+                    { protocol: "https", hostname: "**.supabase.co", pathname: "/storage/v1/object/**" },
+                  ],
+                },
+              },
+            },
+          }),
+        ]
       : []),
   ],
 }));

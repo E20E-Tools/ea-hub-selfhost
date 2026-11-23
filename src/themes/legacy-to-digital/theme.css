@@ -885,7 +885,8 @@
 .ld-stage[data-vertical] .ld-readout {
   inset-block: auto 14px;
   left: auto;
-  inset-inline-start: 10px;
+  /* Opposite side to the Archy assistant, which sits at inline-start. */
+  inset-inline-end: 10px;
   transform: none;
   min-inline-size: 0;
   max-inline-size: calc(50% - 49px);

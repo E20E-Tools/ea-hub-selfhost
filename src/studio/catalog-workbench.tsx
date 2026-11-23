@@ -47,7 +47,8 @@ export function CatalogWorkbench({ products }: { products: Product[] }) {
           {products.map((product) => {
             const url = "/product/" + encodeURIComponent(product.id);
             const fileLabel = (ar ? "تنزيل بطاقة " : "Download brief for ") + product.name;
-            const image = art.image(product);
+            const full = art.image(product);
+            const image = full === product.image && product.imageThumb ? product.imageThumb : full;
             return (
               <article
                 className="nx-product-card"
