@@ -8,6 +8,7 @@ import {
   LEGACY_DESKTOP_FILES,
   legacyFileName,
 } from "../legacy-to-digital/model";
+import { dictionaries } from "@/lib/copy";
 
 /** Planet placement on the orbit ellipse, as % of the orbit box. */
 export function orbitSpot(i: number, count: number): { x: number; y: number } {
@@ -50,18 +51,16 @@ export default function OrbitalPortalStage({ products, settings }: StageProps) {
         <h1>{settings.displayTitle}</h1>
         <p className="orb-lead">
           {settings.tagline ||
-            (ar
-              ? "كل ما تبعثر في مؤسستك، في مدار واحد."
-              : "Everything scattered across your enterprise, in one orbit.")}
+            (dictionaries[ar ? "ar" : "en"].stageEverythingScatteredAcrossYour)}
         </p>
         <div className="orb-actions">
           <FeatureOnly feature="discover">
             <a href="/discover" className="orb-cta">
-              {ar ? "ابدأ باحتياجك" : "Start with your need"}
+              {dictionaries[ar ? "ar" : "en"].ldStartCta}
             </a>
           </FeatureOnly>
           <a href="#catalog" className="orb-ghost">
-            {ar ? "استكشف المدار" : "Explore the orbit"}
+            {dictionaries[ar ? "ar" : "en"].stageExploreTheOrbit}
           </a>
         </div>
         <label className="orb-dial">
@@ -73,7 +72,7 @@ export default function OrbitalPortalStage({ products, settings }: StageProps) {
             step={1}
             value={pct}
             onChange={(e) => setPct(Number(e.target.value))}
-            aria-label={ar ? "نسبة التحول" : "Transformation level"}
+            aria-label={dictionaries[ar ? "ar" : "en"].stageTransformationLevel}
             aria-valuetext={`${pct}%`}
             style={{ ["--fill" as string]: `${pct}%` }}
           />
@@ -92,7 +91,7 @@ export default function OrbitalPortalStage({ products, settings }: StageProps) {
           style={{ ["--deg" as string]: `${pct * 3.6}deg` }}
         >
           <strong dir="ltr">{pct}%</strong>
-          <small>{ar ? "نسبة التحول" : "transformed"}</small>
+          <small>{dictionaries[ar ? "ar" : "en"].stageTransformed}</small>
         </div>
         {list.map((p, i) => {
           const spot = orbitSpot(i, list.length);
@@ -116,7 +115,7 @@ export default function OrbitalPortalStage({ products, settings }: StageProps) {
               <span>
                 <b dir="ltr">{p.name}</b>
                 <small>
-                  {live ? p.label : ar ? "في المدار…" : "Entering orbit…"}
+                  {live ? p.label : dictionaries[ar ? "ar" : "en"].stageEnteringOrbit}
                 </small>
               </span>
             </Link>

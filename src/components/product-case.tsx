@@ -4,6 +4,7 @@ import { useEffect, useRef } from "react";
 import type { Product } from "@/lib/products";
 import { cases } from "@/lib/product-cases";
 import { trackJourney } from "@/lib/journey-client";
+import { dictionaries } from "@/lib/copy";
 
 export function ProductCase({
   product,
@@ -37,15 +38,15 @@ export function ProductCase({
   if (!example) return null;
   return (
     <section ref={ref} className="bx-panel ea-case" id="use-case">
-      <small>{ar ? "حالة استخدام توضيحية" : "Illustrative use case"}</small>
+      <small>{dictionaries[ar ? "ar" : "en"].productCaseIllustrativeUseCase}</small>
       <h2>{example.question[i]}</h2>
       <dl>
         <div>
-          <dt>{ar ? "المدخلات" : "Inputs"}</dt>
+          <dt>{dictionaries[ar ? "ar" : "en"].productCaseInputs}</dt>
           <dd>{example.input[i]}</dd>
         </div>
         <div>
-          <dt>{ar ? "النتيجة والقرار" : "Outcome and decision"}</dt>
+          <dt>{dictionaries[ar ? "ar" : "en"].productCaseOutcomeAndDecision}</dt>
           <dd>{example.result[i]}</dd>
         </div>
       </dl>
@@ -59,7 +60,7 @@ export function ProductCase({
             void trackJourney("case_opened", language, { oncePerSession: true })
           }
         >
-          {ar ? "جرّب" : "Try"} {product.name} ↗
+          {dictionaries[ar ? "ar" : "en"].productCaseTry} {product.name} ↗
         </a>
       )}
       {product.servicesEnabled !== false && !product.comingSoon && (
@@ -70,7 +71,7 @@ export function ProductCase({
             encodeURIComponent(product.id)
           }
         >
-          {ar ? "تدريب على هذه الحالة" : "Training for this use case"}
+          {dictionaries[ar ? "ar" : "en"].productCaseTrainingForThisUse}
         </a>
       )}
       {!product.comingSoon && (

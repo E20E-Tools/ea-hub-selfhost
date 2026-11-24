@@ -10,6 +10,7 @@ import {
   type Review,
 } from "@/lib/team-trials";
 import { trialFeedback } from "@/lib/trial-feedback.functions";
+import { dictionaries } from "@/lib/copy";
 
 export function TeamTrials({ ar }: { ar: boolean }) {
   const [list, setList] = useState<Trial[]>([]),
@@ -31,12 +32,10 @@ export function TeamTrials({ ar }: { ar: boolean }) {
     };
   }, []);
   return (
-    <section id="team-trials" aria-label={ar ? "تجارب الفريق" : "Team trials"}>
+    <section id="team-trials" aria-label={dictionaries[ar ? "ar" : "en"].teamTrialsTeamTrials}>
       {error && (
         <p role="alert">
-          {ar
-            ? "تعذر قراءة تجارب هذا الجهاز."
-            : "Could not read trials from this device."}
+          {dictionaries[ar ? "ar" : "en"].teamTrialsCouldNotReadTrials}
         </p>
       )}
       {list.map((t) => (

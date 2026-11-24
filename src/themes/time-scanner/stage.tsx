@@ -14,6 +14,7 @@ import {
   LEGACY_DESKTOP_FILES,
   legacyFileName,
 } from "../legacy-to-digital/model";
+import { dictionaries } from "@/lib/copy";
 
 /** Digital share (0–100) at which product i crosses the beam. */
 export function crossAt(i: number, count: number): number {
@@ -89,7 +90,7 @@ export default function TimeScannerStage({ products, settings }: StageProps) {
         <div className="tscan-digital">
           <div className="tscan-hub">
             <strong dir="ltr">{settings.displayTitle || "E20E"}</strong>
-            <small>{ar ? "منظومة واحدة" : "One system"}</small>
+            <small>{dictionaries[ar ? "ar" : "en"].stageOneSystem}</small>
           </div>
           {list.map((p, i) => {
             const slot = SLOTS[i]!;
@@ -111,16 +112,12 @@ export default function TimeScannerStage({ products, settings }: StageProps) {
                   <b dir="ltr">{p.name}</b>
                   <em>
                     {p.comingSoon
-                      ? ar
-                        ? "قريبًا"
-                        : "Soon"
-                      : ar
-                        ? "متاحة"
-                        : "Live"}
+                      ? dictionaries[ar ? "ar" : "en"].stageSoon
+                      : dictionaries[ar ? "ar" : "en"].roadmapLive}
                   </em>
                 </span>
                 <span className="tscan-node-label">
-                  {live ? p.label : ar ? "قيد الترحيل…" : "Migrating…"}
+                  {live ? p.label : dictionaries[ar ? "ar" : "en"].stageMigrating}
                 </span>
               </Link>
             );
@@ -133,7 +130,7 @@ export default function TimeScannerStage({ products, settings }: StageProps) {
           aria-hidden="true"
         >
           <span className="tscan-legacy-tag" dir="ltr">
-            LEGACY_ENTERPRISE.EXE — {ar ? "(لا يستجيب)" : "(Not Responding)"}
+            LEGACY_ENTERPRISE.EXE — {dictionaries[ar ? "ar" : "en"].stageNotResponding}
           </span>
           <div className="tscan-files">
             {pending.map((p, i) => (
@@ -167,9 +164,7 @@ export default function TimeScannerStage({ products, settings }: StageProps) {
             role="slider"
             className="tscan-handle"
             aria-label={
-              ar
-                ? "نسبة التحول من القديم إلى الرقمي"
-                : "Legacy to digital transformation"
+              dictionaries[ar ? "ar" : "en"].stageLegacyToDigitalTransformation
             }
             aria-valuemin={10}
             aria-valuemax={90}
@@ -204,9 +199,7 @@ export default function TimeScannerStage({ products, settings }: StageProps) {
         <h1>{settings.displayTitle}</h1>
         <p className="tscan-lead">
           {settings.tagline ||
-            (ar
-              ? "من ملفات مبعثرة إلى منظومة واحدة حيّة."
-              : "From scattered files to one living system.")}
+            (dictionaries[ar ? "ar" : "en"].stageFromScatteredFilesTo)}
         </p>
         <div className="tscan-actions">
           <a href="#catalog" className="tscan-cta">
@@ -216,7 +209,7 @@ export default function TimeScannerStage({ products, settings }: StageProps) {
           </a>
           <FeatureOnly feature="discover">
             <a href="/discover" className="tscan-ghost">
-              {ar ? "ابدأ باحتياجك" : "Start with your need"}
+              {dictionaries[ar ? "ar" : "en"].ldStartCta}
             </a>
           </FeatureOnly>
         </div>

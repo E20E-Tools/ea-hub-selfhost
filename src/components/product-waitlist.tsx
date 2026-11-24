@@ -5,10 +5,11 @@ import type { Product } from "@/lib/catalog";
 import { launchDayLabel, launchInstantFor } from "@/lib/archone-launch";
 import { getWaitlistCount, joinWaitlist } from "@/lib/newsletter.functions";
 import { useFeature } from "@/lib/use-feature";
+import { dictionaries } from "@/lib/copy";
 
 /** Visitor-facing count text; small numbers are shown as-is, zero invites the first signup. */
 export function waitlistCountText(count: number, ar: boolean): string {
-  if (count <= 0) return ar ? "كن أول من ينتظرها" : "Be the first on the list";
+  if (count <= 0) return dictionaries[ar ? "ar" : "en"].productWaitlistBeTheFirstOn;
   if (!ar)
     return count === 1 ? "1 person is waiting" : `${count} people are waiting`;
   if (count === 1) return "شخص واحد بانتظارها";
@@ -61,7 +62,7 @@ export function ProductWaitlist({
         <p className="ea-waitlist-meta">
           {at && (
             <span>
-              {ar ? "الإطلاق المتوقع: " : "Expected launch: "}
+              {dictionaries[ar ? "ar" : "en"].productWaitlistExpectedLaunch}
               <b>{launchDayLabel(at, ar)}</b>
             </span>
           )}
@@ -76,12 +77,8 @@ export function ProductWaitlist({
         <p className="ea-waitlist-done" role="status">
           <Check size={18} aria-hidden="true" />
           {confirm
-            ? ar
-              ? "أُضفت للقائمة. أكّد بريدك من الرسالة التي ستصلك لنبلغك يوم الإطلاق."
-              : "You're on the list. Confirm your email from the message we send, and we'll tell you on launch day."
-            : ar
-              ? "أُضفت للقائمة. سنبلغك يوم الإطلاق."
-              : "You're on the list. We'll tell you on launch day."}
+            ? dictionaries[ar ? "ar" : "en"].productWaitlistYouReOnThe
+            : dictionaries[ar ? "ar" : "en"].productWaitlistYouReOnThe2}
         </p>
       ) : (
         <form
@@ -111,9 +108,7 @@ export function ProductWaitlist({
           }}
         >
           <label htmlFor={`${id}-p`}>
-            {ar
-              ? "ما المشكلة التي تريد أن تحلها هذه الأداة لفريقك؟ (اختياري)"
-              : "What problem should this tool solve for your team? (optional)"}
+            {dictionaries[ar ? "ar" : "en"].productWaitlistWhatProblemShouldThis}
           </label>
           <textarea
             id={`${id}-p`}
@@ -122,13 +117,11 @@ export function ProductWaitlist({
             value={problem}
             onChange={(e) => setProblem(e.target.value)}
             placeholder={
-              ar
-                ? "مثال: لا نعرف أي التطبيقات تتداخل وظائفها"
-                : "e.g. We can't see which applications overlap"
+              dictionaries[ar ? "ar" : "en"].productWaitlistEGWeCan
             }
           />
           <label htmlFor={`${id}-e`}>
-            {ar ? "بريدك الإلكتروني" : "Your email"}
+            {dictionaries[ar ? "ar" : "en"].productWaitlistYourEmail}
           </label>
           <div className="ea-waitlist-row">
             <input
@@ -142,29 +135,19 @@ export function ProductWaitlist({
             />
             <button type="submit" disabled={state === "busy"}>
               {state === "busy"
-                ? ar
-                  ? "جارٍ الإضافة…"
-                  : "Adding…"
-                : ar
-                  ? "أبلغني عند الإطلاق"
-                  : "Notify me at launch"}
+                ? dictionaries[ar ? "ar" : "en"].productWaitlistAdding
+                : dictionaries[ar ? "ar" : "en"].layoutsNotifyMeAtLaunch}
             </button>
           </div>
           {(state === "error" || state === "limit") && (
             <p className="ea-waitlist-error" role="alert">
               {state === "limit"
-                ? ar
-                  ? "محاولات كثيرة. حاول بعد ساعة."
-                  : "Too many attempts. Try again in an hour."
-                : ar
-                  ? "تعذّرت الإضافة. تحقق من البريد وحاول مجددًا."
-                  : "Couldn't add you. Check the email and try again."}
+                ? dictionaries[ar ? "ar" : "en"].productWaitlistTooManyAttemptsTry
+                : dictionaries[ar ? "ar" : "en"].productWaitlistCouldnTAddYou}
             </p>
           )}
           <p className="ea-waitlist-fine">
-            {ar
-              ? "نستخدم بريدك لإبلاغك بالإطلاق فقط، ويمكنك إلغاء المتابعة من أي رسالة."
-              : "We only use your email for the launch notice; unsubscribe from any message."}
+            {dictionaries[ar ? "ar" : "en"].productWaitlistWeOnlyUseYour}
           </p>
         </form>
       )}

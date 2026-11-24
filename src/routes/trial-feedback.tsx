@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { useLanguage } from "@/lib/language";
 import { trialFeedback } from "@/lib/trial-feedback.functions";
+import { dictionaries } from "@/lib/copy";
 
 export const Route = createFileRoute("/trial-feedback")({
   component: FeedbackPage,
@@ -54,24 +55,20 @@ function InvitationForm({fragment}: {fragment:string}) {
   }, [fragment]);
   return (
     <main dir={dir} className="bx-panel ea-team-space">
-      <h1>{ar ? "رأي الفريق في التجربة" : "Team trial feedback"}</h1>
+      <h1>{dictionaries[ar ? "ar" : "en"].trialFeedbackTeamTrialFeedback}</h1>
       {bad ? (
         <p>
-          {ar
-            ? "تعذر فتح رابط الملاحظات. راجع الرابط مع مسؤول التجربة."
-            : "Could not open the invitation. Check the link with the trial owner."}
+          {dictionaries[ar ? "ar" : "en"].trialFeedbackCouldNotOpenThe}
         </p>
       ) : !tool ? (
-        <p>{ar ? "جارٍ التحميل…" : "Loading…"}</p>
+        <p>{dictionaries[ar ? "ar" : "en"].loading}</p>
       ) : (
         <>
           <h2>{tool}</h2>
           <p>{goal}</p>
           {status === "sent" ? (
             <p role="status">
-              {ar
-                ? "تم تسجيل رأيك. شكرًا لمشاركتك."
-                : "Your feedback was recorded. Thank you."}
+              {dictionaries[ar ? "ar" : "en"].trialFeedbackYourFeedbackWasRecorded}
             </p>
           ) : (
             <form
@@ -91,20 +88,18 @@ function InvitationForm({fragment}: {fragment:string}) {
               }}
             >
               <label>
-                {ar
-                  ? "هل استطعت إنجاز المهمة؟"
-                  : "Could you complete the task?"}
+                {dictionaries[ar ? "ar" : "en"].trialFeedbackCouldYouCompleteThe}
                 <select
                   value={outcome}
                   onChange={(e) => setOutcome(e.target.value as typeof outcome)}
                 >
-                  <option value="yes">{ar ? "نعم" : "Yes"}</option>
-                  <option value="partial">{ar ? "جزئيًا" : "Partly"}</option>
-                  <option value="no">{ar ? "لا" : "No"}</option>
+                  <option value="yes">{dictionaries[ar ? "ar" : "en"].replyRatingYes}</option>
+                  <option value="partial">{dictionaries[ar ? "ar" : "en"].trialFeedbackPartly}</option>
+                  <option value="no">{dictionaries[ar ? "ar" : "en"].replyRatingNo}</option>
                 </select>
               </label>
               <label>
-                {ar ? "ما الذي ساعدك أو عطّلك؟" : "What helped or blocked you?"}
+                {dictionaries[ar ? "ar" : "en"].trialFeedbackWhatHelpedOrBlocked}
                 <textarea
                   required
                   maxLength={1000}
@@ -113,13 +108,11 @@ function InvitationForm({fragment}: {fragment:string}) {
                 />
               </label>
               <Button disabled={busy || !note.trim()}>
-                {ar ? "إرسال رأيي" : "Submit feedback"}
+                {dictionaries[ar ? "ar" : "en"].trialFeedbackSubmitFeedback}
               </Button>
               {status === "error" && (
                 <p role="alert">
-                  {ar
-                    ? "تعذر الإرسال. تحقق من الاتصال والرابط."
-                    : "Could not submit. Check your connection and invitation."}
+                  {dictionaries[ar ? "ar" : "en"].trialFeedbackCouldNotSubmitCheck}
                 </p>
               )}
             </form>

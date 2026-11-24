@@ -26,6 +26,7 @@ import {
   useDirection,
   type DirectionId,
 } from "./directions";
+import { dictionaries } from "@/lib/copy";
 
 type NavLink = { to: string; label: string; cta?: boolean };
 function useNavigation() {
@@ -174,7 +175,7 @@ export function StudioHeader() {
             className="s-menu"
             aria-expanded={open}
             aria-controls="network-menu"
-            aria-label={ar ? "قائمة المنصة" : "Platform menu"}
+            aria-label={dictionaries[ar ? "ar" : "en"].shellPlatformMenu}
             onClick={() => setOpen((v) => !v)}
           >
             {open ? <X size={19} /> : <Menu size={19} />}
@@ -185,24 +186,24 @@ export function StudioHeader() {
         <nav
           className="nx-mega"
           id="network-menu"
-          aria-label={ar ? "خريطة الموقع" : "Site directory"}
+          aria-label={dictionaries[ar ? "ar" : "en"].shellSiteDirectory}
         >
           <NavGroup
-            title={ar ? "المنصة والخدمات" : "Platform & services"}
+            title={dictionaries[ar ? "ar" : "en"].shellPlatformServices}
             links={entries.filter((item) => item.group === "platform")}
             icon={Compass}
             path={path}
             close={() => setOpen(false)}
           />
           <NavGroup
-            title={ar ? "مساحة العمل" : "Workspace"}
+            title={dictionaries[ar ? "ar" : "en"].shellWorkspace}
             links={entries.filter((item) => item.group === "workspace")}
             icon={BriefcaseBusiness}
             path={path}
             close={() => setOpen(false)}
           />
           <NavGroup
-            title={ar ? "عن الشركة والتواصل" : "Company & contact"}
+            title={dictionaries[ar ? "ar" : "en"].shellCompanyContact}
             links={entries.filter((item) => item.group === "company")}
             icon={Building2}
             path={path}
@@ -211,7 +212,7 @@ export function StudioHeader() {
           <section className="nx-looks">
             <h2>
               <Palette size={17} />
-              {ar ? "مظهر هذا الجهاز" : "Appearance on this device"}
+              {dictionaries[ar ? "ar" : "en"].shellAppearanceOnThisDevice}
             </h2>
             {(Object.keys(directions) as DirectionId[]).map((id) => (
               <button
@@ -254,14 +255,14 @@ export function StudioFooter() {
   const s = localizedSettings(data.settings, language);
   const ar = language === "ar";
   const links = [
-    { to: "/about", label: ar ? "من نحن" : "About" },
-    { to: "/contact", label: ar ? "اتصل بنا" : "Contact" },
-    { to: "/terms", label: ar ? "شروط الخدمة" : "Terms of service" },
-    { to: "/privacy", label: ar ? "سياسة الخصوصية" : "Privacy policy" },
+    { to: "/about", label: dictionaries[ar ? "ar" : "en"].shellAbout },
+    { to: "/contact", label: dictionaries[ar ? "ar" : "en"].shellContact },
+    { to: "/terms", label: dictionaries[ar ? "ar" : "en"].termsPageTitle },
+    { to: "/privacy", label: dictionaries[ar ? "ar" : "en"].privacyPrivacyPolicy },
   ];
   return (
     <footer className="nx-foot">
-      <nav aria-label={ar ? "روابط الموقع" : "Site links"}>
+      <nav aria-label={dictionaries[ar ? "ar" : "en"].shellSiteLinks}>
         <ul className="nx-foot-links">
           {links.map((link) => (
             <li key={link.to}>

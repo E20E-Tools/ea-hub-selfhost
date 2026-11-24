@@ -19,6 +19,7 @@ import { catalogQueryOptions } from "@/lib/catalog.functions";
 import { localizedProduct } from "@/lib/catalog";
 import { consultantContact, whatsappUrl } from "@/lib/theme-customization";
 import { useActiveTheme } from "@/themes/use-active-theme";
+import { dictionaries } from "@/lib/copy";
 
 const disciplines = [
   [Settings2, "esImplTitle", "esImplBody"],
@@ -95,7 +96,7 @@ function EnterpriseContent() {
           <p>{t("esLead")}</p>
           <div className="ea-service-entry">
           <a className="s-solid" href="#choose-service">
-            {ar ? "اختر الخدمة والأداة" : "Choose a service and tool"}
+            {dictionaries[ar ? "ar" : "en"].enterpriseChooseAServiceAnd}
           </a>
           <a href={requestUrl} onClick={startSelection}>
             {t("esCta")}
@@ -108,9 +109,7 @@ function EnterpriseContent() {
         <div>
           <h2>{t("esServicesTitle")}</h2>
           <p className="s-enter-hint">
-            {ar
-              ? "اختر الخدمة المطلوبة لتكوين نطاق الطلب."
-              : "Select the service to scope your request."}
+            {dictionaries[ar ? "ar" : "en"].enterpriseSelectTheServiceTo}
           </p>
           <div className="s-disciplines">
             {disciplines.map(([Icon, title, body], index) => (
@@ -139,16 +138,16 @@ function EnterpriseContent() {
           </div>
         </div>
         <div className="nx-service-builder">
-          <h3>{ar ? "نطاق طلبك" : "Your service request"}</h3>
+          <h3>{dictionaries[ar ? "ar" : "en"].enterpriseYourServiceRequest}</h3>
           <p className="ea-scope-choice">{t(disciplines[active]![1])}</p>
           <label>
-            {ar ? "الأداة المعنيّة" : "Tool in scope"}
+            {dictionaries[ar ? "ar" : "en"].enterpriseToolInScope}
             <select
               disabled={!ready}
               value={tool}
               onChange={(e) => setTool(e.target.value)}
             >
-              <option value="">{ar ? "أحدّدها لاحقًا" : "Decide later"}</option>
+              <option value="">{dictionaries[ar ? "ar" : "en"].enterpriseDecideLater}</option>
               {available.map((p) => (
                 <option key={p.id} value={p.id}>
                   {p.name}
@@ -156,9 +155,9 @@ function EnterpriseContent() {
               ))}
             </select>
           </label>
-          <dl aria-live="polite" className="ea-scope-deliverables"><dt>{ar?"قبل البدء":"Before you start"}</dt><dd>{prepare}</dd><dt>{ar?"ما ستحصل عليه":"What you’ll receive"}</dt><dd>{deliver}</dd></dl>
+          <dl aria-live="polite" className="ea-scope-deliverables"><dt>{dictionaries[ar ? "ar" : "en"].enterpriseBeforeYouStart}</dt><dd>{prepare}</dd><dt>{dictionaries[ar ? "ar" : "en"].enterpriseWhatYouLlReceive}</dt><dd>{deliver}</dd></dl>
           <a className="s-solid" href={requestUrl} onClick={startSelection}>
-            {ar ? "متابعة طلب " : "Continue with "}
+            {dictionaries[ar ? "ar" : "en"].enterpriseContinueWith}
             {t(disciplines[active]![1])}
             {toolName && (ar ? " — " : " for ") + toolName}{" "}
             <ArrowUpRight size={16} />
@@ -193,9 +192,7 @@ function EnterpriseContent() {
                   <h3>
                     {soon
                       ? t("comingSoonBadge")
-                      : ar
-                        ? "متاح للخدمات الآن"
-                        : "Available for services"}
+                      : dictionaries[ar ? "ar" : "en"].enterpriseAvailableForServices}
                   </h3>
                   {tools.map((item) => {
                     const p = localizedProduct(item, language);
@@ -217,12 +214,8 @@ function EnterpriseContent() {
                         <strong dir="auto">{p.name}</strong>
                         <small>
                           {soon
-                            ? ar
-                              ? "أبلغني عند الإطلاق"
-                              : "Notify me at launch"
-                            : ar
-                              ? "طلب خدمة"
-                              : "Request a service"}
+                            ? dictionaries[ar ? "ar" : "en"].layoutsNotifyMeAtLaunch
+                            : dictionaries[ar ? "ar" : "en"].enterpriseRequestAService}
                         </small>
                         <ArrowUpRight size={16} />
                       </a>

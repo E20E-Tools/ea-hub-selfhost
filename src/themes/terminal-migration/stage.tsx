@@ -5,6 +5,7 @@ import { useLanguage } from "@/lib/language";
 import type { StageProps } from "../registry";
 import { useStageMotion } from "../use-stage-motion";
 import { legacyFileName } from "../legacy-to-digital/model";
+import { dictionaries } from "@/lib/copy";
 
 export const MIGRATION_STAGES = [
   {
@@ -79,9 +80,7 @@ export default function TerminalMigrationStage({
         <h1>{settings.displayTitle}</h1>
         <p>
           {settings.tagline ||
-            (ar
-              ? "مؤسستك القديمة، بعد ترحيلها إلى نظام واحد."
-              : "Your legacy enterprise, migrated into one system.")}
+            (dictionaries[ar ? "ar" : "en"].stageYourLegacyEnterpriseMigrated)}
         </p>
       </div>
 
@@ -101,7 +100,7 @@ export default function TerminalMigrationStage({
         <div
           className="tmig-spine"
           role="group"
-          aria-label={ar ? "مراحل الترحيل" : "Migration stages"}
+          aria-label={dictionaries[ar ? "ar" : "en"].stageMigrationStages}
         >
           {MIGRATION_STAGES.map((s, i) => (
             <button
@@ -123,9 +122,7 @@ export default function TerminalMigrationStage({
         <div className="tmig-hud">
           <div className="tmig-hud-head">
             <strong>
-              {ar
-                ? "لوحة المؤسسة بعد الترحيل"
-                : "Your enterprise, after migration"}
+              {dictionaries[ar ? "ar" : "en"].stageYourEnterpriseAfterMigration}
             </strong>
             <span dir="ltr">LIVE · {current.en.toUpperCase()}</span>
           </div>
@@ -157,10 +154,10 @@ export default function TerminalMigrationStage({
           <div className="tmig-actions">
             <FeatureOnly feature="discover">
               <a href="/discover">
-                {ar ? "ابدأ باحتياجك" : "Start with your need"}
+                {dictionaries[ar ? "ar" : "en"].ldStartCta}
               </a>
             </FeatureOnly>
-            <a href="#catalog">{ar ? "كل الأدوات" : "All tools"}</a>
+            <a href="#catalog">{dictionaries[ar ? "ar" : "en"].stageAllTools}</a>
           </div>
         </div>
       </div>

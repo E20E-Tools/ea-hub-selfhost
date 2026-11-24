@@ -21,6 +21,7 @@ import { useState } from "react";
 import { productImages } from "@/lib/product-images";
 import { trackJourney } from "@/lib/journey-client";
 import { pageUrl } from "@/lib/seo";
+import { dictionaries } from "@/lib/copy";
 
 type Scenario = "adoption" | "overlap" | "dependency";
 type CompareSearch = { scenario?: Scenario | undefined; goal?: DiscoveryGoal | undefined; ids?: string | undefined };
@@ -74,9 +75,9 @@ function ComparePage() {
   const search = Route.useSearch();
   const ar=language==="ar";
   const decisions=[
-    {id:"overlap",ids:["landscape","archone"],title:ar?"تقليل ازدواجية الأنظمة":"Reduce system duplication",why:ar?"ابدأ بـ APM لكشف التطبيقات التي تخدم القدرة نفسها. استخدم ArchONE لتتبّع أثر الدمج على العمليات.":"Start with APM to find applications serving the same capability. Use ArchONE to trace the impact of consolidation on processes."},
-    {id:"adoption",ids:["radar","landscape"],title:ar?"تجربة تقنية جديدة":"Trial a technology",why:ar?"ابدأ بالرادار لتوثيق قرار التجربة، ثم راجع خريطة التطبيقات لمعرفة أين ستُستخدم التقنية.":"Start with Radar to record the trial decision, then consult the application landscape to identify where the technology would be used."},
-    {id:"dependency",ids:["archone","landscape"],title:ar?"فهم أثر تغيير عملية":"Assess a process change",why:ar?"ابدأ بـ ArchONE لتتبّع العملية إلى الأنظمة، ثم تحقّق من اعتماديات التطبيقات في APM.":"Start with ArchONE to trace the process to systems, then verify their application dependencies in APM."}
+    {id:"overlap",ids:["landscape","archone"],title:dictionaries[ar ? "ar" : "en"].compareReduceSystemDuplication,why:dictionaries[ar ? "ar" : "en"].compareStartWithApmTo},
+    {id:"adoption",ids:["radar","landscape"],title:dictionaries[ar ? "ar" : "en"].compareTrialATechnology,why:dictionaries[ar ? "ar" : "en"].compareStartWithRadarTo},
+    {id:"dependency",ids:["archone","landscape"],title:dictionaries[ar ? "ar" : "en"].compareAssessAProcessChange,why:dictionaries[ar ? "ar" : "en"].compareStartWithArchoneTo}
   ].filter(d=>d.ids.every(id=>catalog.products.some(p=>p.id===id&&!p.comingSoon)));
   const [differences, setDifferences] = useState(false);
   const navigate = Route.useNavigate();
@@ -94,13 +95,13 @@ function ComparePage() {
   const products = available.map((product) => localizedProduct(product, language));
   const goal = search.goal ? t(`bxGoal_${search.goal}`) : search.scenario && decision?.id === search.scenario ? decision.title : undefined;
   const choiceGuide: Record<string, string> = {
-    landscape: ar ? "اخترها لحصر التطبيقات القائمة وكشف التداخل بين القدرات التي تدعمها." : "Choose this to map existing applications and find overlapping capabilities.",
-    radar: ar ? "اخترها لتقرّر أي تقنية تتبنّى أو تجرّب أو تقيّم أو توقف، وتوثّق السبب." : "Choose this to decide which technologies to adopt, trial, assess or hold and record why.",
-    archone: ar ? "اخترها لتتبّع أثر تغيير عملية على القدرات والتطبيقات المرتبطة بها." : "Choose this to trace a process change to the capabilities and applications it affects.",
+    landscape: dictionaries[ar ? "ar" : "en"].compareChooseThisToMap,
+    radar: dictionaries[ar ? "ar" : "en"].compareChooseThisToDecide,
+    archone: dictionaries[ar ? "ar" : "en"].compareChooseThisToTrace,
   };
   function explainComparison() {
     const items = products.map(({ id, name }) => ({ id, name }));
-    const names = items.map(item => item.name).join(ar ? " و" : " and ");
+    const names = items.map(item => item.name).join(dictionaries[ar ? "ar" : "en"].compareAnd);
     const question = ar
       ? `ما الفرق بين ${names}؟ ${goal ? "هدفي: " + goal + ". " : ""}متى أختار كل أداة؟ استند إلى صفحات المنتجات.`
       : `How do ${names} differ? ${goal ? "My goal: " + goal + ". " : ""}When should I choose each tool? Use their product pages.`;
@@ -185,7 +186,7 @@ function ComparePage() {
         </p>
       )}
       {decisions.length > 0 && <section className="bx-panel">
-        <h2>{ar ? "ما القرار الذي تحاول اتخاذه؟" : "Which decision are you making?"}</h2>
+        <h2>{dictionaries[ar ? "ar" : "en"].compareWhichDecisionAreYou}</h2>
         <div className="ea-decision-grid">
           {decisions.map((item) => (
             <button key={item.id} type="button" aria-pressed={item === decision} onClick={() => update(item.ids, item.id as Scenario)}>
@@ -255,15 +256,15 @@ function ComparePage() {
       </div>
       {products.length >= 2 && (
         <section className="bx-panel ea-choice-guide">
-          <h2>{ar ? "متى أختار كل أداة؟" : "When should I choose each tool?"}</h2>
+          <h2>{dictionaries[ar ? "ar" : "en"].compareWhenShouldIChoose}</h2>
           <ul>{products.map(product => <li key={product.id}>
             <Link to="/product/$productId" params={{ productId: product.id }}><bdi>{product.name}</bdi></Link>
             <p>{choiceGuide[product.id] || product.description}</p>
             {choiceGuide[product.id] && <Link to="/product/$productId" params={{ productId: product.id }} hash="exercise">
-              {ar ? "جرّبها على مثال" : "Try a worked example"}</Link>}
+              {dictionaries[ar ? "ar" : "en"].productExerciseTryAWorkedExample}</Link>}
           </li>)}</ul>
           {featureEnabled(catalog.settings?.featureFlags, "assistant") && <Button type="button" onClick={explainComparison}>
-            {ar ? "اشرح لي الفرق مع Archy" : "Explain the difference with Archy"}
+            {dictionaries[ar ? "ar" : "en"].compareExplainTheDifferenceWith}
           </Button>}
         </section>
       )}

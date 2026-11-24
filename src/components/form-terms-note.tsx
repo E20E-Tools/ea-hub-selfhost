@@ -3,6 +3,7 @@ import { useSuspenseQuery } from "@tanstack/react-query";
 import { useLanguage } from "@/lib/language";
 import { catalogQueryOptions } from "@/lib/catalog.functions";
 import { featureEnabled } from "@/lib/site-features";
+import { dictionaries } from "@/lib/copy";
 
 /** Small note under request forms linking to the terms of service. */
 export function FormTermsNote() {
@@ -11,13 +12,13 @@ export function FormTermsNote() {
   const ar = language !== "en";
   const privacy = (
     <a href="/privacy" target="_blank" className="text-primary underline underline-offset-4">
-      {ar ? "سياسة الخصوصية" : "privacy policy"}
+      {dictionaries[ar ? "ar" : "en"].formTermsNotePrivacyPolicy}
     </a>
   );
   if (!featureEnabled(catalog.settings.featureFlags, "terms")) {
     return (
       <p className="mt-3 text-xs text-muted-foreground">
-        {ar ? "نتعامل مع بياناتك وفق " : "We handle your data under our "}
+        {dictionaries[ar ? "ar" : "en"].formTermsNoteWeHandleYourData}
         {privacy}.
       </p>
     );
@@ -28,7 +29,7 @@ export function FormTermsNote() {
       <Link to="/terms" target="_blank" className="text-primary underline underline-offset-4">
         {t("formTermsLink")}
       </Link>
-      {ar ? "، ونتعامل مع بياناتك وفق " : ", and we handle your data under our "}
+      {dictionaries[ar ? "ar" : "en"].formTermsNoteAndWeHandleYour}
       {privacy}.
     </p>
   );

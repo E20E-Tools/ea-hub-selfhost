@@ -5,7 +5,7 @@ import { ArrowUpLeft, ArrowUpRight, Check, Clock, X } from "lucide-react";
 import type { Product } from "@/lib/catalog";
 import { localizedProduct } from "@/lib/catalog";
 import { useLanguage } from "@/lib/language";
-import { fill } from "@/lib/copy";
+import { fill, dictionaries } from "@/lib/copy";
 import { archoneLaunchLabel } from "@/lib/archone-launch";
 import { productPractice } from "@/lib/product-practice";
 import { ProductToolsActions } from "@/components/product-tools";
@@ -91,12 +91,8 @@ function StatusText({ product }: { product: Product }) {
   return (
     <>
       {product.comingSoon
-        ? ar
-          ? "قريبًا"
-          : "Coming soon"
-        : ar
-          ? "متاحة الآن"
-          : "Available now"}
+        ? dictionaries[ar ? "ar" : "en"].comingSoonBadge
+        : dictionaries[ar ? "ar" : "en"].roadmapStatAvailable}
     </>
   );
 }
@@ -137,12 +133,8 @@ function HelpLinks({
         }
       >
         {product.comingSoon
-          ? ar
-            ? "أبلغني عند الإطلاق"
-            : "Notify me at launch"
-          : ar
-            ? "تابع التحديثات"
-            : "Follow updates"}
+          ? dictionaries[ar ? "ar" : "en"].layoutsNotifyMeAtLaunch
+          : dictionaries[ar ? "ar" : "en"].layoutsFollowUpdates}
       </a>
     </div>
   );
@@ -226,7 +218,7 @@ function Practice({
     : ["Prepare", "Do it in the tool", "Success criterion"];
   return (
     <section className={className} id="practice">
-      <h2>{ar ? "تمرين مقترح لفريقك" : "A first exercise for your team"}</h2>
+      <h2>{dictionaries[ar ? "ar" : "en"].layoutsAFirstExerciseFor}</h2>
       <ol>
         {practice[lang].map((step, i) => (
           <li key={step} data-step={i + 1}>
@@ -238,7 +230,7 @@ function Practice({
       </ol>
       <StepHelp product={product} ar={ar} step={practice[lang][1]!} />
       <p className="pl-source">
-        {ar ? "مرجع المنهج" : "Method reference"} ·{" "}
+        {dictionaries[ar ? "ar" : "en"].layoutsMethodReference} ·{" "}
         <a href={practice.url}>{practice.source}</a>
       </p>
     </section>
@@ -306,27 +298,27 @@ export function MissionLayout({
   const kpis = [
     {
       v: String(product.features.length),
-      t: ar ? "قدرات أساسية" : "Core capabilities",
+      t: dictionaries[ar ? "ar" : "en"].layoutsCoreCapabilities,
       c: "#3ee39a",
     },
     beneficiary.prerequisites?.length
       ? {
           v: String(beneficiary.prerequisites.length),
-          t: ar ? "متطلبات للبدء" : "Things to have ready",
+          t: dictionaries[ar ? "ar" : "en"].layoutsThingsToHaveReady,
           c: "#e9f7f0",
         }
       : null,
     beneficiary.integrations?.length
       ? {
           v: String(beneficiary.integrations.length),
-          t: ar ? "تكاملات" : "Integrations",
+          t: dictionaries[ar ? "ar" : "en"].layoutsIntegrations,
           c: "#7fd1ff",
         }
       : null,
     reviewed
       ? {
           v: reviewed,
-          t: ar ? "آخر مراجعة" : "Last reviewed",
+          t: dictionaries[ar ? "ar" : "en"].layoutsLastReviewed,
           c: "#e6b25c",
           small: true,
         }
@@ -337,17 +329,17 @@ export function MissionLayout({
     <main className="pl-mission" dir={dir}>
       <nav
         className="plm-bar"
-        aria-label={ar ? "أقسام الصفحة" : "Page sections"}
+        aria-label={dictionaries[ar ? "ar" : "en"].layoutsPageSections}
       >
         <Link to="/" className="plm-crumb">
-          {ar ? "المكتبة" : "Library"}
+          {dictionaries[ar ? "ar" : "en"].navLibrary}
         </Link>
         <span aria-hidden="true">/</span>
         <bdi dir="ltr">{product.name}</bdi>
         <span className="plm-jumps">
-          <a href="#fit">{ar ? "الملاءمة" : "Fit"}</a>
-          <a href="#capabilities">{ar ? "ما تحصل عليه" : "What you get"}</a>
-          <a href="#help">{ar ? "المساعدة" : "Help"}</a>
+          <a href="#fit">{dictionaries[ar ? "ar" : "en"].comparisonDecisionFit}</a>
+          <a href="#capabilities">{dictionaries[ar ? "ar" : "en"].productFeatures}</a>
+          <a href="#help">{dictionaries[ar ? "ar" : "en"].layoutsHelp}</a>
         </span>
       </nav>
 
@@ -384,7 +376,7 @@ export function MissionLayout({
       {kpis.length > 0 && (
         <section
           className="plm-kpis"
-          aria-label={ar ? "ملخص سريع" : "At a glance"}
+          aria-label={dictionaries[ar ? "ar" : "en"].layoutsAtAGlance}
         >
           {kpis.map((k) => (
             <div key={k.t}>
@@ -404,14 +396,14 @@ export function MissionLayout({
         <section className="plm-fit" id="fit">
           <div>
             <small dir="ltr">01 · FIT CHECK</small>
-            <h2>{ar ? "هل تناسب فريقك؟" : "Is it right for your team?"}</h2>
+            <h2>{dictionaries[ar ? "ar" : "en"].layoutsIsItRightFor}</h2>
           </div>
           <div className="plm-fit-cards">
             {beneficiary.audience && (
               <div data-kind="yes">
                 <h3>
                   <Check size={18} aria-hidden="true" />
-                  {ar ? "تناسب" : "A good fit"}
+                  {dictionaries[ar ? "ar" : "en"].layoutsAGoodFit}
                 </h3>
                 <p>{beneficiary.audience}</p>
               </div>
@@ -420,7 +412,7 @@ export function MissionLayout({
               <div data-kind="no">
                 <h3>
                   <X size={18} aria-hidden="true" />
-                  {ar ? "لا تناسب" : "Not a fit"}
+                  {dictionaries[ar ? "ar" : "en"].layoutsNotAFit}
                 </h3>
                 <p>{beneficiary.notFor}</p>
               </div>
@@ -432,7 +424,7 @@ export function MissionLayout({
       <section className="plm-bento">
         <div className="plm-card plm-wide" id="capabilities">
           <small dir="ltr">02 · WHAT YOU GET</small>
-          <h2>{ar ? "ما تحصل عليه" : "What you get"}</h2>
+          <h2>{dictionaries[ar ? "ar" : "en"].productFeatures}</h2>
           <ol className="plm-features">
             {product.features.map((f, i) => (
               <li key={f}>
@@ -445,14 +437,14 @@ export function MissionLayout({
         {beneficiary.prerequisites?.length ? (
           <div className="plm-card">
             <small dir="ltr">03 · BEFORE YOU START</small>
-            <h3>{ar ? "المتطلبات السابقة" : "Prerequisites"}</h3>
+            <h3>{dictionaries[ar ? "ar" : "en"].bxPrerequisites}</h3>
             <FactList items={beneficiary.prerequisites} />
           </div>
         ) : null}
         {beneficiary.integrations?.length ? (
           <div className="plm-card" data-tone="info">
             <small dir="ltr">04 · INTEGRATIONS</small>
-            <h3>{ar ? "يتصل بـ" : "Connects to"}</h3>
+            <h3>{dictionaries[ar ? "ar" : "en"].layoutsConnectsTo}</h3>
             <div className="plm-chips">
               {beneficiary.integrations.map((x) => (
                 <span key={x}>{x}</span>
@@ -463,14 +455,14 @@ export function MissionLayout({
         {beneficiary.limitations?.length ? (
           <div className="plm-card" data-tone="warn">
             <small dir="ltr">05 · HONEST LIMITS</small>
-            <h3>{ar ? "ما لا تفعله" : "What it doesn't do"}</h3>
+            <h3>{dictionaries[ar ? "ar" : "en"].layoutsWhatItDoesnT}</h3>
             <FactList items={beneficiary.limitations} />
           </div>
         ) : null}
         {ops.length > 0 && (
           <div className="plm-card" id="operating-requirements">
             <small dir="ltr">06 · OPERATIONS</small>
-            <h3>{ar ? "متطلبات التشغيل" : "Operating requirements"}</h3>
+            <h3>{dictionaries[ar ? "ar" : "en"].layoutsOperatingRequirements}</h3>
             <dl>
               {ops.map((r) => (
                 <div key={r.key}>
@@ -484,7 +476,7 @@ export function MissionLayout({
         {beneficiary.exampleOutput && (
           <div className="plm-card plm-wide" data-tone="glow">
             <small dir="ltr">07 · EXAMPLE OUTPUT</small>
-            <h3>{ar ? "مثال على المخرجات" : "Example output"}</h3>
+            <h3>{dictionaries[ar ? "ar" : "en"].bxExampleOutput}</h3>
             <p>{beneficiary.exampleOutput}</p>
           </div>
         )}
@@ -496,7 +488,7 @@ export function MissionLayout({
       <Release product={product} className="plm-card plm-release" />
 
       <section className="plm-help" id="help">
-        <h2>{ar ? "تحتاج مساعدة؟" : "Need help?"}</h2>
+        <h2>{dictionaries[ar ? "ar" : "en"].layoutsNeedHelp}</h2>
         <HelpLinks product={product} className="plm-help-links" />
       </section>
       <Others others={others} image={image} className="plm-others" />
@@ -521,36 +513,32 @@ export function SpecLayout({
     lang,
   );
   const specs = [
-    { k: ar ? "الفئة" : "CATEGORY", v: product.label },
+    { k: dictionaries[ar ? "ar" : "en"].layoutsCategory, v: product.label },
     {
-      k: ar ? "الحالة" : "STATUS",
+      k: dictionaries[ar ? "ar" : "en"].tmStatus,
       v: product.comingSoon
-        ? ar
-          ? "قريبًا"
-          : "Coming soon"
-        : ar
-          ? "متاحة الآن"
-          : "Available now",
+        ? dictionaries[ar ? "ar" : "en"].comingSoonBadge
+        : dictionaries[ar ? "ar" : "en"].roadmapStatAvailable,
     },
-    product.version ? { k: ar ? "الإصدار" : "VERSION", v: product.version } : null,
-    practice ? { k: ar ? "المنهجية" : "METHOD", v: practice.source } : null,
+    product.version ? { k: dictionaries[ar ? "ar" : "en"].layoutsVersion, v: product.version } : null,
+    practice ? { k: dictionaries[ar ? "ar" : "en"].layoutsMethod, v: practice.source } : null,
     beneficiary.integrations?.length
-      ? { k: ar ? "التكاملات" : "INTEGRATIONS", v: String(beneficiary.integrations.length) }
+      ? { k: dictionaries[ar ? "ar" : "en"].layoutsIntegrations2, v: String(beneficiary.integrations.length) }
       : null,
-    reviewed ? { k: ar ? "آخر مراجعة" : "REVIEWED", v: reviewed } : null,
+    reviewed ? { k: dictionaries[ar ? "ar" : "en"].layoutsReviewed, v: reviewed } : null,
   ].filter(Boolean) as { k: string; v: string }[];
   const sections = [
-    { id: "summary", t: ar ? "في سطرين" : "In short" },
+    { id: "summary", t: dictionaries[ar ? "ar" : "en"].layoutsInShort },
     beneficiary.audience || beneficiary.notFor
-      ? { id: "fit", t: ar ? "الملاءمة" : "Fit" }
+      ? { id: "fit", t: dictionaries[ar ? "ar" : "en"].comparisonDecisionFit }
       : null,
-    { id: "capabilities", t: ar ? "ما تحصل عليه" : "What you get" },
-    { id: "operations", t: ar ? "التشغيل" : "Operations" },
+    { id: "capabilities", t: dictionaries[ar ? "ar" : "en"].productFeatures },
+    { id: "operations", t: dictionaries[ar ? "ar" : "en"].layoutsOperations },
     product.comingSoon
-      ? { id: "access", t: ar ? "الحصول عليها" : "Getting access" }
+      ? { id: "access", t: dictionaries[ar ? "ar" : "en"].layoutsGettingAccess }
       : null,
     practice
-      ? { id: "practice", t: ar ? "تمرين لفريقك" : "Team exercise" }
+      ? { id: "practice", t: dictionaries[ar ? "ar" : "en"].layoutsTeamExercise }
       : null,
   ].filter(Boolean) as { id: string; t: string }[];
   const num = (id: string) =>
@@ -570,7 +558,7 @@ export function SpecLayout({
           <p className="pls-meta" dir="ltr">
             <span>DATASHEET / E20E-{product.id.toUpperCase()}</span>
             <span data-live={product.comingSoon ? undefined : ""}>
-              ● {product.comingSoon ? (ar ? "قريبًا" : "COMING SOON") : ar ? "متاحة" : "AVAILABLE"}
+              ● {product.comingSoon ? (dictionaries[ar ? "ar" : "en"].layoutsComingSoon) : dictionaries[ar ? "ar" : "en"].layoutsAvailable}
             </span>
           </p>
           <h1 dir="ltr">
@@ -593,7 +581,7 @@ export function SpecLayout({
       <div className="pls-body">
         <nav
           className="pls-index"
-          aria-label={ar ? "فهرس الصفحة" : "On this page"}
+          aria-label={dictionaries[ar ? "ar" : "en"].layoutsOnThisPage}
         >
           {sections.map((s, i) => (
             <a key={s.id} href={`#${s.id}`}>
@@ -607,7 +595,7 @@ export function SpecLayout({
           <section id="summary" className="pls-sec">
             <h2>
               <b dir="ltr">{num("summary")}</b>
-              {ar ? "في سطرين" : "In short"}
+              {dictionaries[ar ? "ar" : "en"].layoutsInShort}
             </h2>
             <p className="pls-big">{product.description}</p>
           </section>
@@ -616,18 +604,18 @@ export function SpecLayout({
             <section id="fit" className="pls-sec">
               <h2>
                 <b dir="ltr">{num("fit")}</b>
-                {ar ? "الملاءمة" : "Fit"}
+                {dictionaries[ar ? "ar" : "en"].comparisonDecisionFit}
               </h2>
               <div className="pls-fit">
                 {beneficiary.audience && (
                   <div>
-                    <h3>✓ {ar ? "لمن تناسب" : "Who it's for"}</h3>
+                    <h3>✓ {dictionaries[ar ? "ar" : "en"].layoutsWhoItSFor}</h3>
                     <p>{beneficiary.audience}</p>
                   </div>
                 )}
                 {beneficiary.notFor && (
                   <div data-kind="no">
-                    <h3>✕ {ar ? "متى لا تناسب" : "When it isn't"}</h3>
+                    <h3>✕ {dictionaries[ar ? "ar" : "en"].layoutsWhenItIsnT}</h3>
                     <p>{beneficiary.notFor}</p>
                   </div>
                 )}
@@ -638,7 +626,7 @@ export function SpecLayout({
           <section id="capabilities" className="pls-sec">
             <h2>
               <b dir="ltr">{num("capabilities")}</b>
-              {ar ? "ما تحصل عليه" : "What you get"}
+              {dictionaries[ar ? "ar" : "en"].productFeatures}
             </h2>
             <ol className="pls-features">
               {product.features.map((f, i) => (
@@ -650,34 +638,34 @@ export function SpecLayout({
             </ol>
             {beneficiary.exampleOutput && (
               <p className="pls-example">
-                <b>{ar ? "مثال على المخرجات: " : "Example output: "}</b>
+                <b>{dictionaries[ar ? "ar" : "en"].layoutsExampleOutput}</b>
                 {beneficiary.exampleOutput}
               </p>
             )}
-            <ProductScreenshots shots={beneficiary.screenshots} productName={product.name} ar={ar} className="pls-shots" heading={<h3>{ar ? "من داخل الأداة" : "Inside the tool"}</h3>} />
+            <ProductScreenshots shots={beneficiary.screenshots} productName={product.name} ar={ar} className="pls-shots" heading={<h3>{dictionaries[ar ? "ar" : "en"].layoutsInsideTheTool}</h3>} />
           </section>
 
           <section id="operations" className="pls-sec">
             <h2>
               <b dir="ltr">{num("operations")}</b>
-              {ar ? "التشغيل" : "Operations"}
+              {dictionaries[ar ? "ar" : "en"].layoutsOperations}
             </h2>
             <div className="pls-ops">
               {beneficiary.prerequisites?.length ? (
                 <div>
-                  <h3>{ar ? "ابدأ بـ" : "Start with"}</h3>
+                  <h3>{dictionaries[ar ? "ar" : "en"].layoutsStartWith}</h3>
                   <FactList items={beneficiary.prerequisites} />
                 </div>
               ) : null}
               {beneficiary.integrations?.length ? (
                 <div>
-                  <h3>{ar ? "يتكامل مع" : "Integrates with"}</h3>
+                  <h3>{dictionaries[ar ? "ar" : "en"].layoutsIntegratesWith}</h3>
                   <FactList items={beneficiary.integrations} />
                 </div>
               ) : null}
               {beneficiary.limitations?.length ? (
                 <div data-kind="warn">
-                  <h3>{ar ? "حدود يجب معرفتها" : "Limits to know"}</h3>
+                  <h3>{dictionaries[ar ? "ar" : "en"].layoutsLimitsToKnow}</h3>
                   <FactList items={beneficiary.limitations} />
                 </div>
               ) : null}
@@ -698,7 +686,7 @@ export function SpecLayout({
             <section className="pls-sec">
               <h2>
                 <b dir="ltr">{num("access")}</b>
-                {ar ? "الحصول عليها" : "Getting access"}
+                {dictionaries[ar ? "ar" : "en"].layoutsGettingAccess}
               </h2>
               <Interactive product={product} salesEmail={salesEmail} />
             </section>
@@ -742,18 +730,18 @@ export function JourneyLayout({
   const ready = readiness(have);
   const steps = [
     {
-      t: ar ? "افهم" : "Understand",
-      s: ar ? "ماذا تفعل الأداة" : "What it does",
+      t: dictionaries[ar ? "ar" : "en"].layoutsUnderstand,
+      s: dictionaries[ar ? "ar" : "en"].layoutsWhatItDoes,
     },
     {
-      t: ar ? "الملاءمة" : "Fit",
-      s: ar ? "هل تناسب فريقك" : "Is it for your team",
+      t: dictionaries[ar ? "ar" : "en"].comparisonDecisionFit,
+      s: dictionaries[ar ? "ar" : "en"].layoutsIsItForYour,
     },
     {
-      t: ar ? "جرّب" : "Try",
-      s: ar ? "تمرين لفريقك" : "A team exercise",
+      t: dictionaries[ar ? "ar" : "en"].productCaseTry,
+      s: dictionaries[ar ? "ar" : "en"].layoutsATeamExercise,
     },
-    { t: ar ? "ابدأ" : "Start", s: ar ? "افتح النظام" : "Open the system" },
+    { t: dictionaries[ar ? "ar" : "en"].layoutsStart, s: dictionaries[ar ? "ar" : "en"].layoutsOpenTheSystem },
   ];
 
   return (
@@ -761,8 +749,8 @@ export function JourneyLayout({
       <section className="plj-band">
         <div className="plj-wrap">
           <div className="plj-top">
-            <nav aria-label={ar ? "مسار التنقل" : "Breadcrumb"}>
-              <Link to="/">{ar ? "المكتبة" : "Library"}</Link> /{" "}
+            <nav aria-label={dictionaries[ar ? "ar" : "en"].layoutsBreadcrumb}>
+              <Link to="/">{dictionaries[ar ? "ar" : "en"].navLibrary}</Link> /{" "}
               <bdi dir="ltr">{product.name}</bdi>
             </nav>
             <div className="plj-top-actions">
@@ -782,7 +770,7 @@ export function JourneyLayout({
             {prereqs.length > 0 && (
               <div className="plj-meter">
                 <div>
-                  <span>{ar ? "جاهزية فريقك" : "Your team's readiness"}</span>
+                  <span>{dictionaries[ar ? "ar" : "en"].layoutsYourTeamSReadiness}</span>
                   <b dir="ltr">{ready}%</b>
                 </div>
                 <div
@@ -791,14 +779,12 @@ export function JourneyLayout({
                   aria-valuemin={0}
                   aria-valuemax={100}
                   aria-valuenow={ready}
-                  aria-label={ar ? "جاهزية فريقك" : "Your team's readiness"}
+                  aria-label={dictionaries[ar ? "ar" : "en"].layoutsYourTeamSReadiness}
                 >
                   <i style={{ inlineSize: `${ready}%` }} />
                 </div>
                 <small>
-                  {ar
-                    ? "حدّثها من خطوة «الملاءمة»."
-                    : "Update it in the Fit step."}
+                  {dictionaries[ar ? "ar" : "en"].layoutsUpdateItInThe}
                 </small>
               </div>
             )}
@@ -807,7 +793,7 @@ export function JourneyLayout({
           <div
             className="plj-steps"
             role="tablist"
-            aria-label={ar ? "مراحل القرار" : "Decision steps"}
+            aria-label={dictionaries[ar ? "ar" : "en"].layoutsDecisionSteps}
           >
             {steps.map((s, i) => (
               <button
@@ -850,7 +836,7 @@ export function JourneyLayout({
             ))}
             {beneficiary.exampleOutput && (
               <div className="plj-card plj-span" data-tone="dark">
-                <h3>{ar ? "مثال على المخرجات" : "Example output"}</h3>
+                <h3>{dictionaries[ar ? "ar" : "en"].bxExampleOutput}</h3>
                 <p>{beneficiary.exampleOutput}</p>
               </div>
             )}
@@ -867,27 +853,23 @@ export function JourneyLayout({
           <div className="plj-grid">
             {beneficiary.audience && (
               <div className="plj-card" data-tone="yes">
-                <h2>{ar ? "تناسبك إذا" : "It fits if"}</h2>
+                <h2>{dictionaries[ar ? "ar" : "en"].layoutsItFitsIf}</h2>
                 <p>{beneficiary.audience}</p>
               </div>
             )}
             {beneficiary.notFor && (
               <div className="plj-card" data-tone="no">
-                <h2>{ar ? "ابحث عن غيرها إذا" : "Look elsewhere if"}</h2>
+                <h2>{dictionaries[ar ? "ar" : "en"].layoutsLookElsewhereIf}</h2>
                 <p>{beneficiary.notFor}</p>
               </div>
             )}
             {prereqs.length > 0 && (
               <fieldset className="plj-card plj-span plj-check">
                 <legend>
-                  {ar
-                    ? "هل لديك ما تحتاجه للبدء؟"
-                    : "Do you have what you need?"}
+                  {dictionaries[ar ? "ar" : "en"].layoutsDoYouHaveWhat}
                 </legend>
                 <p>
-                  {ar
-                    ? "علّم ما لديك الآن، وسترى جاهزية فريقك في الأعلى."
-                    : "Tick what you have; readiness updates above."}
+                  {dictionaries[ar ? "ar" : "en"].layoutsTickWhatYouHave}
                 </p>
                 <div>
                   {prereqs.map((p, i) => (
@@ -928,30 +910,26 @@ export function JourneyLayout({
             <div className="plj-card plj-span plj-go">
               <h2>
                 {product.comingSoon
-                  ? ar
-                    ? "لم تُطلق بعد. اطلب إشعارًا أو خطة تبنٍّ."
-                    : "Not launched yet. Ask for a notice or an adoption plan."
-                  : ar
-                    ? "جاهز؟ افتح النظام وابدأ."
-                    : "Ready? Open the system and start."}
+                  ? dictionaries[ar ? "ar" : "en"].layoutsNotLaunchedYetAsk
+                  : dictionaries[ar ? "ar" : "en"].layoutsReadyOpenTheSystem}
               </h2>
               <PrimaryCta product={product} className="plj-cta" />
             </div>
             {beneficiary.integrations?.length ? (
               <div className="plj-card">
-                <h3>{ar ? "يتكامل مع" : "Integrates with"}</h3>
+                <h3>{dictionaries[ar ? "ar" : "en"].layoutsIntegratesWith}</h3>
                 <FactList items={beneficiary.integrations} />
               </div>
             ) : null}
             {beneficiary.limitations?.length ? (
               <div className="plj-card" data-tone="no">
-                <h3>{ar ? "حدود" : "Limits"}</h3>
+                <h3>{dictionaries[ar ? "ar" : "en"].layoutsLimits}</h3>
                 <FactList items={beneficiary.limitations} />
               </div>
             ) : null}
             {ops.length > 0 && (
               <div className="plj-card">
-                <h3>{ar ? "متطلبات التشغيل" : "Operating requirements"}</h3>
+                <h3>{dictionaries[ar ? "ar" : "en"].layoutsOperatingRequirements}</h3>
                 <dl>
                   {ops.map((r) => (
                     <div key={r.key}>
@@ -963,7 +941,7 @@ export function JourneyLayout({
               </div>
             )}
             <div className="plj-card plj-span">
-              <h3>{ar ? "مساعدة" : "Help"}</h3>
+              <h3>{dictionaries[ar ? "ar" : "en"].osHelp}</h3>
               <HelpLinks product={product} className="plj-help" />
             </div>
           </div>
@@ -973,7 +951,7 @@ export function JourneyLayout({
         <div className="plj-next">
           {step > 0 && (
             <button type="button" onClick={() => setStep(step - 1)}>
-              {ar ? "→ السابق" : "← Back"}
+              {dictionaries[ar ? "ar" : "en"].layoutsBack}
             </button>
           )}
           {step < steps.length - 1 && (

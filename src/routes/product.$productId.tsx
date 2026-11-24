@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { catalogQueryOptions } from "@/lib/catalog.functions";
 import { localizedProduct } from "@/lib/catalog";
 import { useLanguage } from "@/lib/language";
-import { fill } from "@/lib/copy";
+import { fill, dictionaries } from "@/lib/copy";
 import { useThemeArt } from "@/themes/use-theme-art";
 import { pageUrl } from "@/lib/seo";
 import {
@@ -134,12 +134,12 @@ function LayoutPreviewBar({ layout }: { layout: ProductLayout }) {
   return (
     <div className="pl-preview-bar" role="status">
       <span>
-        {ar ? "معاينة تخطيط صفحة المنتج: " : "Previewing product layout: "}
+        {dictionaries[ar ? "ar" : "en"].productProductIdPreviewingProductLayout}
         <b>{meta.name[ar ? "ar" : "en"]}</b>
-        {ar ? " · الزوار يرون التخطيط المحفوظ." : " · Visitors still see the saved layout."}
+        {dictionaries[ar ? "ar" : "en"].productProductIdVisitorsStillSeeThe}
       </span>
       <a href={typeof window === "undefined" ? "?" : window.location.pathname}>
-        {ar ? "إنهاء المعاينة" : "End preview"}
+        {dictionaries[ar ? "ar" : "en"].themePreviewEnd}
       </a>
     </div>
   );
@@ -239,7 +239,7 @@ function ClassicProductDetail() {
       <div className="detail-product-actions">
       <a className="ea-guide-step" href={`/guide/${language}.html#s1`}>{language === "ar" ? "كيف أراجع تفاصيل الأداة؟" : "How do I review a tool?"}</a>
         <ProductToolsActions product={product} />
-        <a className="underline underline-offset-4" href={"/newsletter#"+new URLSearchParams({product:product.id,lang:language})}>{product.comingSoon?(ar?"أبلغني عند الإطلاق":"Notify me at launch"):(ar?"تابع تحديثات المنتج":"Follow product updates")}</a>
+        <a className="underline underline-offset-4" href={"/newsletter#"+new URLSearchParams({product:product.id,lang:language})}>{product.comingSoon?(dictionaries[ar ? "ar" : "en"].layoutsNotifyMeAtLaunch):(dictionaries[ar ? "ar" : "en"].productProductIdFollowProductUpdates)}</a>
       </div>
 
       {selection && (
@@ -280,16 +280,16 @@ function ClassicProductDetail() {
           {product.comingSoon && (
             <a href="#access">{language === "ar" ? "طريقة الحصول عليها" : "Acquisition"}</a>
           )}
-          {["archone","landscape","radar"].includes(product.id) && !product.comingSoon && <a href="#exercise">{ar?"جرّب الحالة":"Interactive exercise"}</a>}
-          <a href="#operating-requirements">{ar?"متطلبات التشغيل":"Operating requirements"}</a>
+          {["archone","landscape","radar"].includes(product.id) && !product.comingSoon && <a href="#exercise">{dictionaries[ar ? "ar" : "en"].productProductIdInteractiveExercise}</a>}
+          <a href="#operating-requirements">{dictionaries[ar ? "ar" : "en"].layoutsOperatingRequirements}</a>
           <a href="#capabilities">{t("productFeatures")}</a>
           <a href="#fit">{language === "ar" ? "الملاءمة والمتطلبات" : "Fit and requirements"}</a>
-          {practice && <a href="#practice">{ar ? "تمرين عملي" : "First exercise"}</a>}
+          {practice && <a href="#practice">{dictionaries[ar ? "ar" : "en"].productProductIdFirstExercise}</a>}
           {(product.version || notes) && <a href="#releases">{t("productVersion")}</a>}
-          <a href="#resources">{ar ? "المساعدة والموارد" : "Help and resources"}</a>
+          <a href="#resources">{dictionaries[ar ? "ar" : "en"].productProductIdHelpAndResources}</a>
         </nav>
         <div className="ea-dossier-sections">
-          <section className="bx-panel" id="operating-requirements"><h2>{ar?"متطلبات التشغيل":"Operating requirements"}</h2>
+          <section className="bx-panel" id="operating-requirements"><h2>{dictionaries[ar ? "ar" : "en"].layoutsOperatingRequirements}</h2>
           {(() => {
             const labels = ar
               ? { account: "الحساب", inputs: "البيانات المطلوبة للبدء", exchange: "الاستيراد والتصدير" }
@@ -301,7 +301,7 @@ function ClassicProductDetail() {
                 // says "unconfirmed" while listing Excel/CSV further down.
                 const fallback =
                   key === "exchange" && beneficiary.integrations?.length
-                    ? beneficiary.integrations.join(ar ? "، " : ", ")
+                    ? beneficiary.integrations.join(dictionaries[ar ? "ar" : "en"].comparisonDecisionSeparator)
                     : "";
                 return { key, text: text || fallback };
               })
@@ -316,10 +316,10 @@ function ClassicProductDetail() {
                 ))}
               </dl>
             ) : (
-              <p>{ar ? "سننشر تفاصيل التشغيل بعد التحقق منها." : "Operating details will be published once verified."}</p>
+              <p>{dictionaries[ar ? "ar" : "en"].productProductIdOperatingDetailsWillBe}</p>
             );
           })()}
-          <small>{ar?"آخر مراجعة":"Last verified"} · {product.beneficiaryDetails?.operations?.reviewed || (ar?"غير مسجّلة":"Not recorded")}</small></section>
+          <small>{dictionaries[ar ? "ar" : "en"].productProductIdLastVerified} · {product.beneficiaryDetails?.operations?.reviewed || (dictionaries[ar ? "ar" : "en"].productProductIdNotRecorded)}</small></section>
           <section id="capabilities" className="detail-features">
             <h2>{t("productFeatures")}</h2>
             <ul>
@@ -333,7 +333,7 @@ function ClassicProductDetail() {
           </section>
 
           <section id="fit" className="bx-panel detail-beneficiary" aria-label={t("bxAudience")}>
-            <h2 className="ea-fit-title">{ar ? "هل تناسب احتياجك؟" : "Is this a fit for your team?"}</h2>
+            <h2 className="ea-fit-title">{dictionaries[ar ? "ar" : "en"].productProductIdIsThisAFit}</h2>
             <BeneficiaryFact
               title={t("bxAudience")}
               value={beneficiary.audience}
@@ -373,11 +373,11 @@ function ClassicProductDetail() {
           )}
 
           {practice && <section id="practice" className="bx-panel ea-practice">
-            <h2>{ar ? "تمرين مقترح لفريقك" : "A first exercise for your team"}</h2>
+            <h2>{dictionaries[ar ? "ar" : "en"].layoutsAFirstExerciseFor}</h2>
             <ol>{practice[language].map((step, i) => <li key={step}><strong>{(ar ? ["جهّز", "نفّذ داخل الأداة", "علامة النجاح"] : ["Prepare", "Do this in the tool", "Success criterion"])[i]}</strong><p>{step}</p></li>)}</ol>
-            {!product.comingSoon && product.url && <div className="bx-actions"><a href={product.url} target="_blank" rel="noopener noreferrer">{ar ? "ابدأ المهمة في " : "Start the task in "}{product.name} ↗</a></div>}
+            {!product.comingSoon && product.url && <div className="bx-actions"><a href={product.url} target="_blank" rel="noopener noreferrer">{dictionaries[ar ? "ar" : "en"].productProductIdStartTheTaskIn}{product.name} ↗</a></div>}
             <StepHelp product={product} ar={ar} step={practice[language][1]!} />
-            <p>{ar ? "مرجع المنهج" : "Method reference"} · <a href={practice.url}>{practice.source}</a></p>
+            <p>{dictionaries[ar ? "ar" : "en"].layoutsMethodReference} · <a href={practice.url}>{practice.source}</a></p>
           </section>}
           {product.comingSoon && (
             <div id="access">
@@ -405,11 +405,11 @@ function ClassicProductDetail() {
             </section>
           )}
           <section id="resources" className="bx-panel ea-product-resources">
-            <h2>{ar ? "المساعدة والموارد" : "Help and resources"}</h2>
+            <h2>{dictionaries[ar ? "ar" : "en"].productProductIdHelpAndResources}</h2>
           {product.githubUrl ? (
             <p className="detail-request-links">
               <a href={product.githubUrl} target="_blank" rel="noopener noreferrer" dir="ltr">
-                {product.githubUrl.replace(/\/$/, "") === "https://github.com/e20etools" ? (ar ? "فريق E20E على GitHub" : "E20E on GitHub") : (ar ? "مستودع المنتج" : "Product repository")} ↗
+                {product.githubUrl.replace(/\/$/, "") === "https://github.com/e20etools" ? (dictionaries[ar ? "ar" : "en"].productProductIdE20eOnGithub) : (dictionaries[ar ? "ar" : "en"].productProductIdProductRepository)} ↗
               </a>
             </p>
           ) : null}

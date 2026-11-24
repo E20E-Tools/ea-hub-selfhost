@@ -10,6 +10,7 @@ import {
   newsletterPreferences,
 } from "@/lib/newsletter.functions";
 import { Button } from "@/components/ui/button";
+import { dictionaries } from "@/lib/copy";
 export const Route = createFileRoute("/newsletter")({ component: GatedNewsletter });
 function Newsletter() {
   const { language } = useLanguage();
@@ -72,7 +73,7 @@ function Newsletter() {
     <main className="bx-page" dir={ar ? "rtl" : "ltr"}>
       <section className="bx-panel newsletter-panel mx-auto grid max-w-xl gap-4">
         <h1>{title}</h1>
-        {!managing && (<a className="ea-guide-step" href={`/guide/${(ar ? "ar" : "en")}.html#s4`}>{ar ? "كيف أتابع منتجات محددة؟" : "How do I follow specific products?"}</a>)}
+        {!managing && (<a className="ea-guide-step" href={`/guide/${(ar ? "ar" : "en")}.html#s4`}>{dictionaries[ar ? "ar" : "en"].newsletterHowDoIFollow}</a>)}
         {!done && params && (
           <form
             className="grid gap-4"

@@ -13,6 +13,7 @@ import { useLanguage } from "@/lib/language";
 import type { Copy } from "@/lib/copy";
 import { Button } from "@/components/ui/button";
 import { pageUrl } from "@/lib/seo";
+import { dictionaries } from "@/lib/copy";
 
 export const Route = createFileRoute("/my-requests")({
   head: () => ({
@@ -412,10 +413,10 @@ function MyRequestsPage() {
 function Clarification({id,access,ar,refresh,question}:{question:string;id:string;access:string;ar:boolean;refresh:()=>void}){
  const [body,setBody]=useState(""),[busy,setBusy]=useState(false),[message,setMessage]=useState("");
  const note=useRef("");
- return <details key={question} open={!!question||undefined}><summary>{question||(ar?"إضافة توضيح":"Add a clarification")}</summary><form onSubmit={async e=>{
+ return <details key={question} open={!!question||undefined}><summary>{question||(dictionaries[ar ? "ar" : "en"].myRequestsAddAClarification)}</summary><form onSubmit={async e=>{
  e.preventDefault();if(busy)return;setBusy(true);setMessage("");note.current||=crypto.randomUUID();
  try{const result=await clarifyRequest({data:{access,requestId:id,noteId:note.current,body}});
- if(!result.ok)throw Error();setBody("");note.current="";setMessage(ar?"أُضيف التوضيح إلى طلبك.":"Clarification added to your request.");refresh();}
- catch{setMessage(ar?"تعذّر حفظ التوضيح. حاول مرة أخرى.":"Could not save your clarification. Try again.");}finally{setBusy(false);}
- }}><label className="grid gap-2">{ar?"توضيح للفريق":"Note for the team"}<textarea id={"reply-"+id} required minLength={2} maxLength={1500} disabled={busy} value={body} onChange={e=>{setBody(e.target.value);note.current="";}}/></label><Button disabled={busy}>{ar?"حفظ التوضيح":"Save clarification"}</Button><p role="status">{message}</p></form></details>;
+ if(!result.ok)throw Error();setBody("");note.current="";setMessage(dictionaries[ar ? "ar" : "en"].myRequestsClarificationAddedToYour);refresh();}
+ catch{setMessage(dictionaries[ar ? "ar" : "en"].myRequestsCouldNotSaveYour);}finally{setBusy(false);}
+ }}><label className="grid gap-2">{dictionaries[ar ? "ar" : "en"].myRequestsNoteForTheTeam}<textarea id={"reply-"+id} required minLength={2} maxLength={1500} disabled={busy} value={body} onChange={e=>{setBody(e.target.value);note.current="";}}/></label><Button disabled={busy}>{dictionaries[ar ? "ar" : "en"].myRequestsSaveClarification}</Button><p role="status">{message}</p></form></details>;
 }

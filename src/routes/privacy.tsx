@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { ShieldCheck } from "lucide-react";
 import { useLanguage } from "@/lib/language";
 import { pageUrl } from "@/lib/seo";
+import { dictionaries } from "@/lib/copy";
 
 export const Route = createFileRoute("/privacy")({
   head: () => ({
@@ -122,15 +123,13 @@ function PrivacyPage() {
       <section className="mx-auto w-full max-w-3xl px-4 py-10 sm:px-6">
         <header className="mb-10 border-b border-border pb-8">
           <p className="mb-3 inline-flex items-center gap-2 text-sm font-medium text-primary">
-            <ShieldCheck size={16} aria-hidden="true" /> {ar ? "الخصوصية" : "Privacy"}
+            <ShieldCheck size={16} aria-hidden="true" /> {dictionaries[ar ? "ar" : "en"].privacyPrivacy}
           </p>
           <h1 className="text-3xl font-semibold sm:text-4xl">
-            {ar ? "سياسة الخصوصية" : "Privacy policy"}
+            {dictionaries[ar ? "ar" : "en"].privacyPrivacyPolicy}
           </h1>
           <p className="mt-4 text-lg leading-8 text-muted-foreground">
-            {ar
-              ? "ما الذي نجمعه عند استخدامك E20E Tools، ولماذا، وكيف تطلب حذفه."
-              : "What we collect when you use E20E Tools, why, and how to ask for it to be deleted."}
+            {dictionaries[ar ? "ar" : "en"].privacyWhatWeCollectWhen}
           </p>
         </header>
         <div className="grid gap-8">
@@ -145,7 +144,7 @@ function PrivacyPage() {
             </section>
           ))}
           <p className="text-sm text-muted-foreground">
-            {ar ? "للتواصل بشأن الخصوصية: " : "Privacy questions: "}
+            {dictionaries[ar ? "ar" : "en"].privacyPrivacyQuestions}
             <a href={`mailto:${CONTACT}`} dir="ltr" className="underline">
               {CONTACT}
             </a>

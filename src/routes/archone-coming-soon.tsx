@@ -15,6 +15,7 @@ import {
   launchMonthGrid,
   launchMonthLabel,
 } from "@/lib/archone-launch";
+import { dictionaries } from "@/lib/copy";
 
 export const Route = createFileRoute("/archone-coming-soon")({
   loader: async ({ context }) => {
@@ -86,10 +87,10 @@ function ArchOneSoon() {
 
   const left = now === null || !launch ? null : Math.max(0, launch.getTime() - now);
   const parts = [
-    { v: left === null ? null : Math.floor(left / 86400000), l: ar ? "يوم" : "Days" },
-    { v: left === null ? null : Math.floor(left / 3600000) % 24, l: ar ? "ساعة" : "Hours" },
-    { v: left === null ? null : Math.floor(left / 60000) % 60, l: ar ? "دقيقة" : "Minutes" },
-    { v: left === null ? null : Math.floor(left / 1000) % 60, l: ar ? "ثانية" : "Seconds" },
+    { v: left === null ? null : Math.floor(left / 86400000), l: dictionaries[ar ? "ar" : "en"].archoneComingSoonDays },
+    { v: left === null ? null : Math.floor(left / 3600000) % 24, l: dictionaries[ar ? "ar" : "en"].archoneComingSoonHours },
+    { v: left === null ? null : Math.floor(left / 60000) % 60, l: dictionaries[ar ? "ar" : "en"].archoneComingSoonMinutes },
+    { v: left === null ? null : Math.floor(left / 1000) % 60, l: dictionaries[ar ? "ar" : "en"].archoneComingSoonSeconds },
   ];
 
   const weekdays = ar
@@ -100,18 +101,16 @@ function ArchOneSoon() {
   return (
     <main dir={dir} className="mx-auto w-full max-w-4xl px-4 py-12 text-center">
       <span className="inline-flex items-center gap-2 rounded-full border border-primary/40 px-3 py-1 text-sm text-primary">
-        <Clock size={14} aria-hidden="true" /> {ar ? "قريبًا" : "Coming soon"}
+        <Clock size={14} aria-hidden="true" /> {dictionaries[ar ? "ar" : "en"].comingSoonBadge}
       </span>
       <h1 dir="ltr" className="mt-4 text-5xl font-bold text-foreground">
         ArchONE
       </h1>
       <p className="mx-auto mt-3 max-w-xl text-muted-foreground">
-        {ar
-          ? "منصة البنية المؤسسية الجديدة من E20E Tools. موعد الافتتاح الرسمي:"
-          : "The new enterprise architecture platform from E20E Tools. Official launch:"}
+        {dictionaries[ar ? "ar" : "en"].archoneComingSoonTheNewEnterpriseArchitecture}
       </p>
       <p className="mt-2 text-2xl font-semibold text-foreground">
-        {launch ? launchDayLabel(launch, ar) : ar ? "يُعلن قريبًا" : "To be announced"}
+        {launch ? launchDayLabel(launch, ar) : dictionaries[ar ? "ar" : "en"].archoneComingSoonToBeAnnounced}
       </p>
 
       {launch && grid ? (
@@ -129,7 +128,7 @@ function ArchOneSoon() {
 
           <section
             className="mx-auto mt-10 max-w-sm rounded-xl border border-border bg-card p-4"
-            aria-label={ar ? "التقويم" : "Calendar"}
+            aria-label={dictionaries[ar ? "ar" : "en"].archoneComingSoonCalendar}
           >
             <h2 className="mb-3 font-semibold text-foreground">{launchMonthLabel(launch, ar)}</h2>
             <div className="grid grid-cols-7 gap-1 text-xs">
@@ -162,7 +161,7 @@ function ArchOneSoon() {
                 rel="noopener noreferrer"
               >
                 <CalendarPlus size={16} aria-hidden="true" />{" "}
-                {ar ? "أضف إلى Google Calendar" : "Add to Google Calendar"}
+                {dictionaries[ar ? "ar" : "en"].archoneComingSoonAddToGoogleCalendar}
               </a>
             </Button>
             <Button asChild variant="outline">
@@ -170,14 +169,14 @@ function ArchOneSoon() {
                 href={`data:text/calendar;charset=utf-8,${encodeURIComponent(launchIcs(launch))}`}
                 download="archone-launch.ics"
               >
-                {ar ? "ملف تقويم (Outlook / Apple)" : "Calendar file (Outlook / Apple)"}
+                {dictionaries[ar ? "ar" : "en"].archoneComingSoonCalendarFileOutlookApple}
               </a>
             </Button>
           </>
         ) : null}
         <Button asChild variant="outline">
           <Link to="/product/$productId" params={{ productId: ARCHONE_ID }}>
-            {ar ? "تفاصيل ArchONE" : "ArchONE details"}
+            {dictionaries[ar ? "ar" : "en"].archoneComingSoonArchoneDetails}
           </Link>
         </Button>
       </div>

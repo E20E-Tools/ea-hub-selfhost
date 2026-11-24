@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { dictionaries } from "@/lib/copy";
 
 const sizes: Record<string, number> = { radar: 4, landscape: 4, archone: 3 };
 export const exerciseKey = (id: string) => "ea-hub:exercise:v1:" + id;
@@ -24,12 +25,12 @@ export function SavedExercises({ ar }: { ar: boolean }) {
     return () => window.removeEventListener("storage", refresh);
   }, []);
   if (!ids.length) return null;
-  return <section className="bx-panel"><h2>{ar ? "تماريني على هذا الجهاز" : "My exercises on this device"}</h2>
+  return <section className="bx-panel"><h2>{dictionaries[ar ? "ar" : "en"].savedExercisesMyExercisesOnThis}</h2>
     {ids.map(id => <div className="bx-actions" key={id}>
-      <a href={`/product/${id}?resume=exercise#exercise`}>{ar ? "متابعة التمرين" : "Resume exercise"} · {readExercise(id)?.name}</a>
+      <a href={`/product/${id}?resume=exercise#exercise`}>{dictionaries[ar ? "ar" : "en"].savedExercisesResumeExercise} · {readExercise(id)?.name}</a>
       <Button variant="outline" onClick={() => {
         try { localStorage.removeItem(exerciseKey(id)); setIds(old => old.filter(item => item !== id)); }
         catch { setError(true); }
-      }}>{ar ? "حذف التمرين" : "Delete exercise"}</Button>
-    </div>)}{error && <p role="alert">{ar ? "تعذر حذف التمرين." : "Could not delete the exercise."}</p>}</section>;
+      }}>{dictionaries[ar ? "ar" : "en"].savedExercisesDeleteExercise}</Button>
+    </div>)}{error && <p role="alert">{dictionaries[ar ? "ar" : "en"].savedExercisesCouldNotDeleteThe}</p>}</section>;
 }

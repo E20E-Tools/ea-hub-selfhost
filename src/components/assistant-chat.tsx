@@ -50,7 +50,7 @@ import {
   type StoredSession,
 } from "@/lib/assistant-storage";
 import { useLanguage } from "@/lib/language";
-import { fill2 } from "@/lib/copy";
+import { fill2, dictionaries } from "@/lib/copy";
 import { supabase } from "@/integrations/supabase/client";
 import {
   endVisitorLiveChat,
@@ -90,7 +90,7 @@ function limitedDraft(owner:string) {
 function ReplyBody({message,ar,openProduct}:{message:ChatMessage;ar:boolean;openProduct:(id:string)=>boolean|void}){
   const split=message.role==="assistant"?message.content.search(/\n\n(?=\[[^\n]+\]\(\/product\/[^)]+#(?:access|capabilities)\))/):-1;
   return <><ChatMarkdown onOpenProduct={openProduct}>{split<0?message.content:message.content.slice(0,split)}</ChatMarkdown>
-    {split>=0&&<details><summary>{ar?"المصادر والملاءمة":"Sources and fit"}</summary><ChatMarkdown>{message.content.slice(split).trim()}</ChatMarkdown></details>}</>;
+    {split>=0&&<details><summary>{dictionaries[ar ? "ar" : "en"].assistantChatSourcesAndFit}</summary><ChatMarkdown>{message.content.slice(split).trim()}</ChatMarkdown></details>}</>;
 }
 
 type GateSession = StoredSession;
