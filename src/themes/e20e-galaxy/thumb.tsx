@@ -25,7 +25,14 @@ export function GalaxyThumb() {
         [20, 100],
         [300, 100],
       ].map(([x, y]) => (
-        <circle key={`${x}${y}`} cx={x} cy={y} r="1" fill="white" opacity="0.7" />
+        <circle
+          key={`${x}${y}`}
+          cx={x}
+          cy={y}
+          r="1"
+          fill="white"
+          opacity="0.7"
+        />
       ))}
       <g fill="none" stroke="oklch(0.85 0.1 200 / 0.45)" strokeDasharray="3 3">
         <ellipse cx="160" cy="92" rx="56" ry="20" />
@@ -37,7 +44,14 @@ export function GalaxyThumb() {
       <circle cx="214" cy="100" r="7" fill="oklch(0.7 0.12 200)" />
       <circle cx="74" cy="78" r="9" fill="oklch(0.65 0.15 30)" />
       <circle cx="250" cy="132" r="11" fill="oklch(0.6 0.13 150)" />
-      <ellipse cx="250" cy="132" rx="17" ry="4" fill="none" stroke="oklch(0.9 0.05 150)" />
+      <ellipse
+        cx="250"
+        cy="132"
+        rx="17"
+        ry="4"
+        fill="none"
+        stroke="oklch(0.9 0.05 150)"
+      />
     </svg>
   );
 }

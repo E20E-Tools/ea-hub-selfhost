@@ -128,29 +128,45 @@ function DiscoverPage() {
     1 + Number(criteria.organizationSize) + Number(criteria.maturity);
   const maturityStep = criteria.organizationSize ? 2 : 1;
   const [draftLoaded, setDraftLoaded] = useState(false);
-  const stages = ["goal", ...(criteria.organizationSize ? ["organizationSize"] : []),
-    ...(criteria.maturity ? ["maturity"] : []), "results"];
+  const stages = [
+    "goal",
+    ...(criteria.organizationSize ? ["organizationSize"] : []),
+    ...(criteria.maturity ? ["maturity"] : []),
+    "results",
+  ];
   useEffect(() => {
     try {
       const raw = sessionStorage.getItem(draftKey);
       const draft = raw && draftSchema.safeParse(JSON.parse(raw));
       if (draft && draft.success) {
         const restored = draft.data.answers;
-        const firstMissing = stages.findIndex((s) => s !== "results" && !restored[s as keyof DiscoveryAnswers]);
+        const firstMissing = stages.findIndex(
+          (s) => s !== "results" && !restored[s as keyof DiscoveryAnswers],
+        );
         const savedStep = stages.indexOf(draft.data.stage);
         setAnswers(restored);
-        setStep(Math.min(savedStep < 0 ? questionCount : savedStep, firstMissing < 0 ? questionCount : firstMissing));
+        setStep(
+          Math.min(
+            savedStep < 0 ? questionCount : savedStep,
+            firstMissing < 0 ? questionCount : firstMissing,
+          ),
+        );
       }
-    } catch { /* In private browsing, the chooser still works in memory. */ }
+    } catch {
+      /* In private browsing, the chooser still works in memory. */
+    }
     setDraftLoaded(true);
   }, []);
   const stage = stages[step];
   useEffect(() => {
     if (!draftLoaded) return;
     try {
-      if (answers.goal) sessionStorage.setItem(draftKey, JSON.stringify({ answers, stage }));
+      if (answers.goal)
+        sessionStorage.setItem(draftKey, JSON.stringify({ answers, stage }));
       else sessionStorage.removeItem(draftKey);
-    } catch { /* Storage is optional. */ }
+    } catch {
+      /* Storage is optional. */
+    }
   }, [answers, stage, draftLoaded]);
   const isResults = step >= questionCount;
   const results = discoverProducts(catalog.products, answers, language, {
@@ -188,7 +204,11 @@ function DiscoverPage() {
     maturity: answers.maturity || undefined,
   };
   return (
-    <main className="bx-page ea-workspace ea-discover" dir={dir} data-answer-selected={answers.goal ? true : undefined}>
+    <main
+      className="bx-page ea-workspace ea-discover"
+      dir={dir}
+      data-answer-selected={answers.goal ? true : undefined}
+    >
       <JourneyHeading
         icon={Compass}
         title={t("bxStartNeed")}
@@ -197,10 +217,13 @@ function DiscoverPage() {
       />
       {!isResults && answers.goal && (
         <Button type="button" variant="ghost" onClick={restart}>
-          <RotateCcw size={16} aria-hidden="true" />{t("bxRestart")}
+          <RotateCcw size={16} aria-hidden="true" />
+          {t("bxRestart")}
         </Button>
       )}
-      <a className="ea-guide-step" href={`/guide/${language}.html#s0`}>{language === "ar" ? "كيف أختار أداة؟" : "How do I choose a tool?"}</a>
+      <a className="ea-guide-step" href={`/guide/${language}.html#s0`}>
+        {language === "ar" ? "كيف أختار أداة؟" : "How do I choose a tool?"}
+      </a>
       <CompareTray goal={answers.goal || undefined} />
       <ol className="ea-step-track" aria-label={t("bxStep")}>
         {[
@@ -357,14 +380,17 @@ function DiscoverPage() {
                             (product.id === "radar" ? "landscape" : "radar"),
                         ) && (
                           <FeatureOnly feature="compare">
-                          <Link
-                            to="/compare"
-                            search={{ ids: "radar,landscape", goal: answers.goal || undefined }}
-                          >
-                            {language === "ar"
-                              ? "قارن الأداتين"
-                              : "Compare both tools"}
-                          </Link>
+                            <Link
+                              to="/compare"
+                              search={{
+                                ids: "radar,landscape",
+                                goal: answers.goal || undefined,
+                              }}
+                            >
+                              {language === "ar"
+                                ? "قارن الأداتين"
+                                : "Compare both tools"}
+                            </Link>
                           </FeatureOnly>
                         )}
                       </div>
@@ -409,10 +435,23 @@ function DiscoverPage() {
                             </a>
                           </Button>
                         )}
-                      {!product.comingSoon && ["radar", "landscape", "archone"].includes(product.id) && (
-                        <Button asChild variant="outline"><Link to="/product/$productId" params={{ productId: product.id }}
-                          search={resultSearch} hash="exercise">{language === "ar" ? "جرّبها على مثال" : "Try a worked example"}</Link></Button>
-                      )}
+                      {!product.comingSoon &&
+                        ["radar", "landscape", "archone"].includes(
+                          product.id,
+                        ) && (
+                          <Button asChild variant="outline">
+                            <Link
+                              to="/product/$productId"
+                              params={{ productId: product.id }}
+                              search={resultSearch}
+                              hash="exercise"
+                            >
+                              {language === "ar"
+                                ? "جرّبها على مثال"
+                                : "Try a worked example"}
+                            </Link>
+                          </Button>
+                        )}
                       <Button asChild>
                         <Link
                           to="/product/$productId"
@@ -490,21 +529,21 @@ function DiscoverPage() {
           </details>
         )}
       {!isResults && (
-<details className="ea-flow-details">
-        <summary>{t("blogStepsTitle")}</summary>
-        <ol>
-          {(
-            [
-              "blogStepOne",
-              "blogStepTwo",
-              "blogStepThree",
-              "blogStepFour",
-            ] as const
-          ).map((k) => (
-            <li key={k}>{t(k)}</li>
-          ))}
-        </ol>
-      </details>
+        <details className="ea-flow-details">
+          <summary>{t("blogStepsTitle")}</summary>
+          <ol>
+            {(
+              [
+                "blogStepOne",
+                "blogStepTwo",
+                "blogStepThree",
+                "blogStepFour",
+              ] as const
+            ).map((k) => (
+              <li key={k}>{t(k)}</li>
+            ))}
+          </ol>
+        </details>
       )}
     </main>
   );

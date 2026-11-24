@@ -11,13 +11,17 @@ import {
   type ProductRow,
   type SettingsRow,
 } from "./catalog";
-import { customizationPaths, normalizeThemeCustomizations } from "./theme-customization";
+import {
+  customizationPaths,
+  normalizeThemeCustomizations,
+} from "./theme-customization";
 
 const ASSET_TTL = 60 * 60 * 6;
 
 // Library uploads are full-size originals (a 1342px logo shown at 60px). On Vercel the
 // built-in image optimizer serves a resized WebP; elsewhere the original is used as is.
-const STORAGE_URL = /^https:\/\/[a-z0-9-]+\.supabase\.co\/storage\/v1\/object\//i;
+const STORAGE_URL =
+  /^https:\/\/[a-z0-9-]+\.supabase\.co\/storage\/v1\/object\//i;
 export function optimizedImage(url: string, width: number): string {
   if (!url || !process.env["VERCEL"] || !STORAGE_URL.test(url)) return url;
   return `/_vercel/image?url=${encodeURIComponent(url)}&w=${width}&q=78`;
@@ -28,12 +32,19 @@ export function publishableClient() {
   const key = process.env["SUPABASE_PUBLISHABLE_KEY"];
   if (!url || !key) throw new Error("Missing Supabase environment variables.");
   return createClient<Database>(url, key, {
-    auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
+    auth: {
+      storage: undefined,
+      persistSession: false,
+      autoRefreshToken: false,
+    },
     // Opaque sb_ keys are not JWTs: send apikey only, never the bearer default.
     global: {
       fetch: (input, init) => {
         const headers = new Headers(init?.headers);
-        if (key.startsWith("sb_") && headers.get("Authorization") === `Bearer ${key}`)
+        if (
+          key.startsWith("sb_") &&
+          headers.get("Authorization") === `Bearer ${key}`
+        )
           headers.delete("Authorization");
         headers.set("apikey", key);
         return fetch(input, { ...init, headers });
@@ -44,7 +55,10 @@ export function publishableClient() {
 
 export type PublishableClient = ReturnType<typeof publishableClient>;
 
-export async function resolveAsset(client: PublishableClient, value: string): Promise<string> {
+export async function resolveAsset(
+  client: PublishableClient,
+  value: string,
+): Promise<string> {
   const raw = (value ?? "").trim();
   if (!raw) return "";
   if (/^https?:\/\//i.test(raw)) return raw;
@@ -56,7 +70,8 @@ export async function resolveAsset(client: PublishableClient, value: string): Pr
   const cache = await import("./catalog-cache.server");
   const cached = cache.cachedSignedUrl(path);
   if (cached) return cached;
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+  const { supabaseAdmin } =
+    await import("@/integrations/supabase/client.server");
   const { data, error } = await supabaseAdmin.storage
     .from(ASSET_BUCKET)
     .createSignedUrl(path, ASSET_TTL);
@@ -65,18 +80,23 @@ export async function resolveAsset(client: PublishableClient, value: string): Pr
   return data.signedUrl;
 }
 
-export const getCatalog = createServerFn({ method: "GET" }).handler(async (): Promise<Catalog> => {
-  const cache = await import("./catalog-cache.server");
-  const hit = cache.cachedCatalog<Catalog>();
-  if (hit) return hit;
-  const generation = cache.catalogGeneration();
-  const { catalog, complete } = await buildCatalog();
-  // Only a complete read is kept; after any database error the next visitor read retries.
-  if (complete) cache.rememberCatalog(catalog, generation);
-  return catalog;
-});
+export const getCatalog = createServerFn({ method: "GET" }).handler(
+  async (): Promise<Catalog> => {
+    const cache = await import("./catalog-cache.server");
+    const hit = cache.cachedCatalog<Catalog>();
+    if (hit) return hit;
+    const generation = cache.catalogGeneration();
+    const { catalog, complete } = await buildCatalog();
+    // Only a complete read is kept; after any database error the next visitor read retries.
+    if (complete) cache.rememberCatalog(catalog, generation);
+    return catalog;
+  },
+);
 
-async function buildCatalog(): Promise<{ catalog: Catalog; complete: boolean }> {
+async function buildCatalog(): Promise<{
+  catalog: Catalog;
+  complete: boolean;
+}> {
   try {
     const client = publishableClient();
     const [productsResult, settingsResult] = await Promise.all([
@@ -89,7 +109,8 @@ async function buildCatalog(): Promise<{ catalog: Catalog; complete: boolean }> 
     ]);
 
     const rows = (productsResult.data ?? []) as unknown as ProductRow[];
-    const settingsRow = (settingsResult.data ?? null) as unknown as SettingsRow | null;
+    const settingsRow = (settingsResult.data ??
+      null) as unknown as SettingsRow | null;
     const designPaths = customizationPaths(
       normalizeThemeCustomizations(settingsRow?.theme_customizations),
     );
@@ -102,7 +123,11 @@ async function buildCatalog(): Promise<{ catalog: Catalog; complete: boolean }> 
       const url = designUrls[i];
       if (url) themeAssetUrls[path] = url;
     });
-    const settings = mapSettings(settingsRow, optimizedImage(logo ?? "", 256), themeAssetUrls);
+    const settings = mapSettings(
+      settingsRow,
+      optimizedImage(logo ?? "", 256),
+      themeAssetUrls,
+    );
     const products = await Promise.all(
       rows.map(async (row) => {
         const signed = await resolveAsset(client, row.image_url);
@@ -116,17 +141,24 @@ async function buildCatalog(): Promise<{ catalog: Catalog; complete: boolean }> 
         // Library paths are signed like the product image. The saved path stays in `url`
         // so the admin editor never stores an expiring link; pages show `src`.
         const resolved = await Promise.all(
-          shots.map(async (shot) => ({ ...shot, src: await resolveAsset(client, shot.url) })),
+          shots.map(async (shot) => ({
+            ...shot,
+            src: await resolveAsset(client, shot.url),
+          })),
         );
         return {
           ...product,
-          beneficiaryDetails: { ...product.beneficiaryDetails!, screenshots: resolved },
+          beneficiaryDetails: {
+            ...product.beneficiaryDetails!,
+            screenshots: resolved,
+          },
         };
       }),
     );
 
     const complete = !productsResult.error && !settingsResult.error;
-    if (products.length === 0) return { catalog: { ...fallbackCatalog, settings }, complete };
+    if (products.length === 0)
+      return { catalog: { ...fallbackCatalog, settings }, complete };
     return { catalog: { products, settings }, complete };
   } catch {
     return { catalog: fallbackCatalog, complete: false };

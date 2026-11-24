@@ -1,7 +1,14 @@
 import type { ArchyAnimation } from "./archy-mascot";
 
 export const ARCHY_TOUR_KEY = "e20e-archy-drag-tour-v1";
-export const ARCHY_TOUR_PHASES = ["rewind", "fly", "grab", "drag", "celebrate", "return"] as const;
+export const ARCHY_TOUR_PHASES = [
+  "rewind",
+  "fly",
+  "grab",
+  "drag",
+  "celebrate",
+  "return",
+] as const;
 export type ArchyTourPhase = "idle" | (typeof ARCHY_TOUR_PHASES)[number];
 export const ARCHY_TOUR_MS = {
   wait: 250,
@@ -13,11 +20,17 @@ export const ARCHY_TOUR_MS = {
   return: 1000,
 } as const;
 /** Hand on the leading edge of the 168px character, measured from its top-left. */
-export const ARCHY_TOUR_HAND = { left: { x: 38, y: 102 }, right: { x: 130, y: 102 } } as const;
+export const ARCHY_TOUR_HAND = {
+  left: { x: 38, y: 102 },
+  right: { x: 130, y: 102 },
+} as const;
 export const ARCHY_TOUR_SCALE = 0.8;
 export type Point = { x: number; y: number };
 
-export function shouldRunArchyTour(storage: Pick<Storage, "getItem"> | null, forced = false) {
+export function shouldRunArchyTour(
+  storage: Pick<Storage, "getItem"> | null,
+  forced = false,
+) {
   if (forced) return true;
   try {
     return storage?.getItem(ARCHY_TOUR_KEY) !== "done";
@@ -43,7 +56,12 @@ export function tourEase(t: number) {
   const x = Math.max(0, Math.min(1, t));
   return x < 0.5 ? 4 * x ** 3 : 1 - (-2 * x + 2) ** 3 / 2;
 }
-export function quadraticArc(start: Point, control: Point, end: Point, t: number): Point {
+export function quadraticArc(
+  start: Point,
+  control: Point,
+  end: Point,
+  t: number,
+): Point {
   const x = Math.max(0, Math.min(1, t));
   return {
     x: (1 - x) ** 2 * start.x + 2 * (1 - x) * x * control.x + x ** 2 * end.x,
@@ -81,10 +99,12 @@ export function archyTourRobotReady({
   open: boolean;
   hidden: boolean;
 }) {
-  if (!greetingChecked || !sceneFinal || greetingPending || open || hidden) return false;
+  if (!greetingChecked || !sceneFinal || greetingPending || open || hidden)
+    return false;
   // A session that was already greeted has no Wave or speech to await.
   if (greetingStartedAt === null) return true;
-  const speechDone = !speaking || now - greetingStartedAt >= ARCHY_TOUR_SPEECH_CAP_MS;
+  const speechDone =
+    !speaking || now - greetingStartedAt >= ARCHY_TOUR_SPEECH_CAP_MS;
   return animation === "Idle" && speechDone;
 }
 
@@ -142,7 +162,10 @@ export function requestArchyTourClip(clip: ArchyAnimation) {
   archyTour.update({ clip, clipRequest: snapshot.clipRequest + 1 });
 }
 export function cancelArchyTour(snap = false) {
-  archyTour.update({ cancelSignal: snapshot.cancelSignal + 1, cancelSnap: snap });
+  archyTour.update({
+    cancelSignal: snapshot.cancelSignal + 1,
+    cancelSnap: snap,
+  });
 }
 export function setArchyTourPhase(
   phase: ArchyTourPhase,

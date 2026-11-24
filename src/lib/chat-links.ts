@@ -4,10 +4,12 @@
  */
 export function chatLinkTarget(
   href: string | undefined,
-): { kind: "internal"; to: string } | { kind: "external"; href: string } | null {
+):
+  { kind: "internal"; to: string } | { kind: "external"; href: string } | null {
   if (!href) return null;
   const value = href.trim();
-  if (/^\/(?![/\\])/.test(value) && !/[\\\s]/.test(value)) return { kind: "internal", to: value };
+  if (/^\/(?![/\\])/.test(value) && !/[\\\s]/.test(value))
+    return { kind: "internal", to: value };
   let url: URL;
   try {
     url = new URL(value);

@@ -1,7 +1,10 @@
 // Server-only: signs and verifies the assistant gate tokens. The HMAC key is a
 // subkey derived (HKDF, label "assistant-gate-v1") from the server-only service key,
 // so tokens cannot be forged from the browser and the raw key is never used for signing.
-import { deriveSigningSecret, deriveSigningSecrets } from "./server-keys.server";
+import {
+  deriveSigningSecret,
+  deriveSigningSecrets,
+} from "./server-keys.server";
 
 export const GATE_KEY_LABEL = "assistant-gate-v1";
 /** Signs new tokens with the current root. */
@@ -15,9 +18,14 @@ export function gateSecrets(): Promise<string[]> {
 
 /** One secret, or several tried in order (current first). */
 export type VerifySecrets = string | readonly string[];
-const secretList = (secrets: VerifySecrets) => (typeof secrets === "string" ? [secrets] : secrets);
+const secretList = (secrets: VerifySecrets) =>
+  typeof secrets === "string" ? [secrets] : secrets;
 
-export type ChallengePayload = { kind: "challenge"; answer: number; exp: number };
+export type ChallengePayload = {
+  kind: "challenge";
+  answer: number;
+  exp: number;
+};
 export type AccessPayload = {
   kind: "access";
   name: string;
@@ -33,7 +41,10 @@ function toBase64Url(value: string): string {
   const bytes = new TextEncoder().encode(value);
   let binary = "";
   for (const byte of bytes) binary += String.fromCharCode(byte);
-  return btoa(binary).replaceAll("+", "-").replaceAll("/", "_").replaceAll("=", "");
+  return btoa(binary)
+    .replaceAll("+", "-")
+    .replaceAll("/", "_")
+    .replaceAll("=", "");
 }
 
 function fromBase64Url(value: string): string {
@@ -56,15 +67,25 @@ async function hmac(secret: string, data: string): Promise<string> {
   );
   let binary = "";
   for (const byte of signature) binary += String.fromCharCode(byte);
-  return btoa(binary).replaceAll("+", "-").replaceAll("/", "_").replaceAll("=", "");
+  return btoa(binary)
+    .replaceAll("+", "-")
+    .replaceAll("/", "_")
+    .replaceAll("=", "");
 }
 
-async function sign<T extends object>(secret: string, payload: T): Promise<string> {
+async function sign<T extends object>(
+  secret: string,
+  payload: T,
+): Promise<string> {
   const body = toBase64Url(JSON.stringify(payload));
   return `${body}.${await hmac(secret, body)}`;
 }
 
-async function verify<T>(secrets: VerifySecrets, token: string, now: number): Promise<T | null> {
+async function verify<T>(
+  secrets: VerifySecrets,
+  token: string,
+  now: number,
+): Promise<T | null> {
   for (const secret of secretList(secrets)) {
     const payload = await verifyOne<T>(secret, token, now);
     if (payload) return payload;
@@ -72,7 +93,11 @@ async function verify<T>(secrets: VerifySecrets, token: string, now: number): Pr
   return null;
 }
 
-async function verifyOne<T>(secret: string, token: string, now: number): Promise<T | null> {
+async function verifyOne<T>(
+  secret: string,
+  token: string,
+  now: number,
+): Promise<T | null> {
   const dot = token.lastIndexOf(".");
   if (dot <= 0) return null;
   const body = token.slice(0, dot);
@@ -105,7 +130,10 @@ export const CHALLENGE_KEY_LABEL = "assistant-challenge-v1";
 const b64u = (bytes: Uint8Array) => {
   let binary = "";
   for (const byte of bytes) binary += String.fromCharCode(byte);
-  return btoa(binary).replaceAll("+", "-").replaceAll("/", "_").replaceAll("=", "");
+  return btoa(binary)
+    .replaceAll("+", "-")
+    .replaceAll("/", "_")
+    .replaceAll("=", "");
 };
 const unb64u = (value: string) => {
   const base64 = value.replaceAll("-", "+").replaceAll("_", "/");
@@ -133,7 +161,12 @@ async function challengeKey(secret: string): Promise<CryptoKey> {
     ["encrypt", "decrypt"],
   );
 }
-type SealedChallenge = { kind: "challenge"; iv: string; ct: string; exp: number };
+type SealedChallenge = {
+  kind: "challenge";
+  iv: string;
+  ct: string;
+  exp: number;
+};
 
 /** Issues a signed math question the visitor must solve to prove they are human. */
 export async function issueChallenge(
@@ -178,7 +211,9 @@ export async function verifyChallenge(
           unb64u(sealed.ct),
         ),
       );
-      const payload = JSON.parse(new TextDecoder().decode(plain)) as ChallengePayload;
+      const payload = JSON.parse(
+        new TextDecoder().decode(plain),
+      ) as ChallengePayload;
       if (payload.kind !== "challenge" || payload.exp < now) return false;
       return Number(answer.trim()) === payload.answer;
     } catch {
@@ -228,20 +263,40 @@ export async function verifyAccessToken(
 }
 
 /** A separate signed browser identifier scopes registration without using the corporate IP. */
-export async function registrationBrowser(create: boolean): Promise<string | null> {
+export async function registrationBrowser(
+  create: boolean,
+): Promise<string | null> {
   const { getCookie, setCookie } = await import("@tanstack/react-start/server");
   const secure = process.env["NODE_ENV"] === "production";
   const name = secure ? "__Host-archy-registration" : "archy-registration";
   const cookie = getCookie(name);
   const secrets = await gateSecrets();
   if (cookie && cookie.length < 1024) {
-    const payload = await verify<{kind:string; id:string}>(secrets, cookie, Date.now());
-    if (payload?.kind === "registration-browser" && typeof payload.id === "string") return payload.id;
+    const payload = await verify<{ kind: string; id: string }>(
+      secrets,
+      cookie,
+      Date.now(),
+    );
+    if (
+      payload?.kind === "registration-browser" &&
+      typeof payload.id === "string"
+    )
+      return payload.id;
   }
   if (!create) return null;
   const id = crypto.randomUUID();
   const maxAge = 30 * 86400;
-  const token = await sign(secrets[0]!, {kind:"registration-browser", id, exp:Date.now()+maxAge*1000});
-  setCookie(name,token,{path:"/",secure,httpOnly:true,sameSite:"lax",maxAge});
+  const token = await sign(secrets[0]!, {
+    kind: "registration-browser",
+    id,
+    exp: Date.now() + maxAge * 1000,
+  });
+  setCookie(name, token, {
+    path: "/",
+    secure,
+    httpOnly: true,
+    sameSite: "lax",
+    maxAge,
+  });
   return id;
 }

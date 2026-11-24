@@ -22,14 +22,20 @@ describe("floor-plan generator", () => {
           for (const r of plan.rooms) {
             expect(r.x).toBeGreaterThanOrEqual(plan.outer.x - 0.5);
             expect(r.y).toBeGreaterThanOrEqual(plan.outer.y - 0.5);
-            expect(r.x + r.w).toBeLessThanOrEqual(plan.outer.x + plan.outer.w + 0.5);
-            expect(r.y + r.h).toBeLessThanOrEqual(plan.outer.y + plan.outer.h + 0.5);
+            expect(r.x + r.w).toBeLessThanOrEqual(
+              plan.outer.x + plan.outer.w + 0.5,
+            );
+            expect(r.y + r.h).toBeLessThanOrEqual(
+              plan.outer.y + plan.outer.h + 0.5,
+            );
           }
         });
         it(`${label}: no overlapping rooms, none over the atrium`, () => {
           plan.rooms.forEach((a, i) => {
             expect(overlaps(a, plan.atrium)).toBe(false);
-            plan.rooms.slice(i + 1).forEach((b) => expect(overlaps(a, b)).toBe(false));
+            plan.rooms
+              .slice(i + 1)
+              .forEach((b) => expect(overlaps(a, b)).toBe(false));
           });
         });
         it(`${label}: every room connects to the atrium by an orthogonal corridor`, () => {
@@ -52,7 +58,10 @@ describe("floor-plan generator", () => {
     const a = generateFloorPlan(feats(6), { vertical: false });
     expect(generateFloorPlan(feats(6), { vertical: false })).toEqual(a);
     const m = generateFloorPlan(feats(6), { vertical: false, rtl: true });
-    expect(m.rooms[0]!.x).toBeCloseTo(a.width - a.rooms[0]!.x - a.rooms[0]!.w, 0);
+    expect(m.rooms[0]!.x).toBeCloseTo(
+      a.width - a.rooms[0]!.x - a.rooms[0]!.w,
+      0,
+    );
   });
   it("draws a closed revision cloud", () => {
     const d = revisionCloud({ x: 0, y: 0, w: 100, h: 60 });

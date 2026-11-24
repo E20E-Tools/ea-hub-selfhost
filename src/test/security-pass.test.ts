@@ -29,14 +29,18 @@ describe("AI base URL rule", () => {
 
 describe("server Groq key only goes to api.groq.com", () => {
   it("uses the env key for the official host", () => {
-    expect(resolveAiKey("https://api.groq.com/openai/v1", "", "env-key")).toBe("env-key");
+    expect(resolveAiKey("https://api.groq.com/openai/v1", "", "env-key")).toBe(
+      "env-key",
+    );
   });
   it("never sends the env key to a custom host", () => {
     expect(resolveAiKey("https://evil.example.com/v1", "", "env-key")).toBe("");
     expect(isOfficialGroq("https://api.groq.com.evil.com/v1")).toBe(false);
   });
   it("uses a saved key for a custom host", () => {
-    expect(resolveAiKey("https://openrouter.ai/api/v1", "saved", "env-key")).toBe("saved");
+    expect(
+      resolveAiKey("https://openrouter.ai/api/v1", "saved", "env-key"),
+    ).toBe("saved");
   });
 });
 
@@ -52,6 +56,8 @@ describe("secrets at rest", () => {
   it("gate signing key differs from the raw service key", async () => {
     const key = await deriveSigningSecret("assistant-gate-v1", root);
     expect(key).not.toBe(root);
-    expect(key).not.toBe(await deriveSigningSecret("settings-encryption-v1", root));
+    expect(key).not.toBe(
+      await deriveSigningSecret("settings-encryption-v1", root),
+    );
   });
 });

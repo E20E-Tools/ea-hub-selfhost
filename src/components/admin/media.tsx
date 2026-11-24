@@ -5,10 +5,21 @@ import { Expand, ImagePlus, Loader2, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent, DialogDescription, DialogTitle } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { listAdminImages, uploadAdminImage } from "@/lib/admin.functions";
 import { imageFileSize, type AdminImage } from "@/lib/admin-gallery.shared";
-import { Card, QueryState, imageProblem, selectClass, useAdminCopy } from "./ui";
+import {
+  Card,
+  QueryState,
+  imageProblem,
+  selectClass,
+  useAdminCopy,
+} from "./ui";
 
 export const imagesQueryKey = ["admin-images"];
 
@@ -73,13 +84,22 @@ export function ImagePicker({
 }) {
   const { t, dir } = useAdminCopy();
   const images = useAdminImages();
-  const list = (images.data ?? []).filter((image) => !folder || image.folder.startsWith(folder));
+  const list = (images.data ?? []).filter(
+    (image) => !folder || image.folder.startsWith(folder),
+  );
   return (
     <Dialog open onOpenChange={(open) => (open ? null : onClose())}>
-      <DialogContent dir={dir} className="max-h-[85dvh] overflow-y-auto sm:max-w-2xl">
+      <DialogContent
+        dir={dir}
+        className="max-h-[85dvh] overflow-y-auto sm:max-w-2xl"
+      >
         <DialogTitle>{t("pickImageTitle")}</DialogTitle>
         <DialogDescription>{t("pickImageDesc")}</DialogDescription>
-        <QueryState query={images} empty={t("noImages")} isEmpty={list.length === 0}>
+        <QueryState
+          query={images}
+          empty={t("noImages")}
+          isEmpty={list.length === 0}
+        >
           <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
             {list.map((image) => (
               <button
@@ -109,7 +129,9 @@ export function MediaLibrary() {
   const images = useAdminImages();
   const upload = useImageUpload();
   const input = useRef<HTMLInputElement>(null);
-  const [folder, setFolder] = useState<"products" | "branding" | "affiliates">("products");
+  const [folder, setFolder] = useState<"products" | "branding" | "affiliates">(
+    "products",
+  );
   const [busy, setBusy] = useState(false);
   const [selected, setSelected] = useState<AdminImage | null>(null);
   const [dimensions, setDimensions] = useState<Record<string, string>>({});
@@ -171,9 +193,15 @@ export function MediaLibrary() {
           )}
           {busy ? t("uploading") : t("uploadImage")}
         </Button>
-        <span className="text-xs text-muted-foreground">{t("imageFormats")}</span>
+        <span className="text-xs text-muted-foreground">
+          {t("imageFormats")}
+        </span>
       </div>
-      <QueryState query={images} empty={t("noImages")} isEmpty={(images.data ?? []).length === 0}>
+      <QueryState
+        query={images}
+        empty={t("noImages")}
+        isEmpty={(images.data ?? []).length === 0}
+      >
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
           {images.data?.map((image) => (
             <figure
@@ -216,11 +244,15 @@ export function MediaLibrary() {
                   {image.name}
                 </strong>
                 <div className="flex flex-wrap items-center gap-2 text-muted-foreground">
-                  <Badge variant="secondary">{t(folderKey(image.folder))}</Badge>
+                  <Badge variant="secondary">
+                    {t(folderKey(image.folder))}
+                  </Badge>
                   <span dir="ltr">{imageFileSize(image.bytes)}</span>
                   <span dir="ltr">
                     {dimensions[image.path] ??
-                      (image.width && image.height ? `${image.width} × ${image.height}` : "")}
+                      (image.width && image.height
+                        ? `${image.width} × ${image.height}`
+                        : "")}
                   </span>
                 </div>
               </figcaption>
@@ -228,7 +260,10 @@ export function MediaLibrary() {
           ))}
         </div>
       </QueryState>
-      <Dialog open={selected !== null} onOpenChange={(open) => (open ? null : setSelected(null))}>
+      <Dialog
+        open={selected !== null}
+        onOpenChange={(open) => (open ? null : setSelected(null))}
+      >
         <DialogContent dir={dir} className="sm:max-w-3xl">
           <DialogTitle dir="ltr">{selected?.name}</DialogTitle>
           <DialogDescription dir="ltr">

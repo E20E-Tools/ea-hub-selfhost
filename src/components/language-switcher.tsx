@@ -13,7 +13,11 @@ export function LanguageSwitcher({ inline = false }: { inline?: boolean }) {
   return (
     <div className={inline ? "language-inline" : "language-bar"} dir="ltr">
       <Languages size={14} aria-hidden="true" />
-      <div className="language-choices" role="group" aria-label={t("langSwitchLabel")}>
+      <div
+        className="language-choices"
+        role="group"
+        aria-label={t("langSwitchLabel")}
+      >
         {choices.map((choice) => (
           <button
             key={choice.id}

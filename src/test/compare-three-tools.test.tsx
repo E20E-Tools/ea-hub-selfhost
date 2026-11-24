@@ -36,22 +36,29 @@ vi.mock("@tanstack/react-router", () => ({
     useSearch: () => fixture.search,
     useNavigate: () => fixture.navigate,
   }),
-  Link: ({ children }: { children: React.ReactNode }) => <a href="#fixture">{children}</a>,
+  Link: ({ children }: { children: React.ReactNode }) => (
+    <a href="#fixture">{children}</a>
+  ),
 }));
 vi.mock("@tanstack/react-query", async (original) => ({
   ...(await original<object>()),
   useSuspenseQuery: () => ({ data: catalog }),
 }));
 vi.mock("@/lib/catalog.functions", () => ({ catalogQueryOptions: {} }));
-vi.mock("@/components/product-tools", () => ({ ProductToolsActions: () => null }));
-vi.mock("@/components/metrics-preference", () => ({ MetricsPreference: () => null }));
+vi.mock("@/components/product-tools", () => ({
+  ProductToolsActions: () => null,
+}));
+vi.mock("@/components/metrics-preference", () => ({
+  MetricsPreference: () => null,
+}));
 vi.mock("@/lib/journey-client", () => ({ trackJourney: vi.fn() }));
 
 import { Route } from "@/routes/compare";
 import { MAX_COMPARE, toggleComparison } from "@/lib/my-tools";
 
-const ComparePage = (Route as unknown as { options: { component: () => React.ReactNode } }).options
-  .component;
+const ComparePage = (
+  Route as unknown as { options: { component: () => React.ReactNode } }
+).options.component;
 const columns = () =>
   screen
     .getAllByRole("columnheader")
@@ -69,7 +76,11 @@ describe("comparison with an isolated three-plus tool catalog", () => {
   it("shows three available tools side by side without a removal notice", () => {
     fixture.search = { ids: "alpha,bravo,charlie" };
     render(<ComparePage />);
-    expect(columns()).toEqual(["Fixture alpha", "Fixture bravo", "Fixture charlie"]);
+    expect(columns()).toEqual([
+      "Fixture alpha",
+      "Fixture bravo",
+      "Fixture charlie",
+    ]);
     expect(screen.getByText(/3 \/ 3/)).toBeInTheDocument();
     expect(removedNotice()).toBeNull();
   });
@@ -78,7 +89,11 @@ describe("comparison with an isolated three-plus tool catalog", () => {
     fixture.search = { ids: "alpha,bravo,charlie,delta" };
     render(<ComparePage />);
     expect(MAX_COMPARE).toBe(3);
-    expect(columns()).toEqual(["Fixture alpha", "Fixture bravo", "Fixture charlie"]);
+    expect(columns()).toEqual([
+      "Fixture alpha",
+      "Fixture bravo",
+      "Fixture charlie",
+    ]);
     expect(removedNotice()).not.toBeNull();
   });
 
@@ -106,7 +121,10 @@ describe("comparison with an isolated three-plus tool catalog", () => {
 
   it("refuses a fourth tool at the limit and accepts it after one is removed (replacement)", () => {
     const full = ["alpha", "bravo", "charlie"];
-    expect(toggleComparison(full, "delta")).toEqual({ ids: full, limited: true });
+    expect(toggleComparison(full, "delta")).toEqual({
+      ids: full,
+      limited: true,
+    });
     const afterRemoval = toggleComparison(full, "bravo").ids;
     expect(toggleComparison(afterRemoval, "delta")).toEqual({
       ids: ["alpha", "charlie", "delta"],
@@ -114,7 +132,11 @@ describe("comparison with an isolated three-plus tool catalog", () => {
     });
     fixture.search = { ids: "alpha,charlie,delta" };
     render(<ComparePage />);
-    expect(columns()).toEqual(["Fixture alpha", "Fixture charlie", "Fixture delta"]);
+    expect(columns()).toEqual([
+      "Fixture alpha",
+      "Fixture charlie",
+      "Fixture delta",
+    ]);
   });
 });
 
@@ -127,13 +149,17 @@ it("can start a comparison on the comparison page and saves the selected IDs", (
     replace: true,
     resetScroll: false,
   });
-  expect(JSON.parse(localStorage.getItem("e20e-my-tools-v1")!).compare).toEqual(["alpha", "bravo"]);
+  expect(JSON.parse(localStorage.getItem("e20e-my-tools-v1")!).compare).toEqual(
+    ["alpha", "bravo"],
+  );
 });
 it("hides identical unknown fields when the differences filter is active", () => {
   fixture.search = { ids: "alpha,bravo" };
   render(<ComparePage />);
   const initial = screen.getAllByRole("row").length;
-  act(() => screen.getByRole("checkbox", { name: /differences|الفروق/i }).click());
+  act(() =>
+    screen.getByRole("checkbox", { name: /differences|الفروق/i }).click(),
+  );
   expect(screen.getAllByRole("row").length).toBeLessThan(initial);
   expect(screen.getByText("Feature of alpha")).toBeInTheDocument();
 });

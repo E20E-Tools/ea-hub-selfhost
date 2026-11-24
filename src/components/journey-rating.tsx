@@ -11,7 +11,8 @@ export function JourneyRating() {
   const [busy, setBusy] = useState(false);
   const preference = useMetricsPreference();
   // Ratings are aggregate metrics too: hide them when the visitor or browser opted out.
-  if (!preference || preference.signal || preference.optedOut) return <MetricsPreference />;
+  if (!preference || preference.signal || preference.optedOut)
+    return <MetricsPreference />;
   if (rated)
     return (
       <p className="bx-rating" role="status">
@@ -31,12 +32,13 @@ export function JourneyRating() {
             onClick={() => {
               if (busy) return;
               setBusy(true);
-              void trackJourney("journey_rating", language, { rating, oncePerSession: true }).then(
-                (ok) => {
-                  if (ok) setRated(true);
-                  setBusy(false);
-                },
-              );
+              void trackJourney("journey_rating", language, {
+                rating,
+                oncePerSession: true,
+              }).then((ok) => {
+                if (ok) setRated(true);
+                setBusy(false);
+              });
             }}
           >
             <Star aria-hidden="true" />

@@ -79,7 +79,8 @@ export function normalizeTerms(value: unknown): TermsContent {
     value && typeof value === "object" && !Array.isArray(value)
       ? (value as Record<string, unknown>)
       : {};
-  const str = (x: unknown) => (typeof x === "string" ? x.slice(0, TERMS_MAX) : "");
+  const str = (x: unknown) =>
+    typeof x === "string" ? x.slice(0, TERMS_MAX) : "";
   return { ar: str(v["ar"]), en: str(v["en"]), updatedAt: str(v["updatedAt"]) };
 }
 

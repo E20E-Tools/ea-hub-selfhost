@@ -8,8 +8,14 @@ import {
   type BeneficiaryDetails,
 } from "@/lib/beneficiary-metadata";
 
-function toggle<T extends string>(values: T[], value: T, checked: boolean): T[] {
-  return checked ? [...new Set([...values, value])] : values.filter((item) => item !== value);
+function toggle<T extends string>(
+  values: T[],
+  value: T,
+  checked: boolean,
+): T[] {
+  return checked
+    ? [...new Set([...values, value])]
+    : values.filter((item) => item !== value);
 }
 
 export function ProductFitFields({
@@ -19,10 +25,20 @@ export function ProductFitFields({
   value: BeneficiaryDetails;
   onChange: (value: BeneficiaryDetails) => void;
 }) {
-  const { t,language } = useAdminCopy();
-  const ar=language==="ar";
-  const op=value.operations??{account:{ar:"",en:""},inputs:{ar:"",en:""},exchange:{ar:"",en:""},reviewed:""};
-  const opLabels={account:adminDictionaries[ar ? "ar" : "en"].consoleAccountRequirements,inputs:adminDictionaries[ar ? "ar" : "en"].consoleStartingData,exchange:adminDictionaries[ar ? "ar" : "en"].consoleVerifiedImportAndExportOptions};
+  const { t, language } = useAdminCopy();
+  const ar = language === "ar";
+  const op = value.operations ?? {
+    account: { ar: "", en: "" },
+    inputs: { ar: "", en: "" },
+    exchange: { ar: "", en: "" },
+    reviewed: "",
+  };
+  const opLabels = {
+    account: adminDictionaries[ar ? "ar" : "en"].consoleAccountRequirements,
+    inputs: adminDictionaries[ar ? "ar" : "en"].consoleStartingData,
+    exchange:
+      adminDictionaries[ar ? "ar" : "en"].consoleVerifiedImportAndExportOptions,
+  };
   const groups = [
     {
       key: "goals" as const,
@@ -90,12 +106,50 @@ export function ProductFitFields({
     />
   );
   return (
-    <Card title={t("productBeneficiaryFit")} description={t("productBeneficiaryFitHint")}>
+    <Card
+      title={t("productBeneficiaryFit")}
+      description={t("productBeneficiaryFitHint")}
+    >
       <div className="grid gap-6">
-        <fieldset className="grid gap-3"><legend>{adminDictionaries[ar ? "ar" : "en"].consoleOperatingRequirements}</legend>
-        {(["account","inputs","exchange"] as const).map(key=><BilingualField key={key} label={opLabels[key]} ar={op[key].ar} en={op[key].en} maxLength={800} onChange={v=>onChange({...value,operations:{...op,[key]:v}})}/>)}
-        <label>{adminDictionaries[ar ? "ar" : "en"].consoleLastVerified}<input type="date" value={op.reviewed} onChange={e=>onChange({...value,operations:{...op,reviewed:e.target.value}})}/></label>
-        {op.reviewed && Date.parse(op.reviewed)<Date.now()-90*86400000 && <p>{adminDictionaries[ar ? "ar" : "en"].consoleLastVerifiedOver90DaysAgo}</p>}</fieldset>
+        <fieldset className="grid gap-3">
+          <legend>
+            {adminDictionaries[ar ? "ar" : "en"].consoleOperatingRequirements}
+          </legend>
+          {(["account", "inputs", "exchange"] as const).map((key) => (
+            <BilingualField
+              key={key}
+              label={opLabels[key]}
+              ar={op[key].ar}
+              en={op[key].en}
+              maxLength={800}
+              onChange={(v) =>
+                onChange({ ...value, operations: { ...op, [key]: v } })
+              }
+            />
+          ))}
+          <label>
+            {adminDictionaries[ar ? "ar" : "en"].consoleLastVerified}
+            <input
+              type="date"
+              value={op.reviewed}
+              onChange={(e) =>
+                onChange({
+                  ...value,
+                  operations: { ...op, reviewed: e.target.value },
+                })
+              }
+            />
+          </label>
+          {op.reviewed &&
+            Date.parse(op.reviewed) < Date.now() - 90 * 86400000 && (
+              <p>
+                {
+                  adminDictionaries[ar ? "ar" : "en"]
+                    .consoleLastVerifiedOver90DaysAgo
+                }
+              </p>
+            )}
+        </fieldset>
         {groups.map((group) => (
           <fieldset key={group.key}>
             <legend className="mb-2 text-sm font-medium">{group.legend}</legend>
@@ -129,16 +183,23 @@ export function ProductFitFields({
         {bilingualList("limitations", t("productFitLimitations"))}
         {bilingual("exampleOutput", t("productFitExample"))}
         {bilingualList("purchaseSteps", t("productFitPurchaseSteps"))}
-        <p className="-mt-4 text-xs text-muted-foreground">{t("productFitPurchaseStepsHint")}</p>
+        <p className="-mt-4 text-xs text-muted-foreground">
+          {t("productFitPurchaseStepsHint")}
+        </p>
         {bilingual("problem", t("productFitProblem"), false)}
-        <p className="-mt-4 text-xs text-muted-foreground">{t("productFitProblemHint")}</p>
+        <p className="-mt-4 text-xs text-muted-foreground">
+          {t("productFitProblemHint")}
+        </p>
         <label className="grid gap-1 text-sm">
           <span className="font-medium">{t("productFitLayer")}</span>
           <select
             className="h-9 rounded-md border bg-background px-2"
             value={value.eaLayer}
             onChange={(event) =>
-              onChange({ ...value, eaLayer: event.target.value as BeneficiaryDetails["eaLayer"] })
+              onChange({
+                ...value,
+                eaLayer: event.target.value as BeneficiaryDetails["eaLayer"],
+              })
             }
           >
             <option value="">{t("productFitLayerAuto")}</option>

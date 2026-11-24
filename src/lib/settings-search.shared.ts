@@ -37,10 +37,20 @@ export const SETTINGS_SEARCH_ENTRIES: {
     control: "archy-voice",
     keywords: "archy robot greeting voice sound صوت ترحيب أرشي روبوت مساعد",
   },
-  { tab: "ai", label: "settingsTestChat", control: "archy-test-input",
-    keywords: "compare test chat replies Archy OpenAI local اختبار تجربة مقارنة المحادثة الردود ارشي البحث المحلي" },
-  { tab: "ai", label: "settingsVisitorEngine", control: "archy-engine",
-    keywords: "visitor engine provider Archy OpenAI local default محرك الزوار افتراضي ارشي البحث المحلي" },
+  {
+    tab: "ai",
+    label: "settingsTestChat",
+    control: "archy-test-input",
+    keywords:
+      "compare test chat replies Archy OpenAI local اختبار تجربة مقارنة المحادثة الردود ارشي البحث المحلي",
+  },
+  {
+    tab: "ai",
+    label: "settingsVisitorEngine",
+    control: "archy-engine",
+    keywords:
+      "visitor engine provider Archy OpenAI local default محرك الزوار افتراضي ارشي البحث المحلي",
+  },
   ...FEATURE_KEYS.map((key) => ({
     tab: "features" as const,
     label: `feature_${key}` as const,
@@ -75,7 +85,8 @@ export const SETTINGS_SEARCH_ENTRIES: {
   {
     tab: "navigation",
     label: "tabNavigation",
-    keywords: "menu links navigation القائمة الرئيسية قائمة روابط تنقل الشريط العلوي ترتيب الأزرار header reorder buttons",
+    keywords:
+      "menu links navigation القائمة الرئيسية قائمة روابط تنقل الشريط العلوي ترتيب الأزرار header reorder buttons",
   },
   {
     tab: "appearance",
@@ -101,7 +112,8 @@ export const SETTINGS_SEARCH_ENTRIES: {
   {
     tab: "journey",
     label: "journeyMetrics",
-    keywords: "journey analytics funnel conversion visitor تحليل قياسات زائر رحلة",
+    keywords:
+      "journey analytics funnel conversion visitor تحليل قياسات زائر رحلة",
   },
   {
     tab: "testimonials",

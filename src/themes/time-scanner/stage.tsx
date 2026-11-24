@@ -117,7 +117,9 @@ export default function TimeScannerStage({ products, settings }: StageProps) {
                   </em>
                 </span>
                 <span className="tscan-node-label">
-                  {live ? p.label : dictionaries[ar ? "ar" : "en"].stageMigrating}
+                  {live
+                    ? p.label
+                    : dictionaries[ar ? "ar" : "en"].stageMigrating}
                 </span>
               </Link>
             );
@@ -130,7 +132,8 @@ export default function TimeScannerStage({ products, settings }: StageProps) {
           aria-hidden="true"
         >
           <span className="tscan-legacy-tag" dir="ltr">
-            LEGACY_ENTERPRISE.EXE — {dictionaries[ar ? "ar" : "en"].stageNotResponding}
+            LEGACY_ENTERPRISE.EXE —{" "}
+            {dictionaries[ar ? "ar" : "en"].stageNotResponding}
           </span>
           <div className="tscan-files">
             {pending.map((p, i) => (
@@ -199,7 +202,7 @@ export default function TimeScannerStage({ products, settings }: StageProps) {
         <h1>{settings.displayTitle}</h1>
         <p className="tscan-lead">
           {settings.tagline ||
-            (dictionaries[ar ? "ar" : "en"].stageFromScatteredFilesTo)}
+            dictionaries[ar ? "ar" : "en"].stageFromScatteredFilesTo}
         </p>
         <div className="tscan-actions">
           <a href="#catalog" className="tscan-cta">

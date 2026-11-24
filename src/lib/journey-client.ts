@@ -24,16 +24,36 @@ function eventStorageKey(event: string) {
 export function trackJourney(
   event: PublicJourneyEvent,
   language: "ar" | "en",
-  options: { eventKey?: string; rating?: number; oncePerSession?: boolean } = {},
+  options: {
+    eventKey?: string;
+    rating?: number;
+    oncePerSession?: boolean;
+  } = {},
 ): Promise<boolean> {
-  if (typeof window === "undefined" || !metricsAllowed()) return Promise.resolve(false);
-  const scopedEvent = ["exercise_started","exercise_completed","exercise_requested","case_viewed","case_opened","service_started","service_receipt"].includes(event) ? event+"-"+language : event;
+  if (typeof window === "undefined" || !metricsAllowed())
+    return Promise.resolve(false);
+  const scopedEvent = [
+    "exercise_started",
+    "exercise_completed",
+    "exercise_requested",
+    "case_viewed",
+    "case_opened",
+    "service_started",
+    "service_receipt",
+  ].includes(event)
+    ? event + "-" + language
+    : event;
   let eventKey = options.eventKey ?? "";
   try {
-    if (options.oncePerSession && sessionStorage.getItem(eventStorageKey(scopedEvent)) === "done")
+    if (
+      options.oncePerSession &&
+      sessionStorage.getItem(eventStorageKey(scopedEvent)) === "done"
+    )
       return Promise.resolve(false);
     if (options.oncePerSession) {
-      eventKey = sessionStorage.getItem(`${eventStorageKey(scopedEvent)}-key`) ?? crypto.randomUUID();
+      eventKey =
+        sessionStorage.getItem(`${eventStorageKey(scopedEvent)}-key`) ??
+        crypto.randomUUID();
       sessionStorage.setItem(`${eventStorageKey(scopedEvent)}-key`, eventKey);
     }
   } catch {

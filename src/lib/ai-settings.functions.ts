@@ -84,23 +84,38 @@ export const getAiSettings = createServerFn({ method: "GET" })
     };
   });
 
-export const saveRegistrationPolicy = createServerFn({method:"POST"})
+export const saveRegistrationPolicy = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input:unknown) => z.object({
-    limit:z.number().int().min(1).max(100), minutes:z.number().int().min(1).max(1440)
-  }).parse(input))
-  .handler(async ({context,data})=>{
+  .inputValidator((input: unknown) =>
+    z
+      .object({
+        limit: z.number().int().min(1).max(100),
+        minutes: z.number().int().min(1).max(1440),
+      })
+      .parse(input),
+  )
+  .handler(async ({ context, data }) => {
     await verify(context);
-    const {supabaseAdmin} = await import("@/integrations/supabase/client.server");
-    const {actorEmail} = await import("./admin-guard.server");
-    const {error} = await supabaseAdmin.from("ai_assistant_settings").upsert({
-      id:true, registration_limit:data.limit, registration_wait_minutes:data.minutes,
-      updated_at:new Date().toISOString(), updated_by:actorEmail(context.claims)
+    const { supabaseAdmin } =
+      await import("@/integrations/supabase/client.server");
+    const { actorEmail } = await import("./admin-guard.server");
+    const { error } = await supabaseAdmin.from("ai_assistant_settings").upsert({
+      id: true,
+      registration_limit: data.limit,
+      registration_wait_minutes: data.minutes,
+      updated_at: new Date().toISOString(),
+      updated_by: actorEmail(context.claims),
     });
-    if(error) throw Error("Registration policy could not be saved");
-    await supabaseAdmin.from("admin_activity").insert({actor_id:context.userId,actor_email:actorEmail(context.claims),
-      action:"ai.registration-policy",target:data.limit+" / "+data.minutes+" min"});
-    return {ok:true};
+    if (error) throw Error("Registration policy could not be saved");
+    await supabaseAdmin
+      .from("admin_activity")
+      .insert({
+        actor_id: context.userId,
+        actor_email: actorEmail(context.claims),
+        action: "ai.registration-policy",
+        target: data.limit + " / " + data.minutes + " min",
+      });
+    return { ok: true };
   });
 
 export const aiConfigSchema = z
@@ -157,7 +172,10 @@ export const saveAiSettings = createServerFn({ method: "POST" })
         })
       )
         return { ok: false, message: "errAiKeyOrigin" };
-      if (data.apiKey && new URL(data.baseUrl).origin === "https://api.openai.com") {
+      if (
+        data.apiKey &&
+        new URL(data.baseUrl).origin === "https://api.openai.com"
+      ) {
         const check = await fetch("https://api.openai.com/v1/models", {
           headers: { Authorization: `Bearer ${data.apiKey}` },
           redirect: "error",
@@ -265,10 +283,28 @@ export const testArchyChat = createServerFn({ method: "POST" })
   .handler(async ({ data, context }) => {
     await verify(context);
     const { runAssistantChat } = await import("./recommend.server");
-    const started=Date.now();
-    const record=async(succeeded:boolean,source:string|null,model:string|null)=>{
-      try{const {supabaseAdmin}=await import("@/integrations/supabase/client.server");
-      await supabaseAdmin.from("archy_probe").upsert({engine:data.engine??"saved",succeeded,source,model,elapsed_ms:Date.now()-started,checked_at:new Date().toISOString()});}catch{/* Monitoring does not block a reply. */}
+    const started = Date.now();
+    const record = async (
+      succeeded: boolean,
+      source: string | null,
+      model: string | null,
+    ) => {
+      try {
+        const { supabaseAdmin } =
+          await import("@/integrations/supabase/client.server");
+        await supabaseAdmin
+          .from("archy_probe")
+          .upsert({
+            engine: data.engine ?? "saved",
+            succeeded,
+            source,
+            model,
+            elapsed_ms: Date.now() - started,
+            checked_at: new Date().toISOString(),
+          });
+      } catch {
+        /* Monitoring does not block a reply. */
+      }
     };
     try {
       const { answer, source, model } = await runAssistantChat(
@@ -277,10 +313,10 @@ export const testArchyChat = createServerFn({ method: "POST" })
         true,
         data.engine ?? "saved",
       );
-      await record(true,source,model);
+      await record(true, source, model);
       return { ok: true as const, reply: answer.summary, source, model };
     } catch (error) {
-      await record(false,null,null);
+      await record(false, null, null);
       return {
         ok: false as const,
         denied: safeAiError(error) === "provider failure status=401",

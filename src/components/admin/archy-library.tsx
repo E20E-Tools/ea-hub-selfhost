@@ -73,19 +73,28 @@ export function ArchyLibrary({
   return (
     <details className="my-4 rounded-lg border p-3">
       <summary className="cursor-pointer font-semibold">
-        {adminDictionaries[ar ? "ar" : "en"].consoleSavedQuestionsAndVisitorFeedback}
+        {
+          adminDictionaries[ar ? "ar" : "en"]
+            .consoleSavedQuestionsAndVisitorFeedback
+        }
       </summary>
       <div className="mt-3 grid gap-3">
         <h3>
-          {adminDictionaries[ar ? "ar" : "en"].consoleReplyRatingsBySourceModelAndLanguage}
+          {
+            adminDictionaries[ar ? "ar" : "en"]
+              .consoleReplyRatingsBySourceModelAndLanguage
+          }
         </h3>
         {totals.length ? (
           <ul>
             {totals.map((r, i) => (
               <li key={i}>
                 {r.reply_source ?? "—"} · {r.reply_model ?? "—"} ·{" "}
-                {r.reply_language ?? "—"} · {adminDictionaries[ar ? "ar" : "en"].consoleHelpful}{" "}
-                {r.positive} · {adminDictionaries[ar ? "ar" : "en"].consoleUnhelpful} {r.negative}
+                {r.reply_language ?? "—"} ·{" "}
+                {adminDictionaries[ar ? "ar" : "en"].consoleHelpful}{" "}
+                {r.positive} ·{" "}
+                {adminDictionaries[ar ? "ar" : "en"].consoleUnhelpful}{" "}
+                {r.negative}
               </li>
             ))}
           </ul>
@@ -95,7 +104,10 @@ export function ArchyLibrary({
         {recent.length > 0 && (
           <details>
             <summary>
-              {adminDictionaries[ar ? "ar" : "en"].consoleRecentUnhelpfulReplies}
+              {
+                adminDictionaries[ar ? "ar" : "en"]
+                  .consoleRecentUnhelpfulReplies
+              }
             </summary>
             {recent.map((r) => (
               <div className="border-b py-2" key={r.id}>
@@ -111,7 +123,10 @@ export function ArchyLibrary({
                       document.getElementById("archy-case")?.focus();
                     }}
                   >
-                    {adminDictionaries[ar ? "ar" : "en"].consoleReviewQuestionForSaving}
+                    {
+                      adminDictionaries[ar ? "ar" : "en"]
+                        .consoleReviewQuestionForSaving
+                    }
                   </button>
                 )}
               </div>
@@ -132,7 +147,10 @@ export function ArchyLibrary({
           }}
         >
           <label htmlFor="archy-case">
-            {adminDictionaries[ar ? "ar" : "en"].consoleNewTestQuestionRemovePersonalDetailsBefore}
+            {
+              adminDictionaries[ar ? "ar" : "en"]
+                .consoleNewTestQuestionRemovePersonalDetailsBefore
+            }
           </label>
           <textarea
             id="archy-case"
@@ -143,15 +161,22 @@ export function ArchyLibrary({
             onChange={(e) => setDraft(e.target.value)}
           />
           <select
-            aria-label={adminDictionaries[ar ? "ar" : "en"].consoleQuestionLanguage}
+            aria-label={
+              adminDictionaries[ar ? "ar" : "en"].consoleQuestionLanguage
+            }
             value={lang}
             onChange={(e) => setLang(e.target.value === "en" ? "en" : "ar")}
           >
-            <option value="ar">{adminDictionaries.ar.arabicLanguageName}</option>
+            <option value="ar">
+              {adminDictionaries.ar.arabicLanguageName}
+            </option>
             <option value="en">English</option>
           </select>
           <label>
-            {adminDictionaries[ar ? "ar" : "en"].consoleExpectedTermsNameLinkOrPhraseOne}
+            {
+              adminDictionaries[ar ? "ar" : "en"]
+                .consoleExpectedTermsNameLinkOrPhraseOne
+            }
             <textarea
               className="block w-full border p-2"
               value={expected}
@@ -202,7 +227,11 @@ export function ArchyLibrary({
             </button>
             <button
               disabled={saving || blocked}
-              aria-label={adminDictionaries[ar ? "ar" : "en"].consoleRemove + " " + c.question}
+              aria-label={
+                adminDictionaries[ar ? "ar" : "en"].consoleRemove +
+                " " +
+                c.question
+              }
               onClick={() => void mutate(() => removeArchyCase({ data: c.id }))}
             >
               {adminDictionaries[ar ? "ar" : "en"].consoleRemove}

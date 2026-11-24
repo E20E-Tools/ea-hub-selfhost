@@ -3,7 +3,10 @@ export const MY_TOOLS_CHANGED = "e20e:my-tools-changed";
 export const MAX_COMPARE = 3;
 
 export type MyToolsValue = { favorites: string[]; compare: string[] };
-export type MyToolsRead = { value: MyToolsValue; status: "ok" | "malformed" | "unavailable" };
+export type MyToolsRead = {
+  value: MyToolsValue;
+  status: "ok" | "malformed" | "unavailable";
+};
 export const EMPTY_MY_TOOLS: MyToolsValue = { favorites: [], compare: [] };
 
 export function isPublicProductId(value: unknown): value is string {
@@ -39,7 +42,9 @@ export function parseMyTools(raw: string | null): MyToolsRead {
     return { value: EMPTY_MY_TOOLS, status: "malformed" };
   }
 }
-export function readMyTools(store: Pick<Storage, "getItem"> | null): MyToolsRead {
+export function readMyTools(
+  store: Pick<Storage, "getItem"> | null,
+): MyToolsRead {
   if (!store) return { value: EMPTY_MY_TOOLS, status: "unavailable" };
   try {
     return parseMyTools(store.getItem(MY_TOOLS_KEY));
@@ -53,9 +58,13 @@ export function encodeComparisonIds(ids: string[]): string {
 export function decodeComparisonIds(raw: unknown): string[] {
   return typeof raw === "string" ? productIds(raw.split(","), MAX_COMPARE) : [];
 }
-export function toggleComparison(ids: string[], id: string): { ids: string[]; limited: boolean } {
+export function toggleComparison(
+  ids: string[],
+  id: string,
+): { ids: string[]; limited: boolean } {
   if (!isPublicProductId(id)) return { ids, limited: false };
-  if (ids.includes(id)) return { ids: ids.filter((item) => item !== id), limited: false };
+  if (ids.includes(id))
+    return { ids: ids.filter((item) => item !== id), limited: false };
   if (ids.length >= MAX_COMPARE) return { ids, limited: true };
   return { ids: [...ids, id], limited: false };
 }

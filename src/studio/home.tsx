@@ -7,7 +7,11 @@ import { ArrowUpRight, Boxes, Compass, Map } from "lucide-react";
 
 import { useLanguage } from "@/lib/language";
 import { catalogQueryOptions } from "@/lib/catalog.functions";
-import { filterCatalog, localizedProduct, localizedSettings } from "@/lib/catalog";
+import {
+  filterCatalog,
+  localizedProduct,
+  localizedSettings,
+} from "@/lib/catalog";
 import { archyTour } from "@/lib/archy-tour";
 import { featureEnabled } from "@/lib/site-features";
 import { dictionaries } from "@/lib/copy";
@@ -27,9 +31,13 @@ export function StudioHome() {
   const navigate = Route.useNavigate();
 
   // Earlier shared searches still land on their matching tool in the full library.
-  const linkedTool = q || cat !== "all" ? filterCatalog(products, q, cat)[0]?.id : undefined;
+  const linkedTool =
+    q || cat !== "all" ? filterCatalog(products, q, cat)[0]?.id : undefined;
   useEffect(() => {
-    if ((!q && cat === "all") || (window.location.hash && window.location.hash !== "#catalog"))
+    if (
+      (!q && cat === "all") ||
+      (window.location.hash && window.location.hash !== "#catalog")
+    )
       return;
     const target = linkedTool ? "catalog-" + linkedTool : "catalog";
     document.getElementById(target)?.scrollIntoView({ block: "start" });
@@ -60,7 +68,8 @@ export function StudioHome() {
             href: "/enterprise-services",
             Icon: Boxes,
             title: dictionaries[ar ? "ar" : "en"].homeEnterpriseServices,
-            body: dictionaries[ar ? "ar" : "en"].homeImplementationRolloutTrainingAnd,
+            body: dictionaries[ar ? "ar" : "en"]
+              .homeImplementationRolloutTrainingAnd,
           },
         ]
       : []),
@@ -81,7 +90,9 @@ export function StudioHome() {
       <CatalogWorkbench products={products} />
       <section className="s-service-band">
         <div className="s-section">
-          <h2>{dictionaries[ar ? "ar" : "en"].homeFromDiscoveryToImplementation}</h2>
+          <h2>
+            {dictionaries[ar ? "ar" : "en"].homeFromDiscoveryToImplementation}
+          </h2>
           <div className="s-service-grid">
             {services.map(({ href, Icon, title, body }) => (
               <a key={href} href={href}>

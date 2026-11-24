@@ -1,4 +1,11 @@
-import { createContext, useContext, useRef, useState, type FormEvent, type ReactNode } from "react";
+import {
+  createContext,
+  useContext,
+  useRef,
+  useState,
+  type FormEvent,
+  type ReactNode,
+} from "react";
 import { useServerFn } from "@tanstack/react-start";
 import { CheckCircle2, Loader2, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -26,7 +33,10 @@ import { dictionaries, fill, type Copy } from "@/lib/copy";
 import { currentVisitorAccess } from "@/lib/current-visitor-access";
 import { metricsAllowed } from "@/lib/journey-client";
 
-const TYPE_KEYS: Record<PublicRequestType, { title: keyof Copy; hint: keyof Copy }> = {
+const TYPE_KEYS: Record<
+  PublicRequestType,
+  { title: keyof Copy; hint: keyof Copy }
+> = {
   new: { title: "rqType_new", hint: "rqType_new_hint" },
   feature: { title: "rqType_feature", hint: "rqType_feature_hint" },
   support: { title: "rqType_support", hint: "rqType_support_hint" },
@@ -51,14 +61,20 @@ function Frame({
   if (inline)
     return (
       <InlineContext.Provider value>
-        <div className="assistant-request grid gap-4 overflow-y-auto p-4" dir={dir}>
+        <div
+          className="assistant-request grid gap-4 overflow-y-auto p-4"
+          dir={dir}
+        >
           {children}
         </div>
       </InlineContext.Provider>
     );
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl" dir={dir}>
+      <DialogContent
+        className="max-h-[90vh] overflow-y-auto sm:max-w-2xl"
+        dir={dir}
+      >
         {children}
       </DialogContent>
     </Dialog>
@@ -87,7 +103,9 @@ function FrameDescription({ children }: { children: ReactNode }) {
 }
 function FrameFooter({ children }: { children: ReactNode }) {
   return useContext(InlineContext) ? (
-    <div className="flex flex-wrap items-center justify-end gap-2">{children}</div>
+    <div className="flex flex-wrap items-center justify-end gap-2">
+      {children}
+    </div>
   ) : (
     <DialogFooter>{children}</DialogFooter>
   );
@@ -122,7 +140,8 @@ export function ToolRequestDialog({
   need: string;
 }) {
   const { t, language, dir } = useLanguage();
-  const tr = (key: string) => (key in dictionaries.ar ? t(key as keyof Copy) : key);
+  const tr = (key: string) =>
+    key in dictionaries.ar ? t(key as keyof Copy) : key;
   const [type, setType] = useState<PublicRequestType>("new");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -135,7 +154,10 @@ export function ToolRequestDialog({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
-  const [receipt, setReceipt] = useState<{ id: string; createdAt: string } | null>(null);
+  const [receipt, setReceipt] = useState<{
+    id: string;
+    createdAt: string;
+  } | null>(null);
   const requestId = useRef("");
   const sendRequest = useServerFn(submitRequest);
 
@@ -153,7 +175,9 @@ export function ToolRequestDialog({
   const missing = [
     name.trim().length < 2 && t("requestMissingName"),
     !email.includes("@") && t("requestMissingEmail"),
-    type === "support" && phone.replace(/\D/g, "").length < 7 && t("requestMissingPhone"),
+    type === "support" &&
+      phone.replace(/\D/g, "").length < 7 &&
+      t("requestMissingPhone"),
     needsProduct && !product && t("rqMissingProduct"),
     type === "support" && !urgency && t("rqMissingUrgency"),
     detail.trim().length < 20 && t("rqMissingMessage"),
@@ -197,7 +221,9 @@ export function ToolRequestDialog({
       Object.entries(validation.data).forEach(([key, value]) => {
         if (typeof value === "string") form.set(key, value);
       });
-      const trap = document.getElementById("tool-request-website") as HTMLInputElement | null;
+      const trap = document.getElementById(
+        "tool-request-website",
+      ) as HTMLInputElement | null;
       form.set("website", trap?.value ?? "");
       if (allowImages) images.forEach((image) => form.append("images", image));
       const result = await sendRequest({ data: form });
@@ -227,7 +253,9 @@ export function ToolRequestDialog({
     <Frame inline={inline} open={open} onOpenChange={onOpenChange} dir={dir}>
       <FrameHeader>
         <FrameTitle>
-          {receipt ? t("requestReceivedTitle") : fill(t("trRequestToolTitle"), product?.name ?? "")}
+          {receipt
+            ? t("requestReceivedTitle")
+            : fill(t("trRequestToolTitle"), product?.name ?? "")}
         </FrameTitle>
         <FrameDescription>
           {receipt ? t("requestSavedPlain") : t("trRequestToolLead")}
@@ -247,20 +275,36 @@ export function ToolRequestDialog({
             </dd>
             <dt className="text-muted-foreground">{t("requestTimeLabel")}</dt>
             <dd dir="ltr">
-              {new Date(receipt.createdAt).toLocaleString(language === "ar" ? "ar-SA" : "en-GB")}
+              {new Date(receipt.createdAt).toLocaleString(
+                language === "ar" ? "ar-SA" : "en-GB",
+              )}
             </dd>
           </dl>
           <FrameFooter>
-            <Button type="button" variant="outline" onClick={again} disabled={busy}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={again}
+              disabled={busy}
+            >
               {t("trRequestToolAnother")}
             </Button>
-            <Button type="button" onClick={() => onOpenChange(false)} disabled={busy}>
+            <Button
+              type="button"
+              onClick={() => onOpenChange(false)}
+              disabled={busy}
+            >
               {t("trRequestToolClose")}
             </Button>
           </FrameFooter>
         </div>
       ) : (
-        <form onSubmit={submit} aria-busy={busy} noValidate className="grid gap-4">
+        <form
+          onSubmit={submit}
+          aria-busy={busy}
+          noValidate
+          className="grid gap-4"
+        >
           <input
             id="tool-request-website"
             name="website"
@@ -271,7 +315,9 @@ export function ToolRequestDialog({
             style={hiddenTrap}
           />
           {product ? (
-            <p className="text-sm text-muted-foreground">{fill(t("ucToolLabel"), product.name)}</p>
+            <p className="text-sm text-muted-foreground">
+              {fill(t("ucToolLabel"), product.name)}
+            </p>
           ) : null}
 
           <fieldset className="grid gap-2" disabled={busy}>
@@ -299,14 +345,18 @@ export function ToolRequestDialog({
                     className="accent-primary"
                   />
                   <strong>{t(TYPE_KEYS[option].title)}</strong>
-                  <small className="text-muted-foreground">{t(TYPE_KEYS[option].hint)}</small>
+                  <small className="text-muted-foreground">
+                    {t(TYPE_KEYS[option].hint)}
+                  </small>
                 </label>
               ))}
             </div>
           </fieldset>
 
           <fieldset className="grid gap-3" disabled={busy}>
-            <legend className="text-sm font-medium">{t("requestContactSection")}</legend>
+            <legend className="text-sm font-medium">
+              {t("requestContactSection")}
+            </legend>
             <div className="grid gap-3 sm:grid-cols-2">
               <label className="grid gap-1 text-sm">
                 <span>{t("requestNameLabel")}</span>
@@ -317,9 +367,14 @@ export function ToolRequestDialog({
                   maxLength={100}
                   required
                   aria-invalid={Boolean(fieldErrors["name"])}
-                  aria-describedby={fieldErrors["name"] ? "tool-request-name-error" : undefined}
+                  aria-describedby={
+                    fieldErrors["name"] ? "tool-request-name-error" : undefined
+                  }
                 />
-                <FieldError id="tool-request-name-error" message={fieldErrors["name"]} />
+                <FieldError
+                  id="tool-request-name-error"
+                  message={fieldErrors["name"]}
+                />
               </label>
               <label className="grid gap-1 text-sm">
                 <span>{t("requestEmailLabel")}</span>
@@ -332,9 +387,16 @@ export function ToolRequestDialog({
                   maxLength={255}
                   required
                   aria-invalid={Boolean(fieldErrors["email"])}
-                  aria-describedby={fieldErrors["email"] ? "tool-request-email-error" : undefined}
+                  aria-describedby={
+                    fieldErrors["email"]
+                      ? "tool-request-email-error"
+                      : undefined
+                  }
                 />
-                <FieldError id="tool-request-email-error" message={fieldErrors["email"]} />
+                <FieldError
+                  id="tool-request-email-error"
+                  message={fieldErrors["email"]}
+                />
               </label>
               <label className="grid gap-1 text-sm">
                 <span>{t("requestCompanyLabel")}</span>
@@ -357,9 +419,16 @@ export function ToolRequestDialog({
                     maxLength={20}
                     required
                     aria-invalid={Boolean(fieldErrors["phone"])}
-                    aria-describedby={fieldErrors["phone"] ? "tool-request-phone-error" : undefined}
+                    aria-describedby={
+                      fieldErrors["phone"]
+                        ? "tool-request-phone-error"
+                        : undefined
+                    }
                   />
-                  <FieldError id="tool-request-phone-error" message={fieldErrors["phone"]} />
+                  <FieldError
+                    id="tool-request-phone-error"
+                    message={fieldErrors["phone"]}
+                  />
                 </label>
               ) : null}
               {type === "support" ? (
@@ -372,7 +441,9 @@ export function ToolRequestDialog({
                     required
                     aria-invalid={Boolean(fieldErrors["urgency"])}
                     aria-describedby={
-                      fieldErrors["urgency"] ? "tool-request-urgency-error" : undefined
+                      fieldErrors["urgency"]
+                        ? "tool-request-urgency-error"
+                        : undefined
                     }
                   >
                     <option value="">{t("spSelect")}</option>
@@ -382,14 +453,19 @@ export function ToolRequestDialog({
                       </option>
                     ))}
                   </select>
-                  <FieldError id="tool-request-urgency-error" message={fieldErrors["urgency"]} />
+                  <FieldError
+                    id="tool-request-urgency-error"
+                    message={fieldErrors["urgency"]}
+                  />
                 </label>
               ) : null}
             </div>
           </fieldset>
 
           <fieldset className="grid gap-3" disabled={busy}>
-            <legend className="text-sm font-medium">{t("trRequestProjectSection")}</legend>
+            <legend className="text-sm font-medium">
+              {t("trRequestProjectSection")}
+            </legend>
             <label className="grid gap-1 text-sm">
               <span>{messageLabel}</span>
               <Textarea
@@ -400,9 +476,14 @@ export function ToolRequestDialog({
                 required
                 dir="auto"
                 aria-invalid={Boolean(fieldErrors["need"])}
-                aria-describedby={fieldErrors["need"] ? "tool-request-need-error" : undefined}
+                aria-describedby={
+                  fieldErrors["need"] ? "tool-request-need-error" : undefined
+                }
               />
-              <FieldError id="tool-request-need-error" message={fieldErrors["need"]} />
+              <FieldError
+                id="tool-request-need-error"
+                message={fieldErrors["need"]}
+              />
             </label>
             {type === "feature" ? (
               <label className="grid gap-1 text-sm">
@@ -420,10 +501,18 @@ export function ToolRequestDialog({
           {allowImages ? (
             <section className="grid gap-2">
               <h3 className="text-sm font-medium">
-                {type === "support" ? t("rqScreenshots") : t("requestImagesSection")}{" "}
-                <small className="text-muted-foreground">{t("requestOptional")}</small>
+                {type === "support"
+                  ? t("rqScreenshots")
+                  : t("requestImagesSection")}{" "}
+                <small className="text-muted-foreground">
+                  {t("requestOptional")}
+                </small>
               </h3>
-              <RequestImages files={images} onChange={setImages} disabled={busy} />
+              <RequestImages
+                files={images}
+                onChange={setImages}
+                disabled={busy}
+              />
             </section>
           ) : null}
 
@@ -435,11 +524,19 @@ export function ToolRequestDialog({
 
           <FrameFooter>
             <span className="text-xs text-muted-foreground" aria-live="polite">
-              {busy ? t("requestSaving") : missing.length ? t("requestMissingLead") : ""}
+              {busy
+                ? t("requestSaving")
+                : missing.length
+                  ? t("requestMissingLead")
+                  : ""}
             </span>
             <Button type="submit" disabled={busy}>
               {busy ? (
-                <Loader2 size={16} className="animate-spin" aria-hidden="true" />
+                <Loader2
+                  size={16}
+                  className="animate-spin"
+                  aria-hidden="true"
+                />
               ) : (
                 <Send size={16} aria-hidden="true" />
               )}

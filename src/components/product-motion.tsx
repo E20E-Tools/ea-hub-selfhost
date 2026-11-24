@@ -7,7 +7,13 @@ export function ProductMotion() {
   const { data } = useSuspenseQuery(catalogQueryOptions);
   const { motionEnabled, motionSpeed, motionDirection } = data.settings;
 
-  const { imageFit, imageBrightness, imageContrast, imageSaturation, imageSharpen } = data.settings;
+  const {
+    imageFit,
+    imageBrightness,
+    imageContrast,
+    imageSaturation,
+    imageSharpen,
+  } = data.settings;
   useEffect(() => {
     const root = document.documentElement;
     root.dataset["productImageFit"] = imageFit;

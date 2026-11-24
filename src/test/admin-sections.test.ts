@@ -92,7 +92,9 @@ describe("admin sections", () => {
   it("only aliases to tabs that exist", () => {
     for (const alias of Object.values(SECTION_ALIASES)) {
       if (alias.tab)
-        expect(ADMIN_SECTION_TABS[alias.section] as readonly string[]).toContain(alias.tab);
+        expect(
+          ADMIN_SECTION_TABS[alias.section] as readonly string[],
+        ).toContain(alias.tab);
     }
   });
 });

@@ -2,7 +2,13 @@ import { RequestReceipt } from "@/components/request-receipt";
 import { FormTermsNote } from "@/components/form-terms-note";
 import { FeatureGate } from "@/components/feature-gate";
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type FormEvent,
+} from "react";
 import {
   ArrowLeft,
   ArrowRight,
@@ -147,14 +153,29 @@ function ServiceRequestContent() {
   );
   const [teamSize, setTeamSize] = useState("");
   const [timeline, setTimeline] = useState("");
-  const [exercise,setExercise]=useState("");
-  useEffect(()=>{
-    const match=/^#exercise-([a-f0-9-]{36})$/.exec(window.location.hash);if(!match)return;
-    try{const key="e20e-exercise:"+match[1];const item=JSON.parse(sessionStorage.getItem(key)??"null");
-    if(item?.tool===search.tool && item.expires>Date.now() && typeof item.result==="string")setExercise(item.result.slice(0,2000));
-    sessionStorage.removeItem(key);history.replaceState(history.state,"",location.pathname+location.search);
-    }catch{/* Optional handoff when storage is available. */}
-  },[search.tool]);
+  const [exercise, setExercise] = useState("");
+  useEffect(() => {
+    const match = /^#exercise-([a-f0-9-]{36})$/.exec(window.location.hash);
+    if (!match) return;
+    try {
+      const key = "e20e-exercise:" + match[1];
+      const item = JSON.parse(sessionStorage.getItem(key) ?? "null");
+      if (
+        item?.tool === search.tool &&
+        item.expires > Date.now() &&
+        typeof item.result === "string"
+      )
+        setExercise(item.result.slice(0, 2000));
+      sessionStorage.removeItem(key);
+      history.replaceState(
+        history.state,
+        "",
+        location.pathname + location.search,
+      );
+    } catch {
+      /* Optional handoff when storage is available. */
+    }
+  }, [search.tool]);
   const [need, setNeed] = useState("");
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
@@ -187,7 +208,10 @@ function ServiceRequestContent() {
       if (Array.isArray(values["tools"]))
         setTools(
           (values["tools"] as string[]).filter((id) =>
-            catalog.products.some((p) => p.id === id && !p.comingSoon && p.servicesEnabled !== false),
+            catalog.products.some(
+              (p) =>
+                p.id === id && !p.comingSoon && p.servicesEnabled !== false,
+            ),
           ),
         );
       if (typeof values["teamSize"] === "string")
@@ -198,7 +222,8 @@ function ServiceRequestContent() {
       if (typeof values["email"] === "string") setEmail(values["email"]);
       if (typeof values["phone"] === "string") setPhone(values["phone"]);
       if (typeof values["company"] === "string") setCompany(values["company"]);
-      if(typeof values["exercise"]==="string")setExercise(values["exercise"]);
+      if (typeof values["exercise"] === "string")
+        setExercise(values["exercise"]);
       if (typeof values["need"] === "string") setNeed(values["need"]);
     },
     [catalog.products],
@@ -315,7 +340,10 @@ function ServiceRequestContent() {
         void trackJourney("service_receipt", language, {
           oncePerSession: true,
         });
-        if(exercise.trim())void trackJourney("exercise_requested",language,{oncePerSession:true});
+        if (exercise.trim())
+          void trackJourney("exercise_requested", language, {
+            oncePerSession: true,
+          });
         draft.clear();
         setReceipt({
           id: result.id,
@@ -346,7 +374,12 @@ function ServiceRequestContent() {
   const ready = missing.length === 0;
 
   return (
-    <main data-archy-service={services[0]??""} data-archy-tool={tools[0]??""} className="library-page request-page" dir={dir}>
+    <main
+      data-archy-service={services[0] ?? ""}
+      data-archy-tool={tools[0] ?? ""}
+      className="library-page request-page"
+      dir={dir}
+    >
       <div className="request-shell request-shell-wide">
         <Link
           to="/enterprise-services"
@@ -363,7 +396,16 @@ function ServiceRequestContent() {
               {fill(t("requestThanks"), name.split(" ")[0] ?? "")}{" "}
               {t("srSavedBody")}
             </p>
-            <RequestReceipt receipt={receipt} subject={[...services.map(k => t(`srService_${k}` as keyof Copy)), ...products.filter(p => tools.includes(p.id)).map(p => p.name)].join(" · ")} summary={need} />
+            <RequestReceipt
+              receipt={receipt}
+              subject={[
+                ...services.map((k) => t(`srService_${k}` as keyof Copy)),
+                ...products
+                  .filter((p) => tools.includes(p.id))
+                  .map((p) => p.name),
+              ].join(" · ")}
+              summary={need}
+            />
             <div className="flex flex-wrap justify-center gap-2">
               <Button asChild variant="outline">
                 <Link to="/enterprise-services">{t("srBack")}</Link>
@@ -436,7 +478,24 @@ function ServiceRequestContent() {
                   </a>
                 </section>
               )}
-              {!reviewing && exercise && <section className="ea-scope-summary"><label className="grid">{language==="ar"?"نتيجة التمرين المرفقة — راجعها قبل الإرسال":"Attached exercise result — review before sending"}<Textarea maxLength={2000} rows={6} value={exercise} onChange={e=>setExercise(e.target.value)}/></label><button type="button" onClick={()=>setExercise("")}>{language==="ar"?"إزالة المرفق":"Remove attachment"}</button></section>}
+              {!reviewing && exercise && (
+                <section className="ea-scope-summary">
+                  <label className="grid">
+                    {language === "ar"
+                      ? "نتيجة التمرين المرفقة — راجعها قبل الإرسال"
+                      : "Attached exercise result — review before sending"}
+                    <Textarea
+                      maxLength={2000}
+                      rows={6}
+                      value={exercise}
+                      onChange={(e) => setExercise(e.target.value)}
+                    />
+                  </label>
+                  <button type="button" onClick={() => setExercise("")}>
+                    {language === "ar" ? "إزالة المرفق" : "Remove attachment"}
+                  </button>
+                </section>
+              )}
               {!reviewing && <MetricsPreference />}
               {reviewing && (
                 <RequestReview
@@ -463,7 +522,17 @@ function ServiceRequestContent() {
                     { label: t("srTeamLabel"), value: teamSize },
                     { label: t("srTimelineLabel"), value: timeline },
                     { label: t("srDetailsLabel"), value: need },
-                    ...(exercise?[{label:language==="ar"?"نتيجة التمرين":"Exercise result",value:exercise}]:[]),
+                    ...(exercise
+                      ? [
+                          {
+                            label:
+                              language === "ar"
+                                ? "نتيجة التمرين"
+                                : "Exercise result",
+                            value: exercise,
+                          },
+                        ]
+                      : []),
                   ]}
                 />
               )}

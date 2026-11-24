@@ -10,10 +10,10 @@ export const Route = createFileRoute("/trial-feedback")({
   head: () => ({ meta: [{ name: "robots", content: "noindex,nofollow" }] }),
 });
 function FeedbackPage() {
-  const fragment = useRouterState({select: state => state.location.hash});
-  return <InvitationForm key={fragment} fragment={fragment}/>;
+  const fragment = useRouterState({ select: (state) => state.location.hash });
+  return <InvitationForm key={fragment} fragment={fragment} />;
 }
-function InvitationForm({fragment}: {fragment:string}) {
+function InvitationForm({ fragment }: { fragment: string }) {
   const { language, dir } = useLanguage(),
     ar = language === "ar";
   const [invite, setInvite] = useState(""),
@@ -28,7 +28,10 @@ function InvitationForm({fragment}: {fragment:string}) {
   useEffect(() => {
     let active = true;
     const key = fragment.replace(/^#/, "");
-    if (!/^[a-f0-9]{8}-(?:[a-f0-9]{4}-){3}[a-f0-9]{12}$/i.test(key)) {setBad(true);return;}
+    if (!/^[a-f0-9]{8}-(?:[a-f0-9]{4}-){3}[a-f0-9]{12}$/i.test(key)) {
+      setBad(true);
+      return;
+    }
     setInvite(key);
     try {
       const storageKey = "ea-trial-reply:" + key;
@@ -57,9 +60,7 @@ function InvitationForm({fragment}: {fragment:string}) {
     <main dir={dir} className="bx-panel ea-team-space">
       <h1>{dictionaries[ar ? "ar" : "en"].trialFeedbackTeamTrialFeedback}</h1>
       {bad ? (
-        <p>
-          {dictionaries[ar ? "ar" : "en"].trialFeedbackCouldNotOpenThe}
-        </p>
+        <p>{dictionaries[ar ? "ar" : "en"].trialFeedbackCouldNotOpenThe}</p>
       ) : !tool ? (
         <p>{dictionaries[ar ? "ar" : "en"].loading}</p>
       ) : (
@@ -68,7 +69,10 @@ function InvitationForm({fragment}: {fragment:string}) {
           <p>{goal}</p>
           {status === "sent" ? (
             <p role="status">
-              {dictionaries[ar ? "ar" : "en"].trialFeedbackYourFeedbackWasRecorded}
+              {
+                dictionaries[ar ? "ar" : "en"]
+                  .trialFeedbackYourFeedbackWasRecorded
+              }
             </p>
           ) : (
             <form
@@ -88,18 +92,30 @@ function InvitationForm({fragment}: {fragment:string}) {
               }}
             >
               <label>
-                {dictionaries[ar ? "ar" : "en"].trialFeedbackCouldYouCompleteThe}
+                {
+                  dictionaries[ar ? "ar" : "en"]
+                    .trialFeedbackCouldYouCompleteThe
+                }
                 <select
                   value={outcome}
                   onChange={(e) => setOutcome(e.target.value as typeof outcome)}
                 >
-                  <option value="yes">{dictionaries[ar ? "ar" : "en"].replyRatingYes}</option>
-                  <option value="partial">{dictionaries[ar ? "ar" : "en"].trialFeedbackPartly}</option>
-                  <option value="no">{dictionaries[ar ? "ar" : "en"].replyRatingNo}</option>
+                  <option value="yes">
+                    {dictionaries[ar ? "ar" : "en"].replyRatingYes}
+                  </option>
+                  <option value="partial">
+                    {dictionaries[ar ? "ar" : "en"].trialFeedbackPartly}
+                  </option>
+                  <option value="no">
+                    {dictionaries[ar ? "ar" : "en"].replyRatingNo}
+                  </option>
                 </select>
               </label>
               <label>
-                {dictionaries[ar ? "ar" : "en"].trialFeedbackWhatHelpedOrBlocked}
+                {
+                  dictionaries[ar ? "ar" : "en"]
+                    .trialFeedbackWhatHelpedOrBlocked
+                }
                 <textarea
                   required
                   maxLength={1000}
@@ -112,7 +128,10 @@ function InvitationForm({fragment}: {fragment:string}) {
               </Button>
               {status === "error" && (
                 <p role="alert">
-                  {dictionaries[ar ? "ar" : "en"].trialFeedbackCouldNotSubmitCheck}
+                  {
+                    dictionaries[ar ? "ar" : "en"]
+                      .trialFeedbackCouldNotSubmitCheck
+                  }
                 </p>
               )}
             </form>

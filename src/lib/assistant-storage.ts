@@ -1,12 +1,24 @@
 import type { AssistantTurn } from "./assistant-chat.functions";
 import type { RecommendationPick } from "./recommend.shared";
 
-export type StoredMessage = AssistantTurn & { messageId?:string; picks?: RecommendationPick[]; error?: boolean };
-export type StoredSession = { token: string; name: string; exp: number; email?: string };
+export type StoredMessage = AssistantTurn & {
+  messageId?: string;
+  picks?: RecommendationPick[];
+  error?: boolean;
+};
+export type StoredSession = {
+  token: string;
+  name: string;
+  exp: number;
+  email?: string;
+};
 export const GUEST_CHAT_OWNER = "guest-v2";
 
 /** Unscoped keys from earlier versions; their owner is unknown so they are only ever deleted. */
-export const LEGACY_KEYS = ["e20e-assistant-chat", "e20e-assistant-access"] as const;
+export const LEGACY_KEYS = [
+  "e20e-assistant-chat",
+  "e20e-assistant-access",
+] as const;
 
 export function historyKey(userId: string) {
   return `e20e-assistant-chat:${userId}`;
@@ -25,7 +37,10 @@ function parse(raw: string | null): unknown {
   }
 }
 
-export function parseSession(raw: string | null, now = Date.now()): StoredSession | null {
+export function parseSession(
+  raw: string | null,
+  now = Date.now(),
+): StoredSession | null {
   const value = parse(raw) as Record<string, unknown> | null;
   if (
     !value ||
@@ -57,7 +72,8 @@ export function parseHistory(raw: string | null): StoredMessage[] {
       role: entry["role"],
       content: entry["content"].slice(0, 4000),
     };
-    if(typeof entry["messageId"] === "string") message.messageId=entry["messageId"];
+    if (typeof entry["messageId"] === "string")
+      message.messageId = entry["messageId"];
     if (entry["error"] === true) message.error = true;
     if (Array.isArray(entry["picks"])) {
       message.picks = entry["picks"]
@@ -87,7 +103,11 @@ export function clearLegacy(store: KeyStore) {
 }
 
 /** Loads only the given account's state; expired or malformed sessions are removed. */
-export function loadAccountState(store: KeyStore, userId: string, now = Date.now()) {
+export function loadAccountState(
+  store: KeyStore,
+  userId: string,
+  now = Date.now(),
+) {
   let session: StoredSession | null = null;
   let history: StoredMessage[] = [];
   try {

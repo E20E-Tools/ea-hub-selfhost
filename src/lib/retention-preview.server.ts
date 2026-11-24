@@ -17,11 +17,19 @@ export async function signRetentionPreview(
   ids: string[],
   now = Date.now(),
 ) {
-  const body = JSON.stringify({ actor, type, revision, ids, expires: now + 10 * 60000 });
+  const body = JSON.stringify({
+    actor,
+    type,
+    revision,
+    ids,
+    expires: now + 10 * 60000,
+  });
   return {
     body,
     signature: encode(
-      new Uint8Array(await crypto.subtle.sign("HMAC", await key(), enc.encode(body))),
+      new Uint8Array(
+        await crypto.subtle.sign("HMAC", await key(), enc.encode(body)),
+      ),
     ),
   };
 }
@@ -34,8 +42,17 @@ export async function verifyRetentionPreview(
   now = Date.now(),
 ) {
   try {
-    const bytes = Uint8Array.from(atob(token.signature), (c) => c.charCodeAt(0));
-    if (!(await crypto.subtle.verify("HMAC", await key(), bytes, enc.encode(token.body))))
+    const bytes = Uint8Array.from(atob(token.signature), (c) =>
+      c.charCodeAt(0),
+    );
+    if (
+      !(await crypto.subtle.verify(
+        "HMAC",
+        await key(),
+        bytes,
+        enc.encode(token.body),
+      ))
+    )
       return false;
     const p = JSON.parse(token.body);
     return (

@@ -59,7 +59,13 @@ const draw = (delay: number, dur: number): CSSProperties =>
   ({ "--d": `${delay}s`, "--t": `${dur}s` }) as CSSProperties;
 const pad4 = (v: number) => String(Math.max(0, Math.round(v))).padStart(4, "0");
 
-function TitleBlock({ available, className }: { available: number; className: string }) {
+function TitleBlock({
+  available,
+  className,
+}: {
+  available: number;
+  className: string;
+}) {
   const { t, language } = useLanguage();
   const [today, setToday] = useState("");
   useEffect(() => {
@@ -94,7 +100,9 @@ function TitleBlock({ available, className }: { available: number; className: st
 function SpecSheet({ product, index }: { product: Product; index: number }) {
   const { t, language } = useLanguage();
   const facts = useInspectorFacts(product);
-  const date = product.publicationDate ? formatLaunchDate(product.publicationDate, language) : "";
+  const date = product.publicationDate
+    ? formatLaunchDate(product.publicationDate, language)
+    : "";
   return (
     <div className="lb-spec">
       <dl className="lb-spec-tb">
@@ -138,7 +146,9 @@ function SpecSheet({ product, index }: { product: Product; index: number }) {
         data-soon={facts.available ? undefined : ""}
         aria-label={facts.status}
       >
-        <span>{facts.available ? t("lbApproved") : t("lbUnderConstruction")}</span>
+        <span>
+          {facts.available ? t("lbApproved") : t("lbUnderConstruction")}
+        </span>
         {!facts.available && date ? <small dir="ltr">{date}</small> : null}
       </div>
       <InspectorActions
@@ -151,7 +161,10 @@ function SpecSheet({ product, index }: { product: Product; index: number }) {
   );
 }
 
-export default function LivingBlueprintStage({ products, settings }: StageProps) {
+export default function LivingBlueprintStage({
+  products,
+  settings,
+}: StageProps) {
   const { t, dir, language } = useLanguage();
   const rtl = dir === "rtl";
   const root = useRef<HTMLDivElement>(null);
@@ -161,7 +174,11 @@ export default function LivingBlueprintStage({ products, settings }: StageProps)
   const list = useMemo(() => products.slice(0, 12), [products]);
   const featureKey = list.map((p) => p.features.length).join(",");
   const plan = useMemo(
-    () => generateFloorPlan(featureKey ? featureKey.split(",").map(Number) : [], { vertical, rtl }),
+    () =>
+      generateFloorPlan(featureKey ? featureKey.split(",").map(Number) : [], {
+        vertical,
+        rtl,
+      }),
     [featureKey, vertical, rtl],
   );
   const inspector = useProductInspector();
@@ -214,13 +231,21 @@ export default function LivingBlueprintStage({ products, settings }: StageProps)
   const onMove = (e: RPointerEvent) => {
     if (vertical || e.pointerType !== "mouse" || !svg.current) return;
     const r = svg.current.getBoundingClientRect();
-    setCursor({ x: ((e.clientX - r.left) / r.width) * W, y: ((e.clientY - r.top) / r.height) * H });
+    setCursor({
+      x: ((e.clientX - r.left) / r.width) * W,
+      y: ((e.clientY - r.top) / r.height) * H,
+    });
   };
 
   const openProduct = list.find((p) => p.id === inspector.openId) ?? null;
   const openIndex = openProduct ? list.indexOf(openProduct) : 0;
   const pct = (v: number, of: number) => `${(v / of) * 100}%`;
-  const box = (r: { x: number; y: number; w: number; h: number }): CSSProperties => ({
+  const box = (r: {
+    x: number;
+    y: number;
+    w: number;
+    h: number;
+  }): CSSProperties => ({
     left: pct(r.x, W),
     top: pct(r.y, H),
     width: pct(r.w, W),
@@ -255,10 +280,20 @@ export default function LivingBlueprintStage({ products, settings }: StageProps)
           aria-label={t("lbPlan")}
         >
           <defs>
-            <pattern id="lb-grid" width="20" height="20" patternUnits="userSpaceOnUse">
+            <pattern
+              id="lb-grid"
+              width="20"
+              height="20"
+              patternUnits="userSpaceOnUse"
+            >
               <path d="M20 0H0V20" className="lb-grid-minor" />
             </pattern>
-            <pattern id="lb-grid-major" width="100" height="100" patternUnits="userSpaceOnUse">
+            <pattern
+              id="lb-grid-major"
+              width="100"
+              height="100"
+              patternUnits="userSpaceOnUse"
+            >
               <rect width="100" height="100" fill="url(#lb-grid)" />
               <path d="M100 0H0V100" className="lb-grid-major" />
             </pattern>
@@ -348,7 +383,12 @@ export default function LivingBlueprintStage({ products, settings }: StageProps)
               style={draw(T.corridors - 0.3, 0.6)}
             />
             <path
-              d={rectPath({ x: atrium.x + 8, y: atrium.y + 8, w: atrium.w - 16, h: atrium.h - 16 })}
+              d={rectPath({
+                x: atrium.x + 8,
+                y: atrium.y + 8,
+                w: atrium.w - 16,
+                h: atrium.h - 16,
+              })}
               pathLength={1}
               className="lb-draw lb-hair"
               style={draw(T.corridors - 0.15, 0.6)}
@@ -396,11 +436,15 @@ export default function LivingBlueprintStage({ products, settings }: StageProps)
               : win.wall === "top" || win.wall === "bottom"
                 ? `M${win.from} ${win.wall === "top" ? outer.y : outer.y + outer.h}H${win.to}`
                 : `M${win.wall === "left" ? outer.x : outer.x + outer.w} ${win.from}V${win.to}`;
-            const horizWin = win && (win.wall === "top" || win.wall === "bottom");
-            const off = (o: number) => (horizWin ? `translate(0 ${o})` : `translate(${o} 0)`);
+            const horizWin =
+              win && (win.wall === "top" || win.wall === "bottom");
+            const off = (o: number) =>
+              horizWin ? `translate(0 ${o})` : `translate(${o} 0)`;
             const fx = rtl ? room.x + 14 : room.x + room.w - 14 - room.w * 0.26;
             const fy =
-              room.door.wall === "bottom" ? room.y + 14 : room.y + room.h - 14 - room.h * 0.2;
+              room.door.wall === "bottom"
+                ? room.y + 14
+                : room.y + room.h - 14 - room.h * 0.2;
             return (
               <g
                 key={product.id}
@@ -464,7 +508,12 @@ export default function LivingBlueprintStage({ products, settings }: StageProps)
                   <g className="lb-fade" style={draw(d + 0.3, 0.3)}>
                     <path d={winPath} className="lb-cut lb-cut-outer" />
                     {[-3, 0, 3].map((o) => (
-                      <path key={o} d={winPath} transform={off(o)} className="lb-window" />
+                      <path
+                        key={o}
+                        d={winPath}
+                        transform={off(o)}
+                        className="lb-window"
+                      />
                     ))}
                   </g>
                 ) : null}
@@ -512,7 +561,11 @@ export default function LivingBlueprintStage({ products, settings }: StageProps)
                 ) : null}
                 {product.comingSoon ? (
                   <path
-                    d={revisionCloud(room, vertical ? 4 : 7, vertical ? 12 : 18)}
+                    d={revisionCloud(
+                      room,
+                      vertical ? 4 : 7,
+                      vertical ? 12 : 18,
+                    )}
                     pathLength={1}
                     className="lb-draw lb-cloud"
                     style={draw(T.clouds, 0.7)}
@@ -595,7 +648,13 @@ export default function LivingBlueprintStage({ products, settings }: StageProps)
                   />
                 ))}
                 {[0, 1, 2, 3, 4, 5].map((i) => (
-                  <text key={i} x={i * 40} y="24" textAnchor="middle" className="lb-dim-text">
+                  <text
+                    key={i}
+                    x={i * 40}
+                    y="24"
+                    textAnchor="middle"
+                    className="lb-dim-text"
+                  >
                     {i}
                   </text>
                 ))}
@@ -623,7 +682,11 @@ export default function LivingBlueprintStage({ products, settings }: StageProps)
           {drawing ? (
             <g className="lb-tools" aria-hidden="true">
               <g ref={pen} style={{ opacity: 0 }}>
-                <path d="M0 0L90 -90L90 0Z" className="lb-setsquare" transform="translate(6 6)" />
+                <path
+                  d="M0 0L90 -90L90 0Z"
+                  className="lb-setsquare"
+                  transform="translate(6 6)"
+                />
                 <path d={`M${-W} 8H${W}`} className="lb-tsquare" />
                 <circle r="10" className="lb-pen-glow" />
                 <circle r="3" className="lb-pen" />
@@ -643,12 +706,17 @@ export default function LivingBlueprintStage({ products, settings }: StageProps)
               key={product.id}
               type="button"
               className="lb-room-btn"
-              style={{ ...box(room), ...draw(T.labels + room.index * 0.06, 0.5) }}
+              style={{
+                ...box(room),
+                ...draw(T.labels + room.index * 0.06, 0.5),
+              }}
               data-soon={product.comingSoon ? "" : undefined}
               aria-label={fill(t("lbRoom"), product.name)}
               aria-expanded={inspector.openId === product.id}
               onMouseEnter={() => setActive(product.id)}
-              onMouseLeave={() => setActive((a) => (a === product.id ? null : a))}
+              onMouseLeave={() =>
+                setActive((a) => (a === product.id ? null : a))
+              }
               onFocus={() => setActive(product.id)}
               onBlur={() => setActive((a) => (a === product.id ? null : a))}
               onClick={(e) =>
@@ -679,20 +747,27 @@ export default function LivingBlueprintStage({ products, settings }: StageProps)
         })}
 
         {!vertical ? (
-          <div className="lb-tb-wrap lb-fade" style={{ ...box(tbRect), ...draw(T.title, 0.6) }}>
+          <div
+            className="lb-tb-wrap lb-fade"
+            style={{ ...box(tbRect), ...draw(T.title, 0.6) }}
+          >
             <TitleBlock available={available} className="lb-tb" />
           </div>
         ) : null}
       </div>
 
-      {vertical ? <TitleBlock available={available} className="lb-tb lb-tb-mobile" /> : null}
+      {vertical ? (
+        <TitleBlock available={available} className="lb-tb lb-tb-mobile" />
+      ) : null}
 
       {openProduct ? (
         <InspectorPanel
           product={openProduct}
           className="lb-sheet-panel"
           onClose={inspector.close}
-          title={<span dir="ltr">A-{String(openIndex + 1).padStart(2, "0")}</span>}
+          title={
+            <span dir="ltr">A-{String(openIndex + 1).padStart(2, "0")}</span>
+          }
         >
           <SpecSheet product={openProduct} index={openIndex} />
         </InspectorPanel>

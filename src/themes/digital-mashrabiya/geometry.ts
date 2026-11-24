@@ -19,7 +19,12 @@ export function starPoints(
     return [cx + rad * Math.cos(a), cy + rad * Math.sin(a)] as P;
   });
 }
-export function khatam(cx: number, cy: number, R: number, rot = -Math.PI / 2): P[] {
+export function khatam(
+  cx: number,
+  cy: number,
+  R: number,
+  rot = -Math.PI / 2,
+): P[] {
   return starPoints(cx, cy, R, R * KHATAM_RATIO, 8, rot);
 }
 export function polygon(
@@ -36,7 +41,10 @@ export function polygon(
 }
 const f = (v: number) => (Math.abs(v) < 1e-9 ? 0 : Math.round(v * 100) / 100);
 export function toPath(points: P[], close = true): string {
-  return points.map(([x, y], i) => `${i ? "L" : "M"}${f(x)} ${f(y)}`).join("") + (close ? "Z" : "");
+  return (
+    points.map(([x, y], i) => `${i ? "L" : "M"}${f(x)} ${f(y)}`).join("") +
+    (close ? "Z" : "")
+  );
 }
 
 /**
@@ -55,7 +63,10 @@ export function tessellationTile(s: number): string {
     [s, 0],
   ];
   const lines = diag
-    .map((p, i) => `M${f(p[0])} ${f(p[1])}L${f(corners[i]![0])} ${f(corners[i]![1])}`)
+    .map(
+      (p, i) =>
+        `M${f(p[0])} ${f(p[1])}L${f(corners[i]![0])} ${f(corners[i]![1])}`,
+    )
     .join("");
   return toPath(star) + lines;
 }
@@ -67,17 +78,26 @@ export function tracePath(from: P, to: P): P[] {
   const d = Math.min(Math.abs(dx), Math.abs(dy));
   const sx = Math.sign(dx);
   const sy = Math.sign(dy);
-  const rest = Math.abs(dx) > Math.abs(dy) ? [Math.abs(dx) - d, 0] : [0, Math.abs(dy) - d];
+  const rest =
+    Math.abs(dx) > Math.abs(dy) ? [Math.abs(dx) - d, 0] : [0, Math.abs(dy) - d];
   const half: P = [(rest[0]! / 2) * sx, (rest[1]! / 2) * sy];
   const a: P = [from[0] + half[0], from[1] + half[1]];
   const b: P = [a[0] + d * sx, a[1] + d * sy];
   const pts: P[] = [from, a, b, to];
   return pts.filter(
-    (p, i) => i === 0 || Math.hypot(p[0] - pts[i - 1]![0], p[1] - pts[i - 1]![1]) > 0.01,
+    (p, i) =>
+      i === 0 ||
+      Math.hypot(p[0] - pts[i - 1]![0], p[1] - pts[i - 1]![1]) > 0.01,
   );
 }
 
-export type Tile = { x: number; y: number; size: number; angle: number; ring: number };
+export type Tile = {
+  x: number;
+  y: number;
+  size: number;
+  angle: number;
+  ring: number;
+};
 export type Composition = {
   w: number;
   h: number;
@@ -106,7 +126,9 @@ export function ringComposition(count: number, rtl: boolean): Composition {
     let angle = -Math.PI / 2 + offset + (2 * Math.PI * k) / Math.max(1, m);
     if (rtl) angle = Math.PI - angle;
     const radius = two ? (ring ? 360 : 225) : 290;
-    const size = two ? 112 : Math.min(150, ((2 * Math.PI * radius) / Math.max(n, 1)) * 0.72);
+    const size = two
+      ? 112
+      : Math.min(150, ((2 * Math.PI * radius) / Math.max(n, 1)) * 0.72);
     tiles.push({
       x: cx + radius * Math.cos(angle),
       y: cy + radius * Math.sin(angle),
@@ -132,7 +154,14 @@ export function gridComposition(count: number, rtl: boolean): Composition {
       ring: 0,
     };
   });
-  return { w, h: 300 + Math.ceil(n / 2) * 168 - 40, cx: 180, cy: 116, medallion: 88, tiles };
+  return {
+    w,
+    h: 300 + Math.ceil(n / 2) * 168 - 40,
+    cx: 180,
+    cy: 116,
+    medallion: 88,
+    tiles,
+  };
 }
 
 /** Pointed (equilateral) arch as a CSS polygon; springing line at `spring` (0..1 of the height). */

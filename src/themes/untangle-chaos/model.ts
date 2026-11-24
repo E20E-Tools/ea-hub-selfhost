@@ -8,13 +8,19 @@ export const AUTO_START_MS = 2000;
 export const SESSION_KEY = "e20e-untangle-auto";
 
 /** Legacy files alternate right/left (reading start first) and stack down each side. */
-export function fileSlots(n: number, w: number, h: number, mobile: boolean): Pt[] {
+export function fileSlots(
+  n: number,
+  w: number,
+  h: number,
+  mobile: boolean,
+): Pt[] {
   if (mobile) {
     const cols = 2;
     const rows = Math.ceil(n / cols);
     return Array.from({ length: n }, (_, i) => ({
       x: w * (i % cols === 0 ? 0.25 : 0.75),
-      y: h * 0.5 + ((Math.floor(i / cols) + 0.5) / Math.max(1, rows)) * h * 0.46,
+      y:
+        h * 0.5 + ((Math.floor(i / cols) + 0.5) / Math.max(1, rows)) * h * 0.46,
     }));
   }
   const perSide = Math.ceil(n / 2);
@@ -44,8 +50,12 @@ export function tanglePath(from: Pt, core: Pt, seed: number, t: number): Pt[] {
     const y = from.y + (core.y - from.y) * u * reach;
     const amp = 38 * Math.sin(Math.PI * u);
     const wob =
-      Math.sin(u * 9 + seed * 1.7 + t * 0.0009) + 0.6 * Math.cos(u * 15 - seed + t * 0.0013);
-    pts.push({ x: x + amp * wob, y: y + amp * Math.cos(u * 7 + seed * 2.3 + t * 0.0007) });
+      Math.sin(u * 9 + seed * 1.7 + t * 0.0009) +
+      0.6 * Math.cos(u * 15 - seed + t * 0.0013);
+    pts.push({
+      x: x + amp * wob,
+      y: y + amp * Math.cos(u * 7 + seed * 2.3 + t * 0.0007),
+    });
   }
   return pts;
 }
@@ -87,7 +97,8 @@ export type FixPhase = "legacy" | "fly" | "scan" | "morph" | "done";
 export function fixPhase(ms: number | null): { phase: FixPhase; k: number } {
   if (ms === null || ms < 0) return { phase: "legacy", k: 0 };
   if (ms < FLY_MS) return { phase: "fly", k: ms / FLY_MS };
-  if (ms < FLY_MS + SCAN_MS) return { phase: "scan", k: (ms - FLY_MS) / SCAN_MS };
+  if (ms < FLY_MS + SCAN_MS)
+    return { phase: "scan", k: (ms - FLY_MS) / SCAN_MS };
   if (ms < FLY_MS + SCAN_MS + MORPH_MS)
     return { phase: "morph", k: (ms - FLY_MS - SCAN_MS) / MORPH_MS };
   return { phase: "done", k: 1 };
@@ -98,7 +109,9 @@ export const FIX_TOTAL_MS = FLY_MS + SCAN_MS + MORPH_MS;
 export function elastic(k: number): number {
   if (k <= 0) return 0;
   if (k >= 1) return 1;
-  return Math.pow(2, -10 * k) * Math.sin(((k * 10 - 0.75) * (2 * Math.PI)) / 3) + 1;
+  return (
+    Math.pow(2, -10 * k) * Math.sin(((k * 10 - 0.75) * (2 * Math.PI)) / 3) + 1
+  );
 }
 
 /** Background mix from beige (0) to white (1) with progress. */
@@ -119,7 +132,10 @@ export function mixHex(a: string, b: string, k: number): string {
 }
 
 /** Next file Archy fixes in "fix all": first still-legacy index in order. */
-export function nextUnfixed(fixed: ReadonlySet<number>, n: number): number | null {
+export function nextUnfixed(
+  fixed: ReadonlySet<number>,
+  n: number,
+): number | null {
   for (let i = 0; i < n; i++) if (!fixed.has(i)) return i;
   return null;
 }

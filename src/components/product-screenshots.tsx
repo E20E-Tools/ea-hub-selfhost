@@ -82,7 +82,10 @@ export function ProductScreenshots({
                   type="button"
                   className="ea-shots-nav"
                   onClick={() => step(-1)}
-                  aria-label={dictionaries[ar ? "ar" : "en"].productScreenshotsPreviousScreenshot}
+                  aria-label={
+                    dictionaries[ar ? "ar" : "en"]
+                      .productScreenshotsPreviousScreenshot
+                  }
                 >
                   <Prev size={18} aria-hidden />
                 </button>
@@ -93,7 +96,10 @@ export function ProductScreenshots({
                   type="button"
                   className="ea-shots-nav"
                   onClick={() => step(1)}
-                  aria-label={dictionaries[ar ? "ar" : "en"].productScreenshotsNextScreenshot}
+                  aria-label={
+                    dictionaries[ar ? "ar" : "en"]
+                      .productScreenshotsNextScreenshot
+                  }
                 >
                   <Next size={18} aria-hidden />
                 </button>

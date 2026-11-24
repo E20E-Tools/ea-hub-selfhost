@@ -1,14 +1,23 @@
 // @vitest-environment node
 import { beforeEach, expect, it, vi } from "vitest";
 
-const rpc = vi.hoisted(() => ({ results: [] as { data: unknown; error: unknown }[] }));
+const rpc = vi.hoisted(() => ({
+  results: [] as { data: unknown; error: unknown }[],
+}));
 vi.mock("@/integrations/supabase/client.server", () => ({
-  supabaseAdmin: { rpc: async () => rpc.results.shift() ?? { data: true, error: null } },
+  supabaseAdmin: {
+    rpc: async () => rpc.results.shift() ?? { data: true, error: null },
+  },
 }));
 
 import { checkLimits, consumeLimits } from "@/lib/rate-limit.server";
 
-const rule = { bucket: "chat:burst", subject: "s", limit: 5, windowSeconds: 30 };
+const rule = {
+  bucket: "chat:burst",
+  subject: "s",
+  limit: 5,
+  windowSeconds: 30,
+};
 beforeEach(() => {
   rpc.results = [];
   vi.spyOn(console, "error").mockImplementation(() => undefined);

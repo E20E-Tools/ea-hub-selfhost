@@ -13,8 +13,18 @@ export function CircuitCoreThumb() {
   return (
     <svg viewBox="0 0 320 180" className="theme-thumb-svg" aria-hidden="true">
       <defs>
-        <pattern id="cc-thumb-dots" width="10" height="10" patternUnits="userSpaceOnUse">
-          <circle cx="1" cy="1" r="0.8" fill="oklch(0.844 0.159 114.1 / 0.18)" />
+        <pattern
+          id="cc-thumb-dots"
+          width="10"
+          height="10"
+          patternUnits="userSpaceOnUse"
+        >
+          <circle
+            cx="1"
+            cy="1"
+            r="0.8"
+            fill="oklch(0.844 0.159 114.1 / 0.18)"
+          />
         </pattern>
       </defs>
       <rect width="320" height="180" fill="oklch(0.19 0.026 208.5)" />
@@ -36,7 +46,11 @@ export function CircuitCoreThumb() {
             width="72"
             height="28"
             fill="oklch(0.241 0.034 205)"
-            stroke={i === 7 ? "oklch(0.806 0.147 79 / 0.8)" : "oklch(0.844 0.159 114.1)"}
+            stroke={
+              i === 7
+                ? "oklch(0.806 0.147 79 / 0.8)"
+                : "oklch(0.844 0.159 114.1)"
+            }
           />
           <circle
             cx={x + 64}
@@ -44,7 +58,13 @@ export function CircuitCoreThumb() {
             r="2.4"
             fill={i === 7 ? "oklch(0.806 0.147 79)" : "oklch(0.8 0.18 140)"}
           />
-          <rect x={x + 8} y={y + 12} width="34" height="4" fill="oklch(0.946 0.017 164.7 / 0.8)" />
+          <rect
+            x={x + 8}
+            y={y + 12}
+            width="34"
+            height="4"
+            fill="oklch(0.946 0.017 164.7 / 0.8)"
+          />
         </g>
       ))}
       <rect

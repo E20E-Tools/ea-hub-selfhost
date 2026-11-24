@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { filterAssistantReplies, type AssistantReplyRow } from "@/lib/admin-monitor.shared";
+import {
+  filterAssistantReplies,
+  type AssistantReplyRow,
+} from "@/lib/admin-monitor.shared";
 
 const rows: AssistantReplyRow[] = [
   {

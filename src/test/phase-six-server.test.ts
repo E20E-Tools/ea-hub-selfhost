@@ -44,12 +44,17 @@ vi.mock("@tanstack/react-start", () => ({
         return b;
       },
       handler: (h: (a: unknown) => unknown) => async (a?: { data: unknown }) =>
-        h({ data: validate(a?.data), context: { userId: "admin", claims: {}, supabase: {} } }),
+        h({
+          data: validate(a?.data),
+          context: { userId: "admin", claims: {}, supabase: {} },
+        }),
     };
     return b;
   },
 }));
-vi.mock("@/integrations/supabase/auth-middleware", () => ({ requireSupabaseAuth: {} }));
+vi.mock("@/integrations/supabase/auth-middleware", () => ({
+  requireSupabaseAuth: {},
+}));
 vi.mock("@/lib/admin-guard.server", () => ({
   requireAdmin: async () => {
     if (!state.admin) throw new Error("Forbidden");
@@ -79,7 +84,8 @@ vi.mock("@/integrations/supabase/client.server", () => ({
           data: table === "settings_versions" ? state.version : {},
           error: null,
         }),
-        maybeSingle: async () => state.rows[table] ?? { data: null, error: null },
+        maybeSingle: async () =>
+          state.rows[table] ?? { data: null, error: null },
         then: (resolve: (v: unknown) => unknown) =>
           Promise.resolve({ data: [], error: null, count: 0 }).then(resolve),
       };
@@ -168,25 +174,41 @@ it("absent authoritative settings report unknown assistant and notifications, no
 it.each([null, [], "invalid", 42])(
   "malformed authoritative feature flags %j remain unknown",
   async (flags) => {
-    state.rows["site_settings"] = { data: { feature_flags: flags }, error: null };
+    state.rows["site_settings"] = {
+      data: { feature_flags: flags },
+      error: null,
+    };
     expect((await getApplicationHealth()).assistant).toBeNull();
   },
 );
 it("valid missing feature keys retain authoritative defaults, while explicit false disables", async () => {
   state.rows["site_settings"] = { data: { feature_flags: {} }, error: null };
   expect((await getApplicationHealth()).assistant).toBe(true);
-  state.rows["site_settings"] = { data: { feature_flags: { assistant: false } }, error: null };
+  state.rows["site_settings"] = {
+    data: { feature_flags: { assistant: false } },
+    error: null,
+  };
   expect((await getApplicationHealth()).assistant).toBe(false);
 });
 it("lookup errors and malformed provider/mail rows never claim configuration readiness", async () => {
-  for (const table of ["site_settings", "ai_assistant_settings", "contact_settings"])
+  for (const table of [
+    "site_settings",
+    "ai_assistant_settings",
+    "contact_settings",
+  ])
     state.rows[table] = { data: null, error: { message: "unavailable" } };
   const failed = await getApplicationHealth();
   expect(failed.assistant).toBeNull();
   expect(failed.provider).toBe("unknown");
   expect(failed.mail).toBe("unknown");
-  state.rows["ai_assistant_settings"] = { data: { base_url: null, model: null }, error: null };
-  state.rows["contact_settings"] = { data: { notify_enabled: "yes" }, error: null };
+  state.rows["ai_assistant_settings"] = {
+    data: { base_url: null, model: null },
+    error: null,
+  };
+  state.rows["contact_settings"] = {
+    data: { notify_enabled: "yes" },
+    error: null,
+  };
   const malformed = await getApplicationHealth();
   expect(malformed.provider).toBe("unknown");
   expect(malformed.mail).toBe("unknown");
@@ -232,7 +254,10 @@ it("all operational endpoints deny non-admin access before privileged reads", as
     () => getRetentionPolicies(),
     () => previewRetention({ data: { type: "chats" } }),
     () => previewSettingsRestore({ data: { id: state.version.id } }),
-    () => restoreSettingsVersion({ data: { id: state.version.id, expected: {}, confirm: true } }),
+    () =>
+      restoreSettingsVersion({
+        data: { id: state.version.id, expected: {}, confirm: true },
+      }),
     () =>
       cleanupRetention({
         data: {
@@ -244,7 +269,9 @@ it("all operational endpoints deny non-admin access before privileged reads", as
         },
       }),
     () =>
-      saveRetentionPolicy({ data: { type: "chats", days: 90, manualEnabled: false, revision: 0 } }),
+      saveRetentionPolicy({
+        data: { type: "chats", days: 90, manualEnabled: false, revision: 0 },
+      }),
   ])
     await expect(run()).rejects.toThrow("Forbidden");
   expect(state.calls).toEqual([]);
@@ -290,13 +317,22 @@ it("forwards only explicit candidate IDs with expected policy revision to race-s
   expect(state.rpc).toEqual([
     {
       name: "cleanup_retention_batch",
-      args: { _type: "chats", _ids: ["candidate"], _expected_revision: 7, _actor: "admin" },
+      args: {
+        _type: "chats",
+        _ids: ["candidate"],
+        _expected_revision: 7,
+        _actor: "admin",
+      },
     },
   ]);
 });
 it("restore passes sanitized historical value and exact expected section to atomic compare-and-swap", async () => {
   await restoreSettingsVersion({
-    data: { id: state.version.id, expected: { archy_greeting: { ar: "current" } }, confirm: true },
+    data: {
+      id: state.version.id,
+      expected: { archy_greeting: { ar: "current" } },
+      confirm: true,
+    },
   });
   expect(state.rpc[0]).toEqual({
     name: "restore_settings_version",
@@ -311,7 +347,9 @@ it("restore passes sanitized historical value and exact expected section to atom
 it("restore conflicts are surfaced and never silently overwrite", async () => {
   state.conflict = true;
   await expect(
-    restoreSettingsVersion({ data: { id: state.version.id, expected: {}, confirm: true } }),
+    restoreSettingsVersion({
+      data: { id: state.version.id, expected: {}, confirm: true },
+    }),
   ).rejects.toThrow("settingsConflict");
 });
 it("retention preview never deletes or exposes customer names/email", async () => {

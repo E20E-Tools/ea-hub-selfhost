@@ -300,7 +300,9 @@ function ArchyComparison({
   }
 
   return (
-    <Card title={adminDictionaries[ar ? "ar" : "en"].consoleCompareArchyReplies}>
+    <Card
+      title={adminDictionaries[ar ? "ar" : "en"].consoleCompareArchyReplies}
+    >
       <form
         className="grid gap-2"
         onSubmit={(e) => {
@@ -322,7 +324,10 @@ function ArchyComparison({
         />
         {dirty && (
           <p>
-            {adminDictionaries[ar ? "ar" : "en"].consoleSaveOrDiscardYourSettingsChangesBefore}
+            {
+              adminDictionaries[ar ? "ar" : "en"]
+                .consoleSaveOrDiscardYourSettingsChangesBefore
+            }
           </p>
         )}
         <div className="flex gap-2">
@@ -392,28 +397,43 @@ function ArchyComparison({
                           )}
                         </div>
                         <dl className="mt-3 grid gap-1 border-t pt-2 text-sm">
-                          <dt>{adminDictionaries[ar ? "ar" : "en"].consoleResponseSource}</dt>
+                          <dt>
+                            {
+                              adminDictionaries[ar ? "ar" : "en"]
+                                .consoleResponseSource
+                            }
+                          </dt>
                           <dd>
                             {result.source === "local"
                               ? label("local")
                               : result.source}
                           </dd>
-                          <dt>{adminDictionaries[ar ? "ar" : "en"].consoleReportedModel}</dt>
+                          <dt>
+                            {
+                              adminDictionaries[ar ? "ar" : "en"]
+                                .consoleReportedModel
+                            }
+                          </dt>
                           <dd dir="auto" className="break-all">
                             {result.model ||
-                              (adminDictionaries[ar ? "ar" : "en"].consoleModelNotReported)}
+                              adminDictionaries[ar ? "ar" : "en"]
+                                .consoleModelNotReported}
                           </dd>
                         </dl>
                       </>
                     ) : (
                       <p>
                         {result.state === "loading"
-                          ? adminDictionaries[ar ? "ar" : "en"].consoleWaitingForReply
+                          ? adminDictionaries[ar ? "ar" : "en"]
+                              .consoleWaitingForReply
                           : result.state === "denied"
-                            ? adminDictionaries[ar ? "ar" : "en"].consoleProviderRejectedAuthentication401UpdateTheKey
+                            ? adminDictionaries[ar ? "ar" : "en"]
+                                .consoleProviderRejectedAuthentication401UpdateTheKey
                             : result.state === "error"
-                              ? adminDictionaries[ar ? "ar" : "en"].consoleThisEngineCouldNotReturnAReply
-                              : adminDictionaries[ar ? "ar" : "en"].consoleThisEngineIsUnavailableWithTheCurrent}
+                              ? adminDictionaries[ar ? "ar" : "en"]
+                                  .consoleThisEngineCouldNotReturnAReply
+                              : adminDictionaries[ar ? "ar" : "en"]
+                                  .consoleThisEngineIsUnavailableWithTheCurrent}
                       </p>
                     )}
                   </article>
@@ -461,11 +481,14 @@ function EngineSelector({
       />
       <Card title={adminDictionaries[ar ? "ar" : "en"].consoleArchyChatEngine}>
         <p id="archy-active-engine" className="mb-3">
-          {adminDictionaries[ar ? "ar" : "en"].consoleCurrentlyServingVisitors} ·{" "}
-          <strong>{label(settings.activeEngine)}</strong>
+          {adminDictionaries[ar ? "ar" : "en"].consoleCurrentlyServingVisitors}{" "}
+          · <strong>{label(settings.activeEngine)}</strong>
         </p>
         <label className="grid gap-1" htmlFor="archy-engine">
-          {adminDictionaries[ar ? "ar" : "en"].consoleChooseTheVisitorChatEngine}
+          {
+            adminDictionaries[ar ? "ar" : "en"]
+              .consoleChooseTheVisitorChatEngine
+          }
           <select
             className={selectClass}
             id="archy-engine"
@@ -478,13 +501,18 @@ function EngineSelector({
           </select>
         </label>
         <p className="my-3 text-sm text-muted-foreground">
-          {adminDictionaries[ar ? "ar" : "en"].consoleAfterComparingRepliesApplyYourChoiceWhen}
+          {
+            adminDictionaries[ar ? "ar" : "en"]
+              .consoleAfterComparingRepliesApplyYourChoiceWhen
+          }
         </p>
         {!available && (
           <p role="status">
             {choice === "remote"
-              ? adminDictionaries[ar ? "ar" : "en"].consoleSaveTheProviderKeyToTryIt
-              : adminDictionaries[ar ? "ar" : "en"].consoleLocalSearchIsUnavailableInThisEnvironment}
+              ? adminDictionaries[ar ? "ar" : "en"]
+                  .consoleSaveTheProviderKeyToTryIt
+              : adminDictionaries[ar ? "ar" : "en"]
+                  .consoleLocalSearchIsUnavailableInThisEnvironment}
           </p>
         )}
         <Button
@@ -502,7 +530,8 @@ function EngineSelector({
               );
             } catch {
               toast.error(
-                adminDictionaries[ar ? "ar" : "en"].consoleCouldNotApplyThisEngine,
+                adminDictionaries[ar ? "ar" : "en"]
+                  .consoleCouldNotApplyThisEngine,
               );
             } finally {
               setSaving(false);
@@ -516,34 +545,78 @@ function EngineSelector({
   );
 }
 
-function RegistrationPolicy({settings}: {settings:AiSettingsView}) {
-  const {t}=useAdminCopy();
-  const qc=useQueryClient();
-  const savePolicy=useServerFn(saveRegistrationPolicy);
-  const draft=useDraft({limit:String(settings.registrationLimit),minutes:String(settings.registrationWaitMinutes)});
-  const [busy,setBusy]=useState(false);
-  if(!draft.value) return null;
-  const {limit,minutes}=draft.value;
-  return <Card title={t("regLimitTitle")} description={t("regLimitDesc")}>
-    <form className="grid gap-4" onSubmit={async e=>{
-      e.preventDefault();setBusy(true);
-      try {
-        await savePolicy({data:{limit:Number(limit),minutes:Number(minutes)}});
-        draft.reset({limit,minutes});toast.success(t("saved"));
-        await qc.invalidateQueries({queryKey:["ai-settings"]});
-      } catch {toast.error(t("errSaveAi"));} finally {setBusy(false);}
-    }}>
-    <div className="grid gap-3 sm:grid-cols-2">
-      <label>{t("regLimitCount")}
-        <Input id="archy-registration-limit" type="number" required min={1} max={100} step={1} value={limit} disabled={busy} onChange={e=>draft.setValue({...draft.value!,limit:e.target.value})}/>
-      </label>
-      <label>{t("regLimitWait")}
-        <Input id="archy-registration-minutes" type="number" required min={1} max={1440} step={1} value={minutes} disabled={busy} onChange={e=>draft.setValue({...draft.value!,minutes:e.target.value})}/>
-      </label>
-    </div>
-    <Button className="justify-self-start" disabled={busy||!draft.dirty}>{t("regLimitSave")}</Button>
-    </form>
-  </Card>;
+function RegistrationPolicy({ settings }: { settings: AiSettingsView }) {
+  const { t } = useAdminCopy();
+  const qc = useQueryClient();
+  const savePolicy = useServerFn(saveRegistrationPolicy);
+  const draft = useDraft({
+    limit: String(settings.registrationLimit),
+    minutes: String(settings.registrationWaitMinutes),
+  });
+  const [busy, setBusy] = useState(false);
+  if (!draft.value) return null;
+  const { limit, minutes } = draft.value;
+  return (
+    <Card title={t("regLimitTitle")} description={t("regLimitDesc")}>
+      <form
+        className="grid gap-4"
+        onSubmit={async (e) => {
+          e.preventDefault();
+          setBusy(true);
+          try {
+            await savePolicy({
+              data: { limit: Number(limit), minutes: Number(minutes) },
+            });
+            draft.reset({ limit, minutes });
+            toast.success(t("saved"));
+            await qc.invalidateQueries({ queryKey: ["ai-settings"] });
+          } catch {
+            toast.error(t("errSaveAi"));
+          } finally {
+            setBusy(false);
+          }
+        }}
+      >
+        <div className="grid gap-3 sm:grid-cols-2">
+          <label>
+            {t("regLimitCount")}
+            <Input
+              id="archy-registration-limit"
+              type="number"
+              required
+              min={1}
+              max={100}
+              step={1}
+              value={limit}
+              disabled={busy}
+              onChange={(e) =>
+                draft.setValue({ ...draft.value!, limit: e.target.value })
+              }
+            />
+          </label>
+          <label>
+            {t("regLimitWait")}
+            <Input
+              id="archy-registration-minutes"
+              type="number"
+              required
+              min={1}
+              max={1440}
+              step={1}
+              value={minutes}
+              disabled={busy}
+              onChange={(e) =>
+                draft.setValue({ ...draft.value!, minutes: e.target.value })
+              }
+            />
+          </label>
+        </div>
+        <Button className="justify-self-start" disabled={busy || !draft.dirty}>
+          {t("regLimitSave")}
+        </Button>
+      </form>
+    </Card>
+  );
 }
 
 export function AiSettings() {
@@ -751,7 +824,7 @@ export function AiSettings() {
       </Card>
 
       <EngineSelector settings={s} dirty={form.dirty} />
-      <RegistrationPolicy settings={s}/>
+      <RegistrationPolicy settings={s} />
       <ArchyOperations />
       <Card title={t("aiStatus")}>
         <dl className="grid gap-3 text-sm sm:grid-cols-2">
@@ -816,7 +889,7 @@ function ExpectationResult({
   return (
     <p className="mt-2 rounded border p-2">
       {missing.length
-        ? (adminDictionaries[ar ? "ar" : "en"].consoleReviewMissing) +
+        ? adminDictionaries[ar ? "ar" : "en"].consoleReviewMissing +
           missing.join(" · ")
         : adminDictionaries[ar ? "ar" : "en"].consoleAllExpectedTermsMatched}
     </p>

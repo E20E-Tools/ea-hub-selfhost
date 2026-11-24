@@ -24,8 +24,10 @@ export type FloorPlan = {
 export const DESKTOP = { width: 1200, height: 760 } as const;
 const MOBILE_W = 360;
 
-const weight = (features: number) => 1 + 0.15 * Math.min(Math.max(features, 0), 5);
-const depthFactor = (features: number) => 0.8 + 0.04 * Math.min(Math.max(features, 0), 5);
+const weight = (features: number) =>
+  1 + 0.15 * Math.min(Math.max(features, 0), 5);
+const depthFactor = (features: number) =>
+  0.8 + 0.04 * Math.min(Math.max(features, 0), 5);
 const r1 = (v: number) => Math.round(v * 10) / 10;
 
 function band(
@@ -56,7 +58,11 @@ function band(
       y: r1(y),
       w: r1(w),
       h: r1(h),
-      door: { x: r1(dx), y: r1(doorY), wall: side === "top" ? "bottom" : "top" },
+      door: {
+        x: r1(dx),
+        y: r1(doorY),
+        wall: side === "top" ? "bottom" : "top",
+      },
       corridor: [
         [r1(dx), r1(doorY)],
         [r1(dx), corridorY],
@@ -97,7 +103,17 @@ function desktopPlan(list: number[]): FloorPlan {
   const sideList = list.slice(rest);
   const depth = 150;
   const rooms: PlanRoom[] = [
-    ...band(top, outer.x, outer.x + outer.w, outer.y, depth, "top", atrium.y - 24, atrium, 0),
+    ...band(
+      top,
+      outer.x,
+      outer.x + outer.w,
+      outer.y,
+      depth,
+      "top",
+      atrium.y - 24,
+      atrium,
+      0,
+    ),
     ...band(
       bottom,
       outer.x,
@@ -129,7 +145,11 @@ function desktopPlan(list: number[]): FloorPlan {
         [doorX, cy],
         [left ? atrium.x : atrium.x + atrium.w, cy],
       ],
-      window: { wall: left ? "left" : "right", from: r1(y + h * 0.3), to: r1(y + h * 0.7) },
+      window: {
+        wall: left ? "left" : "right",
+        from: r1(y + h * 0.3),
+        to: r1(y + h * 0.7),
+      },
     });
   });
   return { width, height, outer, atrium, rooms, vertical: false };
@@ -164,19 +184,31 @@ function verticalPlan(list: number[]): FloorPlan {
           [corridorX, cy],
           [corridorX, atrium.y + atrium.h],
         ],
-        window: { wall: left ? "left" : "right", from: r1(y + h * 0.3), to: r1(y + h * 0.7) },
+        window: {
+          wall: left ? "left" : "right",
+          from: r1(y + h * 0.3),
+          to: r1(y + h * 0.7),
+        },
       });
     });
     y += h;
   }
   outer.h = r1(y + 18 - outer.y);
-  return { width, height: r1(outer.y + outer.h + 16), outer, atrium, rooms, vertical: true };
+  return {
+    width,
+    height: r1(outer.y + outer.h + 16),
+    outer,
+    atrium,
+    rooms,
+    vertical: true,
+  };
 }
 
 function mirror(plan: FloorPlan): FloorPlan {
   const W = plan.width;
   const mx = (x: number) => r1(W - x);
-  const flipWall = (w: Wall): Wall => (w === "left" ? "right" : w === "right" ? "left" : w);
+  const flipWall = (w: Wall): Wall =>
+    w === "left" ? "right" : w === "right" ? "left" : w;
   const rect = (r: Rect): Rect => ({ ...r, x: r1(W - r.x - r.w) });
   return {
     ...plan,
@@ -185,11 +217,19 @@ function mirror(plan: FloorPlan): FloorPlan {
     rooms: plan.rooms.map((room) => ({
       ...room,
       ...rect(room),
-      door: { x: mx(room.door.x), y: room.door.y, wall: flipWall(room.door.wall) },
+      door: {
+        x: mx(room.door.x),
+        y: room.door.y,
+        wall: flipWall(room.door.wall),
+      },
       corridor: room.corridor.map(([x, y]) => [mx(x), y] as Pt),
       window: room.window
         ? room.window.wall === "top" || room.window.wall === "bottom"
-          ? { wall: room.window.wall, from: mx(room.window.to), to: mx(room.window.from) }
+          ? {
+              wall: room.window.wall,
+              from: mx(room.window.to),
+              to: mx(room.window.from),
+            }
           : { ...room.window, wall: flipWall(room.window.wall) }
         : null,
     })),
@@ -198,7 +238,12 @@ function mirror(plan: FloorPlan): FloorPlan {
 
 export function overlaps(a: Rect, b: Rect): boolean {
   const e = 0.5; // shared walls are allowed
-  return a.x + e < b.x + b.w && b.x + e < a.x + a.w && a.y + e < b.y + b.h && b.y + e < a.y + a.h;
+  return (
+    a.x + e < b.x + b.w &&
+    b.x + e < a.x + a.w &&
+    a.y + e < b.y + b.h &&
+    b.y + e < a.y + a.h
+  );
 }
 
 export function onRectEdge([x, y]: Pt, r: Rect, tol = 0.6): boolean {

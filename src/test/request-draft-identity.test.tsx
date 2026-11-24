@@ -2,7 +2,10 @@ import { act, cleanup, render, screen, waitFor } from "@testing-library/react";
 import { useCallback, useState } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-type AuthCallback = (event: string, session: { user: { id: string } } | null) => void;
+type AuthCallback = (
+  event: string,
+  session: { user: { id: string } } | null,
+) => void;
 const auth = vi.hoisted(() => ({
   listeners: [] as AuthCallback[],
   resolveUser: null as null | ((value: unknown) => void),
@@ -32,7 +35,11 @@ vi.mock("@/integrations/supabase/client", () => ({
 import { requestDraftKey, useRequestDraft } from "@/lib/request-draft";
 
 const emit = (event: string, id: string | null) =>
-  act(() => auth.listeners.forEach((listener) => listener(event, id ? { user: { id } } : null)));
+  act(() =>
+    auth.listeners.forEach((listener) =>
+      listener(event, id ? { user: { id } } : null),
+    ),
+  );
 const resolveGetUser = (id: string | null) =>
   act(async () => {
     auth.resolveUser?.(
@@ -42,8 +49,13 @@ const resolveGetUser = (id: string | null) =>
     );
     await Promise.resolve();
   });
-const stored = (owner: string) => window.sessionStorage.getItem(requestDraftKey("request", owner));
-const seed = (owner: string, values: Record<string, unknown>, includePersonal = true) =>
+const stored = (owner: string) =>
+  window.sessionStorage.getItem(requestDraftKey("request", owner));
+const seed = (
+  owner: string,
+  values: Record<string, unknown>,
+  includePersonal = true,
+) =>
   window.sessionStorage.setItem(
     requestDraftKey("request", owner),
     JSON.stringify({ version: 1, includePersonal, values }),
@@ -59,13 +71,19 @@ function Form() {
   const [productId, setProductId] = useState("");
   const restore = useCallback((values: Record<string, unknown>) => {
     if (typeof values["name"] === "string") setName(values["name"]);
-    if (typeof values["productId"] === "string") setProductId(values["productId"]);
+    if (typeof values["productId"] === "string")
+      setProductId(values["productId"]);
   }, []);
   const reset = () => {
     setName("");
     setProductId("");
   };
-  const draft = useRequestDraft("request", { type: "new", productId, name }, restore, reset);
+  const draft = useRequestDraft(
+    "request",
+    { type: "new", productId, name },
+    restore,
+    reset,
+  );
   api = { ...draft, setName, name, productId };
   return <output data-testid="name">{name}</output>;
 }

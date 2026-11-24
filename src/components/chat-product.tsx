@@ -19,7 +19,13 @@ export function ChatProductPage({
   return (
     <div className="assistant-product" dir={dir}>
       <div className="assistant-product-back">
-        <Button type="button" variant="ghost" size="sm" onClick={onBack} autoFocus>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={onBack}
+          autoFocus
+        >
           <Undo2 className="size-4" aria-hidden="true" />
           {t("chatBackToConversation")}
         </Button>

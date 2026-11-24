@@ -6,7 +6,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { saveCategories } from "@/lib/admin.functions";
 import type { Catalog } from "@/lib/catalog";
-import { Card, EmptyBlock, FieldError, LangTag, SaveBar, useAdminCopy, useDraft } from "./ui";
+import {
+  Card,
+  EmptyBlock,
+  FieldError,
+  LangTag,
+  SaveBar,
+  useAdminCopy,
+  useDraft,
+} from "./ui";
 
 type Row = { key: string; id: string; ar: string; en: string };
 
@@ -51,7 +59,9 @@ export function CategoriesTab({ catalog }: { catalog: Catalog }) {
     }
     setBusy(true);
     try {
-      const result = await saveCategories({ data: { categories, categoriesEn } });
+      const result = await saveCategories({
+        data: { categories, categoriesEn },
+      });
       if (!result.ok) return void toast.error(t(result.message));
       toast.success(t("saved"));
       form.reset(rows);
@@ -106,7 +116,9 @@ export function CategoriesTab({ catalog }: { catalog: Catalog }) {
                 aria-label={t("categoryId")}
                 dir="ltr"
                 value={row.id}
-                onChange={(e) => update(row.key, { id: e.target.value.toLowerCase() })}
+                onChange={(e) =>
+                  update(row.key, { id: e.target.value.toLowerCase() })
+                }
               />
               <Input
                 aria-label={`${t("categoryName")} AR`}
@@ -127,7 +139,11 @@ export function CategoriesTab({ catalog }: { catalog: Catalog }) {
                 variant="ghost"
                 size="icon"
                 aria-label={t("removeCategory")}
-                onClick={() => form.setValue((current) => current.filter((r) => r.key !== row.key))}
+                onClick={() =>
+                  form.setValue((current) =>
+                    current.filter((r) => r.key !== row.key),
+                  )
+                }
               >
                 <Trash2 className="size-4" aria-hidden="true" />
               </Button>
@@ -136,7 +152,12 @@ export function CategoriesTab({ catalog }: { catalog: Catalog }) {
         </div>
       )}
       {error ? <FieldError text={error} /> : null}
-      <SaveBar dirty={form.dirty} busy={busy} onSave={() => void save()} onDiscard={form.discard} />
+      <SaveBar
+        dirty={form.dirty}
+        busy={busy}
+        onSave={() => void save()}
+        onDiscard={form.discard}
+      />
     </Card>
   );
 }

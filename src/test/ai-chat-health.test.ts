@@ -32,7 +32,9 @@ describe("aiChatHealth", () => {
   });
 
   it("takes median and slowest-5% reply times from successful answers only", () => {
-    const times = [1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 100000];
+    const times = [
+      1000, 2000, 3000, 4000, 5000, 6000, 7000, 8000, 9000, 100000,
+    ];
     const health = aiChatHealth(
       times
         .map((ms, i) => row("assistant", "success", ms, i + 1))
@@ -60,7 +62,9 @@ describe("aiChatHealth", () => {
 
   it("does not alert while the median reply time stays at or below the threshold", () => {
     const health = aiChatHealth(
-      [1, 2, 3, 4, 5].map((i) => row("assistant", "success", CHAT_HEALTH_SLOW_MS, i)),
+      [1, 2, 3, 4, 5].map((i) =>
+        row("assistant", "success", CHAT_HEALTH_SLOW_MS, i),
+      ),
       NOW,
     );
     expect(health.alert).toBeNull();

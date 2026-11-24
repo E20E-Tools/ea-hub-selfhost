@@ -1,6 +1,9 @@
 export const ARCHY_LIGHTWEIGHT_KEY = "e20e-archy-lightweight-v1";
 
-export function archyLightweightChoice(stored: string | null, saveData: boolean): boolean {
+export function archyLightweightChoice(
+  stored: string | null,
+  saveData: boolean,
+): boolean {
   if (stored === "1") return true;
   if (stored === "0") return false;
   return saveData;
@@ -10,7 +13,10 @@ export function readArchyLightweight(
   saveData: boolean,
 ): boolean {
   try {
-    return archyLightweightChoice(store?.getItem(ARCHY_LIGHTWEIGHT_KEY) ?? null, saveData);
+    return archyLightweightChoice(
+      store?.getItem(ARCHY_LIGHTWEIGHT_KEY) ?? null,
+      saveData,
+    );
   } catch {
     return saveData;
   }
@@ -23,6 +29,8 @@ export function saveArchyLightweight(value: boolean): void {
   }
 }
 export function browserSaveData(): boolean {
-  const connection = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
+  const connection = (
+    navigator as Navigator & { connection?: { saveData?: boolean } }
+  ).connection;
   return connection?.saveData === true;
 }

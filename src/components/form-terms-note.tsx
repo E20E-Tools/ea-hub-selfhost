@@ -11,7 +11,11 @@ export function FormTermsNote() {
   const { data: catalog } = useSuspenseQuery(catalogQueryOptions);
   const ar = language !== "en";
   const privacy = (
-    <a href="/privacy" target="_blank" className="text-primary underline underline-offset-4">
+    <a
+      href="/privacy"
+      target="_blank"
+      className="text-primary underline underline-offset-4"
+    >
       {dictionaries[ar ? "ar" : "en"].formTermsNotePrivacyPolicy}
     </a>
   );
@@ -26,7 +30,11 @@ export function FormTermsNote() {
   return (
     <p className="mt-3 text-xs text-muted-foreground">
       {t("formTermsNote")}{" "}
-      <Link to="/terms" target="_blank" className="text-primary underline underline-offset-4">
+      <Link
+        to="/terms"
+        target="_blank"
+        className="text-primary underline underline-offset-4"
+      >
         {t("formTermsLink")}
       </Link>
       {dictionaries[ar ? "ar" : "en"].formTermsNoteAndWeHandleYour}

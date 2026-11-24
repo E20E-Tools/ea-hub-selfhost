@@ -7,7 +7,10 @@ import { isPublicationDate } from "./publication-date";
 export const ARCHONE_ID = "archone";
 const RIYADH_OFFSET_MS = 3 * 3_600_000;
 
-export function launchInstantFor(id: string, date: string | null | undefined): Date | null {
+export function launchInstantFor(
+  id: string,
+  date: string | null | undefined,
+): Date | null {
   if (!date || !isPublicationDate(date)) return null;
   const time = id === ARCHONE_ID ? "09:00:00" : "00:00:00";
   const at = new Date(`${date}T${time}+03:00`);
@@ -27,7 +30,10 @@ export function hasLaunched(
 const locale = (ar: boolean) => (ar ? "ar-u-nu-latn" : "en-GB");
 
 /** Short badge text, e.g. "Launches 22 Nov 2026"; empty when no publication date is set. */
-export function archoneLaunchLabel(ar: boolean, date: string | null | undefined): string {
+export function archoneLaunchLabel(
+  ar: boolean,
+  date: string | null | undefined,
+): string {
   const at = launchInstantFor(ARCHONE_ID, date);
   if (!at) return "";
   const text = new Intl.DateTimeFormat(locale(ar), {
@@ -59,7 +65,10 @@ export function launchMonthLabel(at: Date, ar: boolean): string {
 }
 
 /** Riyadh calendar month containing the launch: leading blanks then day numbers. */
-export function launchMonthGrid(at: Date): { cells: (number | null)[]; day: number } {
+export function launchMonthGrid(at: Date): {
+  cells: (number | null)[];
+  day: number;
+} {
   const local = new Date(at.getTime() + RIYADH_OFFSET_MS);
   const year = local.getUTCFullYear();
   const month = local.getUTCMonth();
@@ -120,7 +129,8 @@ export function launchGoogleCalendarHref(at: Date, ar: boolean): string {
 
 /** Where the page sends visitors: null keeps the countdown, otherwise the target path. */
 export function archoneSoonTarget(
-  product: { id: string; comingSoon?: boolean; publicationDate?: string } | undefined,
+  product:
+    { id: string; comingSoon?: boolean; publicationDate?: string } | undefined,
   now: number,
 ): "home" | "product" | null {
   if (!product) return "home";

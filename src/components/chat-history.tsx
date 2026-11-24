@@ -10,7 +10,12 @@ import { formatDate } from "@/lib/format-date";
 import { orderChatMessages } from "@/lib/chat-order";
 import { ChatMarkdown } from "@/components/chat-markdown";
 
-type Chat = { id: string; status: string; created_at: string; last_message_at: string };
+type Chat = {
+  id: string;
+  status: string;
+  created_at: string;
+  last_message_at: string;
+};
 type Msg = { id: string; sender: string; body: string; created_at: string };
 
 /** Paginated history verified through the signed guest identity. */
@@ -41,7 +46,9 @@ export function ChatHistory({
     void readVisitorChats({ data: { access, offset } })
       .then((result) => {
         if (!active) return;
-        setChats((prev) => (offset === 0 ? result.chats : [...(prev ?? []), ...result.chats]));
+        setChats((prev) =>
+          offset === 0 ? result.chats : [...(prev ?? []), ...result.chats],
+        );
         setMoreChats(result.hasMore);
       })
       .catch(() => {
@@ -56,12 +63,16 @@ export function ChatHistory({
     let active = true;
     setError(false);
     if (messageOffset === 0) setMessages(null);
-    void readVisitorChats({ data: { access, chatId: open.id, offset: messageOffset } })
+    void readVisitorChats({
+      data: { access, chatId: open.id, offset: messageOffset },
+    })
       .then((result) => {
         if (!active) return;
         setMessages((prev) =>
           orderChatMessages(
-            messageOffset === 0 ? result.messages : [...result.messages, ...(prev ?? [])],
+            messageOffset === 0
+              ? result.messages
+              : [...result.messages, ...(prev ?? [])],
           ),
         );
         setMoreMessages(result.hasMore);
@@ -74,7 +85,8 @@ export function ChatHistory({
     };
   }, [open, access, messageOffset, retry]);
 
-  const when = (v: string) => formatDate(v, language, { dateStyle: "medium", timeStyle: "short" });
+  const when = (v: string) =>
+    formatDate(v, language, { dateStyle: "medium", timeStyle: "short" });
   const statusLabel = (s: string) =>
     s === "waiting"
       ? t("histWaiting")
@@ -87,15 +99,24 @@ export function ChatHistory({
   return (
     <div className="assistant-log chat-history">
       <div className="chat-history-head">
-        <Button variant="ghost" size="sm" onClick={open ? () => setOpen(null) : onClose}>
-          <Back className="size-4" /> {open ? t("histAll") : t("histBackToChat")}
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={open ? () => setOpen(null) : onClose}
+        >
+          <Back className="size-4" />{" "}
+          {open ? t("histAll") : t("histBackToChat")}
         </Button>
         <strong>{open ? when(open.created_at) : t("histTitle")}</strong>
       </div>
       {error && (
         <p role="alert" className="text-sm text-destructive">
           {t("chatFailed")}{" "}
-          <Button variant="ghost" size="sm" onClick={() => setRetry((n) => n + 1)}>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setRetry((n) => n + 1)}
+          >
             {t("histRetry")}
           </Button>
         </p>
@@ -121,7 +142,10 @@ export function ChatHistory({
                     }}
                   >
                     <span className="chat-history-row">
-                      <span className="chat-history-badge" data-status={c.status}>
+                      <span
+                        className="chat-history-badge"
+                        data-status={c.status}
+                      >
                         {statusLabel(c.status)}
                       </span>
                       <span className="text-xs text-muted-foreground">
@@ -133,7 +157,11 @@ export function ChatHistory({
               ))}
             </ul>
             {moreChats && (
-              <Button variant="outline" size="sm" onClick={() => setOffset((n) => n + 50)}>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setOffset((n) => n + 50)}
+              >
                 {t("histMoreChats")}
               </Button>
             )}
@@ -144,13 +172,20 @@ export function ChatHistory({
       ) : (
         <>
           {moreMessages && (
-            <Button variant="outline" size="sm" onClick={() => setMessageOffset((n) => n + 100)}>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setMessageOffset((n) => n + 100)}
+            >
               {t("histOlderMessages")}
             </Button>
           )}
           {messages.map((m) =>
             m.sender === "system" ? (
-              <p key={m.id} className="text-center text-xs text-muted-foreground">
+              <p
+                key={m.id}
+                className="text-center text-xs text-muted-foreground"
+              >
                 {m.body === "requested"
                   ? t("histSysRequested")
                   : m.body === "joined"
@@ -168,12 +203,16 @@ export function ChatHistory({
                   </span>
                 )}
                 <div dir="auto" className="whitespace-pre-wrap break-words">
-                  <ChatMarkdown onOpenProduct={onOpenProduct}>{m.body}</ChatMarkdown>
+                  <ChatMarkdown onOpenProduct={onOpenProduct}>
+                    {m.body}
+                  </ChatMarkdown>
                 </div>
               </div>
             ),
           )}
-          {messages.length > 0 && <RateChat key={open.id} chatId={open.id} access={access} />}
+          {messages.length > 0 && (
+            <RateChat key={open.id} chatId={open.id} access={access} />
+          )}
         </>
       )}
     </div>
@@ -186,7 +225,9 @@ function RateChat({ chatId, access }: { chatId: string; access: string }) {
   const rate = useServerFn(rateLiveChat);
   const [stars, setStars] = useState(0);
   const [comment, setComment] = useState("");
-  const [state, setState] = useState<"idle" | "busy" | "done" | "failed">("idle");
+  const [state, setState] = useState<"idle" | "busy" | "done" | "failed">(
+    "idle",
+  );
 
   useEffect(() => {
     let active = true;
@@ -218,7 +259,11 @@ function RateChat({ chatId, access }: { chatId: string; access: string }) {
   return (
     <div className="chat-rate">
       <strong className="text-sm">{t("rateTitle")}</strong>
-      <div className="chat-rate-stars" role="radiogroup" aria-label={t("rateTitle")}>
+      <div
+        className="chat-rate-stars"
+        role="radiogroup"
+        aria-label={t("rateTitle")}
+      >
         {[1, 2, 3, 4, 5].map((n) => (
           <button
             key={n}
@@ -247,13 +292,22 @@ function RateChat({ chatId, access }: { chatId: string; access: string }) {
               setState("idle");
             }}
           />
-          <Button size="sm" disabled={state === "busy"} onClick={() => void send()}>
-            {state === "busy" && <Loader2 className="size-4 animate-spin" />} {t("rateSend")}
+          <Button
+            size="sm"
+            disabled={state === "busy"}
+            onClick={() => void send()}
+          >
+            {state === "busy" && <Loader2 className="size-4 animate-spin" />}{" "}
+            {t("rateSend")}
           </Button>
         </>
       )}
-      {state === "done" && <p className="text-xs text-muted-foreground">{t("rateThanks")}</p>}
-      {state === "failed" && <p className="text-xs text-destructive">{t("rateFailed")}</p>}
+      {state === "done" && (
+        <p className="text-xs text-muted-foreground">{t("rateThanks")}</p>
+      )}
+      {state === "failed" && (
+        <p className="text-xs text-destructive">{t("rateFailed")}</p>
+      )}
     </div>
   );
 }

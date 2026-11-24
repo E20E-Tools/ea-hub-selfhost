@@ -22,7 +22,12 @@ export function UntangleChaosThumb() {
             strokeWidth="1.5"
           />
           <rect x="246" y={y} width="62" height="22" rx="8" fill="#2F6BFF" />
-          <path d={`M246 ${y + 11} H215 V90 H192`} fill="none" stroke="#2F6BFF" strokeWidth="2" />
+          <path
+            d={`M246 ${y + 11} H215 V90 H192`}
+            fill="none"
+            stroke="#2F6BFF"
+            strokeWidth="2"
+          />
           <circle cx="215" cy={y + 11} r="2.5" fill="#00D4FF" />
         </g>
       ))}
@@ -36,7 +41,14 @@ export function UntangleChaosThumb() {
         stroke="#4A4536"
         strokeWidth="2"
       />
-      <text x="160" y="94" textAnchor="middle" fontSize="11" fill="#39FF6A" fontFamily="monospace">
+      <text
+        x="160"
+        y="94"
+        textAnchor="middle"
+        fontSize="11"
+        fill="#39FF6A"
+        fontFamily="monospace"
+      >
         E20E.EXE
       </text>
       <g transform="translate(150 30)">

@@ -5,7 +5,9 @@ describe("stale page files after publish", () => {
   it("recognises a missing page file", () => {
     expect(
       isStaleChunkError(
-        new TypeError("Failed to fetch dynamically imported module: https://x/assets/a.js"),
+        new TypeError(
+          "Failed to fetch dynamically imported module: https://x/assets/a.js",
+        ),
       ),
     ).toBe(true);
   });

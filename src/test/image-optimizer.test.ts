@@ -22,7 +22,9 @@ describe("optimizedImage", () => {
   it("leaves non-storage and empty URLs alone", () => {
     vi.stubEnv("VERCEL", "1");
     expect(optimizedImage("/assets/logo.png", 256)).toBe("/assets/logo.png");
-    expect(optimizedImage("https://example.com/a.jpg", 256)).toBe("https://example.com/a.jpg");
+    expect(optimizedImage("https://example.com/a.jpg", 256)).toBe(
+      "https://example.com/a.jpg",
+    );
     expect(optimizedImage("", 256)).toBe("");
   });
 });

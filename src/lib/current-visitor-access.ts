@@ -45,9 +45,13 @@ export async function currentVisitorAccess(): Promise<string> {
 }
 
 /** Verified account id (server re-verifies the bearer) plus that owner's Archy pass, read together. */
-export async function currentViewer(): Promise<{ token: string; accountId: string }> {
+export async function currentViewer(): Promise<{
+  token: string;
+  accountId: string;
+}> {
   const owner = await currentOwner();
   if (!owner) return { token: "", accountId: "" };
-  if (owner.kind === "account") return { token: tokenFor(owner.id), accountId: owner.id };
+  if (owner.kind === "account")
+    return { token: tokenFor(owner.id), accountId: owner.id };
   return { token: tokenFor(GUEST_CHAT_OWNER), accountId: "" };
 }

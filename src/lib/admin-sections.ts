@@ -7,7 +7,14 @@ import type { AdminCopyKey } from "./admin-copy";
 
 export const ADMIN_SECTION_TABS = {
   dashboard: [],
-  customers: ["requests", "offers", "conversations", "assistant", "feedback", "visitors"],
+  customers: [
+    "requests",
+    "offers",
+    "conversations",
+    "assistant",
+    "feedback",
+    "visitors",
+  ],
   enterprise: [],
   content: ["products", "categories", "affiliates", "media"],
   settings: [
@@ -90,7 +97,9 @@ export const ADMIN_NAV: {
   },
   {
     group: "groupManage",
-    items: [{ id: "content", label: "navContent", description: "navContentDesc" }],
+    items: [
+      { id: "content", label: "navContent", description: "navContentDesc" },
+    ],
   },
   {
     group: "groupSystem",
@@ -137,7 +146,10 @@ export const TAB_LABELS: Record<AdminTab, AdminCopyKey> = {
 };
 
 /** Old ?section= values (bookmarks, earlier links) and where they open now. */
-export const SECTION_ALIASES: Record<string, { section: AdminSection; tab?: AdminTab }> = {
+export const SECTION_ALIASES: Record<
+  string,
+  { section: AdminSection; tab?: AdminTab }
+> = {
   home: { section: "dashboard" },
   "enterprise-requests": { section: "enterprise" },
   // Inbox, live chat and feedback now live inside the customer workspace.
@@ -181,7 +193,10 @@ export function defaultTab(section: AdminSection): AdminTab | undefined {
 }
 
 /** Resolves raw URL values to a valid section + tab (unknown values fall back safely). */
-export function resolveAdminLocation(section: unknown, tab?: unknown): AdminLocation {
+export function resolveAdminLocation(
+  section: unknown,
+  tab?: unknown,
+): AdminLocation {
   if (isSection(section)) {
     const tabs = ADMIN_SECTION_TABS[section] as readonly string[];
     const valid = typeof tab === "string" && tabs.includes(tab);

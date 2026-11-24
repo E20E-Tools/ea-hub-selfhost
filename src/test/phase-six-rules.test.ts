@@ -113,23 +113,37 @@ it("searches English and Arabic keywords to existing specific controls", () => {
   expect(searchSettings("api key")).toContainEqual(
     expect.objectContaining({ tab: "ai", control: "ai-key" }),
   );
-  expect(searchSettings("شروط")).toContainEqual(expect.objectContaining({ tab: "terms" }));
-  expect(searchSettings("journey")).toContainEqual(expect.objectContaining({ tab: "journey" }));
-  expect(searchSettings("voice").map((x) => x.control)).toContain("archy-voice");
+  expect(searchSettings("شروط")).toContainEqual(
+    expect.objectContaining({ tab: "terms" }),
+  );
+  expect(searchSettings("journey")).toContainEqual(
+    expect.objectContaining({ tab: "journey" }),
+  );
+  expect(searchSettings("voice").map((x) => x.control)).toContain(
+    "archy-voice",
+  );
   expect(searchSettings("صوت").map((x) => x.control)).toContain("archy-voice");
   expect(searchSettings("شعار").map((x) => x.tab)).toContain("general");
-  expect(searchSettings("assistant").map((x) => x.control)).toContain("feature-assistant");
+  expect(searchSettings("assistant").map((x) => x.control)).toContain(
+    "feature-assistant",
+  );
   expect(searchSettings("إصدارات").map((x) => x.tab)).toContain("history");
 });
 it("rejects arbitrary DNS names and trusted-host suffix tricks", async () => {
   expect(aiBaseUrlProblem("https://public-attacker.example/v1")).not.toBeNull();
-  expect(aiBaseUrlProblem("https://api.groq.com.attacker.example/v1")).not.toBeNull();
+  expect(
+    aiBaseUrlProblem("https://api.groq.com.attacker.example/v1"),
+  ).not.toBeNull();
   expect(aiBaseUrlProblem("https://api.groq.com/openai/v1")).toBeNull();
   let called = false;
-  const f = boundedAiFetch("https://public-attacker.example/v1", 1000, async () => {
-    called = true;
-    return new Response();
-  });
+  const f = boundedAiFetch(
+    "https://public-attacker.example/v1",
+    1000,
+    async () => {
+      called = true;
+      return new Response();
+    },
+  );
   await expect(f("https://public-attacker.example/v1")).rejects.toThrow();
   expect(called).toBe(false);
 });
@@ -140,6 +154,8 @@ it("contextual reasons use available live catalog records only", () => {
   }));
   const context = archyContext(products, "en", "/");
   expect(context).toHaveLength(1);
-  expect(context[0]?.reason).toBe(products[0]?.descriptionEn || products[0]?.description);
+  expect(context[0]?.reason).toBe(
+    products[0]?.descriptionEn || products[0]?.description,
+  );
   expect(archyComparePrompt(["A", "B"], "ar")).toContain("A و B");
 });

@@ -1,4 +1,10 @@
-import { act, cleanup, fireEvent, render, waitFor } from "@testing-library/react";
+import {
+  act,
+  cleanup,
+  fireEvent,
+  render,
+  waitFor,
+} from "@testing-library/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { historyKey, sessionKey } from "@/lib/assistant-storage";
@@ -13,14 +19,18 @@ function deferred<T>(): Deferred<T> {
 
 const auth = vi.hoisted(() => ({
   getUser: vi.fn(),
-  listener: null as null | ((event: string, s: { user: unknown } | null) => void),
+  listener: null as
+    null | ((event: string, s: { user: unknown } | null) => void),
   listeners: new Set<(event: string, s: { user: unknown } | null) => void>(),
   send: vi.fn(),
   readChats: vi.fn(),
   eqs: [] as [string, string, unknown][],
 }));
 
-vi.mock("@/lib/archy-quality.functions",()=>({getProductReviews:async()=>[],rateArchyReply:vi.fn()}));
+vi.mock("@/lib/archy-quality.functions", () => ({
+  getProductReviews: async () => [],
+  rateArchyReply: vi.fn(),
+}));
 vi.mock("@tanstack/react-start", () => ({ useServerFn: (fn: unknown) => fn }));
 vi.mock("@/lib/archy-tour-visit-client", () => ({
   currentTourVisit: () => "",
@@ -28,12 +38,19 @@ vi.mock("@/lib/archy-tour-visit-client", () => ({
 }));
 const routerPath = vi.hoisted(() => ({ value: "/" }));
 vi.mock("@tanstack/react-router", () => ({
-  useRouterState: ({ select }: { select: (s: { location: { pathname: string } }) => string }) =>
-    select({ location: { pathname: routerPath.value } }),
-  Link: ({ children }: { children: React.ReactNode }) => <a href="/">{children}</a>,
+  useRouterState: ({
+    select,
+  }: {
+    select: (s: { location: { pathname: string } }) => string;
+  }) => select({ location: { pathname: routerPath.value } }),
+  Link: ({ children }: { children: React.ReactNode }) => (
+    <a href="/">{children}</a>
+  ),
   ClientOnly: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }));
-vi.mock("@/components/archy-scene", () => ({ default: () => <div data-testid="archy-scene" /> }));
+vi.mock("@/components/archy-scene", () => ({
+  default: () => <div data-testid="archy-scene" />,
+}));
 vi.mock("@/integrations/supabase/client", () => ({
   supabase: {
     auth: {
@@ -93,7 +110,9 @@ vi.mock("@/lib/assistant-chat.functions", () => ({
   registerAssistantVisitor: vi.fn(),
   sendAssistantMessage: (...args: unknown[]) => auth.send(...args),
 }));
-vi.mock("@/lib/archy-visitor.functions", () => ({ getMyArchySummary: vi.fn(async () => null) }));
+vi.mock("@/lib/archy-visitor.functions", () => ({
+  getMyArchySummary: vi.fn(async () => null),
+}));
 vi.mock("@/lib/catalog.functions", () => ({
   catalogQueryOptions: {
     queryKey: ["catalog"],
@@ -120,7 +139,10 @@ const user = (id: string): User => ({
   email: `${id}@example.com`,
   email_confirmed_at: "2026-01-01",
 });
-const seed = (id: string, history: { role: string; content: string }[] = []) => {
+const seed = (
+  id: string,
+  history: { role: string; content: string }[] = [],
+) => {
   localStorage.setItem(
     sessionKey(id),
     JSON.stringify({ token: `t-${id}`, name: id, exp: Date.now() + 3_600_000 }),
@@ -154,13 +176,18 @@ async function mount(initial: Promise<{ data: { user: User | null } }>) {
   return view;
 }
 async function sendMessage(container: HTMLElement, text: string) {
-  const box = container.querySelector(".assistant-form textarea") as HTMLTextAreaElement;
+  const box = container.querySelector(
+    ".assistant-form textarea",
+  ) as HTMLTextAreaElement;
   fireEvent.change(box, { target: { value: text } });
   await act(async () => {
     fireEvent.submit(box.closest("form")!);
   });
 }
-const reply = (summary: string) => ({ ok: true, reply: { summary, picks: [] } });
+const reply = (summary: string) => ({
+  ok: true,
+  reply: { summary, picks: [] },
+});
 
 // The first test loads the whole chat module graph; on a cold cache that alone can pass 5s.
 vi.setConfig({ testTimeout: 20_000 });
@@ -183,9 +210,13 @@ afterEach(() => {
 it("opens registration from Archy without sending anything", async () => {
   const view = await mount(Promise.resolve({ data: { user: null } }));
   await act(async () => undefined);
-  expect(view.container.querySelector("#assistant-panel .assistant-gate")).not.toBeNull();
+  expect(
+    view.container.querySelector("#assistant-panel .assistant-gate"),
+  ).not.toBeNull();
   expect(view.container.querySelector("#gate-name")).not.toBeNull();
-  await waitFor(()=>expect(view.container.querySelector("#gate-answer")).not.toBeNull());
+  await waitFor(() =>
+    expect(view.container.querySelector("#gate-answer")).not.toBeNull(),
+  );
   expect(view.container.querySelector("#gate-verify-email")).toBeNull();
   expect(auth.send).not.toHaveBeenCalled();
 });
@@ -194,7 +225,9 @@ it("on a tool page clicking Archy opens the gate directly without sending", asyn
   routerPath.value = "/product/tech-radar";
   const view = await mount(Promise.resolve({ data: { user: null } }));
   await act(async () => undefined);
-  expect(view.container.querySelector("#assistant-panel .assistant-gate")).not.toBeNull();
+  expect(
+    view.container.querySelector("#assistant-panel .assistant-gate"),
+  ).not.toBeNull();
   expect(auth.send).not.toHaveBeenCalled();
 });
 
@@ -266,7 +299,9 @@ it("drops a pending reply when the visitor signs out", async () => {
   emit(null);
   await act(async () => pending.resolve(reply("AFTER SIGNOUT")));
   expect(view.container.textContent).not.toContain("AFTER SIGNOUT");
-  expect(view.container.textContent).not.toContain("private signout fixture question");
+  expect(view.container.textContent).not.toContain(
+    "private signout fixture question",
+  );
   expect(view.container.querySelector(".assistant-gate")).not.toBeNull();
   expect(localStorage.getItem(historyKey("a"))).not.toContain("AFTER SIGNOUT");
 });
@@ -291,14 +326,20 @@ it("keeps working when localStorage itself throws on access", async () => {
 });
 
 it("opens a reply's tool page inside the chat and returns to the same replies", async () => {
-  seed("a", [{ role: "assistant", content: "[Landscape](/product/landscape)" }]);
+  seed("a", [
+    { role: "assistant", content: "[Landscape](/product/landscape)" },
+  ]);
   const view = await mount(Promise.resolve({ data: { user: user("a") } }));
   await act(async () => undefined);
-  const replyLink = view.container.querySelector('.assistant-msg a[href="/product/landscape"]')!;
+  const replyLink = view.container.querySelector(
+    '.assistant-msg a[href="/product/landscape"]',
+  )!;
   fireEvent.click(replyLink);
   expect(view.container.querySelector(".assistant-product")).not.toBeNull();
   expect(view.getByRole("heading", { name: "Landscape" })).not.toBeNull();
-  expect(view.container.textContent).toContain("The real Landscape tool details inside the chat.");
+  expect(view.container.textContent).toContain(
+    "The real Landscape tool details inside the chat.",
+  );
   expect(view.container.querySelector(".assistant-log")).toBeNull();
   fireEvent.click(view.getByRole("button", { name: "Back to chat" }));
   expect(view.container.querySelector(".assistant-product")).toBeNull();
@@ -325,7 +366,11 @@ it("polls only the open team chat and stops after closing, with failed reads han
     created_at: "2026-11-13",
     last_message_at: "2026-11-13",
   };
-  auth.readChats.mockResolvedValue({ chats: [chat], messages: [], hasMore: false });
+  auth.readChats.mockResolvedValue({
+    chats: [chat],
+    messages: [],
+    hasMore: false,
+  });
   vi.useFakeTimers();
   const view = await mount(Promise.resolve({ data: { user: user("a") } }));
   await act(async () => undefined);
@@ -333,7 +378,9 @@ it("polls only the open team chat and stops after closing, with failed reads han
   await act(async () => {
     await vi.advanceTimersByTimeAsync(3000);
   });
-  expect(view.container.textContent).toContain("The reply could not be sent right now");
+  expect(view.container.textContent).toContain(
+    "The reply could not be sent right now",
+  );
   const closeButton = view.getAllByRole("button", { name: /^Close$/ })[0];
   if (!closeButton) throw new Error("Missing close button");
   fireEvent.click(closeButton);
@@ -344,4 +391,3 @@ it("polls only the open team chat and stops after closing, with failed reads han
   expect(auth.readChats).toHaveBeenCalledTimes(count);
   vi.useRealTimers();
 });
-

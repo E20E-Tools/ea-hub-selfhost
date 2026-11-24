@@ -1,6 +1,10 @@
 import { render, screen, fireEvent } from "@testing-library/react";
 import { QueryClient } from "@tanstack/react-query";
-import { createMemoryHistory, createRouter, RouterProvider } from "@tanstack/react-router";
+import {
+  createMemoryHistory,
+  createRouter,
+  RouterProvider,
+} from "@tanstack/react-router";
 import { describe, expect, it, vi } from "vitest";
 
 vi.mock("@/lib/catalog.functions", async () => {
@@ -15,7 +19,11 @@ vi.mock("@/lib/catalog.functions", async () => {
     ],
   };
   return {
-    catalogQueryOptions: { queryKey: ["catalog"], queryFn: async () => catalog, staleTime: 60_000 },
+    catalogQueryOptions: {
+      queryKey: ["catalog"],
+      queryFn: async () => catalog,
+      staleTime: 60_000,
+    },
   };
 });
 vi.mock("@/lib/contact.functions", () => ({
@@ -39,7 +47,9 @@ vi.mock("@/integrations/supabase/client", () => ({
   supabase: {
     auth: {
       getSession: async () => ({ data: { session: null }, error: null }),
-      onAuthStateChange: () => ({ data: { subscription: { unsubscribe() {} } } }),
+      onAuthStateChange: () => ({
+        data: { subscription: { unsubscribe() {} } },
+      }),
     },
   },
 }));
@@ -54,7 +64,11 @@ describe("Dynamic recommendation previews", () => {
     window.localStorage.setItem(LANGUAGE_STORAGE_KEY, "ar");
     const router = createRouter({
       routeTree,
-      context: { queryClient: new QueryClient({ defaultOptions: { queries: { retry: false } } }) },
+      context: {
+        queryClient: new QueryClient({
+          defaultOptions: { queries: { retry: false } },
+        }),
+      },
       history: createMemoryHistory({ initialEntries: ["/request"] }),
     });
     await router.load();
@@ -67,9 +81,8 @@ describe("Dynamic recommendation previews", () => {
       "href",
       "/product/itfm",
     );
-    expect(await screen.findByRole("link", { name: "Innovation" })).toHaveAttribute(
-      "href",
-      "/product/innovation",
-    );
+    expect(
+      await screen.findByRole("link", { name: "Innovation" }),
+    ).toHaveAttribute("href", "/product/innovation");
   }, 15000);
 });

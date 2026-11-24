@@ -58,8 +58,8 @@ it("finishes the real rig without modifying its cached materials or detaching it
       const headBone = model.getObjectByName("head")!;
       const neutral = headBone.quaternion.clone();
       mixer.clipAction(gesture).reset().play();
-      mixer.update(.8);
-      expect(neutral.angleTo(headBone.quaternion)).toBeGreaterThan(.05);
+      mixer.update(0.8);
+      expect(neutral.angleTo(headBone.quaternion)).toBeGreaterThan(0.05);
     }
     mixer.uncacheRoot(model);
   } finally {

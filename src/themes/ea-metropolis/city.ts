@@ -3,7 +3,12 @@
 export type GPt = [number, number];
 export type Footprint = { x: number; y: number; w: number; d: number };
 export type BuildingKind = "tower" | "stepped" | "twisted" | "dome";
-export type Lot = { cx: number; cy: number; footprint: Footprint; route: GPt[] };
+export type Lot = {
+  cx: number;
+  cy: number;
+  footprint: Footprint;
+  route: GPt[];
+};
 
 /** 2:1 isometric tile (screen px per grid unit is half of these). */
 export const TW = 64;
@@ -51,7 +56,9 @@ export function routeToHQ(cx: number, cy: number): GPt[] {
     pts.push([roadX, 0]);
     if (Math.abs(roadX) > 1.5) pts.push([roadX, 1.5], [1.5 * sgn(cx), 1.5]);
   }
-  return pts.filter((p, i) => i === 0 || p[0] !== pts[i - 1]![0] || p[1] !== pts[i - 1]![1]);
+  return pts.filter(
+    (p, i) => i === 0 || p[0] !== pts[i - 1]![0] || p[1] !== pts[i - 1]![1],
+  );
 }
 
 export function hash(text: string): number {
@@ -84,7 +91,11 @@ export type BuildingSpec = {
 const KINDS: BuildingKind[] = ["tower", "stepped", "twisted", "dome"];
 
 /** Procedural, deterministic building from the product id; height grows with feature count. */
-export function buildingFor(id: string, features: number, lot: GPt): BuildingSpec {
+export function buildingFor(
+  id: string,
+  features: number,
+  lot: GPt,
+): BuildingSpec {
   const r = rng(id);
   const kind = KINDS[hash(id) % KINDS.length]!;
   const w = 1.35 + r() * 0.5;
@@ -121,12 +132,17 @@ export function parkLots(count: number): GPt[] {
 
 /** Grid extent (inclusive of a 1.5-unit kerb) for slabs and roads. */
 export function cityBounds(lots: Lot[]): { min: number; max: number } {
-  const reach = Math.max(3, ...lots.map((l) => Math.max(Math.abs(l.cx), Math.abs(l.cy))));
+  const reach = Math.max(
+    3,
+    ...lots.map((l) => Math.max(Math.abs(l.cx), Math.abs(l.cy))),
+  );
   return { min: -(reach + 1.5), max: reach + 1.5 };
 }
 
 export function footprintsOverlap(a: Footprint, b: Footprint): boolean {
-  return a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.d && b.y < a.y + a.d;
+  return (
+    a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.d && b.y < a.y + a.d
+  );
 }
 
 /** Three visible faces of an iso box: top, left (max-y side) and right (max-x side). */
@@ -143,9 +159,15 @@ export function boxFaces(
       .map((v) => Math.round(v * 10) / 10)
       .join(",");
   return {
-    top: [P(f.x, f.y, z1), P(x1, f.y, z1), P(x1, y1, z1), P(f.x, y1, z1)].join(" "),
-    left: [P(f.x, y1, z0), P(x1, y1, z0), P(x1, y1, z1), P(f.x, y1, z1)].join(" "),
-    right: [P(x1, f.y, z0), P(x1, y1, z0), P(x1, y1, z1), P(x1, f.y, z1)].join(" "),
+    top: [P(f.x, f.y, z1), P(x1, f.y, z1), P(x1, y1, z1), P(f.x, y1, z1)].join(
+      " ",
+    ),
+    left: [P(f.x, y1, z0), P(x1, y1, z0), P(x1, y1, z1), P(f.x, y1, z1)].join(
+      " ",
+    ),
+    right: [P(x1, f.y, z0), P(x1, y1, z0), P(x1, y1, z1), P(x1, f.y, z1)].join(
+      " ",
+    ),
   };
 }
 
@@ -186,7 +208,8 @@ export function skyAt(phase: number): { top: string; horizon: string } {
 /** 0 = full day, 1 = full night. */
 export function nightAt(phase: number): number {
   const p = ((phase % 1) + 1) % 1;
-  const ramp = (a: number, b: number, v: number) => Math.max(0, Math.min(1, (v - a) / (b - a)));
+  const ramp = (a: number, b: number, v: number) =>
+    Math.max(0, Math.min(1, (v - a) / (b - a)));
   if (p < 0.45) return 1 - ramp(0, 0.08, p);
   if (p < 0.7) return ramp(0.45, 0.7, p);
   return p < 0.92 ? 1 : 1 - ramp(0.92, 1, p) * 0.15;

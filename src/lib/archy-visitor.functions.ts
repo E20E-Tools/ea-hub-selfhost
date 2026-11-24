@@ -7,16 +7,26 @@ export type ArchyVisitorSummary = {
   chats: number;
   openSupport: number;
   /** The visitor's latest support requests (newest first, max 3). */
-  support: { id: string; status: string; createdAt: string; updatedAt: string | null }[];
+  support: {
+    id: string;
+    status: string;
+    createdAt: string;
+    updatedAt: string | null;
+  }[];
 };
 
 /** The signed-in visitor's own summary for Archy's guide card: never another visitor's data. */
 export const getMyArchySummary = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<ArchyVisitorSummary | null> => {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: account } = await supabaseAdmin.auth.admin.getUserById(context.userId);
-    const email = account.user?.email_confirmed_at ? account.user.email?.toLowerCase() : null;
+    const { supabaseAdmin } =
+      await import("@/integrations/supabase/client.server");
+    const { data: account } = await supabaseAdmin.auth.admin.getUserById(
+      context.userId,
+    );
+    const email = account.user?.email_confirmed_at
+      ? account.user.email?.toLowerCase()
+      : null;
     if (!email) return null;
     // Chats are read as the caller and filtered to their own rows (admins can read all); support requests are service-only rows
     // matched on the caller's own confirmed email.

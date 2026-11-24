@@ -38,10 +38,14 @@
   --font-sans: var(--lb-body);
   font-family: var(--lb-body);
   background:
-    linear-gradient(oklch(0.55 0.12 255 / 0.12) 1px, transparent 1px) 0 0 / 100px 100px,
-    linear-gradient(90deg, oklch(0.55 0.12 255 / 0.12) 1px, transparent 1px) 0 0 / 100px 100px,
-    linear-gradient(oklch(0.55 0.12 255 / 0.06) 1px, transparent 1px) 0 0 / 20px 20px,
-    linear-gradient(90deg, oklch(0.55 0.12 255 / 0.06) 1px, transparent 1px) 0 0 / 20px 20px,
+    linear-gradient(oklch(0.55 0.12 255 / 0.12) 1px, transparent 1px) 0 0 /
+      100px 100px,
+    linear-gradient(90deg, oklch(0.55 0.12 255 / 0.12) 1px, transparent 1px) 0
+      0 / 100px 100px,
+    linear-gradient(oklch(0.55 0.12 255 / 0.06) 1px, transparent 1px) 0 0 / 20px
+      20px,
+    linear-gradient(90deg, oklch(0.55 0.12 255 / 0.06) 1px, transparent 1px) 0
+      0 / 20px 20px,
     #fff;
 
   & .site-header {
@@ -56,10 +60,18 @@
     block-size: 12px;
     border-top: 1px solid var(--lb-ink);
     background:
-      repeating-linear-gradient(90deg, var(--lb-ink) 0 1px, transparent 1px 50px) top / 100% 12px
-        no-repeat,
-      repeating-linear-gradient(90deg, var(--lb-ink) 0 1px, transparent 1px 10px) top / 100% 5px
-        no-repeat;
+      repeating-linear-gradient(
+          90deg,
+          var(--lb-ink) 0 1px,
+          transparent 1px 50px
+        )
+        top / 100% 12px no-repeat,
+      repeating-linear-gradient(
+          90deg,
+          var(--lb-ink) 0 1px,
+          transparent 1px 10px
+        )
+        top / 100% 5px no-repeat;
   }
   & .site-nav {
     border-radius: 0 !important;
@@ -129,11 +141,15 @@
       linear-gradient(var(--c), var(--c)) 0 6px / 14px 1px no-repeat,
       linear-gradient(var(--c), var(--c)) 6px 0 / 1px 14px no-repeat,
       linear-gradient(var(--c), var(--c)) 100% 6px / 14px 1px no-repeat,
-      linear-gradient(var(--c), var(--c)) calc(100% - 6px) 0 / 1px 14px no-repeat,
-      linear-gradient(var(--c), var(--c)) 0 calc(100% - 6px) / 14px 1px no-repeat,
+      linear-gradient(var(--c), var(--c)) calc(100% - 6px) 0 / 1px 14px
+        no-repeat,
+      linear-gradient(var(--c), var(--c)) 0 calc(100% - 6px) / 14px 1px
+        no-repeat,
       linear-gradient(var(--c), var(--c)) 6px 100% / 1px 14px no-repeat,
-      linear-gradient(var(--c), var(--c)) 100% calc(100% - 6px) / 14px 1px no-repeat,
-      linear-gradient(var(--c), var(--c)) calc(100% - 6px) 100% / 1px 14px no-repeat;
+      linear-gradient(var(--c), var(--c)) 100% calc(100% - 6px) / 14px 1px
+        no-repeat,
+      linear-gradient(var(--c), var(--c)) calc(100% - 6px) 100% / 1px 14px
+        no-repeat;
   }
   & .product-card::after {
     content: "SHEET A-" counter(lb-sheet, decimal-leading-zero);
@@ -210,7 +226,14 @@
   }
 
   /* Inner pages read as sheets with a title block. */
-  & :is(.home-action, .detail-hero, .detail-visual, .request-form, .request-success) {
+  &
+    :is(
+      .home-action,
+      .detail-hero,
+      .detail-visual,
+      .request-form,
+      .request-success
+    ) {
     position: relative;
     border-radius: 0;
     border: 1px solid var(--lb-ink);
@@ -256,7 +279,8 @@
   inline-size: 100%;
   padding: 0;
   background:
-    radial-gradient(120% 90% at 30% 20%, var(--lb-blue), var(--lb-blue-2)), var(--lb-blue);
+    radial-gradient(120% 90% at 30% 20%, var(--lb-blue), var(--lb-blue-2)),
+    var(--lb-blue);
   color: var(--lb-line);
   overflow: hidden;
   font-family: var(--lb-body);
@@ -635,8 +659,10 @@
   border-radius: 0;
   border: 1px solid var(--lb-ink);
   background:
-    linear-gradient(oklch(0.55 0.12 255 / 0.06) 1px, transparent 1px) 0 0 / 16px 16px,
-    linear-gradient(90deg, oklch(0.55 0.12 255 / 0.06) 1px, transparent 1px) 0 0 / 16px 16px,
+    linear-gradient(oklch(0.55 0.12 255 / 0.06) 1px, transparent 1px) 0 0 / 16px
+      16px,
+    linear-gradient(90deg, oklch(0.55 0.12 255 / 0.06) 1px, transparent 1px) 0
+      0 / 16px 16px,
     #fff;
   color: var(--lb-ink);
   box-shadow:
@@ -863,7 +889,9 @@
   }
 }
 
-:root[data-motion="off"] .lb-stage :is(.lb-draw, .lb-fade, .lb-room-btn, .lb-dim-live),
+:root[data-motion="off"]
+  .lb-stage
+  :is(.lb-draw, .lb-fade, .lb-room-btn, .lb-dim-live),
 :root[data-motion="off"] :is(.lb-stamp, .product-inspector.lb-sheet-panel) {
   animation: none !important;
 }

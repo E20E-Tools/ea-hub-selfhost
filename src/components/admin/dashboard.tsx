@@ -136,11 +136,7 @@ export function DashboardSection({
         description={t("navDashboardDesc")}
         actions={
           <>
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => go("settings")}
-            >
+            <Button size="sm" variant="outline" onClick={() => go("settings")}>
               <Settings className="size-4" aria-hidden="true" />
               {t("quickSiteSettings")}
             </Button>

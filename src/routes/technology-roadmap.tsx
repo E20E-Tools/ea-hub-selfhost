@@ -4,7 +4,12 @@ import { CalendarRange, Layers, Table2, Search, X } from "lucide-react";
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { ALL_CATEGORIES, filterCatalog, localizedProduct, localizedSettings } from "@/lib/catalog";
+import {
+  ALL_CATEGORIES,
+  filterCatalog,
+  localizedProduct,
+  localizedSettings,
+} from "@/lib/catalog";
 import { catalogQueryOptions } from "@/lib/catalog.functions";
 import {
   buildTechnologyRoadmap,
@@ -21,7 +26,8 @@ import { useThemeArt } from "@/themes/use-theme-art";
 import { pageUrl } from "@/lib/seo";
 
 export const Route = createFileRoute("/technology-roadmap")({
-  loader: ({ context }) => context.queryClient.ensureQueryData(catalogQueryOptions),
+  loader: ({ context }) =>
+    context.queryClient.ensureQueryData(catalogQueryOptions),
   head: () => ({
     meta: [
       { title: "Technology roadmap 2026–2027 — E20E Tools | خارطة التقنيات" },
@@ -30,7 +36,10 @@ export const Route = createFileRoute("/technology-roadmap")({
         content:
           "خارطة تبنّي مقترحة لجميع أدوات مكتبة E20E Tools خلال 2026 و2027، تشمل التخطيط والتجربة والتحسين. A suggested adoption roadmap for every E20E Tools library product across 2026 and 2027.",
       },
-      { property: "og:title", content: "Technology roadmap 2026–2027 — E20E Tools" },
+      {
+        property: "og:title",
+        content: "Technology roadmap 2026–2027 — E20E Tools",
+      },
       {
         property: "og:description",
         content:
@@ -50,16 +59,24 @@ function TechnologyRoadmap() {
   const art = useThemeArt();
   const { language, dir, t } = useLanguage();
   const settings = localizedSettings(catalog.settings, language);
-  const list = catalog.products.map((product) => localizedProduct(product, language));
+  const list = catalog.products.map((product) =>
+    localizedProduct(product, language),
+  );
   const [year, setYear] = useState<number | undefined>();
   const [query, setQuery] = useState("");
   const [view, setView] = useState<"timeline" | "list">("timeline");
   const now = new Date();
-  const currentPeriod = now.getUTCFullYear() + "-Q" + (Math.floor(now.getUTCMonth() / 3) + 1);
+  const currentPeriod =
+    now.getUTCFullYear() + "-Q" + (Math.floor(now.getUTCMonth() / 3) + 1);
   const [category, setCategory] = useState(ALL_CATEGORIES);
   const periods = roadmapPeriods(year);
-  const rows = buildTechnologyRoadmap(filterCatalog(list, query, category), year);
-  const available = catalog.products.filter((product) => !product.comingSoon).length;
+  const rows = buildTechnologyRoadmap(
+    filterCatalog(list, query, category),
+    year,
+  );
+  const available = catalog.products.filter(
+    (product) => !product.comingSoon,
+  ).length;
 
   return (
     <FeatureGate featureKey="roadmap">
@@ -88,7 +105,10 @@ function TechnologyRoadmap() {
             </div>
           </dl>
         </header>
-        <section className="roadmap-controls" aria-label={t("roadmapFilterLabel")}>
+        <section
+          className="roadmap-controls"
+          aria-label={t("roadmapFilterLabel")}
+        >
           <div className="roadmap-search">
             <Search size={17} />
             <Input
@@ -108,7 +128,11 @@ function TechnologyRoadmap() {
               </Button>
             )}
           </div>
-          <div className="roadmap-years" role="group" aria-label={t("yearLabel")}>
+          <div
+            className="roadmap-years"
+            role="group"
+            aria-label={t("yearLabel")}
+          >
             <Button
               variant={year === undefined ? "default" : "ghost"}
               aria-pressed={year === undefined}
@@ -127,22 +151,27 @@ function TechnologyRoadmap() {
               </Button>
             ))}
           </div>
-          <div className="roadmap-categories" role="group" aria-label={t("roadmapFieldLabel")}>
-            {[[ALL_CATEGORIES, t("allFilter")], ...Object.entries(settings.categories)].map(
-              ([id, label]) => (
-                <Button
-                  size="sm"
-                  variant={category === id ? "default" : "ghost"}
-                  key={id}
-                  aria-pressed={category === id}
-                  onClick={() => {
-                    if (id) setCategory(id);
-                  }}
-                >
-                  {label}
-                </Button>
-              ),
-            )}
+          <div
+            className="roadmap-categories"
+            role="group"
+            aria-label={t("roadmapFieldLabel")}
+          >
+            {[
+              [ALL_CATEGORIES, t("allFilter")],
+              ...Object.entries(settings.categories),
+            ].map(([id, label]) => (
+              <Button
+                size="sm"
+                variant={category === id ? "default" : "ghost"}
+                key={id}
+                aria-pressed={category === id}
+                onClick={() => {
+                  if (id) setCategory(id);
+                }}
+              >
+                {label}
+              </Button>
+            ))}
           </div>
         </section>
         <div className="ea-roadmap-view">
@@ -162,7 +191,11 @@ function TechnologyRoadmap() {
               <Table2 size={16} />
               {language === "ar" ? "الجدول الزمني" : "Timeline"}
             </button>
-            <button type="button" aria-pressed={view === "list"} onClick={() => setView("list")}>
+            <button
+              type="button"
+              aria-pressed={view === "list"}
+              onClick={() => setView("list")}
+            >
               <Layers size={16} />
               {language === "ar" ? "حسب الأداة" : "By tool"}
             </button>
@@ -173,10 +206,17 @@ function TechnologyRoadmap() {
             {rows.map(({ product, milestones }) => (
               <article key={product.id}>
                 <header>
-                  <Link to="/product/$productId" params={{ productId: product.id }}>
+                  <Link
+                    to="/product/$productId"
+                    params={{ productId: product.id }}
+                  >
                     <h2 dir="auto">{product.name}</h2>
                   </Link>
-                  <span>{product.comingSoon ? t("comingSoonBadge") : t("roadmapLive")}</span>
+                  <span>
+                    {product.comingSoon
+                      ? t("comingSoonBadge")
+                      : t("roadmapLive")}
+                  </span>
                 </header>
                 <ol>
                   {milestones.map((m) => (
@@ -200,7 +240,9 @@ function TechnologyRoadmap() {
           aria-label={t("roadmapTableLabel")}
           tabIndex={0}
         >
-          <table className={`roadmap-table ${year ? "roadmap-single-year" : ""}`}>
+          <table
+            className={`roadmap-table ${year ? "roadmap-single-year" : ""}`}
+          >
             <caption className="sr-only">{t("roadmapCaption")}</caption>
             <thead>
               <tr>
@@ -208,7 +250,12 @@ function TechnologyRoadmap() {
                   {t("roadmapColumn")}
                 </th>
                 {(year ? [year] : [...ROADMAP_YEARS]).map((value) => (
-                  <th key={value} colSpan={4} scope="colgroup" className="roadmap-year-head">
+                  <th
+                    key={value}
+                    colSpan={4}
+                    scope="colgroup"
+                    className="roadmap-year-head"
+                  >
                     {value}
                   </th>
                 ))}
@@ -218,7 +265,9 @@ function TechnologyRoadmap() {
                   <th
                     key={period.id}
                     scope="col"
-                    className={period.id === currentPeriod ? "roadmap-current" : ""}
+                    className={
+                      period.id === currentPeriod ? "roadmap-current" : ""
+                    }
                   >
                     <span dir="ltr">Q{period.quarter}</span>
                     <small>{quarterRanges[language][period.quarter - 1]}</small>
@@ -246,9 +295,18 @@ function TechnologyRoadmap() {
                       )}
                       <span>
                         <strong dir="ltr">{product.name}</strong>
-                        <small>{settings.categories[product.category] ?? product.label}</small>
-                        <em className={product.comingSoon ? "roadmap-soon" : "roadmap-live"}>
-                          {product.comingSoon ? t("comingSoonBadge") : t("roadmapLive")}
+                        <small>
+                          {settings.categories[product.category] ??
+                            product.label}
+                        </small>
+                        <em
+                          className={
+                            product.comingSoon ? "roadmap-soon" : "roadmap-live"
+                          }
+                        >
+                          {product.comingSoon
+                            ? t("comingSoonBadge")
+                            : t("roadmapLive")}
                         </em>
                       </span>
                     </Link>
@@ -282,16 +340,21 @@ function TechnologyRoadmap() {
             </Button>
           </div>
         )}
-        <section className="roadmap-legend" aria-label={t("roadmapPhasesLabel")}>
-          {(["plan", "pilot", "adopt", "optimize", "conditional"] as const).map((phase) => (
-            <div key={phase}>
-              <i className={`roadmap-phase-${phase}`} />
-              <span>
-                <strong>{roadmapPhaseLabel(phase, language)}</strong>
-                <small>{roadmapPhaseDetail(phase, language)}</small>
-              </span>
-            </div>
-          ))}
+        <section
+          className="roadmap-legend"
+          aria-label={t("roadmapPhasesLabel")}
+        >
+          {(["plan", "pilot", "adopt", "optimize", "conditional"] as const).map(
+            (phase) => (
+              <div key={phase}>
+                <i className={`roadmap-phase-${phase}`} />
+                <span>
+                  <strong>{roadmapPhaseLabel(phase, language)}</strong>
+                  <small>{roadmapPhaseDetail(phase, language)}</small>
+                </span>
+              </div>
+            ),
+          )}
         </section>
         <p className="roadmap-footnote">{t("roadmapFootnote")}</p>
       </main>

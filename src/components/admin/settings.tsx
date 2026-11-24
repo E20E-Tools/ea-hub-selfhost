@@ -29,7 +29,11 @@ import {
 } from "lucide-react";
 import "./settings-workspace.css";
 import { searchSettings } from "@/lib/settings-search.shared";
-import { ApplicationHealth, SettingsHistory, RetentionManagement } from "./operations";
+import {
+  ApplicationHealth,
+  SettingsHistory,
+  RetentionManagement,
+} from "./operations";
 import { JourneyOverview } from "./journey";
 import type { AdminTab } from "@/lib/admin-sections";
 import { SETTINGS_GROUPS, TAB_LABELS } from "@/lib/admin-sections";
@@ -76,7 +80,12 @@ const DESCRIPTIONS: Partial<Record<AdminTab, AdminCopyKey>> = {
   archy: "tabArchyDesc",
 };
 
-const groupIcons = [Fingerprint, PanelsTopLeft, AudioLines, MonitorCog] as const;
+const groupIcons = [
+  Fingerprint,
+  PanelsTopLeft,
+  AudioLines,
+  MonitorCog,
+] as const;
 const icons = {
   general: Fingerprint,
   appearance: Palette,
@@ -115,8 +124,11 @@ export function SettingsSection({
   const searchInput = useRef<HTMLInputElement>(null);
   const [customizeTheme, setCustomizeTheme] = useState<DesignThemeId>();
   const layout = useSettingsLayout();
-  const current = tab && Object.hasOwn(icons, tab) ? (tab as WorkspaceTab) : "overview";
-  const group = SETTINGS_GROUPS.find((g) => (g.tabs as readonly string[]).includes(current));
+  const current =
+    tab && Object.hasOwn(icons, tab) ? (tab as WorkspaceTab) : "overview";
+  const group = SETTINGS_GROUPS.find((g) =>
+    (g.tabs as readonly string[]).includes(current),
+  );
   const matches = searchSettings(query);
   const Next = dir === "rtl" ? ChevronLeft : ChevronRight;
   const searching = Boolean(query.trim());
@@ -142,7 +154,8 @@ export function SettingsSection({
     const observer = new MutationObserver(() => {
       if (focusField()) observer.disconnect();
     });
-    if (!focusField()) observer.observe(container, { childList: true, subtree: true });
+    if (!focusField())
+      observer.observe(container, { childList: true, subtree: true });
     return () => {
       observer.disconnect();
       highlighted?.classList.remove("settings-field-focus");
@@ -164,7 +177,9 @@ export function SettingsSection({
   const open = (id: AdminTab, focus?: string) => {
     if (current === id && (search.focus === focus || !focus)) {
       setQuery("");
-      requestAnimationFrame(() => focus && document.getElementById(focus)?.focus());
+      requestAnimationFrame(
+        () => focus && document.getElementById(focus)?.focus(),
+      );
     } else if (focus) {
       void navigate({
         to: "/admin",
@@ -180,37 +195,43 @@ export function SettingsSection({
   };
   const Icon = current === "overview" ? LayoutGrid : icons[current];
   const formBody = (
-          <div className="settings-form-body" ref={body}>
-            {current === "general" ? <GeneralSettings catalog={catalog} /> : null}
-            {current === "appearance" ? (
-              <AppearanceSettings catalog={catalog} onCustomize={openCustomize} />
-            ) : null}
-            {current === "customize" && (
-              <CustomizeSettings catalog={catalog} initialTheme={customizeTheme} />
-            )}
-            {current === "terms" && <TermsSettings catalog={catalog} />}
-            {current === "notifications" && (
-              <ContactSettings key="notifications" catalog={catalog} mode="notifications" />
-            )}
-            {current === "testimonials" ? <TestimonialsSettings /> : null}
-            {current === "navigation" ? <NavigationSettings catalog={catalog} /> : null}
-            {current === "features" ? <FeatureSettings catalog={catalog} /> : null}
-            {current === "status" ? (
-              <FeatureStatus
-                catalog={catalog}
-                onManage={(key) => open("features", "feature-" + key)}
-              />
-            ) : null}
-            {current === "contact" ? (
-              <ContactSettings key="public" catalog={catalog} mode="public" />
-            ) : null}
-            {current === "ai" ? <AiSettings /> : null}
-            {current === "archy" ? <ArchySettings catalog={catalog} /> : null}
-            {current === "health" ? <ApplicationHealth /> : null}
-            {current === "history" ? <SettingsHistory /> : null}
-            {current === "retention" ? <RetentionManagement /> : null}
-            {current === "journey" ? <JourneyOverview /> : null}
-          </div>
+    <div className="settings-form-body" ref={body}>
+      {current === "general" ? <GeneralSettings catalog={catalog} /> : null}
+      {current === "appearance" ? (
+        <AppearanceSettings catalog={catalog} onCustomize={openCustomize} />
+      ) : null}
+      {current === "customize" && (
+        <CustomizeSettings catalog={catalog} initialTheme={customizeTheme} />
+      )}
+      {current === "terms" && <TermsSettings catalog={catalog} />}
+      {current === "notifications" && (
+        <ContactSettings
+          key="notifications"
+          catalog={catalog}
+          mode="notifications"
+        />
+      )}
+      {current === "testimonials" ? <TestimonialsSettings /> : null}
+      {current === "navigation" ? (
+        <NavigationSettings catalog={catalog} />
+      ) : null}
+      {current === "features" ? <FeatureSettings catalog={catalog} /> : null}
+      {current === "status" ? (
+        <FeatureStatus
+          catalog={catalog}
+          onManage={(key) => open("features", "feature-" + key)}
+        />
+      ) : null}
+      {current === "contact" ? (
+        <ContactSettings key="public" catalog={catalog} mode="public" />
+      ) : null}
+      {current === "ai" ? <AiSettings /> : null}
+      {current === "archy" ? <ArchySettings catalog={catalog} /> : null}
+      {current === "health" ? <ApplicationHealth /> : null}
+      {current === "history" ? <SettingsHistory /> : null}
+      {current === "retention" ? <RetentionManagement /> : null}
+      {current === "journey" ? <JourneyOverview /> : null}
+    </div>
   );
   return (
     <div className="settings-workspace">
@@ -231,8 +252,16 @@ export function SettingsSection({
         </div>
         <div className="settings-heading-row">
           <div>
-            <h1>{current === "overview" ? t("navSettings") : t(TAB_LABELS[current])}</h1>
-            <p>{current === "overview" ? t("navSettingsDesc") : t(DESCRIPTIONS[current]!)}</p>
+            <h1>
+              {current === "overview"
+                ? t("navSettings")
+                : t(TAB_LABELS[current])}
+            </h1>
+            <p>
+              {current === "overview"
+                ? t("navSettingsDesc")
+                : t(DESCRIPTIONS[current]!)}
+            </p>
           </div>
           <div className="settings-finder" role="search">
             <Search size={17} aria-hidden="true" />
@@ -251,7 +280,10 @@ export function SettingsSection({
                 const first = matches[0];
                 if (e.key === "Enter" && first && !e.nativeEvent.isComposing) {
                   e.preventDefault();
-                  open(first.tab, first.control?.replace(/-ar$/, "-" + language));
+                  open(
+                    first.tab,
+                    first.control?.replace(/-ar$/, "-" + language),
+                  );
                 }
                 if (e.key === "Escape") setQuery("");
               }}
@@ -273,19 +305,31 @@ export function SettingsSection({
         <LayoutSwitcher state={layout} />
       </header>
       {searching && (
-        <section className="settings-results" aria-label={t("opsSettingsSearch")}>
-          {matches.length > 0 && <p role="status">{t("searchSettingsResults")} · {matches.length}</p>}
-          <ul ref={resultsList} onKeyDown={(event) => {
-            if (event.key === "Escape") {
-              setQuery("");
-              searchInput.current?.focus();
-            }
-          }}>
+        <section
+          className="settings-results"
+          aria-label={t("opsSettingsSearch")}
+        >
+          {matches.length > 0 && (
+            <p role="status">
+              {t("searchSettingsResults")} · {matches.length}
+            </p>
+          )}
+          <ul
+            ref={resultsList}
+            onKeyDown={(event) => {
+              if (event.key === "Escape") {
+                setQuery("");
+                searchInput.current?.focus();
+              }
+            }}
+          >
             {matches.map((m) => (
               <li key={m.tab + "-" + (m.control ?? "")}>
                 <button
                   type="button"
-                  onClick={() => open(m.tab, m.control?.replace(/-ar$/, "-" + language))}
+                  onClick={() =>
+                    open(m.tab, m.control?.replace(/-ar$/, "-" + language))
+                  }
                 >
                   <span>
                     {t(m.label)}
@@ -300,12 +344,27 @@ export function SettingsSection({
         </section>
       )}
       {current === "overview" && !searching && layout.active === "classic" && (
-        <section className="settings-quick" aria-labelledby="settings-quick-title">
+        <section
+          className="settings-quick"
+          aria-labelledby="settings-quick-title"
+        >
           <h2 id="settings-quick-title">{t("quickSettingsTitle")}</h2>
           <div>
-            <button type="button" onClick={() => open("navigation")}>{t("quickSettingsMenu")}<Next size={16} /></button>
-            <button type="button" onClick={() => open("ai", "archy-test-input")}>{t("quickSettingsChat")}<Next size={16} /></button>
-            <button type="button" onClick={() => open("contact", "c-email")}>{t("quickSettingsEmail")}<Next size={16} /></button>
+            <button type="button" onClick={() => open("navigation")}>
+              {t("quickSettingsMenu")}
+              <Next size={16} />
+            </button>
+            <button
+              type="button"
+              onClick={() => open("ai", "archy-test-input")}
+            >
+              {t("quickSettingsChat")}
+              <Next size={16} />
+            </button>
+            <button type="button" onClick={() => open("contact", "c-email")}>
+              {t("quickSettingsEmail")}
+              <Next size={16} />
+            </button>
           </div>
         </section>
       )}
@@ -319,7 +378,12 @@ export function SettingsSection({
         />
       ) : current === "overview" && layout.active === "control" ? (
         <div hidden={searching}>
-          <ControlCenter catalog={catalog} icons={icons} descriptions={DESCRIPTIONS} open={open} />
+          <ControlCenter
+            catalog={catalog}
+            icons={icons}
+            descriptions={DESCRIPTIONS}
+            open={open}
+          />
         </div>
       ) : current === "overview" ? (
         <div className="settings-directory" hidden={searching}>
@@ -340,8 +404,11 @@ export function SettingsSection({
                       <li key={id}>
                         <button type="button" onClick={() => open(id)}>
                           <TileIcon size={16} />
-                          <span>{t(TAB_LABELS[id])}
-                            {DESCRIPTIONS[id] && <small>{t(DESCRIPTIONS[id]!)}</small>}
+                          <span>
+                            {t(TAB_LABELS[id])}
+                            {DESCRIPTIONS[id] && (
+                              <small>{t(DESCRIPTIONS[id]!)}</small>
+                            )}
                           </span>
                           <Next size={16} />
                         </button>

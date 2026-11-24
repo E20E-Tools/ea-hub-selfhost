@@ -30,9 +30,11 @@ vi.mock("@tanstack/react-start", () => ({
 vi.mock("@/integrations/supabase/auth-middleware", () => ({
   requireSupabaseAuth: {},
 }));
-const jar=vi.hoisted(()=>new Map<string,string>());
+const jar = vi.hoisted(() => new Map<string, string>());
 vi.mock("@tanstack/react-start/server", () => ({
-  getCookie:(key:string)=>jar.get(key),setCookie:(key:string,value:string)=>jar.set(key,value),setResponseHeader:vi.fn(),
+  getCookie: (key: string) => jar.get(key),
+  setCookie: (key: string, value: string) => jar.set(key, value),
+  setResponseHeader: vi.fn(),
   getRequest: () => new Request("http://127.0.0.1/"),
 }));
 vi.mock("@/lib/recommend.server", () => ({
@@ -104,16 +106,35 @@ it("registers a visitor, serves a reply and stores its model and the visitor rat
     const { supabaseAdmin } =
       await import("@/integrations/supabase/client.server");
     // Two different browsers use the same transport/IP. Only the first visitor should hit their quota.
-    const policy=await supabaseAdmin.from("ai_assistant_settings").upsert({id:true,registration_limit:2,registration_wait_minutes:3});
+    const policy = await supabaseAdmin
+      .from("ai_assistant_settings")
+      .upsert({
+        id: true,
+        registration_limit: 2,
+        registration_wait_minutes: 3,
+      });
     expect(policy.error).toBeNull();
-    async function registerAgain(){
-      const c=await getAssistantChallenge();if(c.mode!=="math")throw Error("Expected math");
-      return registerAssistantVisitor({data:{name:"Release test",email:"release@example.test",question:"",answer:String(c.a+c.b),token:c.token,language:"en"}});
+    async function registerAgain() {
+      const c = await getAssistantChallenge();
+      if (c.mode !== "math") throw Error("Expected math");
+      return registerAssistantVisitor({
+        data: {
+          name: "Release test",
+          email: "release@example.test",
+          question: "",
+          answer: String(c.a + c.b),
+          token: c.token,
+          language: "en",
+        },
+      });
     }
     expect((await registerAgain()).ok).toBe(true);
-    const blocked=await registerAgain();
+    const blocked = await registerAgain();
     expect(blocked.ok).toBe(false);
-    if(!blocked.ok){expect(blocked.retryAt).toBeGreaterThan(Date.now()+170000);expect(blocked.retryAt).toBeLessThanOrEqual(Date.now()+180001);}
+    if (!blocked.ok) {
+      expect(blocked.retryAt).toBeGreaterThan(Date.now() + 170000);
+      expect(blocked.retryAt).toBeLessThanOrEqual(Date.now() + 180001);
+    }
     jar.clear();
     expect((await registerAgain()).ok).toBe(true);
     const { data, error } = await supabaseAdmin

@@ -35,7 +35,9 @@ export function WorkControls({ ar }: { ar: boolean }) {
     i = ar ? 0 : 1;
   return (
     <section className="bx-panel grid gap-3">
-      <h2>{dictionaries[ar ? "ar" : "en"].workAssistantTaskAssistantAndPrivacy}</h2>
+      <h2>
+        {dictionaries[ar ? "ar" : "en"].workAssistantTaskAssistantAndPrivacy}
+      </h2>
       <p>
         {dictionaries[ar ? "ar" : "en"].workAssistantChooseAvailableTasksAnd}
       </p>
@@ -59,7 +61,7 @@ export function WorkControls({ ar }: { ar: boolean }) {
                 />{" "}
                 {j === 0
                   ? dictionaries[ar ? "ar" : "en"].workAssistantEnableFeature
-                  : (dictionaries[ar ? "ar" : "en"].workAssistantAllowOpenai) +
+                  : dictionaries[ar ? "ar" : "en"].workAssistantAllowOpenai +
                     sections[f][j === 1 ? 0 : 1][i]}
               </label>
             ))}
@@ -81,7 +83,9 @@ export function WorkControls({ ar }: { ar: boolean }) {
             await saveWorkPolicy({ data: draft });
             cache.setQueryData(["archy-work-policy"], draft);
             set(null);
-            note(dictionaries[ar ? "ar" : "en"].workAssistantTaskPermissionsSaved);
+            note(
+              dictionaries[ar ? "ar" : "en"].workAssistantTaskPermissionsSaved,
+            );
           } catch {
             note(dictionaries[ar ? "ar" : "en"].workAssistantSaveFailed);
           } finally {
@@ -124,10 +128,10 @@ export function CloudOption({
   if (!Object.keys(fields).length) return null;
   return (
     <details className="mt-3">
-      <summary>{dictionaries[ar ? "ar" : "en"].workAssistantRefineWithOpenai}</summary>
-      <p>
-        {dictionaries[ar ? "ar" : "en"].workAssistantTextThatWillBe}
-      </p>
+      <summary>
+        {dictionaries[ar ? "ar" : "en"].workAssistantRefineWithOpenai}
+      </summary>
+      <p>{dictionaries[ar ? "ar" : "en"].workAssistantTextThatWillBe}</p>
       <pre className="whitespace-pre-wrap break-words">
         {Object.values(fields).join("\n")}
       </pre>
@@ -150,14 +154,17 @@ export function CloudOption({
             setModel(res.model);
           } catch {
             set(
-              dictionaries[ar ? "ar" : "en"].workAssistantOpenaiIsUnavailableThe,
+              dictionaries[ar ? "ar" : "en"]
+                .workAssistantOpenaiIsUnavailableThe,
             );
           } finally {
             wait(false);
           }
         }}
       >
-        {busy ? "…" : dictionaries[ar ? "ar" : "en"].workAssistantConfirmAndSend}
+        {busy
+          ? "…"
+          : dictionaries[ar ? "ar" : "en"].workAssistantConfirmAndSend}
       </Button>
       <div role="status" className="whitespace-pre-wrap">
         {model && (

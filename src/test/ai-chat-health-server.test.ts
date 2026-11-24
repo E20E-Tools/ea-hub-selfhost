@@ -19,7 +19,8 @@ vi.mock("@tanstack/react-start/server", () => ({
 vi.mock("@/integrations/supabase/client.server", () => {
   const query = (table: string) => {
     const q: Record<string, unknown> = {};
-    for (const k of ["select", "eq", "gte", "in", "order", "limit"]) q[k] = () => q;
+    for (const k of ["select", "eq", "gte", "in", "order", "limit"])
+      q[k] = () => q;
     q["then"] = (resolve: (v: unknown) => void) =>
       resolve(
         table === "application_telemetry"
@@ -35,7 +36,10 @@ vi.mock("@/integrations/supabase/client.server", () => {
   return {
     supabaseAdmin: {
       from: query,
-      rpc: async (_name: string, args: { _bucket: string; _subject: string; _limit: number }) => {
+      rpc: async (
+        _name: string,
+        args: { _bucket: string; _subject: string; _limit: number },
+      ) => {
         const key = `${args._bucket}|${args._subject}`;
         const used = m.counts.get(key) ?? 0;
         if (used >= args._limit) return { data: false, error: null };
@@ -50,7 +54,11 @@ import { noteAiFailures } from "@/lib/telemetry.server";
 
 const NOW = Date.parse("2026-11-17T12:00:00Z");
 const min = (n: number) => new Date(NOW - n * 60_000).toISOString();
-const row = (outcome: "success" | "failure", duration_ms: number, minutesAgo: number) => ({
+const row = (
+  outcome: "success" | "failure",
+  duration_ms: number,
+  minutesAgo: number,
+) => ({
   operation: "assistant",
   outcome,
   duration_ms,

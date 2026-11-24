@@ -15,7 +15,9 @@ describe("terms of service", () => {
     expect(termsText(empty, "en")).toBe(DEFAULT_TERMS_EN);
   });
   it("uses the saved text when present", () => {
-    expect(termsText(normalizeTerms({ ar: "## أ\nنص" }), "ar")).toBe("## أ\nنص");
+    expect(termsText(normalizeTerms({ ar: "## أ\nنص" }), "ar")).toBe(
+      "## أ\nنص",
+    );
   });
   it("draft is governed by Saudi law", () => {
     expect(DEFAULT_TERMS_EN).toContain("Kingdom of Saudi Arabia");

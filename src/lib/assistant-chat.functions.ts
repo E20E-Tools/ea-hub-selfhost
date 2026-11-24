@@ -1,17 +1,32 @@
-import {archyPage,contextForAnswer,type ArchyPage} from "./archy-page";
+import { archyPage, contextForAnswer, type ArchyPage } from "./archy-page";
 import { createServerFn } from "@tanstack/react-start";
-import { CHAT_GLOBAL_BUCKET, CHAT_GLOBAL_DAY_LIMIT, ipEmailSubject } from "./ai-budget.shared";
-import { isReplyLanguage, type Recommendation, type ReplyLanguage } from "./recommend.shared";
+import {
+  CHAT_GLOBAL_BUCKET,
+  CHAT_GLOBAL_DAY_LIMIT,
+  ipEmailSubject,
+} from "./ai-budget.shared";
+import {
+  isReplyLanguage,
+  type Recommendation,
+  type ReplyLanguage,
+} from "./recommend.shared";
 import { assistantRegistrationSchema } from "./assistant-registration";
 
 export type AssistantTurn = { role: "user" | "assistant"; content: string };
 /** `code: "gate"` means the access token is missing, expired or owned by another account. */
 export type AssistantResult =
-  { ok: true; messageId?: string; reply: Recommendation } | { ok: false; message: string; code?: "gate" };
+  | { ok: true; messageId?: string; reply: Recommendation }
+  | { ok: false; message: string; code?: "gate" };
 
 const TEXT: Record<
   ReplyLanguage,
-  { limit: string; refused: string; failed: string; gate: string; suspended: string }
+  {
+    limit: string;
+    refused: string;
+    failed: string;
+    gate: string;
+    suspended: string;
+  }
 > = {
   ar: {
     limit: "وصلت إلى الحد المؤقت للرسائل. حاول بعد بضع دقائق.",
@@ -21,11 +36,13 @@ const TEXT: Record<
     suspended: "أُوقفت المحادثة مؤقتًا بسبب نشاط غير معتاد. حاول بعد 24 ساعة.",
   },
   en: {
-    limit: "You have reached the temporary message limit. Try again in a few minutes.",
+    limit:
+      "You have reached the temporary message limit. Try again in a few minutes.",
     refused: "Not allowed from outside the site.",
     failed: "The reply could not be sent right now. Try again.",
     gate: "Please register your details before using the tool guide.",
-    suspended: "Chat was suspended due to unusual activity. Try again in 24 hours.",
+    suspended:
+      "Chat was suspended due to unusual activity. Try again in 24 hours.",
   },
 };
 
@@ -37,7 +54,10 @@ export function validateTurns(value: unknown): {
   language: ReplyLanguage;
   access: string;
 } {
-  const source = value && typeof value === "object" ? (value as Record<string, unknown>) : {};
+  const source =
+    value && typeof value === "object"
+      ? (value as Record<string, unknown>)
+      : {};
   const raw = Array.isArray(source["turns"]) ? source["turns"] : [];
   if (raw.length === 0) throw new Error("لا توجد رسالة.");
   // Only the newest visitor turn is accepted. Earlier context comes from the server-stored
@@ -49,10 +69,12 @@ export function validateTurns(value: unknown): {
       : "";
   if (!content) throw new Error("اكتب رسالتك أولًا.");
   const turns: AssistantTurn[] = [{ role: "user", content }];
-  const language: ReplyLanguage = isReplyLanguage(source["language"]) ? source["language"] : "ar";
+  const language: ReplyLanguage = isReplyLanguage(source["language"])
+    ? source["language"]
+    : "ar";
   const access = typeof source["access"] === "string" ? source["access"] : "";
-  const context=archyPage(source["context"]);
-  return { turns, language, access,...(context && {context}) };
+  const context = archyPage(source["context"]);
+  return { turns, language, access, ...(context && { context }) };
 }
 
 export const sendAssistantMessage = createServerFn({ method: "POST" })
@@ -65,16 +87,20 @@ export const sendAssistantMessage = createServerFn({ method: "POST" })
     if (site && site !== "same-origin" && site !== "none")
       return { ok: false, message: text.refused };
     const { serverFeatureEnabled } = await import("./site-features.server");
-    if (!(await serverFeatureEnabled("assistant"))) return { ok: false, message: text.failed };
-    const { verifyAccessToken, gateSecrets } = await import("./assistant-gate.server");
+    if (!(await serverFeatureEnabled("assistant")))
+      return { ok: false, message: text.failed };
+    const { verifyAccessToken, gateSecrets } =
+      await import("./assistant-gate.server");
     const access = await verifyAccessToken(await gateSecrets(), data.access);
     if (!access) return { ok: false, message: text.gate, code: "gate" };
     // Guest identity is minted only after the signed math check, never derived from typed email.
-    if (!access.visitorId) return { ok: false, message: text.gate, code: "gate" };
+    if (!access.visitorId)
+      return { ok: false, message: text.gate, code: "gate" };
     const email = access.email.trim().toLowerCase();
     const { checkLimits, clientIp, hashSubject, noteBudgetUsage } =
       await import("./rate-limit.server");
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { supabaseAdmin } =
+      await import("@/integrations/supabase/client.server");
     // Ban key combines IP and email so nobody can lock out another visitor by email alone.
     const banKey = `${clientIp(request)}|${access.email}`;
     // Per-visitor quotas use the same IP + email pairing: the email in the pass is typed, not verified.
@@ -89,7 +115,8 @@ export const sendAssistantMessage = createServerFn({ method: "POST" })
       .eq("subject", subject)
       .gte("created_at", since);
     // Fail closed (without banning) when the ban store cannot be read.
-    if (bans.error || bans.count === null) return { ok: false, message: text.failed };
+    if (bans.error || bans.count === null)
+      return { ok: false, message: text.failed };
     if (bans.count > 0) return { ok: false, message: text.suspended };
     // Bot suspicion: more than 5 messages within 30 seconds is not human-paced.
     const pace = await checkLimits([
@@ -97,15 +124,42 @@ export const sendAssistantMessage = createServerFn({ method: "POST" })
     ]);
     if (pace === "error") return { ok: false, message: text.failed };
     if (pace === "limited") {
-      await supabaseAdmin.from("rate_limit_events").insert({ bucket: "chat:ban", subject });
+      await supabaseAdmin
+        .from("rate_limit_events")
+        .insert({ bucket: "chat:ban", subject });
       return { ok: false, message: text.suspended };
     }
     const quota = await checkLimits([
-      { bucket: "chat:ip", subject: clientIp(request), limit: 20, windowSeconds: 600 },
-      { bucket: "chat:ip-day", subject: clientIp(request), limit: 40, windowSeconds: 86_400 },
-      { bucket: "chat:user-10m", subject: userKey, limit: 5, windowSeconds: 600 },
-      { bucket: "chat:user-hour", subject: userKey, limit: 10, windowSeconds: 3600 },
-      { bucket: "chat:user-day", subject: userKey, limit: 30, windowSeconds: 86_400 },
+      {
+        bucket: "chat:ip",
+        subject: clientIp(request),
+        limit: 20,
+        windowSeconds: 600,
+      },
+      {
+        bucket: "chat:ip-day",
+        subject: clientIp(request),
+        limit: 40,
+        windowSeconds: 86_400,
+      },
+      {
+        bucket: "chat:user-10m",
+        subject: userKey,
+        limit: 5,
+        windowSeconds: 600,
+      },
+      {
+        bucket: "chat:user-hour",
+        subject: userKey,
+        limit: 10,
+        windowSeconds: 3600,
+      },
+      {
+        bucket: "chat:user-day",
+        subject: userKey,
+        limit: 30,
+        windowSeconds: 86_400,
+      },
       {
         bucket: CHAT_GLOBAL_BUCKET,
         subject: "all",
@@ -115,15 +169,44 @@ export const sendAssistantMessage = createServerFn({ method: "POST" })
     ]);
     if (quota === "error") return { ok: false, message: text.failed };
     if (quota === "limited") return { ok: false, message: text.limit };
-    await noteBudgetUsage(CHAT_GLOBAL_BUCKET, CHAT_GLOBAL_DAY_LIMIT, "ai.chat_global_limit_80");
+    await noteBudgetUsage(
+      CHAT_GLOBAL_BUCKET,
+      CHAT_GLOBAL_DAY_LIMIT,
+      "ai.chat_global_limit_80",
+    );
     try {
       // Context is the visitor's current open conversation as stored on the server
       // (visitor + AI messages, oldest first, at most 12), then the new visitor turn.
       const live = await import("./live-chat.server");
-      const history = await live.openChatContext(supabaseAdmin, access.visitorId);
+      const history = await live.openChatContext(
+        supabaseAdmin,
+        access.visitorId,
+      );
       const { runAssistantChat } = await import("./recommend.server");
-      const answerStarted=Date.now();
-      const {answer: reply, source, model} = await runAssistantChat([...history, ...data.turns.map(turn=>data.context?{...turn,content:turn.content+"\n["+contextForAnswer(data.context,data.language==="ar")+"]"}:turn)], data.language,true);
+      const answerStarted = Date.now();
+      const {
+        answer: reply,
+        source,
+        model,
+      } = await runAssistantChat(
+        [
+          ...history,
+          ...data.turns.map((turn) =>
+            data.context
+              ? {
+                  ...turn,
+                  content:
+                    turn.content +
+                    "\n[" +
+                    contextForAnswer(data.context, data.language === "ar") +
+                    "]",
+                }
+              : turn,
+          ),
+        ],
+        data.language,
+        true,
+      );
       let messageId: string | undefined;
       // Owner asked to keep every chat (visitor prompt + AI reply) for three months so
       // admins can read it and continue with a person.
@@ -135,16 +218,30 @@ export const sendAssistantMessage = createServerFn({ method: "POST" })
           language: data.language,
         });
         const last = data.turns[data.turns.length - 1]?.content ?? "";
-        const promptId = crypto.randomUUID(), id = crypto.randomUUID();
+        const promptId = crypto.randomUUID(),
+          id = crypto.randomUUID();
         await live.appendMessages(supabaseAdmin, chat.id, [
-          { id:promptId,sender: "visitor", body: last },
-          { id,sender: "ai", body: reply.summary, prompt_id:promptId,reply_ms:Date.now()-answerStarted,reply_source:source,reply_model:model,reply_language:/\p{Script=Arabic}/u.test(last)?"ar":/[a-z]/i.test(last)?"en":data.language },
+          { id: promptId, sender: "visitor", body: last },
+          {
+            id,
+            sender: "ai",
+            body: reply.summary,
+            prompt_id: promptId,
+            reply_ms: Date.now() - answerStarted,
+            reply_source: source,
+            reply_model: model,
+            reply_language: /\p{Script=Arabic}/u.test(last)
+              ? "ar"
+              : /[a-z]/i.test(last)
+                ? "en"
+                : data.language,
+          },
         ]);
-        messageId=id;
+        messageId = id;
       } catch (error) {
         console.error("live chat save failed");
       }
-      return { ok: true, reply, ...(messageId ? {messageId} : {}) };
+      return { ok: true, reply, ...(messageId ? { messageId } : {}) };
     } catch (error) {
       console.error("assistant chat failed");
       return { ok: false, message: text.failed };
@@ -152,7 +249,8 @@ export const sendAssistantMessage = createServerFn({ method: "POST" })
   });
 
 export type AssistantRegistration =
-  { ok: true; token: string; name: string; exp: number } | { ok: false; message: string;retryAt?:number };
+  | { ok: true; token: string; name: string; exp: number }
+  | { ok: false; message: string; retryAt?: number };
 
 export function validateRegistration(value: unknown): {
   name: string;
@@ -178,14 +276,17 @@ export type AssistantChallenge =
 export const getAssistantChallenge = createServerFn({ method: "GET" }).handler(
   async (): Promise<AssistantChallenge> => {
     const { serverFeatureEnabled } = await import("./site-features.server");
-    if (!(await serverFeatureEnabled("assistant"))) throw new Error(TEXT.ar.failed);
-    const {registrationBrowser} = await import("./assistant-gate.server");
-    const {setResponseHeader} = await import("@tanstack/react-start/server");
-    setResponseHeader("Cache-Control","private, no-store");
+    if (!(await serverFeatureEnabled("assistant")))
+      throw new Error(TEXT.ar.failed);
+    const { registrationBrowser } = await import("./assistant-gate.server");
+    const { setResponseHeader } = await import("@tanstack/react-start/server");
+    setResponseHeader("Cache-Control", "private, no-store");
     await registrationBrowser(true);
     const turnstile = (await import("./turnstile.server")).turnstileConfig();
-    if (turnstile) return { mode: "turnstile", siteKey: turnstile.siteKey, token: "" };
-    const { issueChallenge, gateSecret } = await import("./assistant-gate.server");
+    if (turnstile)
+      return { mode: "turnstile", siteKey: turnstile.siteKey, token: "" };
+    const { issueChallenge, gateSecret } =
+      await import("./assistant-gate.server");
     return { mode: "math", ...(await issueChallenge(await gateSecret())) };
   },
 );
@@ -211,16 +312,30 @@ export const registerAssistantVisitor = createServerFn({ method: "POST" })
     // Honeypot: real visitors never see or fill this field.
     if (data.website) return { ok: false, message: text.failed };
     const { serverFeatureEnabled } = await import("./site-features.server");
-    if (!(await serverFeatureEnabled("assistant"))) return { ok: false, message: text.failed };
-    const {clientIp,hashSubject} = await import("./rate-limit.server");
+    if (!(await serverFeatureEnabled("assistant")))
+      return { ok: false, message: text.failed };
+    const { clientIp, hashSubject } = await import("./rate-limit.server");
     const gate = await import("./assistant-gate.server");
     const browser = await gate.registrationBrowser(false);
-    if (!browser) return {ok:false,message:data.language==="ar"?"اسمح بملفات تعريف الارتباط وأعد المحاولة.":"Allow cookies and try again."};
+    if (!browser)
+      return {
+        ok: false,
+        message:
+          data.language === "ar"
+            ? "اسمح بملفات تعريف الارتباط وأعد المحاولة."
+            : "Allow cookies and try again.",
+      };
     const turnstileServer = await import("./turnstile.server");
     const turnstile = turnstileServer.turnstileConfig();
     if (turnstile) {
       // Cloudflare enforces single use of its own tokens.
-      if (!(await turnstileServer.verifyTurnstile(turnstile, data.turnstile, clientIp(request))))
+      if (
+        !(await turnstileServer.verifyTurnstile(
+          turnstile,
+          data.turnstile,
+          clientIp(request),
+        ))
+      )
         return { ok: false, message: text.failed };
     } else {
       const secrets = await gate.gateSecrets();
@@ -242,16 +357,23 @@ export const registerAssistantVisitor = createServerFn({ method: "POST" })
         return { ok: false, message: text.failed };
     }
     const secret = await gate.gateSecret();
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const {data: retryAt,error} = await supabaseAdmin.rpc("register_archy_guest", {
-      _subject:await hashSubject(browser), _name:data.name || guestName(data.language), _email:data.email, _question:data.question
-    });
+    const { supabaseAdmin } =
+      await import("@/integrations/supabase/client.server");
+    const { data: retryAt, error } = await supabaseAdmin.rpc(
+      "register_archy_guest",
+      {
+        _subject: await hashSubject(browser),
+        _name: data.name || guestName(data.language),
+        _email: data.email,
+        _question: data.question,
+      },
+    );
     if (error) {
       console.error("assistant registration failed", error.code);
       return { ok: false, message: text.failed };
     }
-    if (typeof retryAt !== "number") return {ok:false,message:text.failed};
-    if (retryAt > 0) return {ok:false,message:text.limit,retryAt};
+    if (typeof retryAt !== "number") return { ok: false, message: text.failed };
+    if (retryAt > 0) return { ok: false, message: text.limit, retryAt };
     const name = data.name || guestName(data.language);
     const access = await gate.issueAccessToken(
       secret,

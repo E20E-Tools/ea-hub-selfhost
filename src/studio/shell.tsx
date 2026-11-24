@@ -258,7 +258,10 @@ export function StudioFooter() {
     { to: "/about", label: dictionaries[ar ? "ar" : "en"].shellAbout },
     { to: "/contact", label: dictionaries[ar ? "ar" : "en"].shellContact },
     { to: "/terms", label: dictionaries[ar ? "ar" : "en"].termsPageTitle },
-    { to: "/privacy", label: dictionaries[ar ? "ar" : "en"].privacyPrivacyPolicy },
+    {
+      to: "/privacy",
+      label: dictionaries[ar ? "ar" : "en"].privacyPrivacyPolicy,
+    },
   ];
   return (
     <footer className="nx-foot">

@@ -9,7 +9,8 @@ import { dictionaries } from "@/lib/copy";
 
 /** Visitor-facing count text; small numbers are shown as-is, zero invites the first signup. */
 export function waitlistCountText(count: number, ar: boolean): string {
-  if (count <= 0) return dictionaries[ar ? "ar" : "en"].productWaitlistBeTheFirstOn;
+  if (count <= 0)
+    return dictionaries[ar ? "ar" : "en"].productWaitlistBeTheFirstOn;
   if (!ar)
     return count === 1 ? "1 person is waiting" : `${count} people are waiting`;
   if (count === 1) return "شخص واحد بانتظارها";
@@ -108,7 +109,10 @@ export function ProductWaitlist({
           }}
         >
           <label htmlFor={`${id}-p`}>
-            {dictionaries[ar ? "ar" : "en"].productWaitlistWhatProblemShouldThis}
+            {
+              dictionaries[ar ? "ar" : "en"]
+                .productWaitlistWhatProblemShouldThis
+            }
           </label>
           <textarea
             id={`${id}-p`}
@@ -116,9 +120,7 @@ export function ProductWaitlist({
             maxLength={600}
             value={problem}
             onChange={(e) => setProblem(e.target.value)}
-            placeholder={
-              dictionaries[ar ? "ar" : "en"].productWaitlistEGWeCan
-            }
+            placeholder={dictionaries[ar ? "ar" : "en"].productWaitlistEGWeCan}
           />
           <label htmlFor={`${id}-e`}>
             {dictionaries[ar ? "ar" : "en"].productWaitlistYourEmail}
@@ -142,7 +144,8 @@ export function ProductWaitlist({
           {(state === "error" || state === "limit") && (
             <p className="ea-waitlist-error" role="alert">
               {state === "limit"
-                ? dictionaries[ar ? "ar" : "en"].productWaitlistTooManyAttemptsTry
+                ? dictionaries[ar ? "ar" : "en"]
+                    .productWaitlistTooManyAttemptsTry
                 : dictionaries[ar ? "ar" : "en"].productWaitlistCouldnTAddYou}
             </p>
           )}

@@ -6,7 +6,11 @@ const Tabs = React.forwardRef<
   React.ElementRef<typeof TabsPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof TabsPrimitive.Root>
 >(({ className, ...props }, ref) => (
-  <TabsPrimitive.Root ref={ref} className={cn("min-w-0", className)} {...props} />
+  <TabsPrimitive.Root
+    ref={ref}
+    className={cn("min-w-0", className)}
+    {...props}
+  />
 ));
 Tabs.displayName = TabsPrimitive.Root.displayName;
 

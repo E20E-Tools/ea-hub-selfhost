@@ -1,27 +1,46 @@
 import { z } from "zod";
 
 const planSchema = z.object({
-  id: z.uuid(), tool: z.string(), goal: z.string(), owner: z.string(),
-  date: z.iso.date(), criterion: z.string(), reason: z.string(),
+  id: z.uuid(),
+  tool: z.string(),
+  goal: z.string(),
+  owner: z.string(),
+  date: z.iso.date(),
+  criterion: z.string(),
+  reason: z.string(),
 });
 const attemptSchema = z.object({
-  id: z.uuid(), task: z.string(), result: z.string(),
-  link: z.string().transform(value => {
+  id: z.uuid(),
+  task: z.string(),
+  result: z.string(),
+  link: z.string().transform((value) => {
     if (!value) return "";
     try {
       const url = new URL(value);
       return ["http:", "https:"].includes(url.protocol) ? url.href : "";
-    } catch { return ""; }
+    } catch {
+      return "";
+    }
   }),
 });
 const reviewSchema = z.object({
-  choice: z.enum(["adopt", "extend", "alternative"]), reason: z.string(),
-  date: z.iso.date(), next: z.string(),
+  choice: z.enum(["adopt", "extend", "alternative"]),
+  reason: z.string(),
+  date: z.iso.date(),
+  next: z.string(),
 });
 const trialSchema = planSchema.extend({
-  ownerKey: z.uuid(), invite: z.uuid(), shared: z.boolean(), closed: z.boolean(),
-  attempts: z.array(attemptSchema), reviews: z.array(reviewSchema),
-  feedback: z.array(z.object({outcome: z.enum(["yes","partial","no"]), note: z.string()})).default([]),
+  ownerKey: z.uuid(),
+  invite: z.uuid(),
+  shared: z.boolean(),
+  closed: z.boolean(),
+  attempts: z.array(attemptSchema),
+  reviews: z.array(reviewSchema),
+  feedback: z
+    .array(
+      z.object({ outcome: z.enum(["yes", "partial", "no"]), note: z.string() }),
+    )
+    .default([]),
 });
 export type Plan = z.infer<typeof planSchema>;
 export type Review = z.infer<typeof reviewSchema>;
@@ -33,8 +52,11 @@ export function allTrials(): Trial[] {
   for (const key of Object.keys(localStorage)) {
     if (!key.startsWith(prefix)) continue;
     try {
-      const record = trialSchema.safeParse(JSON.parse(localStorage.getItem(key) ?? "null"));
-      if (record.success && prefix + record.data.id === key) records.push(record.data);
+      const record = trialSchema.safeParse(
+        JSON.parse(localStorage.getItem(key) ?? "null"),
+      );
+      if (record.success && prefix + record.data.id === key)
+        records.push(record.data);
     } catch {
       /* Skip unreadable entries. */
     }

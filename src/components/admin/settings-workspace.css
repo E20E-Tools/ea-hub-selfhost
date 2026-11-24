@@ -100,7 +100,11 @@
 }
 .settings-domain {
   --domain-accent: var(--console-accent);
-  --domain-surface: color-mix(in srgb, var(--console-accent) 10%, var(--console-card));
+  --domain-surface: color-mix(
+    in srgb,
+    var(--console-accent) 10%,
+    var(--console-card)
+  );
   padding: 1.15rem;
 }
 .settings-domain > header {
@@ -252,7 +256,13 @@
   color: oklch(98.8% 0.016 160);
   padding: 1.2rem 1.5rem;
   border-radius: 0.8rem;
-  background: radial-gradient(ellipse at top right, oklch(39.2% 0.048 160), transparent 64%), oklch(28.5% 0.032 160);
+  background:
+    radial-gradient(
+      ellipse at top right,
+      oklch(39.2% 0.048 160),
+      transparent 64%
+    ),
+    oklch(28.5% 0.032 160);
 }
 .settings-identity-preview small {
   display: block;
@@ -439,12 +449,42 @@
   }
 }
 
-.settings-quick { padding:1rem; margin-block-end:1rem; border:1px solid var(--settings-line); border-radius:.9rem; background:var(--console-paper); }
-.settings-quick h2 { font-size:1rem; font-weight:650; margin-block-end:.65rem; }
-.settings-quick > div { display:grid; grid-template-columns:repeat(auto-fit,minmax(min(100%,12rem),1fr)); gap:.5rem; }
-.settings-quick button { display:flex; align-items:center; justify-content:space-between; gap:.5rem; min-height:44px; padding:.6rem .85rem; border:1px solid var(--settings-line); border-radius:.55rem; background:var(--settings-paper); color:var(--settings-ink); text-align:start; }
-.settings-quick button:hover { border-color:var(--settings-teal); }
-.settings-quick svg { color:var(--settings-teal); }
+.settings-quick {
+  padding: 1rem;
+  margin-block-end: 1rem;
+  border: 1px solid var(--settings-line);
+  border-radius: 0.9rem;
+  background: var(--console-paper);
+}
+.settings-quick h2 {
+  font-size: 1rem;
+  font-weight: 650;
+  margin-block-end: 0.65rem;
+}
+.settings-quick > div {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 12rem), 1fr));
+  gap: 0.5rem;
+}
+.settings-quick button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  min-height: 44px;
+  padding: 0.6rem 0.85rem;
+  border: 1px solid var(--settings-line);
+  border-radius: 0.55rem;
+  background: var(--settings-paper);
+  color: var(--settings-ink);
+  text-align: start;
+}
+.settings-quick button:hover {
+  border-color: var(--settings-teal);
+}
+.settings-quick svg {
+  color: var(--settings-teal);
+}
 
 /* Product layout picker thumbnails */
 .pl-thumb {

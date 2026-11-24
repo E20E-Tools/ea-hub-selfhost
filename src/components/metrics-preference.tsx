@@ -18,7 +18,9 @@ export function MetricsPreference() {
           <input
             type="checkbox"
             checked={!preference.optedOut}
-            onChange={(event) => setFailed(!setMetricsOptOut(!event.currentTarget.checked))}
+            onChange={(event) =>
+              setFailed(!setMetricsOptOut(!event.currentTarget.checked))
+            }
           />
           <span>{t("bxMetricsLabel")}</span>
         </label>

@@ -1,7 +1,11 @@
 // @vitest-environment node
 import { beforeEach, describe, expect, it, vi } from "vitest";
 const mocks = vi.hoisted(() => ({
-  context: null as null | { userId: string; claims: unknown; supabase: unknown },
+  context: null as null | {
+    userId: string;
+    claims: unknown;
+    supabase: unknown;
+  },
   role: vi.fn(),
   from: vi.fn(),
   users: vi.fn(),
@@ -18,18 +22,31 @@ vi.mock("@tanstack/react-start", () => ({
     return b;
   },
 }));
-vi.mock("@/integrations/supabase/auth-middleware", () => ({ requireSupabaseAuth: {} }));
+vi.mock("@/integrations/supabase/auth-middleware", () => ({
+  requireSupabaseAuth: {},
+}));
 vi.mock("@/integrations/supabase/client.server", () => ({
-  supabaseAdmin: { from: mocks.from, auth: { admin: { listUsers: mocks.users } } },
+  supabaseAdmin: {
+    from: mocks.from,
+    auth: { admin: { listUsers: mocks.users } },
+  },
 }));
 import { listVisitorProfiles } from "@/lib/visitors.functions";
 beforeEach(() => {
   vi.resetAllMocks();
-  mocks.context = { userId: "caller", claims: {}, supabase: { rpc: mocks.role, from: mocks.from } };
+  mocks.context = {
+    userId: "caller",
+    claims: {},
+    supabase: { rpc: mocks.role, from: mocks.from },
+  };
   mocks.role.mockResolvedValue({ data: true, error: null });
   mocks.users.mockResolvedValue({ data: { users: [] }, error: null });
   mocks.from.mockReturnValue({
-    select: () => ({ order: () => ({ range: () => Promise.resolve({ data: [], error: null }) }) }),
+    select: () => ({
+      order: () => ({
+        range: () => Promise.resolve({ data: [], error: null }),
+      }),
+    }),
   });
 });
 describe("visitor details authorization", () => {

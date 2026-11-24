@@ -21,12 +21,33 @@ export function E20eOsThumb() {
       <rect width="320" height="180" fill="url(#os-t-a)" />
       <rect width="320" height="180" fill="url(#os-t-b)" />
       <rect width="320" height="12" fill="oklch(0.2 0.03 260 / 0.6)" />
-      <rect x="8" y="4" width="26" height="4" rx="2" fill="oklch(0.95 0.01 260)" />
-      <rect x="270" y="4" width="40" height="4" rx="2" fill="oklch(0.95 0.01 260 / 0.7)" />
+      <rect
+        x="8"
+        y="4"
+        width="26"
+        height="4"
+        rx="2"
+        fill="oklch(0.95 0.01 260)"
+      />
+      <rect
+        x="270"
+        y="4"
+        width="40"
+        height="4"
+        rx="2"
+        fill="oklch(0.95 0.01 260 / 0.7)"
+      />
       {icon.map((c, i) => (
         <g key={i} transform={`translate(14 ${22 + i * 34})`}>
           <rect width="22" height="22" rx="6" fill={c} />
-          <rect x="1" y="25" width="20" height="3" rx="1.5" fill="oklch(0.95 0.01 260 / 0.8)" />
+          <rect
+            x="1"
+            y="25"
+            width="20"
+            height="3"
+            rx="1.5"
+            fill="oklch(0.95 0.01 260 / 0.8)"
+          />
         </g>
       ))}
       <g transform="translate(110 28)">
@@ -41,10 +62,38 @@ export function E20eOsThumb() {
         <circle cx="10" cy="8" r="3" fill="oklch(0.68 0.2 25)" />
         <circle cx="20" cy="8" r="3" fill="oklch(0.82 0.16 85)" />
         <circle cx="30" cy="8" r="3" fill="oklch(0.76 0.17 145)" />
-        <rect x="8" y="22" width="154" height="38" rx="4" fill="oklch(0.536 0.089 205 / 0.6)" />
-        <rect x="8" y="68" width="80" height="5" rx="2.5" fill="oklch(0.95 0.01 260)" />
-        <rect x="8" y="79" width="120" height="4" rx="2" fill="oklch(0.95 0.01 260 / 0.55)" />
-        <rect x="8" y="88" width="34" height="9" rx="4.5" fill="oklch(0.712 0.131 83.7)" />
+        <rect
+          x="8"
+          y="22"
+          width="154"
+          height="38"
+          rx="4"
+          fill="oklch(0.536 0.089 205 / 0.6)"
+        />
+        <rect
+          x="8"
+          y="68"
+          width="80"
+          height="5"
+          rx="2.5"
+          fill="oklch(0.95 0.01 260)"
+        />
+        <rect
+          x="8"
+          y="79"
+          width="120"
+          height="4"
+          rx="2"
+          fill="oklch(0.95 0.01 260 / 0.55)"
+        />
+        <rect
+          x="8"
+          y="88"
+          width="34"
+          height="9"
+          rx="4.5"
+          fill="oklch(0.712 0.131 83.7)"
+        />
       </g>
       <rect
         x="92"
@@ -56,7 +105,15 @@ export function E20eOsThumb() {
         stroke="oklch(1 0 0 / 0.25)"
       />
       {[...icon, "oklch(0.25 0.02 260)"].map((c, i) => (
-        <rect key={i} x={100 + i * 25} y="156" width="17" height="14" rx="4" fill={c} />
+        <rect
+          key={i}
+          x={100 + i * 25}
+          y="156"
+          width="17"
+          height="14"
+          rx="4"
+          fill={c}
+        />
       ))}
     </svg>
   );

@@ -14,11 +14,13 @@ type TurnstileApi = {
   remove: (id: string) => void;
 };
 
-const SCRIPT_SRC = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+const SCRIPT_SRC =
+  "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
 let loading: Promise<TurnstileApi> | null = null;
 
 function loadTurnstile(): Promise<TurnstileApi> {
-  const existing = (window as unknown as { turnstile?: TurnstileApi }).turnstile;
+  const existing = (window as unknown as { turnstile?: TurnstileApi })
+    .turnstile;
   if (existing) return Promise.resolve(existing);
   loading ??= new Promise<TurnstileApi>((resolve, reject) => {
     const script = document.createElement("script");

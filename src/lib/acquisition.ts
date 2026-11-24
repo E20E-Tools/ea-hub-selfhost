@@ -13,9 +13,15 @@ export type AcquisitionGuide = {
 };
 
 /** Requirements and purchase path for a tool that cannot be requested yet; null when available. */
-export function acquisitionGuide(product: Product, language: Language): AcquisitionGuide | null {
+export function acquisitionGuide(
+  product: Product,
+  language: Language,
+): AcquisitionGuide | null {
   if (!product.comingSoon) return null;
-  const details = localizeBeneficiaryDetails(product.beneficiaryDetails, language);
+  const details = localizeBeneficiaryDetails(
+    product.beneficiaryDetails,
+    language,
+  );
   return {
     requirements: details.prerequisites,
     // Never substitute a generic process: an empty list is shown as "not provided".
@@ -28,7 +34,11 @@ export function acquisitionGuide(product: Product, language: Language): Acquisit
 }
 
 /** Pre-filled sales email subject so the team sees which upcoming tool the visitor wants. */
-export function salesMailto(email: string, productName: string, language: Language): string {
+export function salesMailto(
+  email: string,
+  productName: string,
+  language: Language,
+): string {
   const subject = pick(
     language,
     `اهتمام بشراء ${productName}`,

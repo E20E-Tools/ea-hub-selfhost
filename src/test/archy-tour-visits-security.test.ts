@@ -1,6 +1,11 @@
 // @vitest-environment node
 import { beforeEach, describe, expect, it, vi } from "vitest";
-const mocks = vi.hoisted(() => ({ from: vi.fn(), verify: vi.fn(), admin: vi.fn(), context: {} }));
+const mocks = vi.hoisted(() => ({
+  from: vi.fn(),
+  verify: vi.fn(),
+  admin: vi.fn(),
+  context: {},
+}));
 vi.mock("@tanstack/react-start", () => ({
   createServerFn: () => {
     let validate = (x: unknown) => x;
@@ -16,14 +21,21 @@ vi.mock("@tanstack/react-start", () => ({
     return b;
   },
 }));
-vi.mock("@/integrations/supabase/auth-middleware", () => ({ requireSupabaseAuth: {} }));
+vi.mock("@/integrations/supabase/auth-middleware", () => ({
+  requireSupabaseAuth: {},
+}));
 vi.mock("@/lib/admin-guard.server", () => ({ requireAdmin: mocks.admin }));
 vi.mock("@/lib/archy-tour-visits.server", () => ({
   verifyTourVisitToken: mocks.verify,
   tourVisitorIdentity: vi.fn(),
 }));
-vi.mock("@/integrations/supabase/client.server", () => ({ supabaseAdmin: { from: mocks.from } }));
-import { listTourVisits, updateTourVisit } from "@/lib/archy-tour-visits.functions";
+vi.mock("@/integrations/supabase/client.server", () => ({
+  supabaseAdmin: { from: mocks.from },
+}));
+import {
+  listTourVisits,
+  updateTourVisit,
+} from "@/lib/archy-tour-visits.functions";
 beforeEach(() => {
   vi.resetAllMocks();
   mocks.context = {};
@@ -31,7 +43,9 @@ beforeEach(() => {
 describe("tour visitor authorization", () => {
   it("rejects a forged tour token before reading records", async () => {
     mocks.verify.mockResolvedValue(null);
-    expect(await updateTourVisit({ data: { token: "forged", action: "chat" } })).toEqual({
+    expect(
+      await updateTourVisit({ data: { token: "forged", action: "chat" } }),
+    ).toEqual({
       ok: false,
     });
     expect(mocks.from).not.toHaveBeenCalled();

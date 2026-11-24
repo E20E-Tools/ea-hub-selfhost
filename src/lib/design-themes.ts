@@ -25,7 +25,12 @@ export type DesignThemeId = (typeof DESIGN_THEME_IDS)[number];
 export type AnimationIntensity = "low" | "medium" | "high";
 
 /** Layouts for the product detail page; "classic" is the original dossier. */
-export const PRODUCT_LAYOUTS = ["classic", "mission", "spec", "journey"] as const;
+export const PRODUCT_LAYOUTS = [
+  "classic",
+  "mission",
+  "spec",
+  "journey",
+] as const;
 export type ProductLayout = (typeof PRODUCT_LAYOUTS)[number];
 
 export const PRODUCT_LAYOUT_META: Record<
@@ -34,7 +39,10 @@ export const PRODUCT_LAYOUT_META: Record<
 > = {
   classic: {
     name: { en: "Classic dossier", ar: "الملف الكلاسيكي" },
-    description: { en: "The original single-column dossier.", ar: "الملف الأصلي بعمود واحد." },
+    description: {
+      en: "The original single-column dossier.",
+      ar: "الملف الأصلي بعمود واحد.",
+    },
   },
   mission: {
     name: { en: "Mission control", ar: "غرفة التحكم" },
@@ -60,7 +68,9 @@ export const PRODUCT_LAYOUT_META: Record<
 };
 
 export function isProductLayout(v: unknown): v is ProductLayout {
-  return typeof v === "string" && (PRODUCT_LAYOUTS as readonly string[]).includes(v);
+  return (
+    typeof v === "string" && (PRODUCT_LAYOUTS as readonly string[]).includes(v)
+  );
 }
 
 export type DesignThemeSetting = {
@@ -89,7 +99,10 @@ export const DESIGN_THEMES: DesignThemeMeta[] = [
   {
     id: "classic",
     name: { en: "Classic", ar: "كلاسيكي" },
-    description: { en: "The original warm paper look.", ar: "المظهر الأصلي بلون الورق الدافئ." },
+    description: {
+      en: "The original warm paper look.",
+      ar: "المظهر الأصلي بلون الورق الدافئ.",
+    },
     dark: false,
   },
   {
@@ -263,7 +276,9 @@ export function themeMeta(id: DesignThemeId): DesignThemeMeta {
 }
 
 export function isDesignThemeId(v: unknown): v is DesignThemeId {
-  return typeof v === "string" && (DESIGN_THEME_IDS as readonly string[]).includes(v);
+  return (
+    typeof v === "string" && (DESIGN_THEME_IDS as readonly string[]).includes(v)
+  );
 }
 
 /** Unknown or retired values fall back to Classic with animations on at medium intensity. */
@@ -274,11 +289,15 @@ export function normalizeDesignTheme(value: unknown): DesignThemeSetting {
       : {};
   const setting: DesignThemeSetting = {
     theme: isDesignThemeId(src["theme"]) ? src["theme"] : "classic",
-    animations: typeof src["animations"] === "boolean" ? src["animations"] : true,
+    animations:
+      typeof src["animations"] === "boolean" ? src["animations"] : true,
     intensity:
-      src["intensity"] === "low" || src["intensity"] === "high" ? src["intensity"] : "medium",
+      src["intensity"] === "low" || src["intensity"] === "high"
+        ? src["intensity"]
+        : "medium",
   };
-  if (isProductLayout(src["productLayout"])) setting.productLayout = src["productLayout"];
+  if (isProductLayout(src["productLayout"]))
+    setting.productLayout = src["productLayout"];
   return setting;
 }
 
@@ -308,14 +327,27 @@ const FONT_FAMILIES = {
 export type ThemeFontFamily = keyof typeof FONT_FAMILIES;
 
 /** Fonts each design actually uses; Classic uses only the site fonts, so it loads nothing extra. */
-export const THEME_FONT_FAMILIES: Record<DesignThemeId, readonly ThemeFontFamily[]> = {
+export const THEME_FONT_FAMILIES: Record<
+  DesignThemeId,
+  readonly ThemeFontFamily[]
+> = {
   classic: [],
   "circuit-core": ["Handjet", "IBM Plex Mono", "IBM Plex Sans Arabic"],
   "e20e-os": ["Sora", "IBM Plex Sans Arabic", "JetBrains Mono"],
   "transformation-metro": ["Readex Pro", "IBM Plex Sans Arabic"],
-  "e20e-galaxy": ["Orbitron", "Space Grotesk", "IBM Plex Sans Arabic", "Tajawal"],
+  "e20e-galaxy": [
+    "Orbitron",
+    "Space Grotesk",
+    "IBM Plex Sans Arabic",
+    "Tajawal",
+  ],
   "digital-mashrabiya": ["Reem Kufi", "IBM Plex Sans Arabic"],
-  "legacy-to-digital": ["Sora", "IBM Plex Sans Arabic", "VT323", "IBM Plex Mono"],
+  "legacy-to-digital": [
+    "Sora",
+    "IBM Plex Sans Arabic",
+    "VT323",
+    "IBM Plex Mono",
+  ],
   "living-blueprint": [
     "IBM Plex Mono",
     "Architects Daughter",
@@ -323,7 +355,12 @@ export const THEME_FONT_FAMILIES: Record<DesignThemeId, readonly ThemeFontFamily
     "IBM Plex Sans Arabic",
   ],
   "ea-metropolis": ["Space Grotesk", "IBM Plex Mono"],
-  "transformation-board": ["Sora", "IBM Plex Sans Arabic", "IBM Plex Mono", "VT323"],
+  "transformation-board": [
+    "Sora",
+    "IBM Plex Sans Arabic",
+    "IBM Plex Mono",
+    "VT323",
+  ],
   "untangle-chaos": ["Sora", "IBM Plex Sans Arabic", "VT323", "IBM Plex Mono"],
   "reveal-lens": ["Sora", "IBM Plex Sans Arabic", "VT323", "IBM Plex Mono"],
   "problem-to-tool": ["Sora", "IBM Plex Sans Arabic", "VT323", "IBM Plex Mono"],
@@ -332,7 +369,12 @@ export const THEME_FONT_FAMILIES: Record<DesignThemeId, readonly ThemeFontFamily
   "ea-layers": ["Sora", "IBM Plex Sans Arabic", "VT323", "IBM Plex Mono"],
   "time-scanner": ["Sora", "IBM Plex Sans Arabic", "JetBrains Mono"],
   "orbital-portal": ["Sora", "IBM Plex Sans Arabic", "JetBrains Mono"],
-  "terminal-migration": ["Sora", "IBM Plex Sans Arabic", "JetBrains Mono", "VT323"],
+  "terminal-migration": [
+    "Sora",
+    "IBM Plex Sans Arabic",
+    "JetBrains Mono",
+    "VT323",
+  ],
 };
 
 function fontsHrefFor(families: readonly ThemeFontFamily[]): string {
@@ -347,4 +389,6 @@ export function themeFontsHref(id: DesignThemeId): string {
 }
 
 /** Every design's fonts; loaded only while the admin design chooser is open. */
-export const THEME_FONTS_HREF = fontsHrefFor(Object.keys(FONT_FAMILIES) as ThemeFontFamily[]);
+export const THEME_FONTS_HREF = fontsHrefFor(
+  Object.keys(FONT_FAMILIES) as ThemeFontFamily[],
+);

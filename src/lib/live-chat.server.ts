@@ -4,7 +4,8 @@ import { type LiveChatSender } from "./live-chat.shared";
 import { orderChatMessages } from "./chat-order";
 import type { AssistantTurn } from "./assistant-chat.functions";
 
-type Admin = (typeof import("@/integrations/supabase/client.server"))["supabaseAdmin"];
+type Admin =
+  (typeof import("@/integrations/supabase/client.server"))["supabaseAdmin"];
 
 export async function adminClient(): Promise<Admin> {
   return (await import("@/integrations/supabase/client.server")).supabaseAdmin;
@@ -46,16 +47,28 @@ export async function openChatFor(
 /** Most recent visitor/AI messages the model may see from one conversation. */
 export const ASSISTANT_CONTEXT_LIMIT = 12;
 
-type ContextRow = { id: string; sender: string; body: string; created_at: string };
+type ContextRow = {
+  id: string;
+  sender: string;
+  body: string;
+  created_at: string;
+};
 
 /** Orders stored messages chronologically and maps visitor → user, ai → assistant. */
-export function turnsFromMessages(rows: readonly ContextRow[]): AssistantTurn[] {
-  return orderChatMessages(rows.filter((row) => row.sender === "visitor" || row.sender === "ai"))
+export function turnsFromMessages(
+  rows: readonly ContextRow[],
+): AssistantTurn[] {
+  return orderChatMessages(
+    rows.filter((row) => row.sender === "visitor" || row.sender === "ai"),
+  )
     .slice(-ASSISTANT_CONTEXT_LIMIT)
     .map((row) =>
       row.sender === "visitor"
         ? { role: "user" as const, content: row.body.trim().slice(0, 1200) }
-        : { role: "assistant" as const, content: row.body.trim().slice(0, 4000) },
+        : {
+            role: "assistant" as const,
+            content: row.body.trim().slice(0, 4000),
+          },
     )
     .filter((turn) => turn.content.length > 0);
 }
@@ -65,7 +78,10 @@ export function turnsFromMessages(rows: readonly ContextRow[]): AssistantTurn[] 
  * openChatFor reuses). No open chat means no history; read errors are thrown so the
  * caller fails closed instead of answering with partial context.
  */
-export async function openChatContext(db: Admin, visitorId: string): Promise<AssistantTurn[]> {
+export async function openChatContext(
+  db: Admin,
+  visitorId: string,
+): Promise<AssistantTurn[]> {
   const { data: chat, error } = await db
     .from("live_chats")
     .select("id")
@@ -90,17 +106,30 @@ export async function openChatContext(db: Admin, visitorId: string): Promise<Ass
 export async function appendMessages(
   db: Admin,
   chatId: string,
-  messages: { id?:string; sender: LiveChatSender; body: string; prompt_id?:string;reply_source?:string;reply_model?:string|null;reply_ms?:number;reply_language?:string }[],
+  messages: {
+    id?: string;
+    sender: LiveChatSender;
+    body: string;
+    prompt_id?: string;
+    reply_source?: string;
+    reply_model?: string | null;
+    reply_ms?: number;
+    reply_language?: string;
+  }[],
   patch: Record<string, unknown> = {},
 ): Promise<void> {
-  const rows = messages.filter((m) => m.body).map((m) => ({ chat_id: chatId, ...m }));
+  const rows = messages
+    .filter((m) => m.body)
+    .map((m) => ({ chat_id: chatId, ...m }));
   if (rows.length) {
     const { error } = await db.from("live_chat_messages").insert(rows);
     if (error) throw error;
   }
   // Visitor actions arrive from the page they are reading; admin replies never overwrite it.
   const fromVisitor = messages.some(
-    (m) => m.sender === "visitor" || (m.sender === "system" && m.body === "requested"),
+    (m) =>
+      m.sender === "visitor" ||
+      (m.sender === "system" && m.body === "requested"),
   );
   const last_page = fromVisitor ? await visitPage() : "";
   const { error } = await db
@@ -119,20 +148,26 @@ export async function verifyVisitor(
   context: { supabase: unknown; userId: string },
   access: string,
 ): Promise<{ id: string; email: string; name: string } | null> {
-  const { verifyAccessToken, gateSecrets } = await import("./assistant-gate.server");
+  const { verifyAccessToken, gateSecrets } =
+    await import("./assistant-gate.server");
   const token = await verifyAccessToken(await gateSecrets(), access);
   if (!token) return null;
-  if (token.visitorId) return { id: token.visitorId, email: token.email, name: token.name };
+  if (token.visitorId)
+    return { id: token.visitorId, email: token.email, name: token.name };
   if (!context.supabase || !context.userId) return null;
   const supabase = context.supabase as {
     auth: {
       getUser: () => Promise<{
-        data: { user: { email?: string; email_confirmed_at?: string | null } | null };
+        data: {
+          user: { email?: string; email_confirmed_at?: string | null } | null;
+        };
       }>;
     };
   };
   const { data } = await supabase.auth.getUser();
-  const email = data.user?.email_confirmed_at ? data.user.email?.trim().toLowerCase() : null;
+  const email = data.user?.email_confirmed_at
+    ? data.user.email?.trim().toLowerCase()
+    : null;
   if (!email || email !== token.email.trim().toLowerCase()) return null;
   return { id: context.userId, email, name: token.name };
 }

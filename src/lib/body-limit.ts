@@ -10,7 +10,10 @@ export class BodyTooLargeError extends Error {
 function tooLarge(): Response {
   return new Response("Payload Too Large", {
     status: 413,
-    headers: { "content-type": "text/plain; charset=utf-8", connection: "close" },
+    headers: {
+      "content-type": "text/plain; charset=utf-8",
+      connection: "close",
+    },
   });
 }
 
@@ -23,11 +26,13 @@ export function limitRequestBody(
   request: Request,
   max = MAX_BODY_BYTES,
 ): { request: Request } | { response: Response } {
-  if (!request.body || request.method === "GET" || request.method === "HEAD") return { request };
+  if (!request.body || request.method === "GET" || request.method === "HEAD")
+    return { request };
   const declared = request.headers.get("content-length");
   if (declared !== null) {
     const size = Number(declared);
-    if (!Number.isFinite(size) || size < 0 || size > max) return { response: tooLarge() };
+    if (!Number.isFinite(size) || size < 0 || size > max)
+      return { response: tooLarge() };
   }
   let seen = 0;
   const counter = new TransformStream<Uint8Array, Uint8Array>({

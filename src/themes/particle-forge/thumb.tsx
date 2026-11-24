@@ -18,10 +18,25 @@ export function ParticleForgeThumb() {
         );
       })}
       {[70, 160, 250].map((x) => (
-        <rect key={x} x={x - 20} y="128" width="40" height="6" rx="3" fill="#fff" opacity="0.8" />
+        <rect
+          key={x}
+          x={x - 20}
+          y="128"
+          width="40"
+          height="6"
+          rx="3"
+          fill="#fff"
+          opacity="0.8"
+        />
       ))}
       {Array.from({ length: 12 }, (_, i) => (
-        <circle key={`g${i}`} cx={20 + i * 25} cy="160" r="1.6" fill="#ECE5D3" />
+        <circle
+          key={`g${i}`}
+          cx={20 + i * 25}
+          cy="160"
+          r="1.6"
+          fill="#ECE5D3"
+        />
       ))}
     </svg>
   );

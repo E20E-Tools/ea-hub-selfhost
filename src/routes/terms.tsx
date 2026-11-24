@@ -16,7 +16,10 @@ export const Route = createFileRoute("/terms")({
         content:
           "Terms for using E20E Tools, its requests and enterprise services. شروط استخدام المنصة.",
       },
-      { property: "og:title", content: "Terms of service — E20E Tools | شروط الخدمة" },
+      {
+        property: "og:title",
+        content: "Terms of service — E20E Tools | شروط الخدمة",
+      },
       {
         property: "og:description",
         content: "The terms that govern E20E Tools. شروط خدمة منصة E20E Tools.",
@@ -27,7 +30,8 @@ export const Route = createFileRoute("/terms")({
     ],
     links: [{ rel: "canonical", href: pageUrl("/terms") }],
   }),
-  loader: ({ context }) => context.queryClient.ensureQueryData(catalogQueryOptions),
+  loader: ({ context }) =>
+    context.queryClient.ensureQueryData(catalogQueryOptions),
   component: TermsPage,
   errorComponent: () => <main className="library-page p-10">Unavailable</main>,
   notFoundComponent: () => <main className="library-page p-10">Not found</main>,
@@ -48,9 +52,9 @@ function TermsContent() {
   const blocks = parseTerms(termsText(catalog.settings.terms, lang));
   const updated = catalog.settings.terms.updatedAt;
   const updatedText = updated
-    ? new Intl.DateTimeFormat(lang === "ar" ? "ar-SA" : "en-GB", { dateStyle: "long" }).format(
-        new Date(updated),
-      )
+    ? new Intl.DateTimeFormat(lang === "ar" ? "ar-SA" : "en-GB", {
+        dateStyle: "long",
+      }).format(new Date(updated))
     : "";
   const anchor = (i: number) => `terms-${i + 1}`;
 
@@ -61,8 +65,12 @@ function TermsContent() {
           <p className="mb-3 inline-flex items-center gap-2 text-sm font-medium text-primary">
             <ScrollText size={16} aria-hidden="true" /> {t("termsEyebrow")}
           </p>
-          <h1 className="text-3xl font-semibold sm:text-4xl">{t("termsPageTitle")}</h1>
-          <p className="mt-4 max-w-3xl text-lg leading-8 text-muted-foreground">{t("termsLead")}</p>
+          <h1 className="text-3xl font-semibold sm:text-4xl">
+            {t("termsPageTitle")}
+          </h1>
+          <p className="mt-4 max-w-3xl text-lg leading-8 text-muted-foreground">
+            {t("termsLead")}
+          </p>
           {updatedText ? (
             <p className="mt-3 text-sm text-muted-foreground">
               {t("termsUpdated")} {updatedText}
@@ -99,9 +107,14 @@ function TermsContent() {
                 id={anchor(i)}
                 className="scroll-mt-24 rounded-xl border border-border bg-card p-6 text-card-foreground"
               >
-                {b.title ? <h2 className="mb-3 text-lg font-semibold">{b.title}</h2> : null}
+                {b.title ? (
+                  <h2 className="mb-3 text-lg font-semibold">{b.title}</h2>
+                ) : null}
                 {b.paragraphs.map((p, j) => (
-                  <p key={j} className="mt-2 leading-8 text-muted-foreground first:mt-0">
+                  <p
+                    key={j}
+                    className="mt-2 leading-8 text-muted-foreground first:mt-0"
+                  >
                     {p}
                   </p>
                 ))}
@@ -114,7 +127,11 @@ function TermsContent() {
                 className="inline-flex items-center gap-1 text-primary underline underline-offset-4"
               >
                 {t("termsContact")}
-                <ArrowUpRight size={14} aria-hidden="true" className="rtl:-scale-x-100" />
+                <ArrowUpRight
+                  size={14}
+                  aria-hidden="true"
+                  className="rtl:-scale-x-100"
+                />
               </Link>
             </div>
           </article>

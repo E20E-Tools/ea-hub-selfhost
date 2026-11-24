@@ -11,7 +11,8 @@ export async function notifyContactSubmission(
   kind = "request.general",
 ): Promise<void> {
   try {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { supabaseAdmin } =
+      await import("@/integrations/supabase/client.server");
     const { data: settings } = await supabaseAdmin
       .from("contact_settings")
       .select("notify_enabled, auto_reply_enabled")
@@ -28,7 +29,10 @@ export async function notifyContactSubmission(
         actor_id: SYSTEM_ACTOR,
         actor_email: "system",
         action: "contact.email_skipped",
-        target: `${kind} ${messageId} ${parts}: email sending inactive`.slice(0, 200),
+        target: `${kind} ${messageId} ${parts}: email sending inactive`.slice(
+          0,
+          200,
+        ),
       });
     }
   } catch (error) {

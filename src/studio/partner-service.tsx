@@ -46,7 +46,12 @@ export function PartnerService({ learning }: { learning: boolean }) {
         </div>
       ) : (
         <section className="bx-panel">
-          <h2>{dictionaries[ar ? "ar" : "en"].partnerServicePrepareForTheDiscussion}</h2>
+          <h2>
+            {
+              dictionaries[ar ? "ar" : "en"]
+                .partnerServicePrepareForTheDiscussion
+            }
+          </h2>
           <ol className="ea-prep">
             {(ar
               ? [
@@ -75,7 +80,8 @@ export function PartnerService({ learning }: { learning: boolean }) {
       >
         {learning
           ? dictionaries[ar ? "ar" : "en"].partnerServiceAllCoursesOnDt
-          : dictionaries[ar ? "ar" : "en"].partnerServiceVisitDtGuideConsultations}
+          : dictionaries[ar ? "ar" : "en"]
+              .partnerServiceVisitDtGuideConsultations}
         <ArrowUpRight size={18} />
       </a>
     </main>

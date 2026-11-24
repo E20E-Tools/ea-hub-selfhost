@@ -12,7 +12,11 @@ export type RequestNotice =
 type RequestRow = { email: string; name: string; need: string };
 
 export function sender(): string {
-  return (process.env["NOTIFY_FROM"] || process.env["NEWSLETTER_FROM"] || "").trim();
+  return (
+    process.env["NOTIFY_FROM"] ||
+    process.env["NEWSLETTER_FROM"] ||
+    ""
+  ).trim();
 }
 
 export function emailSendingConfigured(): boolean {
@@ -35,12 +39,21 @@ export function composeNotice(
   const ar = /\p{Script=Arabic}/u.test(`${row.name} ${row.need}`);
   const link = `${origin}/my-requests`;
   const name = row.name.trim();
-  const hello = ar ? (name ? `مرحبًا ${name}،` : "مرحبًا،") : name ? `Hello ${name},` : "Hello,";
+  const hello = ar
+    ? name
+      ? `مرحبًا ${name}،`
+      : "مرحبًا،"
+    : name
+      ? `Hello ${name},`
+      : "Hello,";
   if (notice.kind === "reply") {
-    const preview = notice.body.length > 600 ? notice.body.slice(0, 600) + "…" : notice.body;
+    const preview =
+      notice.body.length > 600 ? notice.body.slice(0, 600) + "…" : notice.body;
     return {
       ar,
-      subject: ar ? "رد جديد على طلبك في E20E Tools" : "New reply on your E20E Tools request",
+      subject: ar
+        ? "رد جديد على طلبك في E20E Tools"
+        : "New reply on your E20E Tools request",
       text: [
         hello,
         "",
@@ -48,11 +61,16 @@ export function composeNotice(
         "",
         preview,
         "",
-        ar ? `تابع المحادثة ورد من هنا: ${link}` : `Read the full thread and reply here: ${link}`,
+        ar
+          ? `تابع المحادثة ورد من هنا: ${link}`
+          : `Read the full thread and reply here: ${link}`,
       ].join("\n"),
     };
   }
-  const label = STATUS_TEXT[notice.status] ?? { ar: notice.status, en: notice.status };
+  const label = STATUS_TEXT[notice.status] ?? {
+    ar: notice.status,
+    en: notice.status,
+  };
   return {
     ar,
     subject: ar
@@ -72,7 +90,9 @@ export function composeNotice(
 
 /** Statuses worth an email; moving back to "new" is internal housekeeping. */
 export function statusNeedsNotice(status: string): boolean {
-  return status === "in_progress" || status === "resolved" || status === "rejected";
+  return (
+    status === "in_progress" || status === "resolved" || status === "rejected"
+  );
 }
 
 export async function notifyCustomer(
@@ -80,8 +100,10 @@ export async function notifyCustomer(
   fetcher: typeof fetch = fetch,
 ): Promise<"sent" | "skipped" | "failed"> {
   try {
-    if (notice.kind === "status" && !statusNeedsNotice(notice.status)) return "skipped";
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    if (notice.kind === "status" && !statusNeedsNotice(notice.status))
+      return "skipped";
+    const { supabaseAdmin } =
+      await import("@/integrations/supabase/client.server");
     const { data: row } = await supabaseAdmin
       .from("suggestion_requests")
       .select("email, name, need")
@@ -93,7 +115,11 @@ export async function notifyCustomer(
         actor_id: SYSTEM_ACTOR,
         actor_email: "system",
         action: "customer.email_skipped",
-        target: `${notice.kind} ${notice.requestId}: email sending not set up`.slice(0, 200),
+        target:
+          `${notice.kind} ${notice.requestId}: email sending not set up`.slice(
+            0,
+            200,
+          ),
       });
       return "skipped";
     }
@@ -120,7 +146,10 @@ export async function notifyCustomer(
     });
     return res.ok ? "sent" : "failed";
   } catch (error) {
-    console.error("customer notice failed", error instanceof Error ? error.message : "unknown");
+    console.error(
+      "customer notice failed",
+      error instanceof Error ? error.message : "unknown",
+    );
     return "failed";
   }
 }

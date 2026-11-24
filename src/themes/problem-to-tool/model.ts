@@ -54,7 +54,10 @@ export function typingAt(text: string, ms: number) {
   const chars = Array.from(text);
   const typeEnd = chars.length * TYPE_MS;
   if (ms < typeEnd)
-    return { shown: chars.slice(0, Math.floor(ms / TYPE_MS)).join(""), phase: "typing" as const };
+    return {
+      shown: chars.slice(0, Math.floor(ms / TYPE_MS)).join(""),
+      phase: "typing" as const,
+    };
   if (ms < typeEnd + HOLD_MS) return { shown: text, phase: "match" as const };
   return { shown: text, phase: "clear" as const };
 }
@@ -73,7 +76,11 @@ function words(s: string): string[] {
 }
 
 /** Simple local score: shared words (prefix match counts) against name, problem, description, keywords. */
-export function scoreProduct(query: string, product: Product, language: Language): number {
+export function scoreProduct(
+  query: string,
+  product: Product,
+  language: Language,
+): number {
   const q = words(query);
   if (!q.length) return 0;
   const hay = words(
@@ -90,7 +97,11 @@ export function scoreProduct(query: string, product: Product, language: Language
   for (const w of q) {
     if (hay.includes(w)) score += 2;
     else if (
-      hay.some((h) => h.startsWith(w) || (w.length >= 4 && w.startsWith(h) && h.length >= 3))
+      hay.some(
+        (h) =>
+          h.startsWith(w) ||
+          (w.length >= 4 && w.startsWith(h) && h.length >= 3),
+      )
     )
       score += 1;
   }
@@ -98,7 +109,11 @@ export function scoreProduct(query: string, product: Product, language: Language
 }
 
 /** Closest product id for the typed text, or null when nothing shares a word. */
-export function bestMatch(query: string, products: Product[], language: Language): string | null {
+export function bestMatch(
+  query: string,
+  products: Product[],
+  language: Language,
+): string | null {
   let best: string | null = null;
   let top = 0;
   for (const p of products) {

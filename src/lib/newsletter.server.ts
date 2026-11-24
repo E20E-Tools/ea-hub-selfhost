@@ -149,10 +149,14 @@ async function issueEntries(
 function issueText(entries: Entry[], lang: "ar" | "en") {
   return entries.map((r) => r[lang] + "\n" + origin() + r.path).join("\n\n");
 }
-function editorialBody(entries: Entry[], lang: "ar" | "en", approved?: string | null) {
+function editorialBody(
+  entries: Entry[],
+  lang: "ar" | "en",
+  approved?: string | null,
+) {
   if (!approved) return issueText(entries, lang);
   const links = new Set(approved.match(/https?:\/\/[^\s]+/g) ?? []);
-  const added = entries.filter(entry => !links.has(origin() + entry.path));
+  const added = entries.filter((entry) => !links.has(origin() + entry.path));
   return [approved, issueText(added, lang)].filter(Boolean).join("\n\n");
 }
 function footer(member: Member) {
@@ -178,12 +182,14 @@ export async function previewIssue(month: string) {
   const rows = saved
     ? []
     : await issueEntries(from, next.toISOString().slice(0, 10));
-  const [editorial] = await database()< {body_ar:string|null;body_en:string|null}[] >`select body_ar,body_en from newsletter_editorial where month=${from}`;
+  const [editorial] = await database()<
+    { body_ar: string | null; body_en: string | null }[]
+  >`select body_ar,body_en from newsletter_editorial where month=${from}`;
   return {
-    source: {ar:issueText(rows,"ar"),en:issueText(rows,"en")},
+    source: { ar: issueText(rows, "ar"), en: issueText(rows, "en") },
     locked: Boolean(saved),
-    ar: saved?.body_ar ?? editorialBody(rows,"ar",editorial?.body_ar),
-    en: saved?.body_en ?? editorialBody(rows,"en",editorial?.body_en),
+    ar: saved?.body_ar ?? editorialBody(rows, "ar", editorial?.body_ar),
+    en: saved?.body_en ?? editorialBody(rows, "en", editorial?.body_en),
     ready: configured(),
   };
 }
@@ -268,9 +274,15 @@ export async function sendDue() {
       return;
     const rows = await issueEntries(from, to, tx);
     if (!rows.length) return;
-    const [editorial] = await tx<{body_ar:string|null;body_en:string|null}[]>`select body_ar,body_en from newsletter_editorial where month=${from}`;
+    const [editorial] = await tx<
+      { body_ar: string | null; body_en: string | null }[]
+    >`select body_ar,body_en from newsletter_editorial where month=${from}`;
     const body = (language: "ar" | "en") =>
-      editorialBody(rows,language,language==="ar"?editorial?.body_ar:editorial?.body_en);
+      editorialBody(
+        rows,
+        language,
+        language === "ar" ? editorial?.body_ar : editorial?.body_en,
+      );
     const inserted =
       await tx`insert into newsletter_issues(month,body_ar,body_en,entries) values(${from},${body("ar")},${body("en")},${JSON.stringify(rows)}::jsonb) on conflict do nothing returning month`;
     if (inserted.length)
@@ -329,32 +341,57 @@ export async function sendDue() {
   }
   return { configured: true, confirmed, delivered };
 }
-export async function approveEditorial(month:string, lang:"ar"|"en", body:string){
-  const from=month+"-01",next=new Date(from+"T00:00:00Z");
-  next.setUTCMonth(next.getUTCMonth()+1);
-  await database().begin(async tx=>{
+export async function approveEditorial(
+  month: string,
+  lang: "ar" | "en",
+  body: string,
+) {
+  const from = month + "-01",
+    next = new Date(from + "T00:00:00Z");
+  next.setUTCMonth(next.getUTCMonth() + 1);
+  await database().begin(async (tx) => {
     await tx`select pg_advisory_xact_lock(hashtext(${from}))`;
-    if((await tx`select month from newsletter_issues where month=${from}`).length)throw Error("Issue already finalized");
-    const entries=await issueEntries(from,next.toISOString().slice(0,10),tx);
-    const urls=new Set(entries.map(e=>origin()+e.path));
-    const included=new Set(body.match(/https?:\/\/[^\s]+/g)??[]);
-    if(!urls.size||urls.size!==included.size||[...urls].some(u=>!included.has(u)))throw Error("Keep source links");
-    if(lang==="ar")await tx`insert into newsletter_editorial(month,body_ar) values(${from},${body}) on conflict(month) do update set body_ar=excluded.body_ar`;
-    else await tx`insert into newsletter_editorial(month,body_en) values(${from},${body}) on conflict(month) do update set body_en=excluded.body_en`;
+    if (
+      (await tx`select month from newsletter_issues where month=${from}`).length
+    )
+      throw Error("Issue already finalized");
+    const entries = await issueEntries(
+      from,
+      next.toISOString().slice(0, 10),
+      tx,
+    );
+    const urls = new Set(entries.map((e) => origin() + e.path));
+    const included = new Set(body.match(/https?:\/\/[^\s]+/g) ?? []);
+    if (
+      !urls.size ||
+      urls.size !== included.size ||
+      [...urls].some((u) => !included.has(u))
+    )
+      throw Error("Keep source links");
+    if (lang === "ar")
+      await tx`insert into newsletter_editorial(month,body_ar) values(${from},${body}) on conflict(month) do update set body_ar=excluded.body_ar`;
+    else
+      await tx`insert into newsletter_editorial(month,body_en) values(${from},${body}) on conflict(month) do update set body_en=excluded.body_en`;
   });
 }
 
 /** People following a coming-soon product (confirmed or awaiting confirmation). */
 export async function waitlistCount(productId: string): Promise<number> {
   const sql = database();
-  const [row] = await sql<{ n: number }[]>`select count(*)::int as n from newsletter_members where ${productId}=any(products) and state in ('active','pending')`;
+  const [row] = await sql<
+    { n: number }[]
+  >`select count(*)::int as n from newsletter_members where ${productId}=any(products) and state in ('active','pending')`;
   return row?.n ?? 0;
 }
 
 /** Waitlist size for every coming-soon product, largest first. */
-export async function waitlistSizes(): Promise<{ id: string; name: string; members: number }[]> {
+export async function waitlistSizes(): Promise<
+  { id: string; name: string; members: number }[]
+> {
   const sql = database();
-  return sql<{ id: string; name: string; members: number }[]>`select p.id, p.name, (select count(*)::int from newsletter_members m where p.id=any(m.products) and m.state in ('active','pending')) as members from products p where p.coming_soon order by members desc, p.sort_order`;
+  return sql<
+    { id: string; name: string; members: number }[]
+  >`select p.id, p.name, (select count(*)::int from newsletter_members m where p.id=any(m.products) and m.state in ('active','pending')) as members from products p where p.coming_soon order by members desc, p.sort_order`;
 }
 
 /**
@@ -368,15 +405,21 @@ export async function joinWaitlist(
   productId: string,
 ): Promise<{ ok: boolean; confirm: boolean }> {
   const sql = database();
-  const [product] = await sql<{ id: string }[]>`select id from products where id=${productId} and coming_soon`;
+  const [product] = await sql<
+    { id: string }[]
+  >`select id from products where id=${productId} and coming_soon`;
   if (!product) return { ok: false, confirm: false };
-  const [active] = await sql<{ id: string }[]>`update newsletter_members set products=array(select distinct unnest(products||array[${productId}]::text[])) where email=${email} and state='active' returning id`;
+  const [active] = await sql<
+    { id: string }[]
+  >`update newsletter_members set products=array(select distinct unnest(products||array[${productId}]::text[])) where email=${email} and state='active' returning id`;
   if (active) {
     await scheduleLaunches(active.id);
     return { ok: true, confirm: false };
   }
   // A recent pending signup keeps its confirmation link; just add the product to it.
-  const [pending] = await sql<{ id: string }[]>`update newsletter_members set products=array(select distinct unnest(products||array[${productId}]::text[])) where email=${email} and state='pending' and requested_at >= now()-interval '1 day' returning id`;
+  const [pending] = await sql<
+    { id: string }[]
+  >`update newsletter_members set products=array(select distinct unnest(products||array[${productId}]::text[])) where email=${email} and state='pending' and requested_at >= now()-interval '1 day' returning id`;
   if (pending) {
     await scheduleLaunches(pending.id);
     return { ok: true, confirm: true };

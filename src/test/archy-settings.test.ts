@@ -15,9 +15,18 @@ it("uses the admin greeting for the visitor language and the built-in one when e
 it("keeps voice on by default and clamps speed and pitch to 0.6–1.4", () => {
   expect(normalizeArchyGreeting({}).voiceOn).toBe(true);
   expect(normalizeArchyGreeting({ voiceOn: false }).voiceOn).toBe(false);
-  expect(normalizeArchyGreeting({ rate: 5, pitch: 0.1 })).toMatchObject({ rate: 1.4, pitch: 0.6 });
+  expect(normalizeArchyGreeting({ rate: 5, pitch: 0.1 })).toMatchObject({
+    rate: 1.4,
+    pitch: 0.6,
+  });
   expect(() =>
-    archyGreetingSchema.parse({ ar: "", en: "", voiceOn: true, rate: 2, pitch: 1 }),
+    archyGreetingSchema.parse({
+      ar: "",
+      en: "",
+      voiceOn: true,
+      rate: 2,
+      pitch: 1,
+    }),
   ).toThrow();
 });
 
@@ -30,8 +39,13 @@ it("suggests a chat from the page first, then from open support requests", () =>
 });
 
 it("opens the guide automatically by default after 3 s, delay kept within 1–30 s", () => {
-  expect(normalizeArchyGreeting({})).toMatchObject({ autoGuide: true, guideDelay: 3 });
-  expect(normalizeArchyGreeting({ autoGuide: false, guideDelay: 90 })).toMatchObject({
+  expect(normalizeArchyGreeting({})).toMatchObject({
+    autoGuide: true,
+    guideDelay: 3,
+  });
+  expect(
+    normalizeArchyGreeting({ autoGuide: false, guideDelay: 90 }),
+  ).toMatchObject({
     autoGuide: false,
     guideDelay: 30,
   });

@@ -8,10 +8,16 @@ vi.mock("@/integrations/supabase/client", () => ({
       // A stored sign-in exists locally, but the server reports it revoked (session_not_found).
       getSession: vi
         .fn()
-        .mockResolvedValue({ data: { session: { access_token: "x" } }, error: null }),
+        .mockResolvedValue({
+          data: { session: { access_token: "x" } },
+          error: null,
+        }),
       getUser: vi
         .fn()
-        .mockResolvedValue({ data: { user: null }, error: new AuthSessionMissingError() }),
+        .mockResolvedValue({
+          data: { user: null },
+          error: new AuthSessionMissingError(),
+        }),
       onAuthStateChange: vi.fn().mockReturnValue({
         data: { subscription: { unsubscribe: vi.fn() } },
       }),
@@ -35,7 +41,9 @@ describe("an unconfirmed stored sign-in", () => {
       }),
     );
     const restore = vi.fn();
-    const { result } = renderHook(() => useRequestDraft("request", { productId: "" }, restore));
+    const { result } = renderHook(() =>
+      useRequestDraft("request", { productId: "" }, restore),
+    );
     await new Promise((resolve) => setTimeout(resolve, 50));
     expect(restore).not.toHaveBeenCalled();
     expect(result.current.ready).toBe(false);

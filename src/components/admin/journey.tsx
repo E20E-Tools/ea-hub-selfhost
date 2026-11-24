@@ -7,8 +7,11 @@ import { QueryState, useAdminCopy } from "./ui";
 import type { JourneyEvent } from "@/lib/journey.shared";
 
 const EVENT_LABELS: Record<JourneyEvent, string> = {
-  exercise_started:"exerciseStarts",exercise_completed:"exerciseFinishes",exercise_requested:"exerciseSubmissions",
-  case_viewed:"caseViewed",case_opened:"caseOpened",
+  exercise_started: "exerciseStarts",
+  exercise_completed: "exerciseFinishes",
+  exercise_requested: "exerciseSubmissions",
+  case_viewed: "caseViewed",
+  case_opened: "caseOpened",
   contact_started: "contactStarts",
   contact_receipt: "contactReceipts",
   service_started: "serviceStarts",
@@ -129,12 +132,64 @@ export function JourneyOverview() {
                 </dd>
               </div>
             </dl>
-            <section className="my-6"><h3>{adminDictionaries[language].consoleConversionByEventLanguageOver30Days}</h3>
-              <table className="w-full text-start"><thead><tr>{[adminDictionaries[language].consoleLanguage,t("caseOpened"),t("serviceRate"),t("exerciseFinishes"),t("exerciseSubmissions")].map(title=><th key={title} scope="col">{title}</th>)}</tr></thead>
-              <tbody>{(["ar","en"] as const).map(lang=>{
-                const count=(k:JourneyEvent)=>query.data!.rows.filter(r=>r.language===lang&&r.event===k).reduce((n,r)=>n+r.count,0);
-                const rate=(a:JourneyEvent,b:JourneyEvent)=>count(b)?number(Math.round(100*count(a)/count(b)))+"% ("+number(count(a))+" / "+number(count(b))+")":"—";
-                return <tr key={lang}><th scope="row">{lang==="ar"?"العربية":"English"}</th><td>{rate("case_opened","case_viewed")}</td><td>{rate("service_receipt","service_started")}</td><td>{rate("exercise_completed","exercise_started")}</td><td>{rate("exercise_requested","exercise_completed")}</td></tr>})}</tbody></table>
+            <section className="my-6">
+              <h3>
+                {
+                  adminDictionaries[language]
+                    .consoleConversionByEventLanguageOver30Days
+                }
+              </h3>
+              <table className="w-full text-start">
+                <thead>
+                  <tr>
+                    {[
+                      adminDictionaries[language].consoleLanguage,
+                      t("caseOpened"),
+                      t("serviceRate"),
+                      t("exerciseFinishes"),
+                      t("exerciseSubmissions"),
+                    ].map((title) => (
+                      <th key={title} scope="col">
+                        {title}
+                      </th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {(["ar", "en"] as const).map((lang) => {
+                    const count = (k: JourneyEvent) =>
+                      query
+                        .data!.rows.filter(
+                          (r) => r.language === lang && r.event === k,
+                        )
+                        .reduce((n, r) => n + r.count, 0);
+                    const rate = (a: JourneyEvent, b: JourneyEvent) =>
+                      count(b)
+                        ? number(Math.round((100 * count(a)) / count(b))) +
+                          "% (" +
+                          number(count(a)) +
+                          " / " +
+                          number(count(b)) +
+                          ")"
+                        : "—";
+                    return (
+                      <tr key={lang}>
+                        <th scope="row">
+                          {lang === "ar" ? "العربية" : "English"}
+                        </th>
+                        <td>{rate("case_opened", "case_viewed")}</td>
+                        <td>{rate("service_receipt", "service_started")}</td>
+                        <td>
+                          {rate("exercise_completed", "exercise_started")}
+                        </td>
+                        <td>
+                          {rate("exercise_requested", "exercise_completed")}
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
             </section>
             {!query.data.rows.length && (
               <p className="mt-5 text-sm text-muted-foreground" role="status">

@@ -5,13 +5,25 @@ export const ARCHY_HOP_DELAY_MS = 18_000;
 /** How long the first greeting waits for the 3D model before falling back to text only. */
 export const ARCHY_MODEL_WAIT_MS = 12_000;
 
-export type ArchyAnimation = "Wave" | "Idle" | "Hop" | "Sleep" | "Eat" | "Think" | "Phone" | "Read" | "Exercise" | "Laugh";
+export type ArchyAnimation =
+  | "Wave"
+  | "Idle"
+  | "Hop"
+  | "Sleep"
+  | "Eat"
+  | "Think"
+  | "Phone"
+  | "Read"
+  | "Exercise"
+  | "Laugh";
 
 type SessionReader = Pick<Storage, "getItem">;
 type SessionWriter = Pick<Storage, "setItem">;
 
 /** A route navigation must not replay the greeting; one browser session gets it once. */
-export function shouldShowArchyGreeting(storage: SessionReader | null): boolean {
+export function shouldShowArchyGreeting(
+  storage: SessionReader | null,
+): boolean {
   try {
     return storage?.getItem(ARCHY_GREETING_SESSION_KEY) !== "shown";
   } catch {
@@ -27,10 +39,15 @@ export function markArchyGreetingShown(storage: SessionWriter | null): void {
   }
 }
 
-export function archyAnimationAfterFinish(_clip: ArchyAnimation): ArchyAnimation {
+export function archyAnimationAfterFinish(
+  _clip: ArchyAnimation,
+): ArchyAnimation {
   return "Idle";
 }
 
-export function shouldAnimateArchy(reducedMotion: boolean, documentHidden: boolean): boolean {
+export function shouldAnimateArchy(
+  reducedMotion: boolean,
+  documentHidden: boolean,
+): boolean {
   return !reducedMotion && !documentHidden;
 }

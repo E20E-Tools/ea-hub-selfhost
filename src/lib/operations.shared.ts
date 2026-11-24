@@ -9,7 +9,10 @@ export const retentionPolicySchema = z
     manualEnabled: z.boolean(),
     revision: z.number().int().min(0),
   })
-  .refine((v) => v.type !== "chats" || v.days === 90, "Chats retain the existing 90-day policy");
+  .refine(
+    (v) => v.type !== "chats" || v.days === 90,
+    "Chats retain the existing 90-day policy",
+  );
 
 export function summarizeTelemetry(
   rows: { operation: string; outcome: string; duration_ms: number }[],
@@ -22,7 +25,9 @@ export function summarizeTelemetry(
       success: samples.filter((r) => r.outcome === "success").length,
       failure: samples.filter((r) => r.outcome === "failure").length,
       meanMs: samples.length
-        ? Math.round(samples.reduce((sum, r) => sum + r.duration_ms, 0) / samples.length)
+        ? Math.round(
+            samples.reduce((sum, r) => sum + r.duration_ms, 0) / samples.length,
+          )
         : null,
     };
   });
@@ -46,13 +51,19 @@ export function sanitizeSettingsValue(value: unknown): unknown {
   if (value && typeof value === "object")
     return Object.fromEntries(
       Object.entries(value)
-        .filter(([key]) => !/(key|secret|token|password|authorization|cookie)/i.test(key))
+        .filter(
+          ([key]) =>
+            !/(key|secret|token|password|authorization|cookie)/i.test(key),
+        )
         .map(([key, v]) => [key, sanitizeSettingsValue(v)]),
     );
   if (typeof value === "string")
     return value
       .replace(/(https:\/\/[^\s?]+)\?[^\s]+/g, "$1")
-      .replace(/(?:sk-[\w-]{12,}|gsk_[\w-]{12,}|eyJ[\w-]+\.[\w-]+\.[\w-]+)/g, "[redacted]");
+      .replace(
+        /(?:sk-[\w-]{12,}|gsk_[\w-]{12,}|eyJ[\w-]+\.[\w-]+\.[\w-]+)/g,
+        "[redacted]",
+      );
   return value;
 }
 
@@ -91,21 +102,29 @@ export function aiFailureAlert(
   const hour = ai.filter((r) => Date.parse(r.created_at) >= now - 3_600_000);
   const hourFailures = hour.filter((r) => r.outcome === "failure").length;
   const rate =
-    hour.length >= AI_FAILURE_MIN_SAMPLES && hourFailures / hour.length > AI_FAILURE_RATE;
+    hour.length >= AI_FAILURE_MIN_SAMPLES &&
+    hourFailures / hour.length > AI_FAILURE_RATE;
   if (streak >= AI_FAILURE_STREAK)
     return { streak, hourFailures, hourSamples: hour.length, reason: "streak" };
-  if (rate) return { streak, hourFailures, hourSamples: hour.length, reason: "rate" };
+  if (rate)
+    return { streak, hourFailures, hourSamples: hour.length, reason: "rate" };
   return null;
 }
 
-export type BudgetAlert = { kind: "request" | "chat"; used: number; limit: number };
+export type BudgetAlert = {
+  kind: "request" | "chat";
+  used: number;
+  limit: number;
+};
 
 /** Daily site-wide budgets at or above the 80% alert threshold. */
 export function budgetAlerts(
   usage: readonly { kind: BudgetAlert["kind"]; used: number; limit: number }[],
   threshold: (limit: number) => number,
 ): BudgetAlert[] {
-  return usage.filter((u) => u.used >= threshold(u.limit)).map((u) => ({ ...u }));
+  return usage
+    .filter((u) => u.used >= threshold(u.limit))
+    .map((u) => ({ ...u }));
 }
 
 /* ---------------- AI chat health ---------------- */
@@ -137,7 +156,10 @@ export type AiChatHealth = {
 /** Nearest-rank percentile over an ascending list; null when empty. */
 function percentile(sorted: readonly number[], q: number): number | null {
   if (!sorted.length) return null;
-  const index = Math.max(0, Math.min(sorted.length - 1, Math.ceil(q * sorted.length) - 1));
+  const index = Math.max(
+    0,
+    Math.min(sorted.length - 1, Math.ceil(q * sorted.length) - 1),
+  );
   const value = sorted[index];
   return value === undefined ? null : Math.round(value);
 }
@@ -148,11 +170,18 @@ function percentile(sorted: readonly number[], q: number): number | null {
  * Only assistant (conversation) answers count; recommendations and requests are separate.
  */
 export function aiChatHealth(
-  rows: readonly { operation: string; outcome: string; duration_ms: number; created_at: string }[],
+  rows: readonly {
+    operation: string;
+    outcome: string;
+    duration_ms: number;
+    created_at: string;
+  }[],
   now = Date.now(),
 ): AiChatHealth {
   const hour = rows.filter(
-    (r) => r.operation === "assistant" && Date.parse(r.created_at) >= now - 3_600_000,
+    (r) =>
+      r.operation === "assistant" &&
+      Date.parse(r.created_at) >= now - 3_600_000,
   );
   const hourSuccess = hour.filter((r) => r.outcome === "success").length;
   const successRate = hour.length ? hourSuccess / hour.length : null;
@@ -178,5 +207,12 @@ export function aiChatHealth(
   } else if (medianMs !== null && medianMs > CHAT_HEALTH_SLOW_MS) {
     alert = { reason: "slow", hourSuccess, hourSamples: hour.length, medianMs };
   }
-  return { hourSamples: hour.length, hourSuccess, successRate, medianMs, p95Ms, alert };
+  return {
+    hourSamples: hour.length,
+    hourSuccess,
+    successRate,
+    medianMs,
+    p95Ms,
+    alert,
+  };
 }

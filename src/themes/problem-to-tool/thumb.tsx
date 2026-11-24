@@ -28,9 +28,21 @@ export function ProblemToToolThumb() {
       <rect x="94" y="118" width="100" height="10" rx="4" fill="#0F1730" />
       <rect x="94" y="136" width="150" height="6" rx="3" fill="#9aa3b8" />
       <g transform="translate(42 104)">
-        <rect width="28" height="22" rx="8" fill="#fff" stroke="#2F6BFF" strokeWidth="2" />
+        <rect
+          width="28"
+          height="22"
+          rx="8"
+          fill="#fff"
+          stroke="#2F6BFF"
+          strokeWidth="2"
+        />
         <rect x="6" y="6" width="16" height="9" rx="4" fill="#0F1730" />
-        <path d="M28 14 L38 10" stroke="#2F6BFF" strokeWidth="3" strokeLinecap="round" />
+        <path
+          d="M28 14 L38 10"
+          stroke="#2F6BFF"
+          strokeWidth="3"
+          strokeLinecap="round"
+        />
       </g>
     </svg>
   );

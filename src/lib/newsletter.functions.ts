@@ -26,7 +26,8 @@ export const joinNewsletter = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     // Checked before the rate limit so a switched-off sign-up spends no quota and writes nothing.
     const { serverFeatureEnabled } = await import("./site-features.server");
-    if (!(await serverFeatureEnabled("newsletter"))) throw Error("Newsletter sign-up is unavailable");
+    if (!(await serverFeatureEnabled("newsletter")))
+      throw Error("Newsletter sign-up is unavailable");
     const { getRequest } = await import("@tanstack/react-start/server");
     const { clientIp, consumeLimits } = await import("./rate-limit.server");
     if (
@@ -98,33 +99,62 @@ export const getNewsletterPreview = createServerFn({ method: "POST" })
   });
 export const emailNewsletterPreview = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator(z.object({ month: monthSchema, lang: z.enum(["en", "ar"]), recipient: z.enum(["admin", "editorial"]).optional() }))
+  .inputValidator(
+    z.object({
+      month: monthSchema,
+      lang: z.enum(["en", "ar"]),
+      recipient: z.enum(["admin", "editorial"]).optional(),
+    }),
+  )
   .handler(async ({ context, data }) => {
     await (await import("./admin-guard.server")).requireAdmin(context);
-    const email = data.recipient === "editorial" ? "EA@E20E.Tools" : z.string().email().parse(context.claims.email);
+    const email =
+      data.recipient === "editorial"
+        ? "EA@E20E.Tools"
+        : z.string().email().parse(context.claims.email);
     return (await import("./newsletter.server")).sendPreview(
       data.month,
       data.lang,
       email,
     );
   });
-export const approveIssue=createServerFn({method:"POST"}).middleware([requireSupabaseAuth])
-.inputValidator(z.object({month:monthSchema,lang:z.enum(["ar","en"]),body:z.string().trim().min(5).max(30000)}))
-.handler(async({context,data})=>{
-  await (await import("./admin-guard.server")).requireAdmin(context);
-  if(!(await (await import("./work-assistant.server")).readPolicy()).issue.enabled)throw Error("Feature disabled");
-  await (await import("./newsletter.server")).approveEditorial(data.month,data.lang,data.body);
-  return true;
-});
+export const approveIssue = createServerFn({ method: "POST" })
+  .middleware([requireSupabaseAuth])
+  .inputValidator(
+    z.object({
+      month: monthSchema,
+      lang: z.enum(["ar", "en"]),
+      body: z.string().trim().min(5).max(30000),
+    }),
+  )
+  .handler(async ({ context, data }) => {
+    await (await import("./admin-guard.server")).requireAdmin(context);
+    if (
+      !(await (await import("./work-assistant.server")).readPolicy()).issue
+        .enabled
+    )
+      throw Error("Feature disabled");
+    await (
+      await import("./newsletter.server")
+    ).approveEditorial(data.month, data.lang, data.body);
+    return true;
+  });
 
-const productIdSchema = z.string().regex(/^[a-z0-9_-]+$/i).max(100);
+const productIdSchema = z
+  .string()
+  .regex(/^[a-z0-9_-]+$/i)
+  .max(100);
 
 /** Public: how many people are waiting for a coming-soon product. 0 when unknown. */
 export const getWaitlistCount = createServerFn({ method: "GET" })
   .inputValidator(z.object({ productId: productIdSchema }))
   .handler(async ({ data }) => {
     try {
-      return { count: await (await import("./newsletter.server")).waitlistCount(data.productId) };
+      return {
+        count: await (
+          await import("./newsletter.server")
+        ).waitlistCount(data.productId),
+      };
     } catch {
       return { count: 0 };
     }
@@ -146,21 +176,32 @@ export const joinWaitlist = createServerFn({ method: "POST" })
   .inputValidator(waitlistInputSchema)
   .handler(async ({ data }) => {
     const { serverFeatureEnabled } = await import("./site-features.server");
-    if (!(await serverFeatureEnabled("waitlist"))) return { ok: false as const, message: "product" as const };
+    if (!(await serverFeatureEnabled("waitlist")))
+      return { ok: false as const, message: "product" as const };
     const { getRequest } = await import("@tanstack/react-start/server");
     const { clientIp, consumeLimits } = await import("./rate-limit.server");
     if (
       !(await consumeLimits([
-        { bucket: "waitlist:join", subject: clientIp(getRequest()), windowSeconds: 3600, limit: 10 },
+        {
+          bucket: "waitlist:join",
+          subject: clientIp(getRequest()),
+          windowSeconds: 3600,
+          limit: 10,
+        },
       ]))
     )
       return { ok: false as const, message: "limit" as const };
     const server = await import("./newsletter.server");
-    const joined = await server.joinWaitlist(data.email, data.lang, data.productId);
+    const joined = await server.joinWaitlist(
+      data.email,
+      data.lang,
+      data.productId,
+    );
     if (!joined.ok) return { ok: false as const, message: "product" as const };
     if (data.problem.length >= 5) {
       try {
-        const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+        const { supabaseAdmin } =
+          await import("@/integrations/supabase/client.server");
         await supabaseAdmin.from("suggestion_requests").insert({
           id: crypto.randomUUID(),
           request_type: "feature",

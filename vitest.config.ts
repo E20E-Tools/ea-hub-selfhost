@@ -4,7 +4,9 @@ import path from "node:path";
 
 // Node 25+ ships its own global localStorage, which shadows jsdom's and is undefined
 // without --localstorage-file. Turn it off so tests use jsdom's storage on every Node.
-const nodeWebStorageOff = process.allowedNodeEnvironmentFlags.has("--no-experimental-webstorage")
+const nodeWebStorageOff = process.allowedNodeEnvironmentFlags.has(
+  "--no-experimental-webstorage",
+)
   ? ["--no-experimental-webstorage"]
   : [];
 

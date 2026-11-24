@@ -30,8 +30,14 @@ export const SERVICE_TIMELINES = ["asap", "1-3m", "3-6m", "exploring"] as const;
 export const URGENCIES = ["low", "normal", "urgent"] as const;
 export type Urgency = (typeof URGENCIES)[number];
 export const OPEN_REQUEST_STATUSES = ["new", "in_progress"] as const;
-export function needsVisitorReply(request: { status: string; pending_question?: string | null }) {
-  return OPEN_REQUEST_STATUSES.some((status) => status === request.status) && Boolean(request.pending_question);
+export function needsVisitorReply(request: {
+  status: string;
+  pending_question?: string | null;
+}) {
+  return (
+    OPEN_REQUEST_STATUSES.some((status) => status === request.status) &&
+    Boolean(request.pending_question)
+  );
 }
 
 export const REQUEST_STATUSES = [
@@ -61,7 +67,7 @@ const phonePattern = /^$|^[+\d][\d\s()-]*$/;
 
 export const requestSchema = z
   .object({
-    source:z.literal("contact").optional(),
+    source: z.literal("contact").optional(),
     requestId: z.string().uuid(),
     type: z.enum(REQUEST_TYPES),
     name: z.string().trim().min(2, "rqErrName").max(100),
@@ -83,13 +89,16 @@ export const requestSchema = z
       .max(SERVICE_KINDS.length * 2)
       .default([]),
     tools: z.array(z.string().trim().min(1).max(80)).max(60).default([]),
-    exercise:z.string().trim().max(2000).default(""),
+    exercise: z.string().trim().max(2000).default(""),
     teamSize: z.union([z.literal(""), z.enum(TEAM_SIZES)]).default(""),
     timeline: z.union([z.literal(""), z.enum(SERVICE_TIMELINES)]).default(""),
     website: z.string().max(200).default(""),
   })
   .superRefine((value, ctx) => {
-    if ((value.type !== "general" || value.source !== "contact") && value.need.length < 20)
+    if (
+      (value.type !== "general" || value.source !== "contact") &&
+      value.need.length < 20
+    )
       ctx.addIssue({ code: "custom", path: ["need"], message: "rqErrMessage" });
     if (
       (value.type === "feature" || value.type === "support") &&
@@ -144,7 +153,7 @@ export function normaliseRequest(entry: RequestEntry) {
     details:
       entry.type === "service"
         ? {
-            ...(entry.exercise && {exercise:entry.exercise}),
+            ...(entry.exercise && { exercise: entry.exercise }),
             services: [...new Set(entry.services)],
             tools: [...new Set(entry.tools)],
             teamSize: entry.teamSize,

@@ -17,8 +17,12 @@ vi.mock("@tanstack/react-start", () => ({
     return chain;
   },
 }));
-vi.mock("@/integrations/supabase/auth-middleware", () => ({ requireSupabaseAuth: {} }));
-vi.mock("@/integrations/supabase/client.server", () => ({ supabaseAdmin: { from: mocks.from } }));
+vi.mock("@/integrations/supabase/auth-middleware", () => ({
+  requireSupabaseAuth: {},
+}));
+vi.mock("@/integrations/supabase/client.server", () => ({
+  supabaseAdmin: { from: mocks.from },
+}));
 import { getAdminAiUsage } from "@/lib/admin-monitor.functions";
 beforeEach(() => {
   vi.resetAllMocks();

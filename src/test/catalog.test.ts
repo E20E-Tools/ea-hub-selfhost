@@ -16,22 +16,31 @@ const list = fallbackCatalog.products;
 
 describe("Product library filtering", () => {
   it("searches product names without case sensitivity", () => {
-    expect(filterCatalog(list, "  ARCHONE  ", ALL_CATEGORIES).map((p) => p.id)).toEqual([
-      "archone",
-    ]);
+    expect(
+      filterCatalog(list, "  ARCHONE  ", ALL_CATEGORIES).map((p) => p.id),
+    ).toEqual(["archone"]);
   });
   it("combines category and Arabic search", () => {
-    expect(filterCatalog(list, "تقييم", "technology").map((p) => p.id)).toEqual(["radar"]);
+    expect(filterCatalog(list, "تقييم", "technology").map((p) => p.id)).toEqual(
+      ["radar"],
+    );
     expect(filterCatalog(list, "تقييم", "architecture")).toEqual([]);
   });
   it("returns both technology tools for their category", () => {
-    expect(filterCatalog(list, "", "technology").map((p) => p.id)).toEqual(["landscape", "radar"]);
+    expect(filterCatalog(list, "", "technology").map((p) => p.id)).toEqual([
+      "landscape",
+      "radar",
+    ]);
   });
   it("shows only architecture products when Architecture is selected", () => {
-    expect(filterCatalog(list, "", "architecture").map((p) => p.id)).toEqual(["archone"]);
+    expect(filterCatalog(list, "", "architecture").map((p) => p.id)).toEqual([
+      "archone",
+    ]);
   });
   it("shows only platform products when Platforms is selected", () => {
-    expect(filterCatalog(list, "", "platform").map((p) => p.id)).toEqual(["platform"]);
+    expect(filterCatalog(list, "", "platform").map((p) => p.id)).toEqual([
+      "platform",
+    ]);
   });
   it("restores every product when All is selected", () => {
     expect(filterCatalog(list, "", ALL_CATEGORIES).map((p) => p.id)).toEqual([
@@ -45,7 +54,9 @@ describe("Product library filtering", () => {
     expect(filterCatalog(list, "nonexistent tool", ALL_CATEGORIES)).toEqual([]);
   });
   it("marks only EA Tool as coming soon, with its name free of the badge text", () => {
-    expect(products.filter((p) => p.comingSoon).map((p) => p.id)).toEqual(["platform"]);
+    expect(products.filter((p) => p.comingSoon).map((p) => p.id)).toEqual([
+      "platform",
+    ]);
     expect(products.find((p) => p.id === "platform")?.name).toBe("EA Tool");
     expect(products.filter((p) => !p.comingSoon).map((p) => p.id)).toEqual([
       "archone",
@@ -58,7 +69,11 @@ describe("Product library filtering", () => {
 describe("Admin-controlled filter chips", () => {
   it("uses the category names stored in site settings", () => {
     const chips = buildFilterChips(list, { technology: "إدارة التقنيات" });
-    expect(chips[0]).toEqual({ id: ALL_CATEGORIES, label: "كل المنتجات", count: 4 });
+    expect(chips[0]).toEqual({
+      id: ALL_CATEGORIES,
+      label: "كل المنتجات",
+      count: 4,
+    });
     expect(chips.find((chip) => chip.id === "technology")).toEqual({
       id: "technology",
       label: "إدارة التقنيات",
@@ -68,7 +83,9 @@ describe("Admin-controlled filter chips", () => {
   it("falls back to the raw category id when the admin renamed nothing", () => {
     const chips = buildFilterChips(list, {});
     expect(chips.map((chip) => chip.id)).toContain("architecture");
-    expect(chips.find((chip) => chip.id === "architecture")?.label).toBe("architecture");
+    expect(chips.find((chip) => chip.id === "architecture")?.label).toBe(
+      "architecture",
+    );
   });
 });
 

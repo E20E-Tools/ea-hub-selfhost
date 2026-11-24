@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { createRecommendationGuard, RECOMMEND_LIMIT_MESSAGE } from "@/lib/recommend-guard.server";
+import {
+  createRecommendationGuard,
+  RECOMMEND_LIMIT_MESSAGE,
+} from "@/lib/recommend-guard.server";
 
 function request(site: string | null = "same-origin", ip = "192.0.2.1") {
   const headers = new Headers({ "cf-connecting-ip": ip });
@@ -8,9 +11,12 @@ function request(site: string | null = "same-origin", ip = "192.0.2.1") {
 }
 
 describe("Recommendation request admission", () => {
-  it.each(["cross-site", "same-site", "", null])("rejects Fetch Metadata %s", (site) => {
-    expect(createRecommendationGuard()(request(site), 0)).not.toBeNull();
-  });
+  it.each(["cross-site", "same-site", "", null])(
+    "rejects Fetch Metadata %s",
+    (site) => {
+      expect(createRecommendationGuard()(request(site), 0)).not.toBeNull();
+    },
+  );
   it.each(["same-origin", "none"])("allows Fetch Metadata %s", (site) => {
     expect(createRecommendationGuard()(request(site), 0)).toBeNull();
   });
@@ -22,9 +28,13 @@ describe("Recommendation request admission", () => {
   });
   it("admits only four parallel requests", async () => {
     const guard = createRecommendationGuard();
-    const results = await Promise.all(Array.from({ length: 20 }, async () => guard(request(), 0)));
+    const results = await Promise.all(
+      Array.from({ length: 20 }, async () => guard(request(), 0)),
+    );
     expect(results.filter((result) => result === null)).toHaveLength(4);
-    expect(results.filter((result) => result === RECOMMEND_LIMIT_MESSAGE)).toHaveLength(16);
+    expect(
+      results.filter((result) => result === RECOMMEND_LIMIT_MESSAGE),
+    ).toHaveLength(16);
   });
   it("keeps client quotas independent", () => {
     const guard = createRecommendationGuard();
@@ -35,7 +45,10 @@ describe("Recommendation request admission", () => {
     const guard = createRecommendationGuard();
     for (let i = 0; i < 5; i++) {
       const req = new Request("https://hub.e20e.tools/", {
-        headers: { "sec-fetch-site": "same-origin", "x-forwarded-for": `192.0.2.${i}` },
+        headers: {
+          "sec-fetch-site": "same-origin",
+          "x-forwarded-for": `192.0.2.${i}`,
+        },
       });
       expect(guard(req, 0)).toBe(i < 4 ? null : RECOMMEND_LIMIT_MESSAGE);
     }

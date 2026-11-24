@@ -19,23 +19,34 @@ vi.mock("@tanstack/react-start", () => ({
       return chain;
     };
     chain["middleware"] = () => chain;
-    chain["handler"] = (h: (a: { data: unknown }) => unknown) => async (args?: { data: unknown }) =>
-      h({
-        data: chain["validator"]
-          ? (chain["validator"] as (x: unknown) => unknown)(args?.data)
-          : undefined,
-      } as never);
+    chain["handler"] =
+      (h: (a: { data: unknown }) => unknown) =>
+      async (args?: { data: unknown }) =>
+        h({
+          data: chain["validator"]
+            ? (chain["validator"] as (x: unknown) => unknown)(args?.data)
+            : undefined,
+        } as never);
     return chain;
   },
 }));
-vi.mock("@/integrations/supabase/auth-middleware", () => ({ requireSupabaseAuth: {} }));
-vi.mock("@/lib/site-features.server", () => ({ serverFeatureEnabled: async () => true }));
-const jar=vi.hoisted(()=>new Map<string,string>());
+vi.mock("@/integrations/supabase/auth-middleware", () => ({
+  requireSupabaseAuth: {},
+}));
+vi.mock("@/lib/site-features.server", () => ({
+  serverFeatureEnabled: async () => true,
+}));
+const jar = vi.hoisted(() => new Map<string, string>());
 vi.mock("@tanstack/react-start/server", () => ({
-  getCookie:(key:string)=>jar.get(key),setCookie:(key:string,value:string)=>jar.set(key,value),setResponseHeader:vi.fn(),
+  getCookie: (key: string) => jar.get(key),
+  setCookie: (key: string, value: string) => jar.set(key, value),
+  setResponseHeader: vi.fn(),
   getRequest: () =>
     new Request("https://www.e20e.tools/", {
-      headers: { "sec-fetch-site": "same-origin", "cf-connecting-ip": "198.51.100.7" },
+      headers: {
+        "sec-fetch-site": "same-origin",
+        "cf-connecting-ip": "198.51.100.7",
+      },
     }),
 }));
 vi.mock("@/lib/live-chat.server", () => ({
@@ -50,7 +61,8 @@ vi.mock("@/lib/live-chat.server", () => ({
 vi.mock("@/integrations/supabase/client.server", () => {
   const query = (table: string) => {
     const q: Record<string, unknown> = {};
-    for (const k of ["select", "eq", "gte", "in", "order", "limit"]) q[k] = () => q;
+    for (const k of ["select", "eq", "gte", "in", "order", "limit"])
+      q[k] = () => q;
     q["then"] = (resolve: (v: unknown) => void) =>
       resolve(
         table === "rate_limit_events"
@@ -66,10 +78,16 @@ vi.mock("@/integrations/supabase/client.server", () => {
   return {
     supabaseAdmin: {
       from: query,
-      rpc: async (name: string, args: { _bucket: string; _subject: string; _limit: number }) => {
-        if(name==="register_archy_guest"){
-          m.inserts.push({table:"assistant_registrations",row:{...args}});
-          return {data:0,error:null};
+      rpc: async (
+        name: string,
+        args: { _bucket: string; _subject: string; _limit: number },
+      ) => {
+        if (name === "register_archy_guest") {
+          m.inserts.push({
+            table: "assistant_registrations",
+            row: { ...args },
+          });
+          return { data: 0, error: null };
         }
         m.rpcCalls.push(`${name}:${args._bucket}`);
         const key = `${args._bucket}|${args._subject}`;
@@ -82,10 +100,16 @@ vi.mock("@/integrations/supabase/client.server", () => {
   };
 });
 
-import { getAssistantChallenge, registerAssistantVisitor } from "@/lib/assistant-chat.functions";
+import {
+  getAssistantChallenge,
+  registerAssistantVisitor,
+} from "@/lib/assistant-chat.functions";
 import { noteBudgetUsage } from "@/lib/rate-limit.server";
 import { noteAiFailures } from "@/lib/telemetry.server";
-import { requestHumanChat, sendVisitorLiveMessage } from "@/lib/live-chat.functions";
+import {
+  requestHumanChat,
+  sendVisitorLiveMessage,
+} from "@/lib/live-chat.functions";
 import { hashSubject } from "@/lib/rate-limit.server";
 
 beforeEach(() => {
@@ -105,7 +129,13 @@ afterEach(() => {
 
 const register = (extra: Record<string, string>) =>
   registerAssistantVisitor({
-    data: { name: "Khaled", email: "k@example.com", language: "en", website: "", ...extra },
+    data: {
+      name: "Khaled",
+      email: "k@example.com",
+      language: "en",
+      website: "",
+      ...extra,
+    },
   } as never);
 
 describe("2) registration challenge", () => {
@@ -116,14 +146,20 @@ describe("2) registration challenge", () => {
     const answer = String(challenge.a + challenge.b);
     expect((await register({ token: challenge.token, answer })).ok).toBe(true);
     expect((await register({ token: challenge.token, answer })).ok).toBe(false);
-    expect(m.inserts.filter((i) => i.table === "assistant_registrations")).toHaveLength(1);
+    expect(
+      m.inserts.filter((i) => i.table === "assistant_registrations"),
+    ).toHaveLength(1);
   });
   it("burns the token on a wrong answer so it cannot be retried", async () => {
     const challenge = await getAssistantChallenge();
     if (challenge.mode !== "math") throw new Error("expected math mode");
-    expect((await register({ token: challenge.token, answer: "99" })).ok).toBe(false);
+    expect((await register({ token: challenge.token, answer: "99" })).ok).toBe(
+      false,
+    );
     const right = String(challenge.a + challenge.b);
-    expect((await register({ token: challenge.token, answer: right })).ok).toBe(false);
+    expect((await register({ token: challenge.token, answer: right })).ok).toBe(
+      false,
+    );
   });
   it("uses Turnstile with server-side siteverify when both keys are set", async () => {
     vi.stubEnv("TURNSTILE_SITE_KEY", "site-key");
@@ -147,15 +183,33 @@ describe("3) 80% budget alert in the admin activity log", () => {
   it("logs once per day when the site-wide count reaches 80%", async () => {
     const day = new Date("2026-11-16T10:00:00Z");
     m.eventCount = 239;
-    await noteBudgetUsage("request:global-day", 300, "request.global_limit_80", day);
+    await noteBudgetUsage(
+      "request:global-day",
+      300,
+      "request.global_limit_80",
+      day,
+    );
     expect(m.inserts).toEqual([]);
     m.eventCount = 240;
-    await noteBudgetUsage("request:global-day", 300, "request.global_limit_80", day);
-    await noteBudgetUsage("request:global-day", 300, "request.global_limit_80", day);
+    await noteBudgetUsage(
+      "request:global-day",
+      300,
+      "request.global_limit_80",
+      day,
+    );
+    await noteBudgetUsage(
+      "request:global-day",
+      300,
+      "request.global_limit_80",
+      day,
+    );
     expect(m.inserts).toEqual([
       {
         table: "admin_activity",
-        row: expect.objectContaining({ action: "request.global_limit_80", target: "240/300" }),
+        row: expect.objectContaining({
+          action: "request.global_limit_80",
+          target: "240/300",
+        }),
       },
     ]);
     await noteBudgetUsage(
@@ -167,9 +221,15 @@ describe("3) 80% budget alert in the admin activity log", () => {
     expect(m.inserts).toHaveLength(2);
   });
   it("keys live-chat limits by IP and email together", async () => {
-    await requestHumanChat({ data: { access: "token", language: "en" } } as never);
+    await requestHumanChat({
+      data: { access: "token", language: "en" },
+    } as never);
     await sendVisitorLiveMessage({
-      data: { access: "token", chatId: "f8bcd11c-a841-40d4-a501-13b8f28d74ca", body: "hi" },
+      data: {
+        access: "token",
+        chatId: "f8bcd11c-a841-40d4-a501-13b8f28d74ca",
+        body: "hi",
+      },
     } as never);
     const subject = await hashSubject("198.51.100.7|visitor@example.com");
     for (const bucket of ["live:request", "live:msg-min", "live:msg-day"]) {
@@ -193,7 +253,11 @@ describe("12) AI failure event at most once an hour", () => {
   it("logs nothing while answers succeed", async () => {
     const now = Date.parse("2026-11-16T12:00:00Z");
     m.telemetry = [
-      { operation: "assistant", outcome: "success", created_at: new Date(now).toISOString() },
+      {
+        operation: "assistant",
+        outcome: "success",
+        created_at: new Date(now).toISOString(),
+      },
     ];
     await noteAiFailures(now);
     expect(m.inserts).toEqual([]);

@@ -21,7 +21,9 @@ export const listAffiliates = createServerFn({ method: "GET" }).handler(
       const client = publishableClient();
       const { data, error } = await client
         .from("affiliates")
-        .select("id, title_ar, title_en, description_ar, description_en, image_url, url")
+        .select(
+          "id, title_ar, title_en, description_ar, description_en, image_url, url",
+        )
         .order("sort_order", { ascending: true })
         .order("id", { ascending: true });
       if (error) throw error;

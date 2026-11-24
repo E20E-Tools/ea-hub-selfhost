@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { imageDimensions, stripJpegMetadata, stripWebpMetadata } from "@/lib/suggestion.shared";
+import {
+  imageDimensions,
+  stripJpegMetadata,
+  stripWebpMetadata,
+} from "@/lib/suggestion.shared";
 
 const jpeg = new Uint8Array([
   0xff,
@@ -52,7 +56,9 @@ function webpWithLocationMetadata(): Uint8Array {
     webpChunk("XMP ", new TextEncoder().encode("<xmp>Riyadh</xmp>")),
     webpChunk("VP8 ", new Uint8Array([1, 2, 3, 4])),
   ];
-  const out = new Uint8Array(12 + chunks.reduce((total, chunk) => total + chunk.length, 0));
+  const out = new Uint8Array(
+    12 + chunks.reduce((total, chunk) => total + chunk.length, 0),
+  );
   out.set(new TextEncoder().encode("RIFF"), 0);
   out.set(new TextEncoder().encode("WEBP"), 8);
   new DataView(out.buffer).setUint32(4, out.length - 8, true);
@@ -66,12 +72,18 @@ function webpWithLocationMetadata(): Uint8Array {
 
 describe("uploaded image hardening", () => {
   it("reads JPEG size 64x32", () => {
-    expect(imageDimensions(jpeg, "image/jpeg")).toEqual({ width: 64, height: 32 });
+    expect(imageDimensions(jpeg, "image/jpeg")).toEqual({
+      width: 64,
+      height: 32,
+    });
   });
   it("removes EXIF data but keeps the picture", () => {
     const out = stripJpegMetadata(jpeg);
     expect(out.length).toBe(jpeg.length - 8);
-    expect(imageDimensions(out, "image/jpeg")).toEqual({ width: 64, height: 32 });
+    expect(imageDimensions(out, "image/jpeg")).toEqual({
+      width: 64,
+      height: 32,
+    });
   });
   it("rejects a PNG with a broken header", () => {
     expect(imageDimensions(new Uint8Array(8), "image/png")).toBeNull();
@@ -80,7 +92,10 @@ describe("uploaded image hardening", () => {
     const original = webpWithLocationMetadata();
     const out = stripWebpMetadata(original);
     const text = new TextDecoder().decode(out);
-    expect(imageDimensions(out, "image/webp")).toEqual({ width: 64, height: 32 });
+    expect(imageDimensions(out, "image/webp")).toEqual({
+      width: 64,
+      height: 32,
+    });
     expect(text).not.toContain("EXIF");
     expect(text).not.toContain("XMP");
     expect(text).not.toContain("GPS");

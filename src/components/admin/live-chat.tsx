@@ -1,4 +1,10 @@
-import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  type FormEvent,
+  type ReactNode,
+} from "react";
 import { toast } from "sonner";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
@@ -14,7 +20,13 @@ import {
 } from "@/lib/live-chat.functions";
 import { cn } from "@/lib/utils";
 import { orderChatMessages } from "@/lib/chat-order";
-import { EmptyBlock, ErrorBlock, LoadingBlock, PageHeader, useAdminCopy } from "./ui";
+import {
+  EmptyBlock,
+  ErrorBlock,
+  LoadingBlock,
+  PageHeader,
+  useAdminCopy,
+} from "./ui";
 import { FaqReplies } from "./faq-replies";
 
 type Chat = {
@@ -69,7 +81,10 @@ function beep() {
  * Watches chats while the admin console is open: refreshes the list and alerts (toast + sound)
  * when a visitor asks for a person. Returns how many chats are waiting.
  */
-export function useLiveChatAlerts(enabled: boolean, openChat: () => void): number {
+export function useLiveChatAlerts(
+  enabled: boolean,
+  openChat: () => void,
+): number {
   const { t } = useAdminCopy();
   const queryClient = useQueryClient();
   const chats = useQuery({
@@ -83,9 +98,13 @@ export function useLiveChatAlerts(enabled: boolean, openChat: () => void): numbe
     if (!enabled) return;
     const channel = supabase
       .channel(`admin-live-${Math.random().toString(36).slice(2)}`)
-      .on("postgres_changes", { event: "*", schema: "public", table: "live_chats" }, () => {
-        void queryClient.invalidateQueries({ queryKey: chatsKey });
-      })
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "live_chats" },
+        () => {
+          void queryClient.invalidateQueries({ queryKey: chatsKey });
+        },
+      )
       .subscribe();
     return () => {
       void supabase.removeChannel(channel);
@@ -95,7 +114,10 @@ export function useLiveChatAlerts(enabled: boolean, openChat: () => void): numbe
     if (!chats.data) return;
     const prev = seen.current;
     const next = new Map(
-      chats.data.map((c) => [c.id, c.status === "waiting" ? c.requested_at : null]),
+      chats.data.map((c) => [
+        c.id,
+        c.status === "waiting" ? c.requested_at : null,
+      ]),
     );
     seen.current = next;
     if (!prev) return;
@@ -106,10 +128,13 @@ export function useLiveChatAlerts(enabled: boolean, openChat: () => void): numbe
         prev.get(chat.id) !== chat.requested_at
       ) {
         beep();
-        toast.info(t("lcAlert", { name: chat.visitor_name || chat.visitor_email }), {
-          action: { label: t("lcOpen"), onClick: openChat },
-          duration: 30_000,
-        });
+        toast.info(
+          t("lcAlert", { name: chat.visitor_name || chat.visitor_email }),
+          {
+            action: { label: t("lcOpen"), onClick: openChat },
+            duration: 30_000,
+          },
+        );
       }
     }
   }, [chats.data, t, openChat]);
@@ -135,7 +160,10 @@ export function LiveChatSection({
   return (
     <div>
       {!embedded ? (
-        <PageHeader title={t("navLiveChat")} description={t("navLiveChatDesc")} />
+        <PageHeader
+          title={t("navLiveChat")}
+          description={t("navLiveChatDesc")}
+        />
       ) : null}
       <div className="grid gap-4 lg:grid-cols-[320px_1fr]">
         <aside className="rounded-lg border border-border bg-card">
@@ -191,7 +219,10 @@ export function LiveChatSection({
                       {chat.visitor_email}
                     </span>
                     <span className="text-xs text-muted-foreground">
-                      {date(chat.last_message_at, { dateStyle: "medium", timeStyle: "short" })}
+                      {date(chat.last_message_at, {
+                        dateStyle: "medium",
+                        timeStyle: "short",
+                      })}
                     </span>
                   </button>
                 </li>
@@ -203,7 +234,9 @@ export function LiveChatSection({
           <ChatThread
             key={current.id}
             chat={current}
-            onChanged={() => void queryClient.invalidateQueries({ queryKey: chatsKey })}
+            onChanged={() =>
+              void queryClient.invalidateQueries({ queryKey: chatsKey })
+            }
           />
         ) : (
           <div className="rounded-lg border border-border bg-card p-6">
@@ -215,7 +248,13 @@ export function LiveChatSection({
   );
 }
 
-function ChatThread({ chat, onChanged }: { chat: Chat; onChanged: () => void }) {
+function ChatThread({
+  chat,
+  onChanged,
+}: {
+  chat: Chat;
+  onChanged: () => void;
+}) {
   const { t, date } = useAdminCopy();
   const [messages, setMessages] = useState<Msg[] | null>(null);
   const [loadError, setLoadError] = useState(false);
@@ -271,7 +310,9 @@ function ChatThread({ chat, onChanged }: { chat: Chat; onChanged: () => void }) 
         (payload) => {
           const row = payload.new as Msg;
           setMessages((prev) =>
-            prev && !prev.some((m) => m.id === row.id) ? orderChatMessages([...prev, row]) : prev,
+            prev && !prev.some((m) => m.id === row.id)
+              ? orderChatMessages([...prev, row])
+              : prev,
           );
         },
       )
@@ -308,7 +349,9 @@ function ChatThread({ chat, onChanged }: { chat: Chat; onChanged: () => void }) 
     <section className="flex min-h-[60dvh] flex-col rounded-lg border border-border bg-card">
       <header className="flex flex-wrap items-center justify-between gap-2 border-b border-border px-4 py-3">
         <div className="min-w-0">
-          <strong className="block truncate">{chat.visitor_name || chat.visitor_email}</strong>
+          <strong className="block truncate">
+            {chat.visitor_name || chat.visitor_email}
+          </strong>
           <a
             className="text-xs text-muted-foreground underline"
             href={`mailto:${chat.visitor_email}`}
@@ -338,9 +381,14 @@ function ChatThread({ chat, onChanged }: { chat: Chat; onChanged: () => void }) 
       </header>
       <ChatDetails
         chat={chat}
-        messageCount={messages?.filter((m) => m.sender !== "system").length ?? null}
+        messageCount={
+          messages?.filter((m) => m.sender !== "system").length ?? null
+        }
       />
-      <div className="flex-1 space-y-3 overflow-y-auto p-4" style={{ maxHeight: "60dvh" }}>
+      <div
+        className="flex-1 space-y-3 overflow-y-auto p-4"
+        style={{ maxHeight: "60dvh" }}
+      >
         {loadError && <ErrorBlock onRetry={() => setRetry((n) => n + 1)} />}
         {hasMore && (
           <Button
@@ -357,8 +405,12 @@ function ChatThread({ chat, onChanged }: { chat: Chat; onChanged: () => void }) 
         ) : (
           messages.map((m) =>
             m.sender === "system" ? (
-              <p key={m.id} className="text-center text-xs text-muted-foreground">
-                {t(`lcSys_${m.body}`)} · {date(m.created_at, { timeStyle: "short" })}
+              <p
+                key={m.id}
+                className="text-center text-xs text-muted-foreground"
+              >
+                {t(`lcSys_${m.body}`)} ·{" "}
+                {date(m.created_at, { timeStyle: "short" })}
               </p>
             ) : (
               <div
@@ -372,7 +424,10 @@ function ChatThread({ chat, onChanged }: { chat: Chat; onChanged: () => void }) 
               >
                 <span className="mb-1 block text-xs opacity-75">
                   {t(`lcSender_${m.sender}`)} ·{" "}
-                  {date(m.created_at, { dateStyle: "short", timeStyle: "short" })}
+                  {date(m.created_at, {
+                    dateStyle: "short",
+                    timeStyle: "short",
+                  })}
                 </span>
                 <p dir="auto" className="whitespace-pre-wrap break-words">
                   {m.body}
@@ -389,7 +444,10 @@ function ChatThread({ chat, onChanged }: { chat: Chat; onChanged: () => void }) 
           inputRef.current?.focus();
         }}
       />
-      <form className="flex items-end gap-2 border-t border-border p-3" onSubmit={submit}>
+      <form
+        className="flex items-end gap-2 border-t border-border p-3"
+        onSubmit={submit}
+      >
         <Textarea
           ref={inputRef}
           value={text}
@@ -404,8 +462,16 @@ function ChatThread({ chat, onChanged }: { chat: Chat; onChanged: () => void }) 
             }
           }}
         />
-        <Button type="submit" disabled={busy || !text.trim()} aria-label={t("lcSend")}>
-          {busy ? <Loader2 className="size-4 animate-spin" /> : <Send className="size-4" />}
+        <Button
+          type="submit"
+          disabled={busy || !text.trim()}
+          aria-label={t("lcSend")}
+        >
+          {busy ? (
+            <Loader2 className="size-4 animate-spin" />
+          ) : (
+            <Send className="size-4" />
+          )}
         </Button>
       </form>
     </section>
@@ -413,7 +479,13 @@ function ChatThread({ chat, onChanged }: { chat: Chat; onChanged: () => void }) 
 }
 
 /** Visitor details for one chat: dates, message count, start page and their support requests. */
-function ChatDetails({ chat, messageCount }: { chat: Chat; messageCount: number | null }) {
+function ChatDetails({
+  chat,
+  messageCount,
+}: {
+  chat: Chat;
+  messageCount: number | null;
+}) {
   const { t, date } = useAdminCopy();
   const readSupport = useServerFn(adminChatVisitorSupport);
   const support = useQuery({
@@ -433,10 +505,16 @@ function ChatDetails({ chat, messageCount }: { chat: Chat; messageCount: number 
       className="border-b border-border bg-muted/30 px-4 py-3 text-sm"
     >
       <dl className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        {item(t("lcStarted"), date(chat.created_at, { dateStyle: "medium", timeStyle: "short" }))}
+        {item(
+          t("lcStarted"),
+          date(chat.created_at, { dateStyle: "medium", timeStyle: "short" }),
+        )}
         {item(
           t("lcLastMessage"),
-          date(chat.last_message_at, { dateStyle: "medium", timeStyle: "short" }),
+          date(chat.last_message_at, {
+            dateStyle: "medium",
+            timeStyle: "short",
+          }),
         )}
         {item(t("lcMessages"), messageCount ?? "…")}
         {item(
@@ -471,8 +549,11 @@ function ChatDetails({ chat, messageCount }: { chat: Chat; messageCount: number 
           <ul className="mt-1 flex flex-wrap gap-2">
             {(support.data ?? []).slice(0, 8).map((r) => (
               <li key={r.id}>
-                <Badge variant={r.status === "new" ? "destructive" : "secondary"}>
-                  {r.kind} · {r.status} · {date(r.created_at, { dateStyle: "short" })}
+                <Badge
+                  variant={r.status === "new" ? "destructive" : "secondary"}
+                >
+                  {r.kind} · {r.status} ·{" "}
+                  {date(r.created_at, { dateStyle: "short" })}
                 </Badge>
               </li>
             ))}

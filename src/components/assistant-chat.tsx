@@ -1,4 +1,4 @@
-import {archyPage,pagePrompts,type ArchyPage} from "@/lib/archy-page";
+import { archyPage, pagePrompts, type ArchyPage } from "@/lib/archy-page";
 import { ReplyRating } from "./reply-rating";
 import { trackProductEvent } from "@/lib/metrics-consent";
 import {
@@ -75,22 +75,64 @@ import {
 type LiveMsg = { id: string; sender: string; body: string; created_at: string };
 
 type ChatMessage = StoredMessage;
-function limitedDraft(owner:string) {
+function limitedDraft(owner: string) {
   try {
-    const saved=sessionStorage.getItem("archy-guest-retry:v2:"+owner);
-    const legacyKey="archy-retry:"+owner;
-    const value=JSON.parse(saved??sessionStorage.getItem(legacyKey)??"null");
-    if(!saved && value){value.until=Date.now();sessionStorage.removeItem(legacyKey);}
-    if(value && Number.isFinite(value.until) && value.until+3600000>Date.now()){
-      return {until:Number(value.until),name:String(value.name??""),email:String(value.email??""),question:String(value.question??"")};
+    const saved = sessionStorage.getItem("archy-guest-retry:v2:" + owner);
+    const legacyKey = "archy-retry:" + owner;
+    const value = JSON.parse(
+      saved ?? sessionStorage.getItem(legacyKey) ?? "null",
+    );
+    if (!saved && value) {
+      value.until = Date.now();
+      sessionStorage.removeItem(legacyKey);
     }
-  }catch{/* Browser storage is optional. */}
+    if (
+      value &&
+      Number.isFinite(value.until) &&
+      value.until + 3600000 > Date.now()
+    ) {
+      return {
+        until: Number(value.until),
+        name: String(value.name ?? ""),
+        email: String(value.email ?? ""),
+        question: String(value.question ?? ""),
+      };
+    }
+  } catch {
+    /* Browser storage is optional. */
+  }
   return null;
 }
-function ReplyBody({message,ar,openProduct}:{message:ChatMessage;ar:boolean;openProduct:(id:string)=>boolean|void}){
-  const split=message.role==="assistant"?message.content.search(/\n\n(?=\[[^\n]+\]\(\/product\/[^)]+#(?:access|capabilities)\))/):-1;
-  return <><ChatMarkdown onOpenProduct={openProduct}>{split<0?message.content:message.content.slice(0,split)}</ChatMarkdown>
-    {split>=0&&<details><summary>{dictionaries[ar ? "ar" : "en"].assistantChatSourcesAndFit}</summary><ChatMarkdown>{message.content.slice(split).trim()}</ChatMarkdown></details>}</>;
+function ReplyBody({
+  message,
+  ar,
+  openProduct,
+}: {
+  message: ChatMessage;
+  ar: boolean;
+  openProduct: (id: string) => boolean | void;
+}) {
+  const split =
+    message.role === "assistant"
+      ? message.content.search(
+          /\n\n(?=\[[^\n]+\]\(\/product\/[^)]+#(?:access|capabilities)\))/,
+        )
+      : -1;
+  return (
+    <>
+      <ChatMarkdown onOpenProduct={openProduct}>
+        {split < 0 ? message.content : message.content.slice(0, split)}
+      </ChatMarkdown>
+      {split >= 0 && (
+        <details>
+          <summary>
+            {dictionaries[ar ? "ar" : "en"].assistantChatSourcesAndFit}
+          </summary>
+          <ChatMarkdown>{message.content.slice(split).trim()}</ChatMarkdown>
+        </details>
+      )}
+    </>
+  );
 }
 
 type GateSession = StoredSession;
@@ -117,23 +159,50 @@ const ToolRequestDialog = lazy(() =>
 export function AssistantChat() {
   const { language, dir, t } = useLanguage();
   const [open, setOpen] = useState(false);
-  const [context,setContext]=useState<ArchyPage|null>(null);
-  useEffect(()=>{
-    if(!open)return;
-    const refresh=()=>{
-      const [,route,id]=window.location.pathname.split("/");
-      const el=document.querySelector<HTMLElement>("main[data-archy-service]");
-      const page=route==="enterprise-services"?(id==="request"?"service-request":"services"):route;
-      const next=archyPage({page,tool:el?.dataset["archyTool"]||id,service:el?.dataset["archyService"]});
-      setContext(prev=>prev?.page===next?.page&&prev?.tool===next?.tool&&prev?.service===next?.service?prev:next);
+  const [context, setContext] = useState<ArchyPage | null>(null);
+  useEffect(() => {
+    if (!open) return;
+    const refresh = () => {
+      const [, route, id] = window.location.pathname.split("/");
+      const el = document.querySelector<HTMLElement>(
+        "main[data-archy-service]",
+      );
+      const page =
+        route === "enterprise-services"
+          ? id === "request"
+            ? "service-request"
+            : "services"
+          : route;
+      const next = archyPage({
+        page,
+        tool: el?.dataset["archyTool"] || id,
+        service: el?.dataset["archyService"],
+      });
+      setContext((prev) =>
+        prev?.page === next?.page &&
+        prev?.tool === next?.tool &&
+        prev?.service === next?.service
+          ? prev
+          : next,
+      );
     };
-    refresh();const observer=new MutationObserver(refresh);
-    observer.observe(document.querySelector(".site-content")??document.body,{subtree:true,childList:true,attributes:true,attributeFilter:["data-archy-tool","data-archy-service"]});
-    return ()=>observer.disconnect();
-  },[open]);
-  const suggestions=context ? pagePrompts(context,language==="ar") : [];
-  const previousOpen=useRef(false);
-  useEffect(()=>{if(previousOpen.current&&!open)document.getElementById("assistant-launcher")?.focus();previousOpen.current=open;},[open]);
+    refresh();
+    const observer = new MutationObserver(refresh);
+    observer.observe(document.querySelector(".site-content") ?? document.body, {
+      subtree: true,
+      childList: true,
+      attributes: true,
+      attributeFilter: ["data-archy-tool", "data-archy-service"],
+    });
+    return () => observer.disconnect();
+  }, [open]);
+  const suggestions = context ? pagePrompts(context, language === "ar") : [];
+  const previousOpen = useRef(false);
+  useEffect(() => {
+    if (previousOpen.current && !open)
+      document.getElementById("assistant-launcher")?.focus();
+    previousOpen.current = open;
+  }, [open]);
 
   // Centered window mode, opened from the «من المشكلة إلى الأداة» bar.
   const [modal, setModal] = useState(false);
@@ -142,7 +211,9 @@ export function AssistantChat() {
     null,
   );
   const [messages, setMessages] = useState<ChatMessage[]>([]);
-  const [comparison, setComparison] = useState<NonNullable<OpenAssistantDetail["comparison"]>>([]);
+  const [comparison, setComparison] = useState<
+    NonNullable<OpenAssistantDetail["comparison"]>
+  >([]);
   const [input, setInput] = useState("");
   const [busy, setBusy] = useState(false);
   const [session, setSession] = useState<GateSession | null>(null);
@@ -190,9 +261,21 @@ export function AssistantChat() {
   const [challengeRetry, setChallengeRetry] = useState(0);
   const [challengeFailed, setChallengeFailed] = useState(false);
   const [gateError, setGateError] = useState("");
-  const [retryAt,setRetryAt]=useState(0);
-  const [now,setNow]=useState(Date.now);
-  useEffect(()=>{if(!retryAt)return;const id=setInterval(()=>{const t=Date.now();setNow(t);if(t>=retryAt){setRetryAt(0);setGateError("");setChallenge(null);}},1000);return ()=>clearInterval(id);},[retryAt]);
+  const [retryAt, setRetryAt] = useState(0);
+  const [now, setNow] = useState(Date.now);
+  useEffect(() => {
+    if (!retryAt) return;
+    const id = setInterval(() => {
+      const t = Date.now();
+      setNow(t);
+      if (t >= retryAt) {
+        setRetryAt(0);
+        setGateError("");
+        setChallenge(null);
+      }
+    }, 1000);
+    return () => clearInterval(id);
+  }, [retryAt]);
   // Confirmed email of the signed-in visitor; the chat stays closed without it.
   const [verified, setVerified] = useState<string | null>(null);
 
@@ -338,12 +421,17 @@ export function AssistantChat() {
       }
       setVerified(email ?? "guest");
       const stored = store ? loadAccountState(store, id).session : null;
-      const draft=limitedDraft(id);
-      if(!stored && draft){
-        setGateName(draft.name);setGateEmail(draft.email);setGateQuestion(draft.question);
-        setRetryAt(draft.until>Date.now()?draft.until:0);if(draft.until>Date.now())setGateError(" ");
-      }else{setGateEmail(stored?.email ?? email ?? "");setRetryAt(0);}
-
+      const draft = limitedDraft(id);
+      if (!stored && draft) {
+        setGateName(draft.name);
+        setGateEmail(draft.email);
+        setGateQuestion(draft.question);
+        setRetryAt(draft.until > Date.now() ? draft.until : 0);
+        if (draft.until > Date.now()) setGateError(" ");
+      } else {
+        setGateEmail(stored?.email ?? email ?? "");
+        setRetryAt(0);
+      }
     };
     // The initial lookup is ignored if any auth event arrived first: that event is newer.
     // An unconfirmed stored sign-in (revoked, invalid, offline) is unknown: load no owner.
@@ -443,7 +531,7 @@ export function AssistantChat() {
                 role: "assistant",
                 content: result.reply.summary || t("chatSuggestion"),
                 picks: result.reply.picks,
-                ...(result.messageId ? {messageId:result.messageId} : {}),
+                ...(result.messageId ? { messageId: result.messageId } : {}),
               }
             : { role: "assistant", content: result.message, error: true },
         ],
@@ -606,13 +694,33 @@ export function AssistantChat() {
       const result = await register({ data: registration.data });
       if (!live(gen)) return;
       if (!result.ok) {
-        setGateError(result.message); if(result.retryAt){setNow(Date.now());setRetryAt(result.retryAt);
-        try{sessionStorage.setItem("archy-guest-retry:v2:"+owner,JSON.stringify({until:result.retryAt,name:gateName,email:gateEmail,question:gateQuestion}));}catch{/* Keep the in-memory draft. */}}
+        setGateError(result.message);
+        if (result.retryAt) {
+          setNow(Date.now());
+          setRetryAt(result.retryAt);
+          try {
+            sessionStorage.setItem(
+              "archy-guest-retry:v2:" + owner,
+              JSON.stringify({
+                until: result.retryAt,
+                name: gateName,
+                email: gateEmail,
+                question: gateQuestion,
+              }),
+            );
+          } catch {
+            /* Keep the in-memory draft. */
+          }
+        }
         setChallenge(null); // fetch a fresh question for the next attempt
         setTurnstileToken("");
         return;
       }
-      try{sessionStorage.removeItem("archy-guest-retry:v2:"+owner);}catch{/* Optional storage. */}
+      try {
+        sessionStorage.removeItem("archy-guest-retry:v2:" + owner);
+      } catch {
+        /* Optional storage. */
+      }
       const next: GateSession = {
         token: result.token,
         name: result.name,
@@ -714,9 +822,22 @@ export function AssistantChat() {
             </Button>
           </header>
           {comparison.length > 0 && (
-            <nav className="ea-comparison-sources" aria-label={language === "ar" ? "صفحات المنتجات" : "Product references"}>
-              {comparison.map(item => <a key={item.id} href={"/product/" + encodeURIComponent(item.id)}
-                target="_blank" rel="noopener noreferrer">{item.name} ↗</a>)}
+            <nav
+              className="ea-comparison-sources"
+              aria-label={
+                language === "ar" ? "صفحات المنتجات" : "Product references"
+              }
+            >
+              {comparison.map((item) => (
+                <a
+                  key={item.id}
+                  href={"/product/" + encodeURIComponent(item.id)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {item.name} ↗
+                </a>
+              ))}
             </nav>
           )}
           {requestForm ? (
@@ -759,11 +880,43 @@ export function AssistantChat() {
                     : "Ask straight away about a tool or what your team needs. No sign-up needed."}
                 </p>
               </div>
-              {suggestions.length>0 && <div className="ea-archy-prompts">{suggestions.map(q=><button key={q} aria-pressed={gateQuestion===q} type="button" onClick={()=>setGateQuestion(q)}>{q}</button>)}</div>}
-              <Label htmlFor="gate-question">{language==="ar"?"سؤالك":"Your question"}</Label>
-              <Textarea id="gate-question" maxLength={1200} value={gateQuestion} placeholder={language==="ar"?"مثال: نحتاج خريطة لتطبيقاتنا وتكرارها":"e.g. We need a map of our applications and their overlap"} onChange={e=>setGateQuestion(e.target.value)}/>
-              <details className="ea-gate-contact" open={Boolean(gateName || gateEmail) || undefined}>
-                <summary>{language==="ar"?"أضف اسمك وبريدك ليتابع معك الفريق (اختياري)":"Add your name and email so the team can follow up (optional)"}</summary>
+              {suggestions.length > 0 && (
+                <div className="ea-archy-prompts">
+                  {suggestions.map((q) => (
+                    <button
+                      key={q}
+                      aria-pressed={gateQuestion === q}
+                      type="button"
+                      onClick={() => setGateQuestion(q)}
+                    >
+                      {q}
+                    </button>
+                  ))}
+                </div>
+              )}
+              <Label htmlFor="gate-question">
+                {language === "ar" ? "سؤالك" : "Your question"}
+              </Label>
+              <Textarea
+                id="gate-question"
+                maxLength={1200}
+                value={gateQuestion}
+                placeholder={
+                  language === "ar"
+                    ? "مثال: نحتاج خريطة لتطبيقاتنا وتكرارها"
+                    : "e.g. We need a map of our applications and their overlap"
+                }
+                onChange={(e) => setGateQuestion(e.target.value)}
+              />
+              <details
+                className="ea-gate-contact"
+                open={Boolean(gateName || gateEmail) || undefined}
+              >
+                <summary>
+                  {language === "ar"
+                    ? "أضف اسمك وبريدك ليتابع معك الفريق (اختياري)"
+                    : "Add your name and email so the team can follow up (optional)"}
+                </summary>
                 <Label htmlFor="gate-name">{t("gateName")}</Label>
                 <Input
                   autoComplete="name"
@@ -840,13 +993,18 @@ export function AssistantChat() {
               />
               {gateError && (
                 <p role="alert" className="text-sm text-destructive">
-                  {retryAt>now?(language==="ar"?`يمكنك المحاولة بعد ${Math.ceil((retryAt-now)/60000)} دقيقة.`:`Try again in ${Math.ceil((retryAt-now)/60000)} min.`):gateError}
+                  {retryAt > now
+                    ? language === "ar"
+                      ? `يمكنك المحاولة بعد ${Math.ceil((retryAt - now) / 60000)} دقيقة.`
+                      : `Try again in ${Math.ceil((retryAt - now) / 60000)} min.`
+                    : gateError}
                 </p>
               )}
               <Button
                 type="submit"
                 disabled={
-                  retryAt>now || gateBusy ||
+                  retryAt > now ||
+                  gateBusy ||
                   !challenge ||
                   (challenge.mode === "turnstile" && !turnstileToken)
                 }
@@ -875,81 +1033,81 @@ export function AssistantChat() {
                     }}
                   >
                     <section className="ea-chat-action-group">
-                      <h3>{language === "ar" ? "المحادثات" : "Conversations"}</h3>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      aria-label={t("histOpen")}
-                      aria-pressed={showHistory}
-                      onClick={() => setShowHistory((v) => !v)}
-                    >
-                      <History className="size-4" /> {t("histOpen")}
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      aria-label={t("chatNewChat")}
-                      disabled={gateBusy || withPerson}
-                      onClick={() => {
-                        genRef.current += 1;
-                        setBusy(false);
-                        setInput("");
-                        setShowHistory(false);
-                        setSelectedProductId(null);
-                        setShowOptions(false);
-                        save([]);
-                      }}
-                    >
-                      <RotateCcw className="size-4" /> {t("chatNewChat")}
-                    </Button>
-
+                      <h3>
+                        {language === "ar" ? "المحادثات" : "Conversations"}
+                      </h3>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        aria-label={t("histOpen")}
+                        aria-pressed={showHistory}
+                        onClick={() => setShowHistory((v) => !v)}
+                      >
+                        <History className="size-4" /> {t("histOpen")}
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        aria-label={t("chatNewChat")}
+                        disabled={gateBusy || withPerson}
+                        onClick={() => {
+                          genRef.current += 1;
+                          setBusy(false);
+                          setInput("");
+                          setShowHistory(false);
+                          setSelectedProductId(null);
+                          setShowOptions(false);
+                          save([]);
+                        }}
+                      >
+                        <RotateCcw className="size-4" /> {t("chatNewChat")}
+                      </Button>
                     </section>
                     <section className="ea-chat-action-group">
                       <h3>{language === "ar" ? "الدعم" : "Support"}</h3>
-                    {withPerson ? (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        disabled={busy}
-                        onClick={() => void stopHuman()}
-                      >
-                        <Compass className="size-4" /> {t("humanBack")}
+                      {withPerson ? (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          disabled={busy}
+                          onClick={() => void stopHuman()}
+                        >
+                          <Compass className="size-4" /> {t("humanBack")}
+                        </Button>
+                      ) : (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => void startHuman()}
+                          disabled={busy}
+                        >
+                          <UserRound className="size-4" /> {t("humanAsk")}
+                        </Button>
+                      )}
+                      <Button variant="outline" size="sm" asChild>
+                        <Link
+                          to="/request"
+                          search={{ type: "support", from: "chat" }}
+                          onClick={() => {
+                            try {
+                              sessionStorage.setItem(
+                                "e20e-request-prefill",
+                                JSON.stringify({
+                                  name: session.name,
+                                  email: session.email ?? gateEmail,
+                                  access: session.token,
+                                }),
+                              );
+                            } catch {
+                              /* storage unavailable: the visitor types their details */
+                            }
+                            setOpen(false);
+                          }}
+                        >
+                          <LifeBuoy className="size-4" />{" "}
+                          {t("chatSupportRequest")}
+                        </Link>
                       </Button>
-                    ) : (
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => void startHuman()}
-                        disabled={busy}
-                      >
-                        <UserRound className="size-4" /> {t("humanAsk")}
-                      </Button>
-                    )}
-                    <Button variant="outline" size="sm" asChild>
-                      <Link
-                        to="/request"
-                        search={{ type: "support", from: "chat" }}
-                        onClick={() => {
-                          try {
-                            sessionStorage.setItem(
-                              "e20e-request-prefill",
-                              JSON.stringify({
-                                name: session.name,
-                                email: session.email ?? gateEmail,
-                                access: session.token,
-                              }),
-                            );
-                          } catch {
-                            /* storage unavailable: the visitor types their details */
-                          }
-                          setOpen(false);
-                        }}
-                      >
-                        <LifeBuoy className="size-4" />{" "}
-                        {t("chatSupportRequest")}
-                      </Link>
-                    </Button>
-
                     </section>
                   </div>
                 </details>
@@ -988,7 +1146,13 @@ export function AssistantChat() {
                             {m.body}
                           </ChatMarkdown>
                         </div>
-                        {m.sender==="ai" && session && <ReplyRating id={m.id} access={session.token} ar={language==="ar"}/>}
+                        {m.sender === "ai" && session && (
+                          <ReplyRating
+                            id={m.id}
+                            access={session.token}
+                            ar={language === "ar"}
+                          />
+                        )}
                       </div>
                     ),
                   )}
@@ -1017,17 +1181,39 @@ export function AssistantChat() {
                       }}
                     />
                   )}
-                  {suggestions.length>0 && !messages.length && <div className="ea-archy-prompts">{suggestions.map(q=><button key={q} type="button" onClick={()=>setInput(q)}>{q}</button>)}</div>}
+                  {suggestions.length > 0 && !messages.length && (
+                    <div className="ea-archy-prompts">
+                      {suggestions.map((q) => (
+                        <button
+                          key={q}
+                          type="button"
+                          onClick={() => setInput(q)}
+                        >
+                          {q}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                   {[greeting, ...messages].map((message, index) => (
                     <div
                       key={index}
                       className={`assistant-msg ${message.role}${message.error ? " error" : ""}`}
                     >
                       <div className="prose-sm">
-                        <ReplyBody message={message} ar={language==="ar"} openProduct={openProduct} />
+                        <ReplyBody
+                          message={message}
+                          ar={language === "ar"}
+                          openProduct={openProduct}
+                        />
                       </div>
-                      {message.messageId && session && <ReplyRating id={message.messageId} access={session.token} ar={language==="ar"}/>}
-                      {message.picks?.slice(0,1).map((pick) => {
+                      {message.messageId && session && (
+                        <ReplyRating
+                          id={message.messageId}
+                          access={session.token}
+                          ar={language === "ar"}
+                        />
+                      )}
+                      {message.picks?.slice(0, 1).map((pick) => {
                         // Live catalog only: unknown or not-yet-launched tools are not shown.
                         const product = catalog?.products.find(
                           (p) => p.id === pick.id && !p.comingSoon,
@@ -1057,8 +1243,15 @@ export function AssistantChat() {
                     </div>
                   ))}
                   {!messages.length && !showOptions && (
-                    <button type="button" className="ea-chat-starters" onClick={() => setShowOptions(true)}>
-                      <Compass size={16} aria-hidden="true" />{language === "ar" ? "ساعدني في اختيار أداة" : "Help me choose a tool"}
+                    <button
+                      type="button"
+                      className="ea-chat-starters"
+                      onClick={() => setShowOptions(true)}
+                    >
+                      <Compass size={16} aria-hidden="true" />
+                      {language === "ar"
+                        ? "ساعدني في اختيار أداة"
+                        : "Help me choose a tool"}
                     </button>
                   )}
                   {busy && (

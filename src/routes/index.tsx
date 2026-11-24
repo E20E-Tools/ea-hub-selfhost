@@ -24,13 +24,19 @@ export const Route = createFileRoute("/")({
   notFoundComponent: LibraryNotFound,
   head: () => ({
     meta: [
-      { title: "E20E Tools | أدوات البنية المؤسسية — Enterprise architecture tools" },
+      {
+        title:
+          "E20E Tools | أدوات البنية المؤسسية — Enterprise architecture tools",
+      },
       {
         name: "description",
         content:
           "مكتبة أدوات E20E للبنية المؤسسية وإدارة التقنيات. Explore E20E tools for enterprise architecture and technology management.",
       },
-      { property: "og:title", content: "E20E Tools | Enterprise architecture tools" },
+      {
+        property: "og:title",
+        content: "E20E Tools | Enterprise architecture tools",
+      },
       {
         property: "og:description",
         content:

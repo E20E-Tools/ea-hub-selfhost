@@ -13,7 +13,10 @@ export const Route = createFileRoute("/privacy")({
         content:
           "What E20E Tools collects, why, and how to ask for it to be deleted. ما الذي نجمعه ولماذا وكيف تطلب حذفه.",
       },
-      { property: "og:title", content: "Privacy policy — E20E Tools | سياسة الخصوصية" },
+      {
+        property: "og:title",
+        content: "Privacy policy — E20E Tools | سياسة الخصوصية",
+      },
       { property: "og:url", content: pageUrl("/privacy") },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
@@ -109,7 +112,9 @@ const sections: Record<"ar" | "en", Section[]> = {
     },
     {
       title: "Your rights",
-      body: [`You can ask for a copy of your data, a correction, or deletion by emailing ${CONTACT}.`],
+      body: [
+        `You can ask for a copy of your data, a correction, or deletion by emailing ${CONTACT}.`,
+      ],
     },
   ],
 };
@@ -123,7 +128,8 @@ function PrivacyPage() {
       <section className="mx-auto w-full max-w-3xl px-4 py-10 sm:px-6">
         <header className="mb-10 border-b border-border pb-8">
           <p className="mb-3 inline-flex items-center gap-2 text-sm font-medium text-primary">
-            <ShieldCheck size={16} aria-hidden="true" /> {dictionaries[ar ? "ar" : "en"].privacyPrivacy}
+            <ShieldCheck size={16} aria-hidden="true" />{" "}
+            {dictionaries[ar ? "ar" : "en"].privacyPrivacy}
           </p>
           <h1 className="text-3xl font-semibold sm:text-4xl">
             {dictionaries[ar ? "ar" : "en"].privacyPrivacyPolicy}

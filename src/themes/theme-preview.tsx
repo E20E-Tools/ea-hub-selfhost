@@ -1,10 +1,18 @@
 import { useEffect, useState } from "react";
 import { useRouterState } from "@tanstack/react-router";
-import { themeFontsHref, themeMeta, type DesignThemeId } from "@/lib/design-themes";
+import {
+  themeFontsHref,
+  themeMeta,
+  type DesignThemeId,
+} from "@/lib/design-themes";
 import { useFontStylesheet } from "./use-theme-fonts";
 import { fill } from "@/lib/copy";
 import { useLanguage } from "@/lib/language";
-import { PREVIEW_STORAGE_KEY, resolvePreviewTheme, stripPreviewParam } from "./preview";
+import {
+  PREVIEW_STORAGE_KEY,
+  resolvePreviewTheme,
+  stripPreviewParam,
+} from "./preview";
 
 function readStored(): string | null {
   try {
@@ -62,7 +70,9 @@ export function ThemePreview({ saved }: { saved: DesignThemeId }) {
 
   return (
     <div className="theme-preview-bar" role="status" dir={dir}>
-      <span>{fill(t("themePreviewing"), themeMeta(preview).name[language])}</span>
+      <span>
+        {fill(t("themePreviewing"), themeMeta(preview).name[language])}
+      </span>
       <span aria-hidden="true">·</span>
       <button type="button" onClick={end}>
         {t("themePreviewEnd")}

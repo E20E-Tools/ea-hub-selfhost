@@ -50,14 +50,25 @@ describe("coming-soon acquisition guide", () => {
     expect(acquisitionGuide(soon, "ar")?.requirements).toEqual([]);
   });
   it("only announces a launch date for ArchONE, taken from its publication date", () => {
-    expect(acquisitionGuide({ ...soon, publicationDate: "2026-11-22" }, "en")?.launch).toBeNull();
     expect(
-      acquisitionGuide({ ...soon, id: "archone", publicationDate: "2026-11-22" }, "en")?.launch,
+      acquisitionGuide({ ...soon, publicationDate: "2026-11-22" }, "en")
+        ?.launch,
+    ).toBeNull();
+    expect(
+      acquisitionGuide(
+        { ...soon, id: "archone", publicationDate: "2026-11-22" },
+        "en",
+      )?.launch,
     ).toBe("Launches 22 Nov 2026");
     expect(
-      acquisitionGuide({ ...soon, id: "archone", publicationDate: "2026-12-05" }, "ar")?.launch,
+      acquisitionGuide(
+        { ...soon, id: "archone", publicationDate: "2026-12-05" },
+        "ar",
+      )?.launch,
     ).toBe("يُطلق 5 ديسمبر 2026");
-    expect(acquisitionGuide({ ...soon, id: "archone" }, "en")?.launch).toBeNull();
+    expect(
+      acquisitionGuide({ ...soon, id: "archone" }, "en")?.launch,
+    ).toBeNull();
   });
   it("returns no guide for tools that can already be requested", () => {
     expect(acquisitionGuide({ ...soon, comingSoon: false }, "ar")).toBeNull();

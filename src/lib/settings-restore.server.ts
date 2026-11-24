@@ -3,7 +3,8 @@ export async function validateRestore(
   section: string,
   raw: unknown,
 ): Promise<Record<string, unknown>> {
-  if (!raw || typeof raw !== "object" || Array.isArray(raw)) throw new Error("Invalid restore");
+  if (!raw || typeof raw !== "object" || Array.isArray(raw))
+    throw new Error("Invalid restore");
   const r = raw as Record<string, unknown>;
   const a = await import("./admin.functions");
   switch (section) {
@@ -49,13 +50,19 @@ export async function validateRestore(
       a.featureFlagsSchema.parse(r["feature_flags"]);
       break;
     case "contact_info":
-      (await import("./contact-info")).contactInfoSchema.parse(r["contact_info"]);
+      (await import("./contact-info")).contactInfoSchema.parse(
+        r["contact_info"],
+      );
       break;
     case "categories":
-      a.categoriesSchema.parse({ categories: r["categories"], categoriesEn: r["categories_en"] });
+      a.categoriesSchema.parse({
+        categories: r["categories"],
+        categoriesEn: r["categories_en"],
+      });
       break;
     case "customize": {
-      const { saveThemeCustomizationSchema } = await import("./theme-customization");
+      const { saveThemeCustomizationSchema } =
+        await import("./theme-customization");
       const map = r["theme_customizations"];
       if (!map || typeof map !== "object" || Array.isArray(map))
         throw new Error("Invalid customizations");
@@ -69,10 +76,14 @@ export async function validateRestore(
       break;
     }
     case "archy":
-      (await import("./archy-settings")).archyGreetingSchema.parse(r["archy_greeting"]);
+      (await import("./archy-settings")).archyGreetingSchema.parse(
+        r["archy_greeting"],
+      );
       break;
     case "notifications":
-      (await import("./contact-settings.functions")).contactSettingsSchema.parse({
+      (
+        await import("./contact-settings.functions")
+      ).contactSettingsSchema.parse({
         recipientEmail: r["recipient_email"],
         notifyEnabled: r["notify_enabled"],
         autoReplyEnabled: r["auto_reply_enabled"],

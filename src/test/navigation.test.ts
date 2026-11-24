@@ -11,9 +11,9 @@ import {
 
 describe("Editable navigation", () => {
   it("points consultations to the supplied DT Guide address", () => {
-    expect(DEFAULT_NAVIGATION.find((item) => item.id === "consultations")?.url).toBe(
-      "https://www.dt.guide/itconsultations/",
-    );
+    expect(
+      DEFAULT_NAVIGATION.find((item) => item.id === "consultations")?.url,
+    ).toBe("https://www.dt.guide/itconsultations/");
   });
   it("points courses to the supplied DT Guide address", () => {
     expect(DEFAULT_NAVIGATION.find((item) => item.id === "courses")?.url).toBe(
@@ -22,18 +22,28 @@ describe("Editable navigation", () => {
   });
   it("preserves deleted items and an empty menu instead of restoring defaults", () => {
     expect(readNavigation([])).toEqual([]);
-    expect(readNavigation(DEFAULT_NAVIGATION.slice(1)).map((item) => item.id)).not.toContain(
-      "library",
-    );
+    expect(
+      readNavigation(DEFAULT_NAVIGATION.slice(1)).map((item) => item.id),
+    ).not.toContain("library");
   });
   it("keeps explicit placements, reordered links and deletions after saving a legacy menu", () => {
     const migrated = placedNavigation(DEFAULT_NAVIGATION);
-    expect(migrated.find(item => item.url === "/my-tools")?.group).toBe("workspace");
-    expect(migrated.find(item => item.url === "/about")?.group).toBe("company");
+    expect(migrated.find((item) => item.url === "/my-tools")?.group).toBe(
+      "workspace",
+    );
+    expect(migrated.find((item) => item.url === "/about")?.group).toBe(
+      "company",
+    );
     const configured = moveNavigation(migrated, 1, -1)
-      .filter(item => item.url !== "/my-tools")
-      .map(item => item.id === "roadmap" ? { ...item, group: "appearance" as const, topBar: true } : item);
-    expect(placedNavigation(navigationSchema.parse(configured))).toEqual(configured);
+      .filter((item) => item.url !== "/my-tools")
+      .map((item) =>
+        item.id === "roadmap"
+          ? { ...item, group: "appearance" as const, topBar: true }
+          : item,
+      );
+    expect(placedNavigation(navigationSchema.parse(configured))).toEqual(
+      configured,
+    );
     expect(placedNavigation([])).toEqual([]);
   });
   it("moves entries in the requested order", () => {

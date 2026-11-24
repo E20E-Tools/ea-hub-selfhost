@@ -4,7 +4,11 @@ import { toast } from "sonner";
 import { Switch } from "@/components/ui/switch";
 import { saveFeatureFlags } from "@/lib/admin.functions";
 import type { Catalog } from "@/lib/catalog";
-import { FEATURE_KEYS, featureEnabled, type FeatureFlags } from "@/lib/site-features";
+import {
+  FEATURE_KEYS,
+  featureEnabled,
+  type FeatureFlags,
+} from "@/lib/site-features";
 import { Card, SaveBar, SettingRow, useAdminCopy, useDraft } from "./ui";
 
 export function FeatureSettings({ catalog }: { catalog: Catalog }) {
@@ -42,7 +46,9 @@ export function FeatureSettings({ catalog }: { catalog: Catalog }) {
             <Switch
               id={`feature-${key}`}
               checked={featureEnabled(flags, key)}
-              onCheckedChange={(v) => form.setValue((current) => ({ ...current, [key]: v }))}
+              onCheckedChange={(v) =>
+                form.setValue((current) => ({ ...current, [key]: v }))
+              }
             />
             <span className="text-sm text-muted-foreground">
               {featureEnabled(flags, key) ? t("enabled") : t("disabled")}
@@ -50,7 +56,12 @@ export function FeatureSettings({ catalog }: { catalog: Catalog }) {
           </div>
         </SettingRow>
       ))}
-      <SaveBar dirty={form.dirty} busy={busy} onSave={() => void save()} onDiscard={form.discard} />
+      <SaveBar
+        dirty={form.dirty}
+        busy={busy}
+        onSave={() => void save()}
+        onDiscard={form.discard}
+      />
     </Card>
   );
 }

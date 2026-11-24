@@ -13,7 +13,9 @@ export const CATEGORY_LAYER: Record<string, EaLayer> = {
 };
 
 /** Admin override (product editor) wins over the category default. */
-export function layerFor(product: Pick<Product, "category" | "beneficiaryDetails">): EaLayer {
+export function layerFor(
+  product: Pick<Product, "category" | "beneficiaryDetails">,
+): EaLayer {
   const own = product.beneficiaryDetails?.eaLayer;
   if (own) return own;
   return CATEGORY_LAYER[product.category] ?? "applications";
@@ -21,10 +23,12 @@ export function layerFor(product: Pick<Product, "category" | "beneficiaryDetails
 
 /** Products grouped by layer, keeping catalog order inside each layer. */
 export function groupByLayer(products: Product[]): Record<EaLayer, Product[]> {
-  const out = { business: [], applications: [], data: [], technology: [] } as Record<
-    EaLayer,
-    Product[]
-  >;
+  const out = {
+    business: [],
+    applications: [],
+    data: [],
+    technology: [],
+  } as Record<EaLayer, Product[]>;
   for (const p of products) out[layerFor(p)].push(p);
   return out;
 }
@@ -36,7 +40,14 @@ export function explodeAt(ms: number): number {
 }
 
 /** Isometric projection of a plane point (x, y in -1..1) at height z. */
-export function iso(x: number, y: number, z: number, cx: number, cy: number, s: number) {
+export function iso(
+  x: number,
+  y: number,
+  z: number,
+  cx: number,
+  cy: number,
+  s: number,
+) {
   return { x: cx + (x - y) * s * 0.87, y: cy + (x + y) * s * 0.5 - z };
 }
 

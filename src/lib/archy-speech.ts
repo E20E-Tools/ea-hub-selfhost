@@ -5,10 +5,14 @@ export function pickArchyVoice(
   voices: readonly SpeechSynthesisVoice[],
   language: Language,
 ): SpeechSynthesisVoice | null {
-  const available = voices.filter((voice) => voice.lang.toLowerCase().startsWith(language));
+  const available = voices.filter((voice) =>
+    voice.lang.toLowerCase().startsWith(language),
+  );
   if (language === "ar") {
     return (
-      available.find((voice) => voice.lang.toLowerCase().replace("_", "-") === "ar-sa") ??
+      available.find(
+        (voice) => voice.lang.toLowerCase().replace("_", "-") === "ar-sa",
+      ) ??
       available[0] ??
       null
     );

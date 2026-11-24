@@ -24,7 +24,13 @@ import {
 const NAVY = "#0F1730";
 const COLORS = ["#2F6BFF", "#00D4FF", "#8B5CF6"];
 
-function titleTargets(text: string, n: number, w: number, h: number, mobile: boolean): Pt[] {
+function titleTargets(
+  text: string,
+  n: number,
+  w: number,
+  h: number,
+  mobile: boolean,
+): Pt[] {
   if (typeof document === "undefined") return [];
   const c = document.createElement("canvas");
   c.width = Math.max(1, Math.floor(w));
@@ -76,7 +82,13 @@ export default function ParticleForgeStage({ products, settings }: StageProps) {
   );
   const targets = useMemo(() => {
     const radius = Math.min(60, size.w / Math.max(4, list.length * 2.6));
-    const title = titleTargets(settings.displayTitle || "E20E", n, size.w, size.h, mobile);
+    const title = titleTargets(
+      settings.displayTitle || "E20E",
+      n,
+      size.w,
+      size.h,
+      mobile,
+    );
     return {
       grid: gridTargets(n, size.w, size.h),
       clusters: clusterTargets(n, centres, radius),
@@ -125,10 +137,15 @@ export default function ParticleForgeStage({ products, settings }: StageProps) {
           x = tg.x;
           y = tg.y;
         } else {
-          const jitter = f.formation === "grid" ? Math.sin(ms * 0.02 + i) * 0.8 : 0;
+          const jitter =
+            f.formation === "grid" ? Math.sin(ms * 0.02 + i) * 0.8 : 0;
           const push = repel({ x, y }, pointer.current, 80, 6);
-          let vx = (vel[i * 2] ?? 0) * 0.86 + (tg.x - x) * 0.045 * step + push.x;
-          let vy = (vel[i * 2 + 1] ?? 0) * 0.86 + (tg.y + jitter - y) * 0.045 * step + push.y;
+          let vx =
+            (vel[i * 2] ?? 0) * 0.86 + (tg.x - x) * 0.045 * step + push.x;
+          let vy =
+            (vel[i * 2 + 1] ?? 0) * 0.86 +
+            (tg.y + jitter - y) * 0.045 * step +
+            push.y;
           vx = Math.max(-30, Math.min(30, vx));
           vy = Math.max(-30, Math.min(30, vy));
           x += vx * step;
@@ -141,7 +158,11 @@ export default function ParticleForgeStage({ products, settings }: StageProps) {
         ctx.fillStyle =
           f.formation === "grid"
             ? "#ECE5D3"
-            : COLORS[(f.formation === "clusters" ? i % Math.max(1, list.length) : i) % 3]!;
+            : COLORS[
+                (f.formation === "clusters"
+                  ? i % Math.max(1, list.length)
+                  : i) % 3
+              ]!;
         ctx.fillRect(x - 1.4, y - 1.4, 2.8, 2.8);
       }
       if (f.formation === "clusters") {
@@ -173,7 +194,8 @@ export default function ParticleForgeStage({ products, settings }: StageProps) {
       dir={dir}
       onPointerMove={(e) => {
         const r = root.current?.getBoundingClientRect();
-        if (r) pointer.current = { x: e.clientX - r.left, y: e.clientY - r.top };
+        if (r)
+          pointer.current = { x: e.clientX - r.left, y: e.clientY - r.top };
       }}
       onPointerLeave={() => {
         pointer.current = null;
@@ -189,7 +211,12 @@ export default function ParticleForgeStage({ products, settings }: StageProps) {
             key={product.id}
             type="button"
             className="pf-hit"
-            style={{ left: c.x - hit / 2, top: c.y - hit / 2, width: hit, height: hit + 24 }}
+            style={{
+              left: c.x - hit / 2,
+              top: c.y - hit / 2,
+              width: hit,
+              height: hit + 24,
+            }}
             aria-label={fill(t("ucToolLabel"), product.name)}
             onClick={(e) => inspector.open(product.id, e.currentTarget)}
           />

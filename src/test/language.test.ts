@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { directionOf, pick, pickList, resolveLanguage } from "../lib/language-core";
+import {
+  directionOf,
+  pick,
+  pickList,
+  resolveLanguage,
+} from "../lib/language-core";
 import { fill, fill2 } from "../lib/copy";
 
 describe("visitor language choice", () => {

@@ -73,5 +73,9 @@ export async function suggest(need, catalog, lang) {
     : ar
       ? "ما نوع القرار الذي تريد دعمه؟ صف الحاجة، مثل تقييم تقنية أو تتبّع تكاليف التطبيقات."
       : "What decision do you want to support? Describe a need, such as evaluating technology or tracking application costs.";
-  return { summary, picks, modelId: (await model()).model.config._name_or_path };
+  return {
+    summary,
+    picks,
+    modelId: (await model()).model.config._name_or_path,
+  };
 }

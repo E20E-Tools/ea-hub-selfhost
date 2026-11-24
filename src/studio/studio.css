@@ -441,7 +441,10 @@
   font-family: var(--s-font);
 }
 /* Product layouts paint their own stage (Mission is dark), so the shared sheet skips them. */
-:root:root [data-surface="site"] .site-content > main:not(.s-home, .pl-mission, .pl-spec, .pl-journey) {
+:root:root
+  [data-surface="site"]
+  .site-content
+  > main:not(.s-home, .pl-mission, .pl-spec, .pl-journey) {
   background-color: var(--s-sheet);
   color: var(--s-ink);
 }
@@ -745,13 +748,16 @@
   }
 }
 
-
 :root:root [data-surface="site"] .detail-hero .bx-product-tools button {
   color: var(--ea-ink);
   background: var(--ea-surface);
   border: 1px solid var(--ea-line);
 }
-:root:root [data-surface="site"] .detail-hero .bx-product-tools button:is(:hover, [aria-pressed="true"]) {
+:root:root
+  [data-surface="site"]
+  .detail-hero
+  .bx-product-tools
+  button:is(:hover, [aria-pressed="true"]) {
   color: var(--ea-accent);
   border-color: currentColor;
   background: var(--ea-wash);

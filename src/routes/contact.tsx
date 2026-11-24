@@ -1,5 +1,5 @@
 import { RequestReceipt, type Receipt } from "@/components/request-receipt";
-import {currentVisitorAccess} from "@/lib/current-visitor-access";
+import { currentVisitorAccess } from "@/lib/current-visitor-access";
 import { metricsAllowed, trackJourney } from "@/lib/journey-client";
 import { JourneyHeading } from "@/studio/journey-heading";
 import { FormTermsNote } from "@/components/form-terms-note";
@@ -121,20 +121,46 @@ function ContactContent() {
         <JourneyHeading
           icon={Mail}
           title={t("pubContactTitle")}
-          description={
-            dictionaries[ar ? "ar" : "en"].contactChooseWhatYouNeed
-          }
+          description={dictionaries[ar ? "ar" : "en"].contactChooseWhatYouNeed}
         />
         <nav
           className="ea-intents"
-          aria-label={dictionaries[ar ? "ar" : "en"].contactReasonForContactingUs}
+          aria-label={
+            dictionaries[ar ? "ar" : "en"].contactReasonForContactingUs
+          }
         >
-          <a href="#contact-form"><Mail aria-hidden="true" /><span><strong>{dictionaries[ar ? "ar" : "en"].contactGeneralEnquiry}</strong><small>{dictionaries[ar ? "ar" : "en"].contactSendAMessageTo}</small></span></a>
+          <a href="#contact-form">
+            <Mail aria-hidden="true" />
+            <span>
+              <strong>
+                {dictionaries[ar ? "ar" : "en"].contactGeneralEnquiry}
+              </strong>
+              <small>
+                {dictionaries[ar ? "ar" : "en"].contactSendAMessageTo}
+              </small>
+            </span>
+          </a>
           <Link to="/request" search={{ type: "support" }}>
-            <LifeBuoy aria-hidden="true" /><span><strong>{dictionaries[ar ? "ar" : "en"].contactProductSupport}</strong><small>{dictionaries[ar ? "ar" : "en"].contactGetHelpWithA}</small></span>
+            <LifeBuoy aria-hidden="true" />
+            <span>
+              <strong>
+                {dictionaries[ar ? "ar" : "en"].contactProductSupport}
+              </strong>
+              <small>
+                {dictionaries[ar ? "ar" : "en"].contactGetHelpWithA}
+              </small>
+            </span>
           </Link>
           <Link to="/enterprise-services">
-            <BriefcaseBusiness aria-hidden="true" /><span><strong>{dictionaries[ar ? "ar" : "en"].contactTrainingOrImplementation}</strong><small>{dictionaries[ar ? "ar" : "en"].contactExploreServicesForYour}</small></span>
+            <BriefcaseBusiness aria-hidden="true" />
+            <span>
+              <strong>
+                {dictionaries[ar ? "ar" : "en"].contactTrainingOrImplementation}
+              </strong>
+              <small>
+                {dictionaries[ar ? "ar" : "en"].contactExploreServicesForYour}
+              </small>
+            </span>
           </Link>
         </nav>
         <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1.55fr)_minmax(0,1fr)]">
@@ -220,7 +246,9 @@ function ContactForm() {
   const [requestId] = useState(() => crypto.randomUUID());
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const [receipt, setReceipt] = useState<(Receipt & { summary: string }) | null>(null);
+  const [receipt, setReceipt] = useState<
+    (Receipt & { summary: string }) | null
+  >(null);
   const [length, setLength] = useState(0);
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
@@ -233,11 +261,16 @@ function ContactForm() {
     setBusy(true);
     setError("");
     try {
-      form.set("source","contact");
-      form.set("visitorAccess",await currentVisitorAccess());
+      form.set("source", "contact");
+      form.set("visitorAccess", await currentVisitorAccess());
       const result = await send({ data: form });
       if (result.ok) {
-        setReceipt({ id: result.id, createdAt: result.createdAt, tracking: result.tracking, summary: String(form.get("need") ?? "") });
+        setReceipt({
+          id: result.id,
+          createdAt: result.createdAt,
+          tracking: result.tracking,
+          summary: String(form.get("need") ?? ""),
+        });
         void trackJourney("contact_receipt", language);
       } else setError(t(result.message as never));
     } catch (err) {
@@ -267,7 +300,11 @@ function ContactForm() {
       {receipt ? (
         <div className="mt-6 grid gap-3">
           <p role="status">{t("ctDone")}</p>
-          <RequestReceipt receipt={receipt} summary={receipt.summary} subject={t("rqType_general")} />
+          <RequestReceipt
+            receipt={receipt}
+            summary={receipt.summary}
+            subject={t("rqType_general")}
+          />
         </div>
       ) : (
         <form

@@ -51,7 +51,7 @@ export default function OrbitalPortalStage({ products, settings }: StageProps) {
         <h1>{settings.displayTitle}</h1>
         <p className="orb-lead">
           {settings.tagline ||
-            (dictionaries[ar ? "ar" : "en"].stageEverythingScatteredAcrossYour)}
+            dictionaries[ar ? "ar" : "en"].stageEverythingScatteredAcrossYour}
         </p>
         <div className="orb-actions">
           <FeatureOnly feature="discover">
@@ -115,7 +115,9 @@ export default function OrbitalPortalStage({ products, settings }: StageProps) {
               <span>
                 <b dir="ltr">{p.name}</b>
                 <small>
-                  {live ? p.label : dictionaries[ar ? "ar" : "en"].stageEnteringOrbit}
+                  {live
+                    ? p.label
+                    : dictionaries[ar ? "ar" : "en"].stageEnteringOrbit}
                 </small>
               </span>
             </Link>

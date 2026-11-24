@@ -9,9 +9,15 @@ export const Route = createFileRoute("/reset-password")({
   head: () => ({
     meta: [
       { title: "Reset password | E20E Tools" },
-      { name: "description", content: "Set a new password for your E20E Tools account." },
+      {
+        name: "description",
+        content: "Set a new password for your E20E Tools account.",
+      },
       { property: "og:title", content: "Reset password | E20E Tools" },
-      { property: "og:description", content: "Set a new password for your E20E Tools account." },
+      {
+        property: "og:description",
+        content: "Set a new password for your E20E Tools account.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "robots", content: "noindex" },
@@ -31,7 +37,8 @@ function ResetPassword() {
 
   useEffect(() => {
     const { data } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "PASSWORD_RECOVERY" || event === "SIGNED_IN") setReady(true);
+      if (event === "PASSWORD_RECOVERY" || event === "SIGNED_IN")
+        setReady(true);
     });
     supabase.auth.getSession().then(({ data: s }) => {
       if (s.session) setReady(true);
@@ -57,11 +64,16 @@ function ResetPassword() {
   };
 
   return (
-    <main dir={dir} className="ea-workspace ea-account flex min-h-screen items-center justify-center bg-background px-4">
+    <main
+      dir={dir}
+      className="ea-workspace ea-account flex min-h-screen items-center justify-center bg-background px-4"
+    >
       <section className="w-full max-w-sm rounded-xl border border-border bg-card p-6 text-card-foreground">
         <h1 className="mb-4 text-xl font-semibold">{t("pubResetTitle")}</h1>
         {!ready ? (
-          <p className="text-sm text-muted-foreground">{t("pubResetOpenFromEmail")}</p>
+          <p className="text-sm text-muted-foreground">
+            {t("pubResetOpenFromEmail")}
+          </p>
         ) : (
           <form className="space-y-3" onSubmit={submit}>
             <Input
@@ -87,7 +99,11 @@ function ResetPassword() {
             </Button>
           </form>
         )}
-        {message ? <p role="status" className="mt-3 text-sm text-muted-foreground">{message}</p> : null}
+        {message ? (
+          <p role="status" className="mt-3 text-sm text-muted-foreground">
+            {message}
+          </p>
+        ) : null}
       </section>
     </main>
   );

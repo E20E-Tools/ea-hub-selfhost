@@ -46,32 +46,43 @@ vi.mock("@tanstack/react-start", () => ({
         validate = validator;
         return chain;
       },
-      handler: (handler: (args: unknown) => unknown) => async (args?: { data: unknown }) =>
-        handler({
-          data: validate(args?.data),
-          context: {
-            supabase: {
-              auth: {
-                getUser: async () => ({
-                  data: {
-                    user: { email: "visitor@example.com", email_confirmed_at: "2026-01-01" },
-                  },
-                }),
+      handler:
+        (handler: (args: unknown) => unknown) =>
+        async (args?: { data: unknown }) =>
+          handler({
+            data: validate(args?.data),
+            context: {
+              supabase: {
+                auth: {
+                  getUser: async () => ({
+                    data: {
+                      user: {
+                        email: "visitor@example.com",
+                        email_confirmed_at: "2026-01-01",
+                      },
+                    },
+                  }),
+                },
               },
             },
-          },
-        }),
+          }),
     };
     return chain;
   },
 }));
-vi.mock("@/integrations/supabase/auth-middleware", () => ({ requireSupabaseAuth: {} }));
+vi.mock("@/integrations/supabase/auth-middleware", () => ({
+  requireSupabaseAuth: {},
+}));
 vi.mock("@tanstack/react-start/server", () => ({
   setResponseHeader: vi.fn(),
   getRequest: () =>
-    new Request("https://example.com/", { headers: { "sec-fetch-site": "same-origin" } }),
+    new Request("https://example.com/", {
+      headers: { "sec-fetch-site": "same-origin" },
+    }),
 }));
-vi.mock("@/lib/recommend-guard.server", () => ({ guardRecommendation: () => null }));
+vi.mock("@/lib/recommend-guard.server", () => ({
+  guardRecommendation: () => null,
+}));
 vi.mock("@/lib/rate-limit.server", () => ({
   clientIp: () => "192.0.2.1",
   hashSubject: async () => "hashed-subject",
@@ -105,9 +116,10 @@ vi.mock("@/lib/assistant-gate.server", () => ({
 }));
 vi.mock("@/integrations/supabase/client.server", () => ({
   supabaseAdmin: {
-    rpc:async (name:string)=>{
-      if(name!=="register_archy_guest")throw Error("Unexpected function");
-      state.inserts.push("assistant_registrations");return {data:0,error:null};
+    rpc: async (name: string) => {
+      if (name !== "register_archy_guest") throw Error("Unexpected function");
+      state.inserts.push("assistant_registrations");
+      return { data: 0, error: null };
     },
     from: (table: string) => {
       const chain = {
@@ -134,7 +146,11 @@ vi.mock("@/integrations/supabase/client.server", () => ({
 vi.mock("@/lib/recommend.server", () => ({
   runAssistantChat: async () => {
     state.providerCalls++;
-    return { answer:{summary: "mock reply", picks: []},source:"local",model:"test-model" };
+    return {
+      answer: { summary: "mock reply", picks: [] },
+      source: "local",
+      model: "test-model",
+    };
   },
   recommendProducts: async () => {
     state.providerCalls++;
@@ -202,7 +218,10 @@ const endpoints = [
   {
     name: "recommendations",
     key: "recommendations",
-    call: () => recommendTools({ data: { need: "Find a technology tool", language: "en" } }),
+    call: () =>
+      recommendTools({
+        data: { need: "Find a technology tool", language: "en" },
+      }),
     inserts: [],
     calls: 1,
   },
@@ -210,9 +229,15 @@ const endpoints = [
 
 for (const endpoint of endpoints) {
   describe(endpoint.name, () => {
-    for (const mode of ["disabled", "lookup error", "thrown lookup", "missing row"] as const) {
+    for (const mode of [
+      "disabled",
+      "lookup error",
+      "thrown lookup",
+      "missing row",
+    ] as const) {
       it(`${mode} blocks all provider calls, registration inserts and quotas`, async () => {
-        if (mode === "disabled") state.settings = { feature_flags: { [endpoint.key]: false } };
+        if (mode === "disabled")
+          state.settings = { feature_flags: { [endpoint.key]: false } };
         if (mode === "lookup error") state.error = { message: "unavailable" };
         if (mode === "thrown lookup") state.throws = true;
         if (mode === "missing row") state.settings = null;
@@ -224,9 +249,13 @@ for (const endpoint of endpoints) {
       });
     }
 
-    for (const mode of ["explicitly enabled", "missing key defaults"] as const) {
+    for (const mode of [
+      "explicitly enabled",
+      "missing key defaults",
+    ] as const) {
       it(`${mode} preserves the successful flow`, async () => {
-        if (mode === "missing key defaults") state.settings = { feature_flags: {} };
+        if (mode === "missing key defaults")
+          state.settings = { feature_flags: {} };
         expect((await endpoint.call()).ok).toBe(true);
         expect(state.reads).toBe(1);
         expect(state.providerCalls).toBe(endpoint.calls);
@@ -244,10 +273,13 @@ it("re-reads settings on each invocation so an admin disable takes immediate eff
   expect(state.reads).toBe(2);
 });
 
-it.each([null, [], "enabled", false])("malformed flags %j fail closed", async (flags) => {
-  state.settings = { feature_flags: flags };
-  expect(await serverFeatureEnabled("assistant")).toBe(false);
-});
+it.each([null, [], "enabled", false])(
+  "malformed flags %j fail closed",
+  async (flags) => {
+    state.settings = { feature_flags: flags };
+    expect(await serverFeatureEnabled("assistant")).toBe(false);
+  },
+);
 
 it("missing server configuration fails closed without making a read", async () => {
   vi.stubEnv("SUPABASE_PUBLISHABLE_KEY", "");
@@ -263,6 +295,8 @@ it("disabled assistant does not issue a registration challenge", async () => {
 });
 
 it("enabled assistant can issue the registration challenge", async () => {
-  await expect(getAssistantChallenge()).resolves.toMatchObject({ token: "challenge" });
+  await expect(getAssistantChallenge()).resolves.toMatchObject({
+    token: "challenge",
+  });
   expect(state.challenges).toBe(1);
 });

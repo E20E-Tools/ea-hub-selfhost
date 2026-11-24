@@ -4,10 +4,16 @@ import type { Language } from "./language-core";
 export function formatDate(
   value: string | number | Date | null | undefined,
   language: Language,
-  options: Intl.DateTimeFormatOptions = { dateStyle: "medium", timeStyle: "short" },
+  options: Intl.DateTimeFormatOptions = {
+    dateStyle: "medium",
+    timeStyle: "short",
+  },
 ): string {
   if (value === null || value === undefined || value === "") return "—";
   const date = value instanceof Date ? value : new Date(value);
   if (Number.isNaN(date.getTime())) return "—";
-  return new Intl.DateTimeFormat(language === "ar" ? "ar" : "en-GB", options).format(date);
+  return new Intl.DateTimeFormat(
+    language === "ar" ? "ar" : "en-GB",
+    options,
+  ).format(date);
 }

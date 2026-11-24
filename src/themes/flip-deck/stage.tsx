@@ -3,9 +3,22 @@ import { useLanguage } from "@/lib/language";
 import { fill } from "@/lib/copy";
 import type { StageProps } from "../registry";
 import { useStageMotion } from "../use-stage-motion";
-import { useElementSize, useFrameLoop, useMobile, useStageInspector } from "../stage-kit";
+import {
+  useElementSize,
+  useFrameLoop,
+  useMobile,
+  useStageInspector,
+} from "../stage-kit";
 import { legacyFileName } from "../legacy-to-digital/model";
-import { FAN_MS, STACK_MS, accentFor, deckSettledAt, fanPose, flipAngle, wave } from "./model";
+import {
+  FAN_MS,
+  STACK_MS,
+  accentFor,
+  deckSettledAt,
+  fanPose,
+  flipAngle,
+  wave,
+} from "./model";
 
 export default function FlipDeckStage({ products, settings }: StageProps) {
   const { t, dir } = useLanguage();
@@ -43,17 +56,26 @@ export default function FlipDeckStage({ products, settings }: StageProps) {
     [list, size.w, motion.animate, manual, mobile, sign],
   );
 
-  const flip = (id: string, shownTool: boolean) => setManual((m) => ({ ...m, [id]: !shownTool }));
+  const flip = (id: string, shownTool: boolean) =>
+    setManual((m) => ({ ...m, [id]: !shownTool }));
 
   return (
-    <div ref={root} className="fd-stage" dir={dir} data-mobile={mobile ? "" : undefined}>
+    <div
+      ref={root}
+      className="fd-stage"
+      dir={dir}
+      data-mobile={mobile ? "" : undefined}
+    >
       <h2 className="fd-title">{settings.displayTitle}</h2>
       <p className="fd-hint">{t("fdHint")}</p>
       <div className="fd-deck" role="list">
         {list.map((product, i) => {
           const m = manual[product.id];
           const toolShown = m ?? (mobile ? false : true);
-          const style = { "--fd-accent": accentFor(i), zIndex: list.length - i } as CSSProperties;
+          const style = {
+            "--fd-accent": accentFor(i),
+            zIndex: list.length - i,
+          } as CSSProperties;
           return (
             <div
               key={product.id}
@@ -77,8 +99,13 @@ export default function FlipDeckStage({ products, settings }: StageProps) {
                   {product.name}
                 </strong>
                 <span className="fd-desc">{product.description}</span>
-                <span className="fd-status" data-soon={product.comingSoon ? "" : undefined}>
-                  {product.comingSoon ? t("comingSoonBadge") : t("inspectorAvailable")}
+                <span
+                  className="fd-status"
+                  data-soon={product.comingSoon ? "" : undefined}
+                >
+                  {product.comingSoon
+                    ? t("comingSoonBadge")
+                    : t("inspectorAvailable")}
                 </span>
                 <button
                   type="button"

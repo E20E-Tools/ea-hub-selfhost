@@ -7,13 +7,26 @@ import { LanguageSwitcher } from "@/components/language-switcher";
 import { catalogQueryOptions } from "@/lib/catalog.functions";
 import { localizedSettings } from "@/lib/catalog";
 import { IntroVideoButton } from "@/components/intro-video";
-import { featureEnabled, isDisabledFeaturePath, type FeatureFlags } from "@/lib/site-features";
+import {
+  featureEnabled,
+  isDisabledFeaturePath,
+  type FeatureFlags,
+} from "@/lib/site-features";
 import { useLanguage } from "@/lib/language";
 import type { Copy } from "@/lib/copy";
 import { useThemeArt } from "@/themes/use-theme-art";
-import { readNavigation, navigationLabel, type NavigationItem } from "@/lib/navigation.shared";
+import {
+  readNavigation,
+  navigationLabel,
+  type NavigationItem,
+} from "@/lib/navigation.shared";
 
-type NavItem = { to: string; key: keyof Copy; search?: Record<string, string>; cta?: boolean };
+type NavItem = {
+  to: string;
+  key: keyof Copy;
+  search?: Record<string, string>;
+  cta?: boolean;
+};
 
 /** Four links plus the primary "send a request" call to action. */
 export const MAIN_NAV: NavItem[] = [
@@ -28,7 +41,9 @@ export const MAIN_NAV: NavItem[] = [
 export const SEARCH_PAGES: NavItem[] = [...MAIN_NAV];
 
 export function isActivePath(pathname: string, to: string) {
-  return to === "/" ? pathname === "/" : pathname === to || pathname.startsWith(`${to}/`);
+  return to === "/"
+    ? pathname === "/"
+    : pathname === to || pathname.startsWith(`${to}/`);
 }
 
 /** The film lives on the About us page, so its header button follows that switch. */
@@ -41,7 +56,9 @@ export function showsIntroVideo(flags: FeatureFlags | undefined) {
  * menu row underneath. The admin console keeps its own header.
  */
 export function SiteHeader() {
-  const pathname = useRouterState({ select: (state) => state.location.pathname });
+  const pathname = useRouterState({
+    select: (state) => state.location.pathname,
+  });
   const { data: catalog } = useSuspenseQuery(catalogQueryOptions);
   const { language, dir, t, arabicAvailable } = useLanguage();
   const art = useThemeArt();
@@ -50,13 +67,18 @@ export function SiteHeader() {
   const navigation = readNavigation(settings.navigationItems);
   // Hidden menu items and links into switched-off features stay saved but invisible.
   const visibleNavigation = navigation.filter(
-    (item) => item.hidden !== true && !isDisabledFeaturePath(settings.featureFlags, item.url),
+    (item) =>
+      item.hidden !== true &&
+      !isDisabledFeaturePath(settings.featureFlags, item.url),
   );
   const flags = settings.featureFlags;
   const showDiscover = featureEnabled(flags, "discover");
   const showMyTools = featureEnabled(flags, "myTools");
   const searchPages = [
-    ...visibleNavigation.map((item) => ({ to: item.url, label: navigationLabel(item, language) })),
+    ...visibleNavigation.map((item) => ({
+      to: item.url,
+      label: navigationLabel(item, language),
+    })),
     ...(showDiscover ? [{ to: "/discover", label: t("bxStartNeed") }] : []),
     ...(showMyTools ? [{ to: "/my-tools", label: t("bxMyTools") }] : []),
     { to: "/my-requests", label: t("bxTrackRequests") },
@@ -90,11 +112,24 @@ export function SiteHeader() {
       <a href="#main-content" className="skip-link">
         {t("skipToContent")}
       </a>
-      <header className="site-header" dir={dir} data-nav-style={settings.navStyle}>
+      <header
+        className="site-header"
+        dir={dir}
+        data-nav-style={settings.navStyle}
+      >
         <div className="site-header-top">
-          <Link to="/" className="site-brand" aria-label={settings.displayTitle}>
+          <Link
+            to="/"
+            className="site-brand"
+            aria-label={settings.displayTitle}
+          >
             {art.logo(settings.logoUrl) ? (
-              <img src={art.logo(settings.logoUrl)} alt="" width={132} height={78} />
+              <img
+                src={art.logo(settings.logoUrl)}
+                alt=""
+                width={132}
+                height={78}
+              />
             ) : null}
             <span className="site-brand-text">
               <bdi dir="ltr">{settings.displayTitle}</bdi>
@@ -107,34 +142,55 @@ export function SiteHeader() {
           </Link>
           <div className="site-actions">
             {/* Journey shortcuts sit beside the search and the introduction film. */}
-            <div className="site-journey-links" aria-label={t("bxJourneyLinks")}>
+            <div
+              className="site-journey-links"
+              aria-label={t("bxJourneyLinks")}
+            >
               {showDiscover ? (
                 <Button asChild size="sm" className="site-journey-link">
                   <Link to="/discover" aria-label={t("bxStartNeed")}>
                     <Compass size={14} aria-hidden="true" />
-                    <span className="site-journey-label">{t("bxStartNeed")}</span>
+                    <span className="site-journey-label">
+                      {t("bxStartNeed")}
+                    </span>
                   </Link>
                 </Button>
               ) : null}
               {showMyTools ? (
-                <Button asChild size="sm" variant="outline" className="site-journey-link">
+                <Button
+                  asChild
+                  size="sm"
+                  variant="outline"
+                  className="site-journey-link"
+                >
                   <Link to="/my-tools" aria-label={t("bxMyTools")}>
                     <Bookmark size={14} aria-hidden="true" />
                     <span className="site-journey-label">{t("bxMyTools")}</span>
                   </Link>
                 </Button>
               ) : null}
-              <Button asChild size="sm" variant="outline" className="site-journey-link">
+              <Button
+                asChild
+                size="sm"
+                variant="outline"
+                className="site-journey-link"
+              >
                 <Link to="/my-requests" aria-label={t("bxTrackRequests")}>
                   <MessagesSquare size={14} aria-hidden="true" />
-                  <span className="site-journey-label">{t("bxTrackShort")}</span>
+                  <span className="site-journey-label">
+                    {t("bxTrackShort")}
+                  </span>
                 </Link>
               </Button>
             </div>
             <span className="site-actions-divider" aria-hidden="true" />
             <div className="site-tools">
-              {showsIntroVideo(settings.featureFlags) ? <IntroVideoButton /> : null}
-              {featureEnabled(flags, "search") ? <SiteSearch pages={searchPages} /> : null}
+              {showsIntroVideo(settings.featureFlags) ? (
+                <IntroVideoButton />
+              ) : null}
+              {featureEnabled(flags, "search") ? (
+                <SiteSearch pages={searchPages} />
+              ) : null}
               {arabicAvailable ? (
                 <div className="site-lang">
                   <LanguageSwitcher inline />
@@ -149,7 +205,10 @@ export function SiteHeader() {
           aria-label={t("navigationLabel")}
         >
           {visibleNavigation.map((item) =>
-            link(item, item.cta ? "site-nav-link site-nav-cta" : "site-nav-link"),
+            link(
+              item,
+              item.cta ? "site-nav-link site-nav-cta" : "site-nav-link",
+            ),
           )}
         </nav>
       </header>

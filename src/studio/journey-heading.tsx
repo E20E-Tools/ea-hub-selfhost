@@ -6,7 +6,13 @@ import { useFeature } from "@/lib/use-feature";
 
 type ToolView = "discover" | "compare" | "my-tools";
 const destinations = [
-  { id: "discover", feature: "discover", to: "/discover", label: { ar: "اكتشف", en: "Discover" }, icon: Compass },
+  {
+    id: "discover",
+    feature: "discover",
+    to: "/discover",
+    label: { ar: "اكتشف", en: "Discover" },
+    icon: Compass,
+  },
   {
     id: "compare",
     feature: "compare",
@@ -14,7 +20,13 @@ const destinations = [
     label: { ar: "قارن", en: "Compare" },
     icon: GitCompareArrows,
   },
-  { id: "my-tools", feature: "myTools", to: "/my-tools", label: { ar: "المحفوظات", en: "Saved tools" }, icon: Bookmark },
+  {
+    id: "my-tools",
+    feature: "myTools",
+    to: "/my-tools",
+    label: { ar: "المحفوظات", en: "Saved tools" },
+    icon: Bookmark,
+  },
 ] as const;
 
 export function JourneyHeading({
@@ -55,7 +67,11 @@ function JourneyNav({ view }: { view: ToolView }) {
   return (
     <nav aria-label={language === "ar" ? "مسارات الأدوات" : "Tool workspace"}>
       {links.map((item) => (
-        <Link key={item.id} to={item.to} aria-current={view === item.id ? "page" : undefined}>
+        <Link
+          key={item.id}
+          to={item.to}
+          aria-current={view === item.id ? "page" : undefined}
+        >
           <item.icon size={16} aria-hidden="true" />
           {item.label[language]}
         </Link>

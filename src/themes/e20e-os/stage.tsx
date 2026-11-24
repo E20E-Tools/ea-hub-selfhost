@@ -143,12 +143,21 @@ function AppIcon({
       }}
       onFocus={onSelect}
     >
-      <span className="os-icon-tile" style={{ backgroundImage: appGradient(product.id) }}>
+      <span
+        className="os-icon-tile"
+        style={{ backgroundImage: appGradient(product.id) }}
+      >
         <Glyph aria-hidden="true" strokeWidth={1.8} />
         {product.comingSoon ? (
           <svg className="os-ring" viewBox="0 0 40 40" aria-hidden="true">
             <circle cx="20" cy="20" r="16" />
-            <circle cx="20" cy="20" r="16" className="os-ring-arc" pathLength={100} />
+            <circle
+              cx="20"
+              cy="20"
+              r="16"
+              className="os-ring-arc"
+              pathLength={100}
+            />
           </svg>
         ) : null}
       </span>
@@ -156,7 +165,10 @@ function AppIcon({
       {product.comingSoon ? (
         <span className="os-icon-note">
           {product.publicationDate
-            ? fill(t("osLaunchesShort"), shortLaunch(product.publicationDate, language))
+            ? fill(
+                t("osLaunchesShort"),
+                shortLaunch(product.publicationDate, language),
+              )
             : t("comingSoonBadge")}
         </span>
       ) : null}
@@ -171,13 +183,20 @@ function ProductWindowBody({ product }: { product: Product }) {
     <div className="os-win-body">
       {product.image ? (
         <div className="os-win-banner">
-          <img src={product.image} alt={product.imageAlt ?? ""} draggable={false} />
+          <img
+            src={product.image}
+            alt={product.imageAlt ?? ""}
+            draggable={false}
+          />
         </div>
       ) : null}
       <div className="os-win-content">
         <span className="os-win-cat">{product.label}</span>
         <p className="os-win-desc">{product.description}</p>
-        <p className="os-win-status" data-soon={product.comingSoon ? "" : undefined}>
+        <p
+          className="os-win-status"
+          data-soon={product.comingSoon ? "" : undefined}
+        >
           <i aria-hidden="true" />
           {facts.status}
           {facts.launch ? ` · ${facts.launch}` : ""}
@@ -205,9 +224,9 @@ function TerminalBody({
   queued: { n: number; cmd: string };
 }) {
   const { t, language, setLanguage } = useLanguage();
-  const [log, setLog] = useState<Array<{ k: number; text: string; cmd?: boolean }>>(() => [
-    { k: 0, text: t("osTermWelcome") },
-  ]);
+  const [log, setLog] = useState<
+    Array<{ k: number; text: string; cmd?: boolean }>
+  >(() => [{ k: 0, text: t("osTermWelcome") }]);
   const [value, setValue] = useState("");
   const history = useRef<string[]>([]);
   const cursor = useRef(-1);
@@ -226,15 +245,22 @@ function TerminalBody({
     [products],
   );
   const openRef = useRef<(id: string) => void>(() => {});
-  openRef.current = (id) => window.dispatchEvent(new CustomEvent("e20e-os-open", { detail: id }));
+  openRef.current = (id) =>
+    window.dispatchEvent(new CustomEvent("e20e-os-open", { detail: id }));
 
   const exec = useCallback(
     (raw: string) => {
-      const result = runCommand(raw, { products: termProducts, t, language, now: new Date() });
+      const result = runCommand(raw, {
+        products: termProducts,
+        t,
+        language,
+        now: new Date(),
+      });
       if (raw.trim()) {
-        history.current = [...history.current.filter((h) => h !== raw.trim()), raw.trim()].slice(
-          -40,
-        );
+        history.current = [
+          ...history.current.filter((h) => h !== raw.trim()),
+          raw.trim(),
+        ].slice(-40);
       }
       cursor.current = -1;
       if (result.action?.type === "clear") return setLog([]);
@@ -401,20 +427,30 @@ export default function E20eOsStage({ products, settings }: StageProps) {
     const parts = next ? countdownParts(next.at, now) : null;
     const text =
       next && parts
-        ? fill2(t("osToastLaunch"), next.p.name, String(parts.days + (parts.hours > 0 ? 1 : 0)))
-        : fill(t("osToastTools"), String(list.filter((p) => !p.comingSoon).length));
+        ? fill2(
+            t("osToastLaunch"),
+            next.p.name,
+            String(parts.days + (parts.hours > 0 ? 1 : 0)),
+          )
+        : fill(
+            t("osToastTools"),
+            String(list.filter((p) => !p.comingSoon).length),
+          );
     const id = window.setTimeout(() => setToast(text), 2600);
     return () => window.clearTimeout(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [boot, language]);
 
   /* Window manager. */
-  const originFrom = useCallback((el: HTMLElement | null, x: number, y: number) => {
-    const base = desk.current?.getBoundingClientRect();
-    const r = el?.getBoundingClientRect();
-    if (!base || !r) return "50% 0%";
-    return `${r.left + r.width / 2 - base.left - x}px ${r.top + r.height / 2 - base.top - y}px`;
-  }, []);
+  const originFrom = useCallback(
+    (el: HTMLElement | null, x: number, y: number) => {
+      const base = desk.current?.getBoundingClientRect();
+      const r = el?.getBoundingClientRect();
+      if (!base || !r) return "50% 0%";
+      return `${r.left + r.width / 2 - base.left - x}px ${r.top + r.height / 2 - base.top - y}px`;
+    },
+    [],
+  );
 
   const pendingFocus = useRef<string | null>(null);
   const openWin = useCallback(
@@ -428,7 +464,13 @@ export default function E20eOsStage({ products, settings }: StageProps) {
         if (found)
           return prev.map((w) =>
             w.id === id
-              ? { ...w, z, minimized: false, closing: false, anim: ++animSeq.current }
+              ? {
+                  ...w,
+                  z,
+                  minimized: false,
+                  closing: false,
+                  anim: ++animSeq.current,
+                }
               : w,
           );
         const base = desk.current?.getBoundingClientRect();
@@ -436,7 +478,10 @@ export default function E20eOsStage({ products, settings }: StageProps) {
         const k = prev.filter((w) => !w.closing).length;
         const maxX = Math.max(0, (base?.width ?? 1000) - width - 12);
         const x = Math.min(maxX, (base ? base.width * 0.32 : 260) + k * 30);
-        const y = Math.min(Math.max(0, (base?.height ?? 600) - 360), 18 + k * 30);
+        const y = Math.min(
+          Math.max(0, (base?.height ?? 600) - 360),
+          18 + k * 30,
+        );
         return [
           ...prev,
           {
@@ -485,14 +530,20 @@ export default function E20eOsStage({ products, settings }: StageProps) {
 
   const returnFocus = (id: string) => {
     const idx = list.findIndex((p) => p.id === id);
-    (idx >= 0 ? iconRefs.current[idx] : dockRefs.current[id])?.focus({ preventScroll: true });
+    (idx >= 0 ? iconRefs.current[idx] : dockRefs.current[id])?.focus({
+      preventScroll: true,
+    });
   };
 
   const closeWin = (id: string, minimize = false) => {
     setWins((prev) =>
       prev.map((w) =>
         w.id === id
-          ? { ...w, closing: true, origin: originFrom(dockRefs.current[id] ?? null, w.x, w.y) }
+          ? {
+              ...w,
+              closing: true,
+              origin: originFrom(dockRefs.current[id] ?? null, w.x, w.y),
+            }
           : w,
       ),
     );
@@ -500,7 +551,9 @@ export default function E20eOsStage({ products, settings }: StageProps) {
       () =>
         setWins((prev) =>
           minimize
-            ? prev.map((w) => (w.id === id ? { ...w, closing: false, minimized: true } : w))
+            ? prev.map((w) =>
+                w.id === id ? { ...w, closing: false, minimized: true } : w,
+              )
             : prev.filter((w) => w.id !== id),
         ),
       motion.animate ? 260 : 0,
@@ -524,7 +577,16 @@ export default function E20eOsStage({ products, settings }: StageProps) {
     const el = e.currentTarget.closest<HTMLElement>(".os-window");
     if (!el) return;
     e.currentTarget.setPointerCapture(e.pointerId);
-    drag.current = { id: w.id, el, sx: e.clientX, sy: e.clientY, ox: w.x, oy: w.y, x: w.x, y: w.y };
+    drag.current = {
+      id: w.id,
+      el,
+      sx: e.clientX,
+      sy: e.clientY,
+      ox: w.x,
+      oy: w.y,
+      x: w.x,
+      y: w.y,
+    };
     el.dataset["dragging"] = "";
     focusWin(w.id);
   };
@@ -543,11 +605,18 @@ export default function E20eOsStage({ products, settings }: StageProps) {
     if (!d) return;
     delete d.el.dataset["dragging"];
     drag.current = null;
-    setWins((prev) => prev.map((w) => (w.id === d.id ? { ...w, x: d.x, y: d.y } : w)));
+    setWins((prev) =>
+      prev.map((w) => (w.id === d.id ? { ...w, x: d.x, y: d.y } : w)),
+    );
   };
 
   /* Swipe-down to close on mobile sheets. */
-  const swipe = useRef<{ id: string; el: HTMLElement; sy: number; dy: number } | null>(null);
+  const swipe = useRef<{
+    id: string;
+    el: HTMLElement;
+    sy: number;
+    dy: number;
+  } | null>(null);
 
   /* Dock magnification: rects read once on enter, transforms only. */
   const dockCenters = useRef<Array<{ el: HTMLElement; c: number }>>([]);
@@ -563,7 +632,10 @@ export default function E20eOsStage({ products, settings }: StageProps) {
   const onDockMove = (e: ReactPointerEvent) => {
     for (const { el, c } of dockCenters.current) {
       const d = Math.abs(e.clientX - c);
-      el.style.setProperty("--m", (1 + 0.42 * Math.max(0, 1 - d / 110)).toFixed(3));
+      el.style.setProperty(
+        "--m",
+        (1 + 0.42 * Math.max(0, 1 - d / 110)).toFixed(3),
+      );
     }
   };
   const onDockLeave = () => {
@@ -582,8 +654,14 @@ export default function E20eOsStage({ products, settings }: StageProps) {
     cancelAnimationFrame(raf.current);
     raf.current = requestAnimationFrame(() => {
       const r = el.getBoundingClientRect();
-      el.style.setProperty("--px", (((x - r.left) / r.width) * 2 - 1).toFixed(3));
-      el.style.setProperty("--py", (((y - r.top) / r.height) * 2 - 1).toFixed(3));
+      el.style.setProperty(
+        "--px",
+        (((x - r.left) / r.width) * 2 - 1).toFixed(3),
+      );
+      el.style.setProperty(
+        "--py",
+        (((y - r.top) / r.height) * 2 - 1).toFixed(3),
+      );
     });
   };
 
@@ -592,7 +670,12 @@ export default function E20eOsStage({ products, settings }: StageProps) {
     const rows = 4;
     const rtl = dir === "rtl";
     const map: Record<string, number> = mobile
-      ? { ArrowRight: rtl ? -1 : 1, ArrowLeft: rtl ? 1 : -1, ArrowDown: 4, ArrowUp: -4 }
+      ? {
+          ArrowRight: rtl ? -1 : 1,
+          ArrowLeft: rtl ? 1 : -1,
+          ArrowDown: 4,
+          ArrowUp: -4,
+        }
       : {
           ArrowDown: 1,
           ArrowUp: -1,
@@ -680,7 +763,11 @@ export default function E20eOsStage({ products, settings }: StageProps) {
         )}
 
         <div ref={desk} className="os-desktop">
-          <div className="os-icons" role="group" aria-label={t("osDesktopLabel")}>
+          <div
+            className="os-icons"
+            role="group"
+            aria-label={t("osDesktopLabel")}
+          >
             {list.map((p, i) => (
               <AppIcon
                 key={p.id}
@@ -712,7 +799,10 @@ export default function E20eOsStage({ products, settings }: StageProps) {
                 data-closing={w.closing ? "" : undefined}
                 role="dialog"
                 aria-label={title}
-                style={{ transform: `translate3d(${w.x}px, ${w.y}px, 0)`, zIndex: w.z }}
+                style={{
+                  transform: `translate3d(${w.x}px, ${w.y}px, 0)`,
+                  zIndex: w.z,
+                }}
                 onPointerDown={() => focusWin(w.id)}
                 onFocusCapture={() => focusWin(w.id)}
                 onKeyDown={(e) => {
@@ -722,16 +812,28 @@ export default function E20eOsStage({ products, settings }: StageProps) {
                   }
                 }}
               >
-                <div key={w.anim} className="os-window-frame" style={{ transformOrigin: w.origin }}>
+                <div
+                  key={w.anim}
+                  className="os-window-frame"
+                  style={{ transformOrigin: w.origin }}
+                >
                   <header
                     className="os-titlebar"
                     onPointerDown={(e) => {
                       if (mobile) {
                         if ((e.target as HTMLElement).closest("button")) return;
-                        const el = e.currentTarget.closest<HTMLElement>(".os-window-frame");
+                        const el =
+                          e.currentTarget.closest<HTMLElement>(
+                            ".os-window-frame",
+                          );
                         if (el) {
                           e.currentTarget.setPointerCapture(e.pointerId);
-                          swipe.current = { id: w.id, el, sy: e.clientY, dy: 0 };
+                          swipe.current = {
+                            id: w.id,
+                            el,
+                            sy: e.clientY,
+                            dy: 0,
+                          };
                         }
                         return;
                       }
@@ -739,7 +841,10 @@ export default function E20eOsStage({ products, settings }: StageProps) {
                     }}
                     onPointerMove={(e) => {
                       if (swipe.current) {
-                        swipe.current.dy = Math.max(0, e.clientY - swipe.current.sy);
+                        swipe.current.dy = Math.max(
+                          0,
+                          e.clientY - swipe.current.sy,
+                        );
                         swipe.current.el.style.transform = `translateY(${swipe.current.dy}px)`;
                         return;
                       }
@@ -770,7 +875,10 @@ export default function E20eOsStage({ products, settings }: StageProps) {
                         aria-label={`${t("osMinimize")} ${title}`}
                         onClick={() => closeWin(w.id, true)}
                       />
-                      <span className="os-light os-light-zoom" aria-hidden="true" />
+                      <span
+                        className="os-light os-light-zoom"
+                        aria-hidden="true"
+                      />
                     </span>
                     <span className="os-win-title" dir="auto">
                       {title}
@@ -831,10 +939,15 @@ export default function E20eOsStage({ products, settings }: StageProps) {
                 title={p.name}
                 onClick={(e) => openWin(p.id, e.currentTarget)}
               >
-                <span className="os-dock-tile" style={{ backgroundImage: appGradient(p.id) }}>
+                <span
+                  className="os-dock-tile"
+                  style={{ backgroundImage: appGradient(p.id) }}
+                >
                   <Glyph aria-hidden="true" strokeWidth={1.8} />
                 </span>
-                {running.has(p.id) ? <i className="os-run-dot" aria-hidden="true" /> : null}
+                {running.has(p.id) ? (
+                  <i className="os-run-dot" aria-hidden="true" />
+                ) : null}
               </button>
             );
           })}
@@ -853,13 +966,19 @@ export default function E20eOsStage({ products, settings }: StageProps) {
             <span className="os-dock-tile os-dock-term">
               <TerminalIcon aria-hidden="true" strokeWidth={1.8} />
             </span>
-            {running.has(TERMINAL) ? <i className="os-run-dot" aria-hidden="true" /> : null}
+            {running.has(TERMINAL) ? (
+              <i className="os-run-dot" aria-hidden="true" />
+            ) : null}
           </button>
         </nav>
       </div>
 
       {boot === "on" ? (
-        <div className="os-boot" role="status" onPointerDown={() => setBoot("done")}>
+        <div
+          className="os-boot"
+          role="status"
+          onPointerDown={() => setBoot("done")}
+        >
           {settings.logoUrl ? (
             <img src={settings.logoUrl} alt="" className="os-boot-logo" />
           ) : (

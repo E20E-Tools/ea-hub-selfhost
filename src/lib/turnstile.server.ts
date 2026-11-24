@@ -3,7 +3,8 @@
 
 export type TurnstileConfig = { siteKey: string; secretKey: string };
 
-export const TURNSTILE_VERIFY_URL = "https://challenges.cloudflare.com/turnstile/v0/siteverify";
+export const TURNSTILE_VERIFY_URL =
+  "https://challenges.cloudflare.com/turnstile/v0/siteverify";
 
 export function turnstileConfig(): TurnstileConfig | null {
   const siteKey = process.env["TURNSTILE_SITE_KEY"]?.trim();
@@ -20,8 +21,12 @@ export async function verifyTurnstile(
 ): Promise<boolean> {
   if (!token || token.length > 2048) return false;
   try {
-    const body = new URLSearchParams({ secret: config.secretKey, response: token });
-    if (remoteIp && remoteIp !== "unknown-client") body.set("remoteip", remoteIp);
+    const body = new URLSearchParams({
+      secret: config.secretKey,
+      response: token,
+    });
+    if (remoteIp && remoteIp !== "unknown-client")
+      body.set("remoteip", remoteIp);
     const response = await fetcher(TURNSTILE_VERIFY_URL, {
       method: "POST",
       body,

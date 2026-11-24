@@ -14,11 +14,23 @@ export function EaLayersThumb() {
               stroke={c}
               strokeWidth="1.5"
             />
-            <rect x={140 + (i % 2) * 24} y={y - 6} width="30" height="10" rx="3" fill={c} />
+            <rect
+              x={140 + (i % 2) * 24}
+              y={y - 6}
+              width="30"
+              height="10"
+              rx="3"
+              fill={c}
+            />
           </g>
         );
       })}
-      <path d="M100 40 V142 M220 40 V142" stroke="#0F1730" strokeDasharray="3 4" opacity="0.5" />
+      <path
+        d="M100 40 V142 M220 40 V142"
+        stroke="#0F1730"
+        strokeDasharray="3 4"
+        opacity="0.5"
+      />
       <circle cx="100" cy="90" r="3" fill="#8B5CF6" />
       <circle cx="220" cy="70" r="3" fill="#00D4FF" />
     </svg>

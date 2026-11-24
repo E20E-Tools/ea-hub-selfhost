@@ -80,7 +80,7 @@ export default function TerminalMigrationStage({
         <h1>{settings.displayTitle}</h1>
         <p>
           {settings.tagline ||
-            (dictionaries[ar ? "ar" : "en"].stageYourLegacyEnterpriseMigrated)}
+            dictionaries[ar ? "ar" : "en"].stageYourLegacyEnterpriseMigrated}
         </p>
       </div>
 
@@ -157,7 +157,9 @@ export default function TerminalMigrationStage({
                 {dictionaries[ar ? "ar" : "en"].ldStartCta}
               </a>
             </FeatureOnly>
-            <a href="#catalog">{dictionaries[ar ? "ar" : "en"].stageAllTools}</a>
+            <a href="#catalog">
+              {dictionaries[ar ? "ar" : "en"].stageAllTools}
+            </a>
           </div>
         </div>
       </div>

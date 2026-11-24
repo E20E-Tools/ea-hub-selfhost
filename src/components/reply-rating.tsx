@@ -32,7 +32,9 @@ export function ReplyRating({
     >
       {state === "done" ? (
         <>
-          <span>{dictionaries[ar ? "ar" : "en"].replyRatingThanksForYourFeedback}</span>
+          <span>
+            {dictionaries[ar ? "ar" : "en"].replyRatingThanksForYourFeedback}
+          </span>
           <button onClick={() => setState("idle")}>
             {dictionaries[ar ? "ar" : "en"].bxEdit}
           </button>
@@ -66,7 +68,9 @@ export function ReplyRating({
               {dictionaries[ar ? "ar" : "en"].replyRatingCouldNotSaveTry}
             </span>
           )}
-          <span>{dictionaries[ar ? "ar" : "en"].replyRatingWasThisHelpful}</span>
+          <span>
+            {dictionaries[ar ? "ar" : "en"].replyRatingWasThisHelpful}
+          </span>
           <button onClick={() => void rate(true, null)}>
             {dictionaries[ar ? "ar" : "en"].replyRatingYes}
           </button>

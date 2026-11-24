@@ -19,7 +19,10 @@ type ThemeArt = {
 
 export const THEME_ART: Partial<Record<DesignThemeId, ThemeArt>> = {
   "transformation-board": {
-    logo: { source: "branding/07233eca-fed8-40d5-9c19-0fefad5fdf85.png", url: tbLogo.url },
+    logo: {
+      source: "branding/07233eca-fed8-40d5-9c19-0fefad5fdf85.png",
+      url: tbLogo.url,
+    },
     products: {
       "products/archone.jpg": tbArchone.url,
       "products/innovation.jpg": tbInnovation.url,
@@ -35,7 +38,11 @@ export const THEME_ART: Partial<Record<DesignThemeId, ThemeArt>> = {
  * Theme's logo: an admin's per-design upload (`override`) wins, then the theme's
  * recoloured copy when the site still uses the logo it was made from.
  */
-export function themedLogo(theme: DesignThemeId, logoUrl: string, override = ""): string {
+export function themedLogo(
+  theme: DesignThemeId,
+  logoUrl: string,
+  override = "",
+): string {
   if (override) return override;
   const art = THEME_ART[theme];
   if (!art || !logoUrl) return logoUrl;

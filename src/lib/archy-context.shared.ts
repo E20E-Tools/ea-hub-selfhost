@@ -1,14 +1,17 @@
 import type { Product } from "./products";
 import type { Language } from "./language-core";
 /** Reasons are literal catalog descriptions, never invented abilities or launch promises. */
-export function archyContext(products: Product[], language: Language, path: string) {
+export function archyContext(
+  products: Product[],
+  language: Language,
+  path: string,
+) {
   const available = products.filter((p) => !p.comingSoon);
   const id = /^\/product\/([^/]+)/.exec(path)?.[1];
   const focus = available.find((p) => p.id === id);
-  const choices = (focus ? [focus, ...available.filter((p) => p.id !== id)] : available).slice(
-    0,
-    3,
-  );
+  const choices = (
+    focus ? [focus, ...available.filter((p) => p.id !== id)] : available
+  ).slice(0, 3);
   return choices.map((p) => ({
     id: p.id,
     name: p.name,

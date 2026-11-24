@@ -21,7 +21,9 @@ export function startBrowserTourVisit() {
 }
 export function currentTourVisit() {
   try {
-    const value = JSON.parse(sessionStorage.getItem(TOUR_VISIT_SESSION) ?? "null");
+    const value = JSON.parse(
+      sessionStorage.getItem(TOUR_VISIT_SESSION) ?? "null",
+    );
     return typeof value?.token === "string" && value.completed === true
       ? (value.token as string)
       : "";
@@ -29,12 +31,19 @@ export function currentTourVisit() {
     return "";
   }
 }
-export function updateBrowserTourVisit(action: "completed" | "chat", access = "") {
+export function updateBrowserTourVisit(
+  action: "completed" | "chat",
+  access = "",
+) {
   pending = pending
     .then(async () => {
-      const value = JSON.parse(sessionStorage.getItem(TOUR_VISIT_SESSION) ?? "null");
+      const value = JSON.parse(
+        sessionStorage.getItem(TOUR_VISIT_SESSION) ?? "null",
+      );
       if (!value?.token || (action !== "completed" && !value.completed)) return;
-      const result = await updateTourVisit({ data: { token: value.token, action, access } });
+      const result = await updateTourVisit({
+        data: { token: value.token, action, access },
+      });
       if (result.ok && action === "completed")
         sessionStorage.setItem(
           TOUR_VISIT_SESSION,

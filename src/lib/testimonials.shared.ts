@@ -73,7 +73,11 @@ export function testimonialsSeo(list: Testimonial[]): {
       "@type": "CollectionPage",
       name: "Customer testimonials — E20E Tools",
       url: TESTIMONIALS_URL,
-      about: { "@type": "Organization", name: "E20E Tools", url: "https://www.e20e.tools" },
+      about: {
+        "@type": "Organization",
+        name: "E20E Tools",
+        url: "https://www.e20e.tools",
+      },
       mainEntity: {
         "@type": "ItemList",
         numberOfItems: published.length,
@@ -91,7 +95,12 @@ export function testimonialsSeo(list: Testimonial[]): {
                 name: t.name,
                 ...(text.role ? { jobTitle: text.role } : {}),
                 ...(text.organization
-                  ? { worksFor: { "@type": "Organization", name: text.organization } }
+                  ? {
+                      worksFor: {
+                        "@type": "Organization",
+                        name: text.organization,
+                      },
+                    }
                   : {}),
               },
             },
@@ -111,8 +120,15 @@ export function testimonialsForProduct(
   product: { id: string; name: string },
 ): Testimonial[] {
   const escape = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const terms = [product.name, product.id].map((s) => s.trim()).filter((s) => s.length >= 3);
+  const terms = [product.name, product.id]
+    .map((s) => s.trim())
+    .filter((s) => s.length >= 3);
   if (!terms.length) return [];
-  const pattern = new RegExp(`(^|[^\\p{L}\\p{N}])(${terms.map(escape).join("|")})(?=$|[^\\p{L}\\p{N}])`, "iu");
-  return list.filter((t) => t.published && pattern.test(`${t.quoteAr}\n${t.quoteEn}`));
+  const pattern = new RegExp(
+    `(^|[^\\p{L}\\p{N}])(${terms.map(escape).join("|")})(?=$|[^\\p{L}\\p{N}])`,
+    "iu",
+  );
+  return list.filter(
+    (t) => t.published && pattern.test(`${t.quoteAr}\n${t.quoteEn}`),
+  );
 }

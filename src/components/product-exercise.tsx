@@ -68,16 +68,32 @@ export function ProductExercise({
   const [values, setValues] = useState(defaults);
   const [saved, setSaved] = useState(false);
   useEffect(() => {
-    if (new URLSearchParams(location.search).get("resume") !== "exercise") return;
+    if (new URLSearchParams(location.search).get("resume") !== "exercise")
+      return;
     const record = readExercise(product.id);
-    if (record) { setValues(record.values); setResult(record.result); setSaved(true); }
-    else setError(dictionaries[ar ? "ar" : "en"].productExerciseNoSavedExerciseWas);
+    if (record) {
+      setValues(record.values);
+      setResult(record.result);
+      setSaved(true);
+    } else
+      setError(
+        dictionaries[ar ? "ar" : "en"].productExerciseNoSavedExerciseWas,
+      );
   }, [product.id, ar]);
   function save() {
     try {
-      localStorage.setItem(exerciseKey(product.id), JSON.stringify({ name:product.name, values, result, language }));
-      setSaved(true); setError("");
-    } catch { setError(dictionaries[ar ? "ar" : "en"].productExerciseDeviceStorageIsUnavailable); }
+      localStorage.setItem(
+        exerciseKey(product.id),
+        JSON.stringify({ name: product.name, values, result, language }),
+      );
+      setSaved(true);
+      setError("");
+    } catch {
+      setError(
+        dictionaries[ar ? "ar" : "en"]
+          .productExerciseDeviceStorageIsUnavailable,
+      );
+    }
   }
   function start() {
     if (!started) {
@@ -130,10 +146,16 @@ export function ProductExercise({
   return (
     <section className="bx-panel ea-exercise" id="exercise">
       <h2>{dictionaries[ar ? "ar" : "en"].productExerciseTryAWorkedExample}</h2>
-      <p>{radar
-        ? (dictionaries[ar ? "ar" : "en"].productExerciseReviewTheTrialRationale)
-        : apm ? (dictionaries[ar ? "ar" : "en"].productExerciseChangeTheSecondApplication)
-        : (dictionaries[ar ? "ar" : "en"].productExerciseChangeTheApplicationsSupporting)}</p>
+      <p>
+        {radar
+          ? dictionaries[ar ? "ar" : "en"]
+              .productExerciseReviewTheTrialRationale
+          : apm
+            ? dictionaries[ar ? "ar" : "en"]
+                .productExerciseChangeTheSecondApplication
+            : dictionaries[ar ? "ar" : "en"]
+                .productExerciseChangeTheApplicationsSupporting}
+      </p>
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -149,8 +171,10 @@ export function ProductExercise({
           if (apm)
             lines.push(
               v[1]?.toLocaleLowerCase() === v[3]?.toLocaleLowerCase()
-                ? dictionaries[ar ? "ar" : "en"].productExerciseFindingBothApplicationsSupport
-                : dictionaries[ar ? "ar" : "en"].productExerciseFindingTheTwoCapabilities,
+                ? dictionaries[ar ? "ar" : "en"]
+                    .productExerciseFindingBothApplicationsSupport
+                : dictionaries[ar ? "ar" : "en"]
+                    .productExerciseFindingTheTwoCapabilities,
             );
           if (!apm && !radar) lines.push(v.join(" → "));
           setResult(lines.join("\n"));
@@ -186,14 +210,30 @@ export function ProductExercise({
             </label>
           ))}
         </div>
-        <Button>{dictionaries[ar ? "ar" : "en"].productExerciseGenerateResult}</Button>
+        <Button>
+          {dictionaries[ar ? "ar" : "en"].productExerciseGenerateResult}
+        </Button>
       </form>
       {result && (
         <div role="status">
           <pre className="whitespace-pre-wrap">{result}</pre>
           <div className="bx-actions">
-            <Button onClick={save}>{dictionaries[ar ? "ar" : "en"].productExerciseSaveOnThisDevice}</Button>
-            {saved && (showMyTools ? <a href="/my-tools">{dictionaries[ar ? "ar" : "en"].productExerciseSavedViewMyExercises}</a> : <span role="status">{dictionaries[ar ? "ar" : "en"].productExerciseSaved}</span>)}
+            <Button onClick={save}>
+              {dictionaries[ar ? "ar" : "en"].productExerciseSaveOnThisDevice}
+            </Button>
+            {saved &&
+              (showMyTools ? (
+                <a href="/my-tools">
+                  {
+                    dictionaries[ar ? "ar" : "en"]
+                      .productExerciseSavedViewMyExercises
+                  }
+                </a>
+              ) : (
+                <span role="status">
+                  {dictionaries[ar ? "ar" : "en"].productExerciseSaved}
+                </span>
+              ))}
             <Button onClick={download}>
               {dictionaries[ar ? "ar" : "en"].productExerciseDownloadResult}
             </Button>
@@ -205,7 +245,13 @@ export function ProductExercise({
           </div>
         </div>
       )}
-      <StepHelp key={result} product={product} ar={ar} step={dictionaries[ar ? "ar" : "en"].productExerciseWorkedExample} result={result} />
+      <StepHelp
+        key={result}
+        product={product}
+        ar={ar}
+        step={dictionaries[ar ? "ar" : "en"].productExerciseWorkedExample}
+        result={result}
+      />
       {error && <p role="alert">{error}</p>}
     </section>
   );

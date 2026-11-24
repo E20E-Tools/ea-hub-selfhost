@@ -28,7 +28,8 @@ import { dictionaries, type Copy } from "@/lib/copy";
 import { pageUrl } from "@/lib/seo";
 
 export const Route = createFileRoute("/support")({
-  loader: ({ context }) => context.queryClient.ensureQueryData(catalogQueryOptions),
+  loader: ({ context }) =>
+    context.queryClient.ensureQueryData(catalogQueryOptions),
   head: () => ({
     meta: [
       { title: "Support us — E20E Tools | ادعمنا" },
@@ -40,7 +41,8 @@ export const Route = createFileRoute("/support")({
       { property: "og:title", content: "Support E20E Tools" },
       {
         property: "og:description",
-        content: "Built by EA for EA — partner, sponsor or contribute to the tools.",
+        content:
+          "Built by EA for EA — partner, sponsor or contribute to the tools.",
       },
       { property: "og:url", content: pageUrl("/support") },
       { property: "og:type", content: "website" },
@@ -72,7 +74,10 @@ function SupportPage() {
   const [skills, setSkills] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
-  const [receipt, setReceipt] = useState<{ id: string; createdAt: string } | null>(null);
+  const [receipt, setReceipt] = useState<{
+    id: string;
+    createdAt: string;
+  } | null>(null);
   const requestId = useRef("");
   const send = useServerFn(submitSupportOffer);
   const set = (key: string) => (e: { target: { value: string } }) =>
@@ -87,7 +92,9 @@ function SupportPage() {
       email: v("email"),
       phone: v("phone"),
       message: v("message"),
-      website: (document.getElementById("support-website") as HTMLInputElement | null)?.value ?? "",
+      website:
+        (document.getElementById("support-website") as HTMLInputElement | null)
+          ?.value ?? "",
     };
     if (offerType === "partnership")
       return {
@@ -153,7 +160,12 @@ function SupportPage() {
   ) => (
     <label className="request-field">
       <span>{t(label)}</span>
-      <select className="form-select" value={v(key)} onChange={set(key)} required={required}>
+      <select
+        className="form-select"
+        value={v(key)}
+        onChange={set(key)}
+        required={required}
+      >
         <option value="">{emptyLabel ?? t("spSelect")}</option>
         {options.filter(Boolean).map((option) => (
           <option key={option} value={option}>
@@ -166,7 +178,12 @@ function SupportPage() {
   const text = (
     key: string,
     label: keyof Copy,
-    props: { type?: string; ltr?: boolean; required?: boolean; max?: number } = {},
+    props: {
+      type?: string;
+      ltr?: boolean;
+      required?: boolean;
+      max?: number;
+    } = {},
   ) => (
     <label className="request-field">
       <span>{t(label)}</span>
@@ -183,7 +200,10 @@ function SupportPage() {
 
   return (
     <FeatureGate featureKey="support">
-      <main className="library-page request-page ea-workspace ea-support" dir={dir}>
+      <main
+        className="library-page request-page ea-workspace ea-support"
+        dir={dir}
+      >
         <div className="request-shell">
           {receipt ? (
             <div className="request-success" role="status">
@@ -226,7 +246,11 @@ function SupportPage() {
               <fieldset className="choice-cards" disabled={busy}>
                 <legend className="sr-only">{t("spChoose")}</legend>
                 {OFFER_TYPES.map((option) => (
-                  <label key={option} className="choice-card" data-selected={offerType === option}>
+                  <label
+                    key={option}
+                    className="choice-card"
+                    data-selected={offerType === option}
+                  >
                     <input
                       type="radio"
                       name="offer-type"
@@ -252,7 +276,10 @@ function SupportPage() {
                     <>
                       {text("organization", "spOrgName", { required: true })}
                       {select("orgType", "spOrgType", ORG_TYPES, "spOrg_")}
-                      {text("name", "spContactPerson", { required: true, max: 100 })}
+                      {text("name", "spContactPerson", {
+                        required: true,
+                        max: 100,
+                      })}
                       {text("jobTitle", "spJobTitle", { max: 100 })}
                     </>
                   ) : offerType === "financial" ? (
@@ -261,7 +288,10 @@ function SupportPage() {
                       {select("kind", "spKind", FINANCIAL_KINDS, "spKind_")}
                     </>
                   ) : (
-                    text("name", "requestNameLabel", { required: true, max: 100 })
+                    text("name", "requestNameLabel", {
+                      required: true,
+                      max: 100,
+                    })
                   )}
                   {text("email", "requestEmailLabel", {
                     type: "email",
@@ -269,7 +299,11 @@ function SupportPage() {
                     required: true,
                     max: 255,
                   })}
-                  {text("phone", "rqPhoneOptional", { type: "tel", ltr: true, max: 20 })}
+                  {text("phone", "rqPhoneOptional", {
+                    type: "tel",
+                    ltr: true,
+                    max: 20,
+                  })}
                   {offerType === "partnership"
                     ? select("area", "spArea", PARTNER_AREAS, "spArea_")
                     : null}
@@ -312,7 +346,10 @@ function SupportPage() {
                           ))}
                         </select>
                       </label>
-                      <p className="support-note request-field-wide" role="note">
+                      <p
+                        className="support-note request-field-wide"
+                        role="note"
+                      >
                         {t("spPaymentNote")}
                       </p>
                     </>
@@ -323,7 +360,9 @@ function SupportPage() {
                         className="request-field request-field-wide"
                         style={{ border: 0, padding: 0, margin: 0 }}
                       >
-                        <legend style={{ marginBottom: 6 }}>{t("spSkills")}</legend>
+                        <legend style={{ marginBottom: 6 }}>
+                          {t("spSkills")}
+                        </legend>
                         <div className="check-grid">
                           {SKILLS.map((skill) => (
                             <label key={skill} className="check-chip">
@@ -379,9 +418,17 @@ function SupportPage() {
                 <span className="request-submit-status" aria-live="polite">
                   {busy ? t("requestSaving") : ""}
                 </span>
-                <Button type="submit" className="request-submit" disabled={busy}>
+                <Button
+                  type="submit"
+                  className="request-submit"
+                  disabled={busy}
+                >
                   {busy ? (
-                    <Loader2 size={16} className="animate-spin" aria-hidden="true" />
+                    <Loader2
+                      size={16}
+                      className="animate-spin"
+                      aria-hidden="true"
+                    />
                   ) : (
                     <Send size={16} aria-hidden="true" />
                   )}

@@ -37,8 +37,9 @@ export async function handleFeedback(
       return { ok: rows.length === 1 };
     }
     case "view": {
-      const [row] =
-        await sql<{tool:string;goal:string}[]>`select tool,goal from ea_trials.invitations where not closed and invite_hash=${hash(data.invite)}`;
+      const [row] = await sql<
+        { tool: string; goal: string }[]
+      >`select tool,goal from ea_trials.invitations where not closed and invite_hash=${hash(data.invite)}`;
       return row ? { ok: true, tool: row.tool, goal: row.goal } : { ok: false };
     }
     case "reply": {

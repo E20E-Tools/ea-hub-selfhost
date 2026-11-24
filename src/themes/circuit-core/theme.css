@@ -57,7 +57,11 @@
   font-family: var(--font-sans);
   background-color: var(--cc-board);
   background-image:
-    radial-gradient(circle at 1px 1px, oklch(0.844 0.159 114.1 / 0.12) 1px, transparent 1.4px),
+    radial-gradient(
+      circle at 1px 1px,
+      oklch(0.844 0.159 114.1 / 0.12) 1px,
+      transparent 1.4px
+    ),
     url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='360' height='360'%3E%3Cg fill='none' stroke='rgb(203,215,77)' stroke-opacity='0.07' stroke-width='1.5'%3E%3Cpath d='M0 60H90L110 80V150'/%3E%3Cpath d='M360 240H260L240 220V170'/%3E%3Cpath d='M180 360V300L200 280H300'/%3E%3C/g%3E%3Cg fill='rgb(203,215,77)' fill-opacity='0.12'%3E%3Ccircle cx='110' cy='150' r='3'/%3E%3Ccircle cx='240' cy='170' r='3'/%3E%3Ccircle cx='300' cy='280' r='3'/%3E%3C/g%3E%3C/svg%3E");
   background-size:
     18px 18px,
@@ -71,8 +75,8 @@
   /* Header = PCB strip with solder dots. */
   & .site-header {
     background:
-      radial-gradient(circle, var(--cc-amber) 1.6px, transparent 2.2px) left 6px bottom 5px / 26px
-        8px repeat-x,
+      radial-gradient(circle, var(--cc-amber) 1.6px, transparent 2.2px) left 6px
+        bottom 5px / 26px 8px repeat-x,
       color-mix(in oklab, var(--cc-surface) 92%, transparent);
     border-bottom: 2px solid oklch(0.844 0.159 114.1 / 0.4);
   }
@@ -93,9 +97,17 @@
     border-radius: 0;
     border: 1px solid oklch(0.844 0.159 114.1 / 0.35);
     background:
-      repeating-linear-gradient(90deg, oklch(0.844 0.159 114.1 / 0.55) 0 6px, transparent 6px 14px)
+      repeating-linear-gradient(
+          90deg,
+          oklch(0.844 0.159 114.1 / 0.55) 0 6px,
+          transparent 6px 14px
+        )
         left 20px top 0 / calc(100% - 40px) 4px no-repeat,
-      repeating-linear-gradient(90deg, oklch(0.844 0.159 114.1 / 0.55) 0 6px, transparent 6px 14px)
+      repeating-linear-gradient(
+          90deg,
+          oklch(0.844 0.159 114.1 / 0.55) 0 6px,
+          transparent 6px 14px
+        )
         left 20px bottom 0 / calc(100% - 40px) 4px no-repeat,
       var(--cc-surface);
     clip-path: polygon(0 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 0 100%);
@@ -178,7 +190,9 @@
 }
 
 @supports (animation-timeline: view()) {
-  :root[data-design-theme="circuit-core"][data-motion="on"] [data-surface="site"] .product-card {
+  :root[data-design-theme="circuit-core"][data-motion="on"]
+    [data-surface="site"]
+    .product-card {
     animation: cc-power linear both;
     animation-timeline: view();
     animation-range: entry 0% entry 70%;
@@ -434,7 +448,8 @@
     0 16px 28px -10px oklch(0 0 0 / 0.8),
     0 0 0 1px var(--cc-cyan);
 }
-.cc-stage[data-focus] .cc-chip:not(:hover):not(:focus-visible):not([data-selected]) {
+.cc-stage[data-focus]
+  .cc-chip:not(:hover):not(:focus-visible):not([data-selected]) {
   opacity: 0.4;
 }
 .cc-led,

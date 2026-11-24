@@ -1,4 +1,10 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+} from "react";
 import type { Product } from "@/lib/catalog";
 import { useLanguage } from "@/lib/language";
 import type { Language } from "@/lib/language-core";
@@ -41,11 +47,14 @@ function useMobile(): boolean {
 function shortDate(date: string, language: Language): string {
   const at = new Date(`${date}T12:00:00Z`);
   if (Number.isNaN(at.getTime())) return date;
-  return new Intl.DateTimeFormat(language === "ar" ? "ar-SA-u-ca-gregory" : "en-GB", {
-    day: "numeric",
-    month: "short",
-    timeZone: "UTC",
-  }).format(at);
+  return new Intl.DateTimeFormat(
+    language === "ar" ? "ar-SA-u-ca-gregory" : "en-GB",
+    {
+      day: "numeric",
+      month: "short",
+      timeZone: "UTC",
+    },
+  ).format(at);
 }
 
 const STAR_UNIT = toPath(khatam(50, 50, 48));
@@ -112,7 +121,10 @@ export default function MashrabiyaStage({ products, settings }: StageProps) {
   const rtl = dir === "rtl";
   const list = products.slice(0, 12);
   const comp = useMemo(
-    () => (mobile ? gridComposition(list.length, rtl) : ringComposition(list.length, rtl)),
+    () =>
+      mobile
+        ? gridComposition(list.length, rtl)
+        : ringComposition(list.length, rtl),
     [list.length, mobile, rtl],
   );
   const inspector = useProductInspector();
@@ -127,7 +139,10 @@ export default function MashrabiyaStage({ products, settings }: StageProps) {
       /* storage blocked */
     }
     if (seen || !motion.animate) return setReveal("done");
-    const start = window.setTimeout(() => setReveal("opening"), mobile ? 250 : 650);
+    const start = window.setTimeout(
+      () => setReveal("opening"),
+      mobile ? 250 : 650,
+    );
     return () => window.clearTimeout(start);
   }, [motion.animate, mobile]);
   const finishReveal = () => {
@@ -192,7 +207,9 @@ export default function MashrabiyaStage({ products, settings }: StageProps) {
         <p className="dm-title" aria-hidden="true">
           {settings.displayTitle}
         </p>
-        {settings.tagline ? <p className="dm-tagline">{settings.tagline}</p> : null}
+        {settings.tagline ? (
+          <p className="dm-tagline">{settings.tagline}</p>
+        ) : null}
       </div>
 
       <div
@@ -202,7 +219,11 @@ export default function MashrabiyaStage({ products, settings }: StageProps) {
         role="group"
         aria-label={t("dmComposition")}
       >
-        <svg viewBox={`0 0 ${comp.w} ${comp.h}`} className="dm-svg" aria-hidden="true">
+        <svg
+          viewBox={`0 0 ${comp.w} ${comp.h}`}
+          className="dm-svg"
+          aria-hidden="true"
+        >
           <defs>
             <pattern
               id="dm-tess"
@@ -215,7 +236,11 @@ export default function MashrabiyaStage({ products, settings }: StageProps) {
               <path d={tessellationTile(64)} className="dm-tess-line" />
             </pattern>
             <radialGradient id="dm-glow">
-              <stop offset="0" stopColor="var(--dm-gold-2)" stopOpacity="0.35" />
+              <stop
+                offset="0"
+                stopColor="var(--dm-gold-2)"
+                stopOpacity="0.35"
+              />
               <stop offset="1" stopColor="var(--dm-gold)" stopOpacity="0" />
             </radialGradient>
           </defs>
@@ -265,18 +290,31 @@ export default function MashrabiyaStage({ products, settings }: StageProps) {
                 );
               })}
             </g>
-            <path d={toPath(polygon(comp.cx, comp.cy, m * 0.8, 8))} className="dm-med-oct" />
+            <path
+              d={toPath(polygon(comp.cx, comp.cy, m * 0.8, 8))}
+              className="dm-med-oct"
+            />
             <g
               className="dm-rot dm-rot-inner"
               style={{ transformOrigin: `${comp.cx}px ${comp.cy}px` }}
             >
-              <path d={toPath(khatam(comp.cx, comp.cy, m * 0.74))} className="dm-med-star" />
               <path
-                d={toPath(khatam(comp.cx, comp.cy, m * 0.6, -Math.PI / 2 + Math.PI / 8))}
+                d={toPath(khatam(comp.cx, comp.cy, m * 0.74))}
+                className="dm-med-star"
+              />
+              <path
+                d={toPath(
+                  khatam(comp.cx, comp.cy, m * 0.6, -Math.PI / 2 + Math.PI / 8),
+                )}
                 className="dm-med-star2"
               />
             </g>
-            <circle cx={comp.cx} cy={comp.cy} r={m * 0.42} className="dm-med-core" />
+            <circle
+              cx={comp.cx}
+              cy={comp.cy}
+              r={m * 0.42}
+              className="dm-med-core"
+            />
             {settings.logoUrl ? (
               <image
                 href={settings.logoUrl}
@@ -319,7 +357,11 @@ export default function MashrabiyaStage({ products, settings }: StageProps) {
                   : inspector.open(p.id, e.currentTarget)
               }
             >
-              <svg viewBox="0 0 100 100" className="dm-tile-svg" aria-hidden="true">
+              <svg
+                viewBox="0 0 100 100"
+                className="dm-tile-svg"
+                aria-hidden="true"
+              >
                 <g className="dm-ripple">
                   <path d={OCT_UNIT} />
                   <path d={OCT_UNIT} />
@@ -336,7 +378,10 @@ export default function MashrabiyaStage({ products, settings }: StageProps) {
               {p.comingSoon ? (
                 <span className="dm-crescent" dir={dir}>
                   {p.publicationDate
-                    ? fill(t("dmSoonOn"), shortDate(p.publicationDate, language))
+                    ? fill(
+                        t("dmSoonOn"),
+                        shortDate(p.publicationDate, language),
+                      )
                     : t("dmSoon")}
                 </span>
               ) : null}

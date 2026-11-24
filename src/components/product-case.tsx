@@ -38,7 +38,9 @@ export function ProductCase({
   if (!example) return null;
   return (
     <section ref={ref} className="bx-panel ea-case" id="use-case">
-      <small>{dictionaries[ar ? "ar" : "en"].productCaseIllustrativeUseCase}</small>
+      <small>
+        {dictionaries[ar ? "ar" : "en"].productCaseIllustrativeUseCase}
+      </small>
       <h2>{example.question[i]}</h2>
       <dl>
         <div>
@@ -46,7 +48,9 @@ export function ProductCase({
           <dd>{example.input[i]}</dd>
         </div>
         <div>
-          <dt>{dictionaries[ar ? "ar" : "en"].productCaseOutcomeAndDecision}</dt>
+          <dt>
+            {dictionaries[ar ? "ar" : "en"].productCaseOutcomeAndDecision}
+          </dt>
           <dd>{example.result[i]}</dd>
         </div>
       </dl>
@@ -76,7 +80,11 @@ export function ProductCase({
       )}
       {!product.comingSoon && (
         <FeatureOnly feature="trials">
-          <ProductExercise key={product.id + language} product={product} language={language} />
+          <ProductExercise
+            key={product.id + language}
+            product={product}
+            language={language}
+          />
         </FeatureOnly>
       )}
     </section>

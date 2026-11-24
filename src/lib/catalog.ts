@@ -9,10 +9,22 @@ import { hasLaunched } from "./archone-launch";
 import { normalizeBeneficiaryDetails } from "./beneficiary-metadata";
 import { products, type Product } from "./products";
 import { pick, pickList, type Language } from "./language-core";
-import { readNavigation, DEFAULT_NAVIGATION, type NavigationItem } from "./navigation.shared";
+import {
+  readNavigation,
+  DEFAULT_NAVIGATION,
+  type NavigationItem,
+} from "./navigation.shared";
 import { normalizeContactInfo, type ContactInfo } from "./contact-info";
-import { normalizeDesignTheme, defaultDesignTheme, type DesignThemeSetting } from "./design-themes";
-import { defaultFeatureFlags, normalizeFeatureFlags, type FeatureFlags } from "./site-features";
+import {
+  normalizeDesignTheme,
+  defaultDesignTheme,
+  type DesignThemeSetting,
+} from "./design-themes";
+import {
+  defaultFeatureFlags,
+  normalizeFeatureFlags,
+  type FeatureFlags,
+} from "./site-features";
 import { readFooterLinks, type FooterLink } from "./footer-links";
 import {
   normalizeThemeCustomizations,
@@ -185,11 +197,19 @@ export type SettingsRow = {
   archy_greeting?: unknown;
 };
 
-function stringMap(value: unknown, fallback: Record<string, string>): Record<string, string> {
-  if (value === null || typeof value !== "object" || Array.isArray(value)) return fallback;
+function stringMap(
+  value: unknown,
+  fallback: Record<string, string>,
+): Record<string, string> {
+  if (value === null || typeof value !== "object" || Array.isArray(value))
+    return fallback;
   const out: Record<string, string> = {};
   for (const [key, entry] of Object.entries(value as Record<string, unknown>)) {
-    if (typeof entry === "string" && entry.trim() !== "" && /^[a-z0-9-]+$/i.test(key))
+    if (
+      typeof entry === "string" &&
+      entry.trim() !== "" &&
+      /^[a-z0-9-]+$/i.test(key)
+    )
       out[key] = entry.trim();
   }
   return Object.keys(out).length > 0 ? out : fallback;
@@ -205,11 +225,16 @@ function text(value: unknown): string {
   return typeof value === "string" ? value.trim() : "";
 }
 
-export function mapProduct(row: ProductRow, resolvedImage = "", now = Date.now()): Product {
+export function mapProduct(
+  row: ProductRow,
+  resolvedImage = "",
+  now = Date.now(),
+): Product {
   const bundled = productImages[row.id];
   // Display only: a coming-soon product whose launch moment has passed is shown as available.
   // The stored flag is kept in comingSoonSetting so the admin editor never rewrites it silently.
-  const comingSoon = row.coming_soon && !hasLaunched(row.id, row.publication_date, now);
+  const comingSoon =
+    row.coming_soon && !hasLaunched(row.id, row.publication_date, now);
   return {
     id: row.id,
     name: row.name,
@@ -302,11 +327,18 @@ function ratio(value: unknown): number {
  * Returns the product with the wording for the visitor's language already chosen.
  * Rendering code asks for this once and then reads plain fields.
  */
-export function localizedProduct(product: Product, language: Language): Product {
+export function localizedProduct(
+  product: Product,
+  language: Language,
+): Product {
   return {
     ...product,
     label: pick(language, product.label, product.labelEn ?? ""),
-    description: pick(language, product.description, product.descriptionEn ?? ""),
+    description: pick(
+      language,
+      product.description,
+      product.descriptionEn ?? "",
+    ),
     overview: pick(language, product.overview, product.overviewEn ?? ""),
     features: pickList(language, product.features, product.featuresEn ?? []),
     imageAlt: pick(language, product.imageAlt ?? "", product.imageAltEn ?? ""),
@@ -315,10 +347,17 @@ export function localizedProduct(product: Product, language: Language): Product 
 }
 
 /** Same rule for the organisation description and the category names. */
-export function localizedSettings(settings: SiteSettings, language: Language): SiteSettings {
+export function localizedSettings(
+  settings: SiteSettings,
+  language: Language,
+): SiteSettings {
   return {
     ...settings,
-    displayTitle: pick(language, settings.displayTitle, settings.displayTitleEn),
+    displayTitle: pick(
+      language,
+      settings.displayTitle,
+      settings.displayTitleEn,
+    ),
     footerText: pick(language, settings.footerText, settings.footerTextEn),
     tagline: pick(language, settings.tagline, settings.taglineEn),
     description: pick(language, settings.description, settings.descriptionEn),
@@ -339,22 +378,32 @@ export function buildFilterChips(
   language: Language = "ar",
 ): FilterChip[] {
   const counts = new Map<string, number>();
-  for (const product of list) counts.set(product.category, (counts.get(product.category) ?? 0) + 1);
+  for (const product of list)
+    counts.set(product.category, (counts.get(product.category) ?? 0) + 1);
   const chips = [...counts.entries()].map(([id, count]) => ({
     id,
     label: categories[id] ?? id,
     count,
   }));
-  chips.sort((a, b) => a.label.localeCompare(b.label, language === "en" ? "en" : "ar"));
+  chips.sort((a, b) =>
+    a.label.localeCompare(b.label, language === "en" ? "en" : "ar"),
+  );
   const allLabel = language === "en" ? "All products" : "كل المنتجات";
-  return [{ id: ALL_CATEGORIES, label: allLabel, count: list.length }, ...chips];
+  return [
+    { id: ALL_CATEGORIES, label: allLabel, count: list.length },
+    ...chips,
+  ];
 }
 
 /**
  * Search matches both languages whatever the visitor is reading, so an English
  * term still finds a product whose Arabic text never mentions it.
  */
-export function filterCatalog(list: Product[], query: string, category: string): Product[] {
+export function filterCatalog(
+  list: Product[],
+  query: string,
+  category: string,
+): Product[] {
   const term = query.trim().toLocaleLowerCase();
   return list.filter(
     (product) =>
@@ -376,14 +425,28 @@ export const fallbackCatalog: Catalog = {
   settings: defaultSettings,
 };
 
-export type FontChoice = { id: string; label: string; weights: string; arabic: boolean };
+export type FontChoice = {
+  id: string;
+  label: string;
+  weights: string;
+  arabic: boolean;
+};
 
-export const bundledFonts = ["Geist", "Signifier", "IBM Plex Sans Arabic"] as const;
+export const bundledFonts = [
+  "Geist",
+  "Signifier",
+  "IBM Plex Sans Arabic",
+] as const;
 
 export const fontChoices: FontChoice[] = [
   { id: "Geist", label: "Geist", weights: "400", arabic: false },
   { id: "Signifier", label: "Signifier", weights: "400", arabic: false },
-  { id: "Alexandria", label: "Alexandria", weights: "300;400;500;700", arabic: true },
+  {
+    id: "Alexandria",
+    label: "Alexandria",
+    weights: "300;400;500;700",
+    arabic: true,
+  },
   {
     id: "IBM Plex Sans Arabic",
     label: "IBM Plex Sans Arabic",
@@ -393,11 +456,31 @@ export const fontChoices: FontChoice[] = [
   { id: "Tajawal", label: "Tajawal", weights: "300;400;500;700", arabic: true },
   { id: "Almarai", label: "Almarai", weights: "300;400;500;700", arabic: true },
   { id: "Cairo", label: "Cairo", weights: "300;400;500;700", arabic: true },
-  { id: "Readex Pro", label: "Readex Pro", weights: "300;400;500;700", arabic: true },
-  { id: "Noto Kufi Arabic", label: "Noto Kufi Arabic", weights: "300;400;500;700", arabic: true },
-  { id: "Space Grotesk", label: "Space Grotesk", weights: "300;400;500;700", arabic: false },
+  {
+    id: "Readex Pro",
+    label: "Readex Pro",
+    weights: "300;400;500;700",
+    arabic: true,
+  },
+  {
+    id: "Noto Kufi Arabic",
+    label: "Noto Kufi Arabic",
+    weights: "300;400;500;700",
+    arabic: true,
+  },
+  {
+    id: "Space Grotesk",
+    label: "Space Grotesk",
+    weights: "300;400;500;700",
+    arabic: false,
+  },
   { id: "Sora", label: "Sora", weights: "300;400;500;700", arabic: false },
-  { id: "Manrope", label: "Manrope", weights: "300;400;500;700", arabic: false },
+  {
+    id: "Manrope",
+    label: "Manrope",
+    weights: "300;400;500;700",
+    arabic: false,
+  },
 ];
 
 export function isKnownFont(id: string): boolean {
@@ -408,7 +491,8 @@ export function fontsHref(heading: string, body: string): string {
   const ids = [
     ...new Set(
       [heading, body].filter(
-        (id) => isKnownFont(id) && !bundledFonts.some((bundled) => bundled === id),
+        (id) =>
+          isKnownFont(id) && !bundledFonts.some((bundled) => bundled === id),
       ),
     ),
   ];
@@ -434,8 +518,9 @@ export function pickerFonts(local: boolean, saved: string): FontChoice[] {
 export function siteFontStack(id: string): string {
   const head = isKnownFont(id) ? id : "Geist";
   return (
-    [...new Set([head, "IBM Plex Sans Arabic", "Geist"])].map((face) => `"${face}"`).join(",") +
-    ",Arial,sans-serif"
+    [...new Set([head, "IBM Plex Sans Arabic", "Geist"])]
+      .map((face) => `"${face}"`)
+      .join(",") + ",Arial,sans-serif"
   );
 }
 
@@ -461,11 +546,16 @@ export function themeCss(settings: SiteSettings): string {
   const heading = isKnownFont(settings.headingFont)
     ? settings.headingFont
     : defaultSettings.headingFont;
-  const body = isKnownFont(settings.bodyFont) ? settings.bodyFont : defaultSettings.bodyFont;
+  const body = isKnownFont(settings.bodyFont)
+    ? settings.bodyFont
+    : defaultSettings.bodyFont;
   const colors = Object.entries(settings.colors)
-    .filter(([token, value]) => /^--[a-z0-9-]+$/i.test(token) && isValidColor(value))
+    .filter(
+      ([token, value]) => /^--[a-z0-9-]+$/i.test(token) && isValidColor(value),
+    )
     .map(([token, value]) => `${token}:${value.trim()}`);
-  const bodyOverride = body === defaultSettings.bodyFont ? "" : `--s-font:${siteFontStack(body)};`;
+  const bodyOverride =
+    body === defaultSettings.bodyFont ? "" : `--s-font:${siteFontStack(body)};`;
   const fonts = `--font-display:${siteFontStack(heading)};--font-sans:${siteFontStack(body)};${bodyOverride}`;
   const headingRule =
     heading === defaultSettings.headingFont
@@ -485,10 +575,14 @@ export function themeCss(settings: SiteSettings): string {
     "--accent": "--ea-wash",
     "--library-rule": "--ea-line",
   };
-  const overrides = Object.entries(studioPalette).flatMap(([source, target]) => {
-    const value = settings.colors[source]?.trim();
-    return value && isValidColor(value) ? [`${target}:${value}`] : [];
-  });
-  const studio = overrides.length ? `[data-surface="site"]{${overrides.join(";")}}` : "";
+  const overrides = Object.entries(studioPalette).flatMap(
+    ([source, target]) => {
+      const value = settings.colors[source]?.trim();
+      return value && isValidColor(value) ? [`${target}:${value}`] : [];
+    },
+  );
+  const studio = overrides.length
+    ? `[data-surface="site"]{${overrides.join(";")}}`
+    : "";
   return `:root:root{${fonts}${colors.join(";")}}${designs}${studio}${headingRule}`;
 }

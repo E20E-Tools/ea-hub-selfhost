@@ -8,7 +8,10 @@ import {
 } from "@/lib/design-themes";
 import { THEME_STAGES } from "@/themes/registry";
 import { THEME_THUMBS } from "@/themes/thumbs";
-import { beneficiaryDetailsSchema, normalizeBeneficiaryDetails } from "@/lib/beneficiary-metadata";
+import {
+  beneficiaryDetailsSchema,
+  normalizeBeneficiaryDetails,
+} from "@/lib/beneficiary-metadata";
 import * as uc from "@/themes/untangle-chaos/model";
 import * as rl from "@/themes/reveal-lens/model";
 import * as pt from "@/themes/problem-to-tool/model";
@@ -40,15 +43,24 @@ const p = (over: Partial<Product>): Product =>
   }) as Product;
 
 describe("six new designs are registered", () => {
-  it.each(NEW)("%s has id, bilingual name/description, stage, thumb and fonts", (id) => {
-    expect(DESIGN_THEME_IDS).toContain(id);
-    const meta = DESIGN_THEMES.find((t) => t.id === id)!;
-    expect(meta.name.ar && meta.name.en && meta.description.ar && meta.description.en).toBeTruthy();
-    expect(THEME_STAGES[id]).toBeDefined();
-    expect(THEME_THUMBS[id]).toBeTypeOf("function");
-    expect(THEME_FONT_FAMILIES[id]).toContain("Sora");
-  });
-  it("does not change the default design", () => expect(defaultDesignTheme.theme).toBe("classic"));
+  it.each(NEW)(
+    "%s has id, bilingual name/description, stage, thumb and fonts",
+    (id) => {
+      expect(DESIGN_THEME_IDS).toContain(id);
+      const meta = DESIGN_THEMES.find((t) => t.id === id)!;
+      expect(
+        meta.name.ar &&
+          meta.name.en &&
+          meta.description.ar &&
+          meta.description.en,
+      ).toBeTruthy();
+      expect(THEME_STAGES[id]).toBeDefined();
+      expect(THEME_THUMBS[id]).toBeTypeOf("function");
+      expect(THEME_FONT_FAMILIES[id]).toContain("Sora");
+    },
+  );
+  it("does not change the default design", () =>
+    expect(defaultDesignTheme.theme).toBe("classic"));
 });
 
 describe("untangle-chaos", () => {
@@ -113,12 +125,19 @@ describe("problem-to-tool", () => {
     const own = p({
       id: "radar",
       description: "d",
-      beneficiaryDetails: { ...normalizeBeneficiaryDetails({}), problem: { ar: "مشكلتي", en: "" } },
+      beneficiaryDetails: {
+        ...normalizeBeneficiaryDetails({}),
+        problem: { ar: "مشكلتي", en: "" },
+      },
     });
     expect(pt.problemFor(own, "ar")).toBe("مشكلتي");
     expect(pt.problemFor(own, "en")).toBe("مشكلتي");
-    expect(pt.problemFor(p({ id: "radar" }), "en")).toBe(pt.DEFAULT_PROBLEMS["radar"]!.en);
-    expect(pt.problemFor(p({ id: "new", description: "desc" }), "ar")).toBe("desc");
+    expect(pt.problemFor(p({ id: "radar" }), "en")).toBe(
+      pt.DEFAULT_PROBLEMS["radar"]!.en,
+    );
+    expect(pt.problemFor(p({ id: "new", description: "desc" }), "ar")).toBe(
+      "desc",
+    );
   });
   it("every bundled product has an Arabic and English default", () => {
     for (const prod of fallback) {
@@ -128,22 +147,32 @@ describe("problem-to-tool", () => {
   });
   it("types letter by letter then holds the match (~6s cycle)", () => {
     const text = pt.DEFAULT_PROBLEMS["itfm"]!.ar;
-    expect(pt.typingAt(text, pt.TYPE_MS * 3).shown).toBe(Array.from(text).slice(0, 3).join(""));
-    expect(pt.typingAt(text, Array.from(text).length * pt.TYPE_MS + 10).phase).toBe("match");
+    expect(pt.typingAt(text, pt.TYPE_MS * 3).shown).toBe(
+      Array.from(text).slice(0, 3).join(""),
+    );
+    expect(
+      pt.typingAt(text, Array.from(text).length * pt.TYPE_MS + 10).phase,
+    ).toBe("match");
     expect(pt.cycleMs(text)).toBeGreaterThan(4500);
     expect(pt.cycleMs(text)).toBeLessThan(7500);
   });
   it("matches typed words locally to the closest tool", () => {
     const list = fallback;
-    expect(pt.bestMatch("overlap between systems", list, "en")).toBe("landscape");
+    expect(pt.bestMatch("overlap between systems", list, "en")).toBe(
+      "landscape",
+    );
     expect(pt.bestMatch("نتبنّى ونوقف التقنيات", list, "ar")).toBe("radar");
     expect(pt.bestMatch("zzqq", list, "en")).toBeNull();
   });
   it("each tool's own problem text brings up that same tool in Arabic and English", () => {
     for (const prod of fallback) {
       for (const lang of ["ar", "en"] as const) {
-        expect(pt.bestMatch(pt.DEFAULT_PROBLEMS[prod.id]![lang], fallback, lang)).toBe(prod.id);
-        expect(pt.cycleMs(pt.DEFAULT_PROBLEMS[prod.id]![lang])).toBeLessThan(7500);
+        expect(
+          pt.bestMatch(pt.DEFAULT_PROBLEMS[prod.id]![lang], fallback, lang),
+        ).toBe(prod.id);
+        expect(pt.cycleMs(pt.DEFAULT_PROBLEMS[prod.id]![lang])).toBeLessThan(
+          7500,
+        );
       }
     }
   });
@@ -181,8 +210,13 @@ describe("particle-forge", () => {
       { x: 1, y: 1 },
       { x: 1, y: 1 },
     ]);
-    expect(pf.repel({ x: 10, y: 0 }, { x: 0, y: 0 }, 50, 5).x).toBeGreaterThan(0);
-    expect(pf.repel({ x: 100, y: 0 }, { x: 0, y: 0 }, 50, 5)).toEqual({ x: 0, y: 0 });
+    expect(pf.repel({ x: 10, y: 0 }, { x: 0, y: 0 }, 50, 5).x).toBeGreaterThan(
+      0,
+    );
+    expect(pf.repel({ x: 100, y: 0 }, { x: 0, y: 0 }, 50, 5)).toEqual({
+      x: 0,
+      y: 0,
+    });
   });
 });
 
@@ -207,7 +241,10 @@ describe("ea-layers", () => {
     expect(
       el.layerFor({
         category: "technology",
-        beneficiaryDetails: { ...normalizeBeneficiaryDetails({}), eaLayer: "data" },
+        beneficiaryDetails: {
+          ...normalizeBeneficiaryDetails({}),
+          eaLayer: "data",
+        },
       }),
     ).toBe("data");
   });

@@ -14,7 +14,10 @@ export const contactInfoSchema = z.object({
     .string()
     .trim()
     .max(200)
-    .refine((v) => v === "" || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v), "بريد غير صالح"),
+    .refine(
+      (v) => v === "" || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v),
+      "بريد غير صالح",
+    ),
   phone: z
     .string()
     .trim()
@@ -30,7 +33,10 @@ export const contactInfoSchema = z.object({
 });
 
 export function normalizeContactInfo(value: unknown): ContactInfo {
-  const s = value && typeof value === "object" ? (value as Record<string, unknown>) : {};
+  const s =
+    value && typeof value === "object"
+      ? (value as Record<string, unknown>)
+      : {};
   const str = (k: string, max: number) =>
     typeof s[k] === "string" ? (s[k] as string).slice(0, max) : "";
   return {

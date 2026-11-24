@@ -11,7 +11,9 @@ import {
 } from "@/lib/newsletter.functions";
 import { Button } from "@/components/ui/button";
 import { dictionaries } from "@/lib/copy";
-export const Route = createFileRoute("/newsletter")({ component: GatedNewsletter });
+export const Route = createFileRoute("/newsletter")({
+  component: GatedNewsletter,
+});
 function Newsletter() {
   const { language } = useLanguage();
   const [params, setParams] = useState<URLSearchParams | null>(null),
@@ -73,7 +75,14 @@ function Newsletter() {
     <main className="bx-page" dir={ar ? "rtl" : "ltr"}>
       <section className="bx-panel newsletter-panel mx-auto grid max-w-xl gap-4">
         <h1>{title}</h1>
-        {!managing && (<a className="ea-guide-step" href={`/guide/${(ar ? "ar" : "en")}.html#s4`}>{dictionaries[ar ? "ar" : "en"].newsletterHowDoIFollow}</a>)}
+        {!managing && (
+          <a
+            className="ea-guide-step"
+            href={`/guide/${ar ? "ar" : "en"}.html#s4`}
+          >
+            {dictionaries[ar ? "ar" : "en"].newsletterHowDoIFollow}
+          </a>
+        )}
         {!done && params && (
           <form
             className="grid gap-4"
@@ -188,13 +197,17 @@ function Newsletter() {
                         )
                       }
                     />{" "}
-                    <span><bdi>{p.name}</bdi><small>
-                    {p.comingSoon
-                      ? t(
-                          "إشعار الإطلاق والتحديثات",
-                          "Launch alert and updates",
-                        )
-                      : t("تحديثات المنتج", "Product updates")}</small></span>
+                    <span>
+                      <bdi>{p.name}</bdi>
+                      <small>
+                        {p.comingSoon
+                          ? t(
+                              "إشعار الإطلاق والتحديثات",
+                              "Launch alert and updates",
+                            )
+                          : t("تحديثات المنتج", "Product updates")}
+                      </small>
+                    </span>
                   </label>
                 ))}
               </fieldset>
@@ -216,7 +229,11 @@ function Newsletter() {
             </Button>
           </form>
         )}
-        <p role="status">{invalidPreferences ? t("رابط التفضيلات غير صالح.", "Invalid preferences link.") : note}</p>
+        <p role="status">
+          {invalidPreferences
+            ? t("رابط التفضيلات غير صالح.", "Invalid preferences link.")
+            : note}
+        </p>
       </section>
     </main>
   );

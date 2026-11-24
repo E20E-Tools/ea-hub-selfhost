@@ -12,7 +12,8 @@ export function ChatMarkdown({
 }) {
   const components: Components = {
     // Never load remote images automatically (privacy); show their description instead.
-    img: ({ alt }) => (alt ? <span className="chat-image-alt">[{alt}]</span> : null),
+    img: ({ alt }) =>
+      alt ? <span className="chat-image-alt">[{alt}]</span> : null,
     a: ({ href, children }) => {
       const target = chatLinkTarget(href);
       if (!target) return <span>{children}</span>;
@@ -22,7 +23,13 @@ export function ChatMarkdown({
           <a
             href={target.to}
             onClick={(event) => {
-              if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+              if (
+                event.metaKey ||
+                event.ctrlKey ||
+                event.shiftKey ||
+                event.altKey
+              )
+                return;
               if (onOpenProduct(productId) !== false) event.preventDefault();
             }}
           >
@@ -30,7 +37,8 @@ export function ChatMarkdown({
           </a>
         );
       }
-      if (target.kind === "internal") return <Link to={target.to}>{children}</Link>;
+      if (target.kind === "internal")
+        return <Link to={target.to}>{children}</Link>;
       return (
         <a
           href={target.href}

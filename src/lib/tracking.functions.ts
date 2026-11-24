@@ -6,7 +6,7 @@ const inputSchema = z.object({ access: z.string().max(4096).default("") });
 export type TrackedRequest = {
   id: string;
   pending_question?: string;
-  exercise?:string;
+  exercise?: string;
   request_type: string;
   need: string;
   product_id: string | null;
@@ -31,10 +31,21 @@ export type TrackedMessage = {
   body: string;
   created_at: string;
 };
-export type TrackedReply = { id: string; request_id: string; body: string; created_at: string; author_kind?:string };
+export type TrackedReply = {
+  id: string;
+  request_id: string;
+  body: string;
+  created_at: string;
+  author_kind?: string;
+};
 
 /** Overview list sizes. Lists report `…HasMore` so the page never implies a complete history. */
-export const TRACKING_LIMITS = { requests: 100, chats: 50, replies: 200, historyPage: 50 } as const;
+export const TRACKING_LIMITS = {
+  requests: 100,
+  chats: 50,
+  replies: 200,
+  historyPage: 50,
+} as const;
 
 async function trackingIdentity(access: string) {
   const { getRequest } = await import("@tanstack/react-start/server");
@@ -42,7 +53,10 @@ async function trackingIdentity(access: string) {
   if (site && site !== "same-origin" && site !== "none") return null;
   const { resolveRequestIdentity } = await import("./request-identity.server");
   try {
-    return await resolveRequestIdentity(access) ?? (await import("./contact-owner.server")).contactOwner();
+    return (
+      (await resolveRequestIdentity(access)) ??
+      (await import("./contact-owner.server")).contactOwner()
+    );
   } catch {
     return null;
   }
@@ -58,8 +72,10 @@ export const getMyJourney = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const identity = await trackingIdentity(data.access);
     if (!identity) return { status: "unauthorized" as const };
-    const { supabaseAdmin: db } = await import("@/integrations/supabase/client.server");
-    const ownerColumn = identity.kind === "account" ? "account_id" : "visitor_id";
+    const { supabaseAdmin: db } =
+      await import("@/integrations/supabase/client.server");
+    const ownerColumn =
+      identity.kind === "account" ? "account_id" : "visitor_id";
     const [links, chatRows] = await Promise.all([
       db
         .from("request_identities")
@@ -79,38 +95,58 @@ export const getMyJourney = createServerFn({ method: "POST" })
       .slice(0, TRACKING_LIMITS.requests)
       .map((row) => row.request_id);
     const chatsHasMore = (chatRows.data?.length ?? 0) > TRACKING_LIMITS.chats;
-    const chats = ((chatRows.data ?? []) as TrackedChat[]).slice(0, TRACKING_LIMITS.chats);
+    const chats = ((chatRows.data ?? []) as TrackedChat[]).slice(
+      0,
+      TRACKING_LIMITS.chats,
+    );
     const chatIds = chats.map((chat) => chat.id);
     const select =
       "id,request_type,need,product_id,created_at,status,status_updated_at,pending_question,attachments,details";
     const reads = [];
     if (linkedIds.length)
-      reads.push(db.from("suggestion_requests").select(select).in("id", linkedIds).limit(100));
+      reads.push(
+        db
+          .from("suggestion_requests")
+          .select(select)
+          .in("id", linkedIds)
+          .limit(100),
+      );
     if (chatIds.length)
       reads.push(
-        db.from("suggestion_requests").select(select).in("details->>chatId", chatIds).limit(100),
+        db
+          .from("suggestion_requests")
+          .select(select)
+          .in("details->>chatId", chatIds)
+          .limit(100),
       );
     const requestResults = await Promise.all(reads);
-    if (requestResults.some((result) => result.error)) throw new Error("trackingLoadFailed");
+    if (requestResults.some((result) => result.error))
+      throw new Error("trackingLoadFailed");
     const requestMap = new Map<string, TrackedRequest>();
     for (const result of requestResults)
       for (const row of result.data ?? []) {
         const details =
-          row.details && typeof row.details === "object" && !Array.isArray(row.details)
+          row.details &&
+          typeof row.details === "object" &&
+          !Array.isArray(row.details)
             ? (row.details as Record<string, unknown>)
             : {};
         requestMap.set(row.id, {
           id: row.id,
-          pending_question:row.pending_question,
-          exercise:typeof details["exercise"]==="string"?details["exercise"]:"",
+          pending_question: row.pending_question,
+          exercise:
+            typeof details["exercise"] === "string" ? details["exercise"] : "",
           request_type: row.request_type,
           need: row.need,
           product_id: row.product_id,
           created_at: row.created_at,
           status: row.status,
           status_updated_at: row.status_updated_at,
-          attachmentCount: Array.isArray(row.attachments) ? row.attachments.length : 0,
-          chatId: typeof details["chatId"] === "string" ? details["chatId"] : "",
+          attachmentCount: Array.isArray(row.attachments)
+            ? row.attachments.length
+            : 0,
+          chatId:
+            typeof details["chatId"] === "string" ? details["chatId"] : "",
         });
       }
     const allRequests = [...requestMap.values()].sort((a, b) =>
@@ -130,9 +166,16 @@ export const getMyJourney = createServerFn({ method: "POST" })
           .limit(TRACKING_LIMITS.replies + 1)
       : { data: [], error: null };
     const history = requestIds.length
-      ? await db.from("admin_activity").select("id,target,action,created_at")
-          .in("target", requestIds).in("action", REQUEST_STATUSES.map((status) => "request." + status))
-          .order("created_at", { ascending: false }).limit(501)
+      ? await db
+          .from("admin_activity")
+          .select("id,target,action,created_at")
+          .in("target", requestIds)
+          .in(
+            "action",
+            REQUEST_STATUSES.map((status) => "request." + status),
+          )
+          .order("created_at", { ascending: false })
+          .limit(501)
       : { data: [], error: null };
     if (history.error) throw new Error("trackingLoadFailed");
     if (replies.error) throw new Error("trackingLoadFailed");
@@ -141,9 +184,14 @@ export const getMyJourney = createServerFn({ method: "POST" })
       owner: identity.kind,
       requests,
       chats,
-      replies: ((replies.data ?? []) as TrackedReply[]).slice(0, TRACKING_LIMITS.replies).reverse(),
-      statusEvents: (history.data ?? []).slice(0, 500).map(row => ({
-        id: row.id, requestId: row.target, at: row.created_at, status: row.action.slice("request.".length),
+      replies: ((replies.data ?? []) as TrackedReply[])
+        .slice(0, TRACKING_LIMITS.replies)
+        .reverse(),
+      statusEvents: (history.data ?? []).slice(0, 500).map((row) => ({
+        id: row.id,
+        requestId: row.target,
+        at: row.created_at,
+        status: row.action.slice("request.".length),
       })),
       historyHasMore: (history.data?.length ?? 0) > 500,
       requestsHasMore,
@@ -164,7 +212,8 @@ export const getMyChatHistory = createServerFn({ method: "POST" })
   .handler(async ({ data }) => {
     const identity = await trackingIdentity(data.access);
     if (!identity) return { status: "unauthorized" as const };
-    const { supabaseAdmin: db } = await import("@/integrations/supabase/client.server");
+    const { supabaseAdmin: db } =
+      await import("@/integrations/supabase/client.server");
     const owned = await db
       .from("live_chats")
       .select("id")
@@ -191,27 +240,76 @@ export const getMyChatHistory = createServerFn({ method: "POST" })
     };
   });
 
-export const clarifyRequest=createServerFn({method:"POST"})
-.inputValidator((input:unknown)=>inputSchema.extend({requestId:z.string().uuid(),noteId:z.string().uuid(),body:z.string().trim().min(2).max(1500)}).parse(input))
-.handler(async({data})=>{
- const owner=await trackingIdentity(data.access);
- if(!owner)return {ok:false};
- const {supabaseAdmin:db}=await import("@/integrations/supabase/client.server");
- const {data:link}=await db.from("request_identities").select("request_id").eq("request_id",data.requestId).eq(owner.kind==="account"?"account_id":"visitor_id",owner.id).maybeSingle();
- if(!link){
- const request=await db.from("suggestion_requests").select("details").eq("id",data.requestId).maybeSingle();
- const details=request.data?.details;
- const chatId=details && typeof details==="object" && !Array.isArray(details) ? details["chatId"] : null;
- if(typeof chatId!=="string")return {ok:false};
- const chat=await db.from("live_chats").select("id").eq("id",chatId).eq("visitor_id",owner.id).maybeSingle();
- if(!chat.data)return {ok:false};
- }
- const {checkLimits}=await import("./rate-limit.server");
- if(await checkLimits([{bucket:"request:clarify",subject:owner.id,limit:12,windowSeconds:3600}])!=="ok")return {ok:false};
- const row={id:data.noteId,request_id:data.requestId,body:data.body,author_kind:"visitor"};
- const {error}=await db.from("request_replies").insert(row);
- if(error?.code==="23505"){
- const old=await db.from("request_replies").select("id").eq("id",data.noteId).eq("request_id",data.requestId).eq("body",data.body).eq("author_kind","visitor").maybeSingle();
- return {ok:!!old.data};}
- return {ok:!error};
-});
+export const clarifyRequest = createServerFn({ method: "POST" })
+  .inputValidator((input: unknown) =>
+    inputSchema
+      .extend({
+        requestId: z.string().uuid(),
+        noteId: z.string().uuid(),
+        body: z.string().trim().min(2).max(1500),
+      })
+      .parse(input),
+  )
+  .handler(async ({ data }) => {
+    const owner = await trackingIdentity(data.access);
+    if (!owner) return { ok: false };
+    const { supabaseAdmin: db } =
+      await import("@/integrations/supabase/client.server");
+    const { data: link } = await db
+      .from("request_identities")
+      .select("request_id")
+      .eq("request_id", data.requestId)
+      .eq(owner.kind === "account" ? "account_id" : "visitor_id", owner.id)
+      .maybeSingle();
+    if (!link) {
+      const request = await db
+        .from("suggestion_requests")
+        .select("details")
+        .eq("id", data.requestId)
+        .maybeSingle();
+      const details = request.data?.details;
+      const chatId =
+        details && typeof details === "object" && !Array.isArray(details)
+          ? details["chatId"]
+          : null;
+      if (typeof chatId !== "string") return { ok: false };
+      const chat = await db
+        .from("live_chats")
+        .select("id")
+        .eq("id", chatId)
+        .eq("visitor_id", owner.id)
+        .maybeSingle();
+      if (!chat.data) return { ok: false };
+    }
+    const { checkLimits } = await import("./rate-limit.server");
+    if (
+      (await checkLimits([
+        {
+          bucket: "request:clarify",
+          subject: owner.id,
+          limit: 12,
+          windowSeconds: 3600,
+        },
+      ])) !== "ok"
+    )
+      return { ok: false };
+    const row = {
+      id: data.noteId,
+      request_id: data.requestId,
+      body: data.body,
+      author_kind: "visitor",
+    };
+    const { error } = await db.from("request_replies").insert(row);
+    if (error?.code === "23505") {
+      const old = await db
+        .from("request_replies")
+        .select("id")
+        .eq("id", data.noteId)
+        .eq("request_id", data.requestId)
+        .eq("body", data.body)
+        .eq("author_kind", "visitor")
+        .maybeSingle();
+      return { ok: !!old.data };
+    }
+    return { ok: !error };
+  });

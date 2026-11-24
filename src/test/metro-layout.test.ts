@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { layoutBoxes, metroLayout, type MetroInput } from "@/themes/transformation-metro/layout";
+import {
+  layoutBoxes,
+  metroLayout,
+  type MetroInput,
+} from "@/themes/transformation-metro/layout";
 import { splitFlapUnits } from "@/themes/transformation-metro/flap";
 import { metroLines } from "@/themes/transformation-metro/lines";
 
@@ -18,8 +22,10 @@ function input(products: number, categories: number, long = false): MetroInput {
   return lines;
 }
 
-const overlaps = (a: { x: number; y: number; w: number; h: number }, b: typeof a) =>
-  a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h;
+const overlaps = (
+  a: { x: number; y: number; w: number; h: number },
+  b: typeof a,
+) => a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h;
 
 function assertClean(l: ReturnType<typeof metroLayout>) {
   const boxes = layoutBoxes(l);
@@ -51,14 +57,18 @@ describe("metro network layout", () => {
         `%i products / %i lines has no overlaps (${mobile ? "mobile" : "desktop"}${long ? ", long names" : ""})`,
         (n, c) => {
           const l = metroLayout(input(n, c, long), mobile);
-          expect(l.lines.flatMap((x) => x.branches.flatMap((b) => b.stations))).toHaveLength(n);
+          expect(
+            l.lines.flatMap((x) => x.branches.flatMap((b) => b.stations)),
+          ).toHaveLength(n);
           assertClean(l);
         },
       );
     }
   }
   it("is deterministic", () => {
-    expect(metroLayout(input(6, 4), false)).toEqual(metroLayout(input(6, 4), false));
+    expect(metroLayout(input(6, 4), false)).toEqual(
+      metroLayout(input(6, 4), false),
+    );
   });
   it("only octilinear segments", () => {
     for (const line of metroLayout(input(12, 8), false).lines)

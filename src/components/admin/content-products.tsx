@@ -1,15 +1,28 @@
 import { adminDictionaries } from "@/lib/admin-copy";
-import { ProductQuality,type QualityField } from "./product-quality";
-import { useEffect,useRef, useState } from "react";
+import { ProductQuality, type QualityField } from "./product-quality";
+import { useEffect, useRef, useState } from "react";
 import { format, parseISO } from "date-fns";
 import { arSA, enUS } from "date-fns/locale";
 import { CalendarIcon } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import { isPublicationDate } from "@/lib/publication-date";
 import { Link } from "@tanstack/react-router";
 import { useQueryClient } from "@tanstack/react-query";
-import { ArrowLeft, Images, ImagePlus, Loader2, Pencil, Plus, Trash2, X } from "lucide-react";
+import {
+  ArrowLeft,
+  Images,
+  ImagePlus,
+  Loader2,
+  Pencil,
+  Plus,
+  Trash2,
+  X,
+} from "lucide-react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -139,7 +152,8 @@ type Errors = Partial<Record<keyof ProductDraft, string>>;
 
 function validate(d: ProductDraft, t: (k: string) => string): Errors {
   const errors: Errors = {};
-  if (!/^[a-z0-9][a-z0-9-]{1,40}$/.test(d.id.trim().toLowerCase())) errors.id = t("productIdHint");
+  if (!/^[a-z0-9][a-z0-9-]{1,40}$/.test(d.id.trim().toLowerCase()))
+    errors.id = t("productIdHint");
   if (d.name.trim().length < 2) errors.name = t("required");
   if (!d.category) errors.category = t("required");
   if (d.publicationDate && !isPublicationDate(d.publicationDate))
@@ -147,7 +161,8 @@ function validate(d: ProductDraft, t: (k: string) => string): Errors {
   if (d.label.trim().length < 2) errors.label = t("required");
   if (d.description.trim().length < 10) errors.description = t("tooShort");
   if (d.overview.trim().length < 10) errors.overview = t("tooShort");
-  if (d.url.trim() && !/^https?:\/\/\S+$/i.test(d.url.trim())) errors.url = t("invalidUrl");
+  if (d.url.trim() && !/^https?:\/\/\S+$/i.test(d.url.trim()))
+    errors.url = t("invalidUrl");
   if (d.githubUrl.trim() && !/^https:\/\/\S+$/i.test(d.githubUrl.trim()))
     errors.githubUrl = t("invalidUrl");
   return errors;
@@ -157,13 +172,14 @@ function Editor({
   catalog,
   initial,
   isNew,
-  onDone, focusField,
+  onDone,
+  focusField,
 }: {
   catalog: Catalog;
   initial: ProductDraft;
   isNew: boolean;
   onDone: () => void;
-  focusField?:QualityField|undefined;
+  focusField?: QualityField | undefined;
 }) {
   const { t, language, dir } = useAdminCopy();
   const queryClient = useQueryClient();
@@ -175,8 +191,12 @@ function Editor({
   const [busy, setBusy] = useState(false);
   const [errors, setErrors] = useState<Errors>({});
   const [picking, setPicking] = useState(false);
-  const [editorTab, setEditorTab] = useState(focusField==="p-url"?"links":focusField?"texts":"basics");
-  useEffect(()=>{if(focusField)document.getElementById(focusField)?.focus()},[focusField]);
+  const [editorTab, setEditorTab] = useState(
+    focusField === "p-url" ? "links" : focusField ? "texts" : "basics",
+  );
+  useEffect(() => {
+    if (focusField) document.getElementById(focusField)?.focus();
+  }, [focusField]);
   const [dateOpen, setDateOpen] = useState(false);
   const fileInput = useRef<HTMLInputElement>(null);
   const preview = useAssetUrl(draft.imageUrl);
@@ -322,7 +342,11 @@ function Editor({
                   onChange={(e) => set({ id: e.target.value })}
                 />
               </Field>
-              <Field label={t("productName")} error={errors.name} htmlFor="p-name">
+              <Field
+                label={t("productName")}
+                error={errors.name}
+                htmlFor="p-name"
+              >
                 <Input
                   id="p-name"
                   dir="ltr"
@@ -331,7 +355,11 @@ function Editor({
                   onChange={(e) => set({ name: e.target.value })}
                 />
               </Field>
-              <Field label={t("productCategory")} error={errors.category} htmlFor="p-cat">
+              <Field
+                label={t("productCategory")}
+                error={errors.category}
+                htmlFor="p-cat"
+              >
                 <select
                   id="p-cat"
                   className={selectClass}
@@ -349,7 +377,11 @@ function Editor({
                   ))}
                 </select>
               </Field>
-              <Field label={t("productSortOrder")} hint={t("productSortHint")} htmlFor="p-order">
+              <Field
+                label={t("productSortOrder")}
+                hint={t("productSortHint")}
+                htmlFor="p-order"
+              >
                 <Input
                   id="p-order"
                   type="number"
@@ -374,15 +406,22 @@ function Editor({
                           variant="outline"
                           className="min-w-0 flex-1 justify-start font-normal"
                         >
-                          <CalendarIcon className="size-4 shrink-0" aria-hidden="true" />
-                          {draft.publicationDate && isPublicationDate(draft.publicationDate)
+                          <CalendarIcon
+                            className="size-4 shrink-0"
+                            aria-hidden="true"
+                          />
+                          {draft.publicationDate &&
+                          isPublicationDate(draft.publicationDate)
                             ? format(parseISO(draft.publicationDate), "PPP", {
                                 locale: language === "ar" ? arSA : enUS,
                               })
                             : t("productChoosePublicationDate")}
                         </Button>
                       </PopoverTrigger>
-                      <PopoverContent align="start" className="w-auto p-0 pointer-events-auto">
+                      <PopoverContent
+                        align="start"
+                        className="w-auto p-0 pointer-events-auto"
+                      >
                         <Calendar
                           mode="single"
                           captionLayout="dropdown"
@@ -391,15 +430,21 @@ function Editor({
                           locale={language === "ar" ? arSA : enUS}
                           dir={dir}
                           selected={
-                            draft.publicationDate && isPublicationDate(draft.publicationDate)
+                            draft.publicationDate &&
+                            isPublicationDate(draft.publicationDate)
                               ? parseISO(draft.publicationDate)
                               : undefined
                           }
-                          {...(draft.publicationDate && isPublicationDate(draft.publicationDate)
+                          {...(draft.publicationDate &&
+                          isPublicationDate(draft.publicationDate)
                             ? { defaultMonth: parseISO(draft.publicationDate) }
                             : {})}
                           onSelect={(date) => {
-                            set({ publicationDate: date ? format(date, "yyyy-MM-dd") : "" });
+                            set({
+                              publicationDate: date
+                                ? format(date, "yyyy-MM-dd")
+                                : "",
+                            });
                             setDateOpen(false);
                           }}
                           className="pointer-events-auto"
@@ -435,14 +480,17 @@ function Editor({
                 onChange={(v) => set({ label: v.ar, labelEn: v.en })}
               />
               <BilingualField
-                idPrefix="p-description" label={t("productDescription")}
+                idPrefix="p-description"
+                label={t("productDescription")}
                 ar={draft.description}
                 en={draft.descriptionEn}
                 multiline
                 rows={2}
                 maxLength={300}
                 error={errors.description}
-                onChange={(v) => set({ description: v.ar, descriptionEn: v.en })}
+                onChange={(v) =>
+                  set({ description: v.ar, descriptionEn: v.en })
+                }
               />
               <BilingualField
                 label={t("productOverview")}
@@ -475,7 +523,11 @@ function Editor({
         <TabsContent value="release">
           <Card title={t("productRelease")}>
             <div className="grid gap-6">
-              <Field label={t("productVersion")} hint={t("productVersionHint")} htmlFor="p-version">
+              <Field
+                label={t("productVersion")}
+                hint={t("productVersionHint")}
+                htmlFor="p-version"
+              >
                 <Input
                   id="p-version"
                   dir="ltr"
@@ -503,9 +555,15 @@ function Editor({
             <div className="flex flex-col gap-4 sm:flex-row">
               <div className="flex aspect-video w-full items-center justify-center overflow-hidden rounded-lg border border-border bg-muted sm:w-56">
                 {preview ? (
-                  <img src={preview} alt="" className="h-full w-full object-contain" />
+                  <img
+                    src={preview}
+                    alt=""
+                    className="h-full w-full object-contain"
+                  />
                 ) : (
-                  <span className="text-xs text-muted-foreground">{t("noImage")}</span>
+                  <span className="text-xs text-muted-foreground">
+                    {t("noImage")}
+                  </span>
                 )}
               </div>
               <div className="grid min-w-0 flex-1 content-start gap-3">
@@ -552,7 +610,9 @@ function Editor({
                     </Button>
                   ) : null}
                 </div>
-                <p className="text-xs text-muted-foreground">{t("imageFormats")}</p>
+                <p className="text-xs text-muted-foreground">
+                  {t("imageFormats")}
+                </p>
                 <BilingualField
                   label={t("productImageAlt")}
                   ar={draft.imageAlt}
@@ -566,7 +626,12 @@ function Editor({
           <ProductScreenshotsField
             value={draft.beneficiaryDetails.screenshots}
             onChange={(screenshots) =>
-              set({ beneficiaryDetails: { ...draft.beneficiaryDetails, screenshots } })
+              set({
+                beneficiaryDetails: {
+                  ...draft.beneficiaryDetails,
+                  screenshots,
+                },
+              })
             }
           />
         </TabsContent>
@@ -582,7 +647,11 @@ function Editor({
                   onChange={(e) => set({ url: e.target.value })}
                 />
               </Field>
-              <Field label={t("productGithub")} error={errors.githubUrl} htmlFor="p-github">
+              <Field
+                label={t("productGithub")}
+                error={errors.githubUrl}
+                htmlFor="p-github"
+              >
                 <Input
                   id="p-github"
                   dir="ltr"
@@ -607,16 +676,22 @@ function Editor({
             <div className="flex flex-wrap items-center gap-2">
               <Badge>{t("productCatalogPublished")}</Badge>
               <Badge variant={draft.comingSoon ? "secondary" : "success"}>
-                {draft.comingSoon ? t("statusComingSoon") : t("statusAvailable")}
+                {draft.comingSoon
+                  ? t("statusComingSoon")
+                  : t("statusAvailable")}
               </Badge>
             </div>
-            <p className="mt-3 text-sm text-muted-foreground">{t("productCatalogStatusHint")}</p>
+            <p className="mt-3 text-sm text-muted-foreground">
+              {t("productCatalogStatusHint")}
+            </p>
             <div className="mt-5 flex items-center justify-between gap-4 border-t border-border pt-4">
               <div>
                 <label htmlFor="p-soon" className="text-sm font-medium">
                   {t("productComingSoon")}
                 </label>
-                <p className="text-xs text-muted-foreground">{t("productComingSoonHint")}</p>
+                <p className="text-xs text-muted-foreground">
+                  {t("productComingSoonHint")}
+                </p>
               </div>
               <Switch
                 id="p-soon"
@@ -624,8 +699,20 @@ function Editor({
                 onCheckedChange={(v) => set({ comingSoon: v })}
               />
             </div>
-            <label className="mt-4 flex items-center justify-between gap-4" htmlFor="p-services">{adminDictionaries[language].consoleOfferProfessionalServicesForThisProductAfter}
-              <Switch id="p-services" checked={draft.servicesEnabled} onCheckedChange={v=>set({servicesEnabled:v})}/></label>
+            <label
+              className="mt-4 flex items-center justify-between gap-4"
+              htmlFor="p-services"
+            >
+              {
+                adminDictionaries[language]
+                  .consoleOfferProfessionalServicesForThisProductAfter
+              }
+              <Switch
+                id="p-services"
+                checked={draft.servicesEnabled}
+                onCheckedChange={(v) => set({ servicesEnabled: v })}
+              />
+            </label>
           </Card>
         </TabsContent>
       </Tabs>
@@ -653,7 +740,11 @@ function Editor({
 export function ProductsTab({ catalog }: { catalog: Catalog }) {
   const { t, language, dir } = useAdminCopy();
   const queryClient = useQueryClient();
-  const [editing, setEditing] = useState<{ draft: ProductDraft; isNew: boolean;focusField?:QualityField } | null>(null);
+  const [editing, setEditing] = useState<{
+    draft: ProductDraft;
+    isNew: boolean;
+    focusField?: QualityField;
+  } | null>(null);
   const [busyId, setBusyId] = useState("");
   const [confirm, dialog] = useConfirm();
   const settings = catalog.settings;
@@ -663,7 +754,8 @@ export function ProductsTab({ catalog }: { catalog: Catalog }) {
       <Editor
         key={editing.draft.id || "new"}
         catalog={catalog}
-        initial={editing.draft} focusField={editing.focusField}
+        initial={editing.draft}
+        focusField={editing.focusField}
         isNew={editing.isNew}
         onDone={() => setEditing(null)}
       />
@@ -698,14 +790,25 @@ export function ProductsTab({ catalog }: { catalog: Catalog }) {
     <Card
       title={t("tabProducts")}
       actions={
-        <Button size="sm" onClick={() => setEditing({ draft: emptyDraft(settings), isNew: true })}>
+        <Button
+          size="sm"
+          onClick={() =>
+            setEditing({ draft: emptyDraft(settings), isNew: true })
+          }
+        >
           <Plus className="size-4" aria-hidden="true" />
           {t("newProduct")}
         </Button>
       }
     >
       {dialog}
-      <ProductQuality products={catalog.products} ar={language==="ar"} edit={(p,f)=>setEditing({draft:draftFrom(p),isNew:false,focusField:f})}/>
+      <ProductQuality
+        products={catalog.products}
+        ar={language === "ar"}
+        edit={(p, f) =>
+          setEditing({ draft: draftFrom(p), isNew: false, focusField: f })
+        }
+      />
       {catalog.products.length === 0 ? (
         <EmptyBlock text={t("noProducts")} />
       ) : (
@@ -713,10 +816,18 @@ export function ProductsTab({ catalog }: { catalog: Catalog }) {
           <table className="w-full min-w-[560px] text-sm">
             <thead>
               <tr className="border-b border-border text-xs text-muted-foreground">
-                <th className="px-3 py-2 text-start font-medium">{t("colName")}</th>
-                <th className="px-3 py-2 text-start font-medium">{t("colCategory")}</th>
-                <th className="px-3 py-2 text-start font-medium">{t("colStatus")}</th>
-                <th className="px-3 py-2 text-start font-medium">{t("colRelease")}</th>
+                <th className="px-3 py-2 text-start font-medium">
+                  {t("colName")}
+                </th>
+                <th className="px-3 py-2 text-start font-medium">
+                  {t("colCategory")}
+                </th>
+                <th className="px-3 py-2 text-start font-medium">
+                  {t("colStatus")}
+                </th>
+                <th className="px-3 py-2 text-start font-medium">
+                  {t("colRelease")}
+                </th>
                 <th className="px-3 py-2 text-end font-medium">
                   <span className="sr-only">{t("colActions")}</span>
                 </th>
@@ -732,7 +843,9 @@ export function ProductsTab({ catalog }: { catalog: Catalog }) {
                     <Button
                       variant="link"
                       className="h-auto whitespace-normal p-0 text-start"
-                      onClick={() => setEditing({ draft: draftFrom(product), isNew: false })}
+                      onClick={() =>
+                        setEditing({ draft: draftFrom(product), isNew: false })
+                      }
                       aria-label={t("productManage", { name: product.name })}
                     >
                       {product.name}
@@ -746,12 +859,18 @@ export function ProductsTab({ catalog }: { catalog: Catalog }) {
                     )}
                   </td>
                   <td className="px-3 py-2.5">
-                    <Badge variant={product.comingSoon ? "secondary" : "success"}>
-                      {product.comingSoon ? t("statusComingSoon") : t("statusAvailable")}
+                    <Badge
+                      variant={product.comingSoon ? "secondary" : "success"}
+                    >
+                      {product.comingSoon
+                        ? t("statusComingSoon")
+                        : t("statusAvailable")}
                     </Badge>
                   </td>
                   <td className="px-3 py-2.5 text-muted-foreground" dir="ltr">
-                    <span className="block text-start">{product.version || "—"}</span>
+                    <span className="block text-start">
+                      {product.version || "—"}
+                    </span>
                   </td>
                   <td className="px-3 py-2.5">
                     <div className="flex justify-end gap-1">
@@ -760,7 +879,12 @@ export function ProductsTab({ catalog }: { catalog: Catalog }) {
                         size="icon"
                         className="size-8"
                         aria-label={t("editProduct", { name: product.name })}
-                        onClick={() => setEditing({ draft: draftFrom(product), isNew: false })}
+                        onClick={() =>
+                          setEditing({
+                            draft: draftFrom(product),
+                            isNew: false,
+                          })
+                        }
                       >
                         <Pencil className="size-4" aria-hidden="true" />
                       </Button>
@@ -768,12 +892,17 @@ export function ProductsTab({ catalog }: { catalog: Catalog }) {
                         variant="ghost"
                         size="icon"
                         className="size-8"
-                        aria-label={t("deleteProductTitle", { name: product.name })}
+                        aria-label={t("deleteProductTitle", {
+                          name: product.name,
+                        })}
                         disabled={busyId === product.id}
                         onClick={() => void remove(product)}
                       >
                         {busyId === product.id ? (
-                          <Loader2 className="size-4 animate-spin" aria-hidden="true" />
+                          <Loader2
+                            className="size-4 animate-spin"
+                            aria-hidden="true"
+                          />
                         ) : (
                           <Trash2 className="size-4" aria-hidden="true" />
                         )}

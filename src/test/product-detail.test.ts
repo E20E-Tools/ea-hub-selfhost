@@ -19,16 +19,21 @@ describe("Product detail pages", () => {
   });
 
   it("serves a product page at /product/<id> instead of the root fallback", () => {
-    const router = createRouter({ routeTree, context: { queryClient: new QueryClient() } });
+    const router = createRouter({
+      routeTree,
+      context: { queryClient: new QueryClient() },
+    });
     const matches = router.matchRoutes("/product/archone");
     expect(matches.at(-1)?.routeId).not.toBe(rootRouteId);
     expect(matches.at(-1)?.pathname).toBe("/product/archone");
   });
 
   it("keeps EA Tool the only product whose page has no live system to open", () => {
-    expect(products.filter((product) => product.comingSoon).map((product) => product.id)).toEqual([
-      "platform",
-    ]);
+    expect(
+      products
+        .filter((product) => product.comingSoon)
+        .map((product) => product.id),
+    ).toEqual(["platform"]);
     expect(getProduct("radar")?.comingSoon).toBeUndefined();
   });
 });

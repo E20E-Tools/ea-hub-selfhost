@@ -1,9 +1,9 @@
 // @vitest-environment node
 import { describe, expect, it, vi } from "vitest";
 vi.mock("@/lib/server-keys.server", async () => {
-  const actual = await vi.importActual<typeof import("@/lib/server-keys.server")>(
-    "@/lib/server-keys.server",
-  );
+  const actual = await vi.importActual<
+    typeof import("@/lib/server-keys.server")
+  >("@/lib/server-keys.server");
   return {
     ...actual,
     deriveSigningSecret: (label: string) =>
@@ -41,7 +41,11 @@ describe("tour token isolation", () => {
     chain.not.mockReturnValue(chain);
     chain.is.mockResolvedValue({ error: null });
     const db = { from: vi.fn(() => ({ update: vi.fn(() => chain) })) };
-    await recordTourSupport(db as never, await issueTourVisitToken("owned-tour"), "receipt-id");
+    await recordTourSupport(
+      db as never,
+      await issueTourVisitToken("owned-tour"),
+      "receipt-id",
+    );
     expect(chain.eq).toHaveBeenCalledWith("id", "owned-tour");
     expect(chain.not).toHaveBeenCalledWith("completed_at", "is", null);
     expect(chain.is).toHaveBeenCalledWith("support_submitted_at", null);

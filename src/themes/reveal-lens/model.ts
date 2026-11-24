@@ -14,7 +14,12 @@ export function lissajous(t: number, w: number, h: number, speed = 1) {
 }
 
 /** Radius that covers the whole stage from point (x, y). */
-export function coverRadius(x: number, y: number, w: number, h: number): number {
+export function coverRadius(
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+): number {
   return Math.max(
     Math.hypot(x, y),
     Math.hypot(w - x, y),

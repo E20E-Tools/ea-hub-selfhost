@@ -63,7 +63,9 @@ export function keyMoveProblem(input: {
   removeKey: boolean;
 }): boolean {
   if (!input.hasSavedKey || input.newKey || input.removeKey) return false;
-  const before = aiOrigin(input.previousBaseUrl ?? "https://api.groq.com/openai/v1");
+  const before = aiOrigin(
+    input.previousBaseUrl ?? "https://api.groq.com/openai/v1",
+  );
   return before !== aiOrigin(input.nextBaseUrl);
 }
 
@@ -72,8 +74,13 @@ export const AI_REQUEST_TIMEOUT_MS = 45_000;
 /** Provider-controlled errors may echo credentials or prompts: log only numeric HTTP status. */
 export function safeAiError(error: unknown): string {
   const status =
-    error && typeof error === "object" && "statusCode" in error ? error.statusCode : null;
-  return typeof status === "number" && Number.isInteger(status) && status >= 100 && status <= 599
+    error && typeof error === "object" && "statusCode" in error
+      ? error.statusCode
+      : null;
+  return typeof status === "number" &&
+    Number.isInteger(status) &&
+    status >= 100 &&
+    status <= 599
     ? `provider failure status=${status}`
     : "provider failure";
 }
@@ -92,7 +99,11 @@ export function boundedAiFetch(
   const origin = aiOrigin(baseURL);
   return (input, init) => {
     const target =
-      typeof input === "string" ? input : input instanceof URL ? input.href : input.url;
+      typeof input === "string"
+        ? input
+        : input instanceof URL
+          ? input.href
+          : input.url;
     if (
       aiBaseUrlProblem(baseURL) ||
       aiBaseUrlProblem(target) ||
@@ -108,18 +119,26 @@ export function boundedAiFetch(
     if (init?.signal) signals.push(init.signal);
     const signal = AbortSignal.any(signals);
     // Workers reject redirect: "error"; use "manual" and refuse any redirect response.
-    return base(input, { ...init, redirect: "manual", signal }).then((response) => {
-      if (response.type === "opaqueredirect" || (response.status >= 300 && response.status < 400))
-        throw new Error("AI provider redirect refused");
-      return response;
-    });
+    return base(input, { ...init, redirect: "manual", signal }).then(
+      (response) => {
+        if (
+          response.type === "opaqueredirect" ||
+          (response.status >= 300 && response.status < 400)
+        )
+          throw new Error("AI provider redirect refused");
+        return response;
+      },
+    );
   };
 }
 
 export function isOfficialGroq(value: string): boolean {
   try {
     const url = new URL(value);
-    return url.protocol === "https:" && url.hostname.toLowerCase() === OFFICIAL_GROQ_HOST;
+    return (
+      url.protocol === "https:" &&
+      url.hostname.toLowerCase() === OFFICIAL_GROQ_HOST
+    );
   } catch {
     return false;
   }
@@ -129,7 +148,9 @@ export function isOfficialGroq(value: string): boolean {
 export function pickOpenAiChatModels(ids: string[]): string[] {
   const skip =
     /(embed|whisper|tts|audio|realtime|transcribe|dall-e|image|moderation|search|davinci|babbage|instruct|codex|computer-use|sora)/i;
-  const keep = ids.filter((id) => /^(gpt-|o\d|chatgpt-)/i.test(id) && !skip.test(id));
+  const keep = ids.filter(
+    (id) => /^(gpt-|o\d|chatgpt-)/i.test(id) && !skip.test(id),
+  );
   return [...new Set(keep)]
     .sort((a, b) => b.localeCompare(a, "en", { numeric: true }))
     .slice(0, 60);

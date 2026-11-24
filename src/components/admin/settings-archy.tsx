@@ -20,11 +20,18 @@ import {
 import { pickArchyVoice } from "@/lib/archy-speech";
 import type { Catalog } from "@/lib/catalog";
 import { dictionaries } from "@/lib/copy";
-import { BilingualField, Card, SaveBar, SettingRow, useAdminCopy, useDraft } from "./ui";
+import {
+  BilingualField,
+  Card,
+  SaveBar,
+  SettingRow,
+  useAdminCopy,
+  useDraft,
+} from "./ui";
 
 /** Admin preview and editor for Archy's greeting text and voice. */
 export function ArchySettings({ catalog }: { catalog: Catalog }) {
-  const { t,language } = useAdminCopy();
+  const { t, language } = useAdminCopy();
   const queryClient = useQueryClient();
   const save = useServerFn(saveArchyGreeting);
   const saved = catalog.settings.archyGreeting;
@@ -39,7 +46,9 @@ export function ArchySettings({ catalog }: { catalog: Catalog }) {
   const listen = (lang: "ar" | "en") => {
     try {
       const synthesis = window.speechSynthesis;
-      const voice = synthesis ? pickArchyVoice(synthesis.getVoices(), lang) : undefined;
+      const voice = synthesis
+        ? pickArchyVoice(synthesis.getVoices(), lang)
+        : undefined;
       if (!synthesis || !voice || !window.SpeechSynthesisUtterance) {
         toast.error(t("archyNoVoice"));
         return;
@@ -60,7 +69,8 @@ export function ArchySettings({ catalog }: { catalog: Catalog }) {
     setBusy(true);
     try {
       const result = await save({ data: value });
-      if (!result.ok) return void toast.error(t(result.message as AdminCopyKey));
+      if (!result.ok)
+        return void toast.error(t(result.message as AdminCopyKey));
       form.reset(value);
       toast.success(t("saved"));
       await queryClient.invalidateQueries({ queryKey: ["catalog"] });
@@ -73,17 +83,29 @@ export function ArchySettings({ catalog }: { catalog: Catalog }) {
 
   return (
     <div className="grid gap-5">
-      <WorkControls ar={language==="ar"}/>
+      <WorkControls ar={language === "ar"} />
       <Card title={t("archyPreview")}>
         <div className="grid gap-4 sm:grid-cols-[96px_minmax(0,1fr)] sm:items-center">
-          <img src={archyPoster} alt="" className="mx-auto h-24 w-24 object-contain" />
+          <img
+            src={archyPoster}
+            alt=""
+            className="mx-auto h-24 w-24 object-contain"
+          />
           <div className="grid gap-3">
             {(["ar", "en"] as const).map((lang) => (
-              <div key={lang} className="rounded-lg border border-border bg-muted px-3 py-2">
+              <div
+                key={lang}
+                className="rounded-lg border border-border bg-muted px-3 py-2"
+              >
                 <p dir={lang === "ar" ? "rtl" : "ltr"} className="text-sm">
                   {textFor(lang)}
                 </p>
-                <Button variant="ghost" size="sm" className="mt-1" onClick={() => listen(lang)}>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="mt-1"
+                  onClick={() => listen(lang)}
+                >
                   <Volume2 className="size-4" />
                   {t(lang === "ar" ? "archyListenAr" : "archyListenEn")}
                 </Button>
@@ -122,7 +144,9 @@ export function ArchySettings({ catalog }: { catalog: Catalog }) {
               value={[value.rate]}
               onValueChange={([v]) => set({ rate: v ?? value.rate })}
             />
-            <span className="w-10 text-sm tabular-nums">{value.rate.toFixed(2)}</span>
+            <span className="w-10 text-sm tabular-nums">
+              {value.rate.toFixed(2)}
+            </span>
           </div>
         </SettingRow>
         <SettingRow label={t("archyPitch")} htmlFor="archy-pitch">
@@ -135,7 +159,9 @@ export function ArchySettings({ catalog }: { catalog: Catalog }) {
               value={[value.pitch]}
               onValueChange={([v]) => set({ pitch: v ?? value.pitch })}
             />
-            <span className="w-10 text-sm tabular-nums">{value.pitch.toFixed(2)}</span>
+            <span className="w-10 text-sm tabular-nums">
+              {value.pitch.toFixed(2)}
+            </span>
           </div>
         </SettingRow>
         <SaveBar

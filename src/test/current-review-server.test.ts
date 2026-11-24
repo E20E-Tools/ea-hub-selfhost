@@ -31,16 +31,23 @@ vi.mock("@tanstack/react-start", () => ({
         return b;
       },
       handler: (h: (a: unknown) => unknown) => async (a?: { data: unknown }) =>
-        h({ data: validate(a?.data), context: { userId: "admin", claims: {} } }),
+        h({
+          data: validate(a?.data),
+          context: { userId: "admin", claims: {} },
+        }),
     };
     return b;
   },
 }));
 vi.mock("@tanstack/react-start/server", () => ({
   getRequest: () =>
-    new Request("https://example.com", { headers: { "sec-fetch-site": "same-origin" } }),
+    new Request("https://example.com", {
+      headers: { "sec-fetch-site": "same-origin" },
+    }),
 }));
-vi.mock("@/integrations/supabase/auth-middleware", () => ({ requireSupabaseAuth: {} }));
+vi.mock("@/integrations/supabase/auth-middleware", () => ({
+  requireSupabaseAuth: {},
+}));
 vi.mock("@/lib/admin-guard.server", () => ({
   requireAdmin: async () => {
     if (!state.admin) throw new Error("Forbidden");
@@ -51,7 +58,8 @@ vi.mock("@/lib/live-chat.server", () => ({
     state.access.push(access);
     return state.visitor;
   },
-  adminClient: async () => (await import("@/integrations/supabase/client.server")).supabaseAdmin,
+  adminClient: async () =>
+    (await import("@/integrations/supabase/client.server")).supabaseAdmin,
 }));
 vi.mock("@/lib/server-keys.server", () => ({
   isEncrypted: () => true,
@@ -74,7 +82,12 @@ vi.mock("@/integrations/supabase/client.server", () => ({
         order: () => b,
         limit: async () => ({
           data: [
-            { id: "request-A", request_type: "support", status: "new", created_at: "2026-11-13" },
+            {
+              id: "request-A",
+              request_type: "support",
+              status: "new",
+              created_at: "2026-11-13",
+            },
           ],
           error: null,
         }),
@@ -100,7 +113,10 @@ vi.mock("@/integrations/supabase/client.server", () => ({
                 : { id: filters["id"] }
               : table === "live_chat_ratings"
                 ? { stars: 4, comment: "Saved comment" }
-                : { api_key: state.key, base_url: "https://api.groq.com/openai/v1" },
+                : {
+                    api_key: state.key,
+                    base_url: "https://api.groq.com/openai/v1",
+                  },
           error: null,
         }),
         upsert: async () => {
@@ -112,7 +128,10 @@ vi.mock("@/integrations/supabase/client.server", () => ({
     },
   },
 }));
-import { adminChatVisitorSupport, readVisitorChats } from "@/lib/live-chat.functions";
+import {
+  adminChatVisitorSupport,
+  readVisitorChats,
+} from "@/lib/live-chat.functions";
 import { readVisitorRating } from "@/lib/chat-feedback.functions";
 import { getAiSettings, saveAiSettings } from "@/lib/ai-settings.functions";
 const chatId = "22222222-2222-4222-8222-222222222222";
@@ -130,10 +149,14 @@ beforeEach(() => {
 });
 it("support details filter by stored chat ID and never typed-email wildcards", async () => {
   await adminChatVisitorSupport({ data: { chatId } });
-  expect(state.filters).toEqual([["suggestion_requests", "details->>chatId", chatId]]);
+  expect(state.filters).toEqual([
+    ["suggestion_requests", "details->>chatId", chatId],
+  ]);
   state.admin = false;
   const reads = state.reads;
-  await expect(adminChatVisitorSupport({ data: { chatId } })).rejects.toThrow("Forbidden");
+  await expect(adminChatVisitorSupport({ data: { chatId } })).rejects.toThrow(
+    "Forbidden",
+  );
   expect(state.reads).toBe(reads);
 });
 it("current chat retrieves latest messages independently of an older 500-message chat and paginates all 205", async () => {
@@ -141,14 +164,28 @@ it("current chat retrieves latest messages independently of an older 500-message
   expect(first.messages[99]?.body).toBe("reply 204");
   expect(first.messages[0]?.body).toBe("reply 105");
   expect(first.hasMore).toBe(true);
-  const next = await readVisitorChats({ data: { access: "signed", chatId, offset: 100 } });
-  const last = await readVisitorChats({ data: { access: "signed", chatId, offset: 200 } });
+  const next = await readVisitorChats({
+    data: { access: "signed", chatId, offset: 100 },
+  });
+  const last = await readVisitorChats({
+    data: { access: "signed", chatId, offset: 200 },
+  });
   expect(last.hasMore).toBe(false);
   expect(
-    new Set([...first.messages, ...next.messages, ...last.messages].map((m) => m.id)).size,
+    new Set(
+      [...first.messages, ...next.messages, ...last.messages].map((m) => m.id),
+    ).size,
   ).toBe(205);
-  expect(state.filters).toContainEqual(["live_chats", "visitor_id", state.visitor?.id]);
-  expect(state.filters).toContainEqual(["live_chat_messages", "chat_id", chatId]);
+  expect(state.filters).toContainEqual([
+    "live_chats",
+    "visitor_id",
+    state.visitor?.id,
+  ]);
+  expect(state.filters).toContainEqual([
+    "live_chat_messages",
+    "chat_id",
+    chatId,
+  ]);
 });
 it("chat list reads do not download messages", async () => {
   const result = await readVisitorChats({ data: { access: "signed" } });
@@ -156,20 +193,30 @@ it("chat list reads do not download messages", async () => {
   expect(state.reads).toBe(1);
 });
 it("saved guest rating reloads through signed identity and rejects another guest", async () => {
-  expect(await readVisitorRating({ data: { access: "signed", chatId } })).toEqual({
+  expect(
+    await readVisitorRating({ data: { access: "signed", chatId } }),
+  ).toEqual({
     stars: 4,
     comment: "Saved comment",
   });
   expect(state.access).toEqual(["signed"]);
   state.visitor = { id: "wrong", email: "same@example.com", name: "Other" };
   state.filters = [];
-  expect(await readVisitorRating({ data: { access: "other", chatId } })).toBeNull();
-  expect(state.filters.some(([table]) => table === "live_chat_ratings")).toBe(false);
+  expect(
+    await readVisitorRating({ data: { access: "other", chatId } }),
+  ).toBeNull();
+  expect(state.filters.some(([table]) => table === "live_chat_ratings")).toBe(
+    false,
+  );
 });
 it("invalid guest access cannot read chats or ratings", async () => {
   state.visitor = null;
-  expect((await readVisitorChats({ data: { access: "forged", chatId } })).chats).toEqual([]);
-  expect(await readVisitorRating({ data: { access: "forged", chatId } })).toBeNull();
+  expect(
+    (await readVisitorChats({ data: { access: "forged", chatId } })).chats,
+  ).toEqual([]);
+  expect(
+    await readVisitorRating({ data: { access: "forged", chatId } }),
+  ).toBeNull();
   expect(state.reads).toBe(0);
 });
 it("conflicting provider key removal and replacement fails before any read/write", async () => {

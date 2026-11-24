@@ -4,7 +4,10 @@ import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import { publishableClient, resolveAsset } from "./catalog.functions";
 import { logActivity, requireAdmin, type AdminResult } from "./admin.functions";
-import { testimonialInputSchema, type Testimonial } from "./testimonials.shared";
+import {
+  testimonialInputSchema,
+  type Testimonial,
+} from "./testimonials.shared";
 
 const COLUMNS =
   "id, name, role_ar, role_en, organization_ar, organization_en, quote_ar, quote_en, image_url, sort_order, published";
@@ -85,47 +88,61 @@ export const listAllTestimonials = createServerFn({ method: "GET" })
 export const saveTestimonial = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((value: unknown) => testimonialInputSchema.parse(value))
-  .handler(async ({ data, context }): Promise<AdminResult & { id?: string }> => {
-    await requireAdmin(context);
-    try {
-      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-      const row = {
-        name: data.name,
-        role_ar: data.roleAr,
-        role_en: data.roleEn,
-        organization_ar: data.organizationAr,
-        organization_en: data.organizationEn,
-        quote_ar: data.quoteAr,
-        quote_en: data.quoteEn,
-        image_url: data.imagePath,
-        sort_order: data.sortOrder,
-        published: data.published,
-        updated_at: new Date().toISOString(),
-      };
-      const result = data.id
-        ? await supabaseAdmin
-            .from("testimonials")
-            .update(row)
-            .eq("id", data.id)
-            .select("id")
-            .single()
-        : await supabaseAdmin.from("testimonials").insert(row).select("id").single();
-      if (result.error || !result.data) throw result.error ?? new Error("no row");
-      await logActivity(context, "testimonial.save", data.name);
-      return { ok: true, id: result.data.id };
-    } catch {
-      return { ok: false, message: "errSaveTestimonial" };
-    }
-  });
+  .handler(
+    async ({ data, context }): Promise<AdminResult & { id?: string }> => {
+      await requireAdmin(context);
+      try {
+        const { supabaseAdmin } =
+          await import("@/integrations/supabase/client.server");
+        const row = {
+          name: data.name,
+          role_ar: data.roleAr,
+          role_en: data.roleEn,
+          organization_ar: data.organizationAr,
+          organization_en: data.organizationEn,
+          quote_ar: data.quoteAr,
+          quote_en: data.quoteEn,
+          image_url: data.imagePath,
+          sort_order: data.sortOrder,
+          published: data.published,
+          updated_at: new Date().toISOString(),
+        };
+        const result = data.id
+          ? await supabaseAdmin
+              .from("testimonials")
+              .update(row)
+              .eq("id", data.id)
+              .select("id")
+              .single()
+          : await supabaseAdmin
+              .from("testimonials")
+              .insert(row)
+              .select("id")
+              .single();
+        if (result.error || !result.data)
+          throw result.error ?? new Error("no row");
+        await logActivity(context, "testimonial.save", data.name);
+        return { ok: true, id: result.data.id };
+      } catch {
+        return { ok: false, message: "errSaveTestimonial" };
+      }
+    },
+  );
 
 export const deleteTestimonial = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((value: unknown) => z.object({ id: z.string().uuid() }).parse(value))
+  .inputValidator((value: unknown) =>
+    z.object({ id: z.string().uuid() }).parse(value),
+  )
   .handler(async ({ data, context }): Promise<AdminResult> => {
     await requireAdmin(context);
     try {
-      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-      const { error } = await supabaseAdmin.from("testimonials").delete().eq("id", data.id);
+      const { supabaseAdmin } =
+        await import("@/integrations/supabase/client.server");
+      const { error } = await supabaseAdmin
+        .from("testimonials")
+        .delete()
+        .eq("id", data.id);
       if (error) throw error;
       await logActivity(context, "testimonial.delete", data.id);
       return { ok: true };

@@ -13,7 +13,10 @@ import {
   listAllTestimonials,
   saveTestimonial,
 } from "@/lib/testimonials.functions";
-import { testimonialInputSchema, type Testimonial } from "@/lib/testimonials.shared";
+import {
+  testimonialInputSchema,
+  type Testimonial,
+} from "@/lib/testimonials.shared";
 import { ImageChoice } from "./settings-customize";
 import {
   BilingualField,
@@ -63,7 +66,10 @@ const toInput = (row: Draft) => ({
 export function TestimonialsSettings() {
   const { t, dir } = useAdminCopy();
   const list = useServerFn(listAllTestimonials);
-  const read = useQuery({ queryKey: ["admin", "testimonials"], queryFn: () => list() });
+  const read = useQuery({
+    queryKey: ["admin", "testimonials"],
+    queryFn: () => list(),
+  });
   const saved: Draft[] | undefined = read.data?.map((row) => ({
     ...row,
     key: row.id,
@@ -84,7 +90,9 @@ export function TestimonialsSettings() {
     );
 
   const refresh = async () => {
-    await queryClient.invalidateQueries({ queryKey: ["admin", "testimonials"] });
+    await queryClient.invalidateQueries({
+      queryKey: ["admin", "testimonials"],
+    });
     await queryClient.invalidateQueries({ queryKey: ["testimonials"] });
   };
 
@@ -99,7 +107,9 @@ export function TestimonialsSettings() {
     }
     setErrors(found);
     if (Object.keys(found).length) return void toast.error(t("saveFailed"));
-    const base = new Map((saved ?? []).map((row) => [row.key, JSON.stringify(row)]));
+    const base = new Map(
+      (saved ?? []).map((row) => [row.key, JSON.stringify(row)]),
+    );
     setBusy(true);
     try {
       const next: Draft[] = [];
@@ -109,8 +119,14 @@ export function TestimonialsSettings() {
           continue;
         }
         const result = await save({ data: toInput(row) });
-        if (!result.ok) return void toast.error(t(result.message as AdminCopyKey));
-        next.push({ ...row, id: result.id ?? row.id, key: result.id ?? row.key, isNew: false });
+        if (!result.ok)
+          return void toast.error(t(result.message as AdminCopyKey));
+        next.push({
+          ...row,
+          id: result.id ?? row.id,
+          key: result.id ?? row.key,
+          isNew: false,
+        });
       }
       form.reset(next);
       await refresh();
@@ -124,17 +140,23 @@ export function TestimonialsSettings() {
 
   const removeRow = async (row: Draft) => {
     const ok = await confirm({
-      title: t("deleteTestimonialTitle", { name: row.name || t("newTestimonial") }),
+      title: t("deleteTestimonialTitle", {
+        name: row.name || t("newTestimonial"),
+      }),
       body: t("cannotUndo"),
       confirmLabel: t("delete"),
       cancelLabel: t("cancel"),
       dir,
     });
     if (!ok) return;
-    if (row.isNew) return form.setValue((current) => current.filter((r) => r.key !== row.key));
+    if (row.isNew)
+      return form.setValue((current) =>
+        current.filter((r) => r.key !== row.key),
+      );
     try {
       const result = await remove({ data: { id: row.id } });
-      if (!result.ok) return void toast.error(t(result.message as AdminCopyKey));
+      if (!result.ok)
+        return void toast.error(t(result.message as AdminCopyKey));
       form.setValue((current) => current.filter((r) => r.key !== row.key));
       await refresh();
       toast.success(t("testimonialDeleted"));
@@ -162,7 +184,12 @@ export function TestimonialsSettings() {
             <Button
               size="sm"
               variant="outline"
-              onClick={() => form.setValue((current) => [...current, blank(current.length + 1)])}
+              onClick={() =>
+                form.setValue((current) => [
+                  ...current,
+                  blank(current.length + 1),
+                ])
+              }
             >
               <Plus className="size-4" aria-hidden="true" />
               {t("addTestimonial")}
@@ -171,7 +198,8 @@ export function TestimonialsSettings() {
         }
       >
         <p className="text-sm text-muted-foreground">
-          {t("testimonialsCount", { count: String(visible) })} {t("testimonialsMenuNote")}
+          {t("testimonialsCount", { count: String(visible) })}{" "}
+          {t("testimonialsMenuNote")}
         </p>
       </Card>
       <QueryState query={read} empty={t("noTestimonials")} isEmpty={false}>
@@ -181,7 +209,9 @@ export function TestimonialsSettings() {
             <Card
               key={row.key}
               title={row.name || t("newTestimonial")}
-              description={row.published ? t("testimonialShown") : t("testimonialHidden")}
+              description={
+                row.published ? t("testimonialShown") : t("testimonialHidden")
+              }
               actions={
                 <Button
                   variant="ghost"
@@ -197,16 +227,24 @@ export function TestimonialsSettings() {
             >
               <div className="grid gap-4">
                 <div className="grid gap-4 md:grid-cols-[1fr_8rem]">
-                  <Field label={t("testimonialName")} htmlFor={`tm-name-${row.key}`}>
+                  <Field
+                    label={t("testimonialName")}
+                    htmlFor={`tm-name-${row.key}`}
+                  >
                     <Input
                       id={`tm-name-${row.key}`}
                       dir="auto"
                       maxLength={120}
                       value={row.name}
-                      onChange={(e) => update(row.key, { name: e.target.value })}
+                      onChange={(e) =>
+                        update(row.key, { name: e.target.value })
+                      }
                     />
                   </Field>
-                  <Field label={t("affiliateOrder")} htmlFor={`tm-order-${row.key}`}>
+                  <Field
+                    label={t("affiliateOrder")}
+                    htmlFor={`tm-order-${row.key}`}
+                  >
                     <Input
                       id={`tm-order-${row.key}`}
                       type="number"
@@ -216,7 +254,10 @@ export function TestimonialsSettings() {
                       value={row.sortOrder}
                       onChange={(e) =>
                         update(row.key, {
-                          sortOrder: Math.max(0, Math.round(Number(e.target.value) || 0)),
+                          sortOrder: Math.max(
+                            0,
+                            Math.round(Number(e.target.value) || 0),
+                          ),
                         })
                       }
                     />
@@ -227,14 +268,21 @@ export function TestimonialsSettings() {
                   ar={row.roleAr}
                   en={row.roleEn}
                   maxLength={160}
-                  onChange={(v) => update(row.key, { roleAr: v.ar, roleEn: v.en })}
+                  onChange={(v) =>
+                    update(row.key, { roleAr: v.ar, roleEn: v.en })
+                  }
                 />
                 <BilingualField
                   label={t("testimonialOrganization")}
                   ar={row.organizationAr}
                   en={row.organizationEn}
                   maxLength={160}
-                  onChange={(v) => update(row.key, { organizationAr: v.ar, organizationEn: v.en })}
+                  onChange={(v) =>
+                    update(row.key, {
+                      organizationAr: v.ar,
+                      organizationEn: v.en,
+                    })
+                  }
                 />
                 <BilingualField
                   label={t("testimonialQuote")}
@@ -244,7 +292,9 @@ export function TestimonialsSettings() {
                   multiline
                   rows={4}
                   maxLength={1200}
-                  onChange={(v) => update(row.key, { quoteAr: v.ar, quoteEn: v.en })}
+                  onChange={(v) =>
+                    update(row.key, { quoteAr: v.ar, quoteEn: v.en })
+                  }
                 />
                 <ImageChoice
                   label={t("testimonialPhoto")}
@@ -253,13 +303,20 @@ export function TestimonialsSettings() {
                   fallbackUrl=""
                   fallbackText={t("noImage")}
                   folder="branding"
-                  onChange={(imagePath) => update(row.key, { imagePath, image: "" })}
+                  onChange={(imagePath) =>
+                    update(row.key, { imagePath, image: "" })
+                  }
                 />
-                <label className="flex items-center gap-3 text-sm" htmlFor={`tm-pub-${row.key}`}>
+                <label
+                  className="flex items-center gap-3 text-sm"
+                  htmlFor={`tm-pub-${row.key}`}
+                >
                   <Switch
                     id={`tm-pub-${row.key}`}
                     checked={row.published}
-                    onCheckedChange={(published) => update(row.key, { published })}
+                    onCheckedChange={(published) =>
+                      update(row.key, { published })
+                    }
                   />
                   {t("testimonialPublished")}
                 </label>

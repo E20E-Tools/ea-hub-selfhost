@@ -7,11 +7,15 @@ export async function recordTelemetry(
   code: "none" | "provider" | "storage" | "receipt" | "internal" = "none",
 ) {
   try {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { supabaseAdmin } =
+      await import("@/integrations/supabase/client.server");
     await supabaseAdmin.from("application_telemetry").insert({
       operation,
       outcome,
-      duration_ms: Math.min(300000, Math.max(0, Math.round(performance.now() - start))),
+      duration_ms: Math.min(
+        300000,
+        Math.max(0, Math.round(performance.now() - start)),
+      ),
       code,
     });
     // Assistant/recommendation answers feed both AI alerts, whatever the outcome.
@@ -26,7 +30,12 @@ export async function recordTelemetry(
     const old = await supabaseAdmin
       .from("application_telemetry")
       .select("id")
-      .lt("created_at", new Date(Date.now() - (policy.data?.days ?? 30) * 86400000).toISOString())
+      .lt(
+        "created_at",
+        new Date(
+          Date.now() - (policy.data?.days ?? 30) * 86400000,
+        ).toISOString(),
+      )
       .order("created_at")
       .limit(100);
     if (old.data?.length)
@@ -42,7 +51,10 @@ export async function recordTelemetry(
   }
 }
 
-export async function measured<T>(operation: Operation, run: () => Promise<T>): Promise<T> {
+export async function measured<T>(
+  operation: Operation,
+  run: () => Promise<T>,
+): Promise<T> {
   const start = performance.now();
   try {
     const result = await run();
@@ -60,8 +72,10 @@ export async function measured<T>(operation: Operation, run: () => Promise<T>): 
  */
 export async function noteAiFailures(now = Date.now()): Promise<void> {
   try {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { AI_OPERATIONS, aiFailureAlert, aiChatHealth } = await import("./operations.shared");
+    const { supabaseAdmin } =
+      await import("@/integrations/supabase/client.server");
+    const { AI_OPERATIONS, aiFailureAlert, aiChatHealth } =
+      await import("./operations.shared");
     const { data, error } = await supabaseAdmin
       .from("application_telemetry")
       .select("operation,outcome,created_at,duration_ms")
@@ -71,11 +85,17 @@ export async function noteAiFailures(now = Date.now()): Promise<void> {
       .limit(200);
     if (error) return;
     const rows = data ?? [];
-    const { checkLimits, SYSTEM_ACTOR_ID } = await import("./rate-limit.server");
+    const { checkLimits, SYSTEM_ACTOR_ID } =
+      await import("./rate-limit.server");
     const alert = aiFailureAlert(rows, now);
     if (alert) {
       const first = await checkLimits([
-        { bucket: "alert:ai-failure", subject: "hour", limit: 1, windowSeconds: 3600 },
+        {
+          bucket: "alert:ai-failure",
+          subject: "hour",
+          limit: 1,
+          windowSeconds: 3600,
+        },
       ]);
       if (first === "ok")
         await supabaseAdmin.from("admin_activity").insert({
@@ -88,7 +108,12 @@ export async function noteAiFailures(now = Date.now()): Promise<void> {
     const chat = aiChatHealth(rows, now);
     if (!chat.alert) return;
     const first = await checkLimits([
-      { bucket: "alert:ai-chat", subject: "hour", limit: 1, windowSeconds: 3600 },
+      {
+        bucket: "alert:ai-chat",
+        subject: "hour",
+        limit: 1,
+        windowSeconds: 3600,
+      },
     ]);
     if (first !== "ok") return;
     await supabaseAdmin.from("admin_activity").insert({

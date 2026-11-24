@@ -93,13 +93,23 @@ function Box({
           key={`l${z}`}
           d={`M${pt(f.x + 0.12, y1, z)}L${pt(x1 - 0.12, y1, z)}`}
           className={`mc-win${a > 0.86 ? " mc-flick" : ""}`}
-          style={{ "--s": a, animationDelay: `${(a * 9).toFixed(2)}s` } as CSSProperties}
+          style={
+            {
+              "--s": a,
+              animationDelay: `${(a * 9).toFixed(2)}s`,
+            } as CSSProperties
+          }
         />,
         <path
           key={`r${z}`}
           d={`M${pt(x1, f.y + 0.12, z)}L${pt(x1, y1 - 0.12, z)}`}
           className={`mc-win mc-win-r${b > 0.88 ? " mc-flick" : ""}`}
-          style={{ "--s": b, animationDelay: `${(b * 11).toFixed(2)}s` } as CSSProperties}
+          style={
+            {
+              "--s": b,
+              animationDelay: `${(b * 11).toFixed(2)}s`,
+            } as CSSProperties
+          }
         />,
       );
     }
@@ -129,7 +139,11 @@ function blocks(spec: BuildingSpec): { f: Footprint; z0: number; h: number }[] {
         const s = shrink(f, 0.18 + i * 0.04);
         const o = 0.13 * Math.sin(i * 1.2);
         const p = 0.13 * Math.cos(i * 1.2);
-        return { f: { ...s, x: s.x + o, y: s.y + p }, z0: (h / 6) * i, h: h / 6 };
+        return {
+          f: { ...s, x: s.x + o, y: s.y + p },
+          z0: (h / 6) * i,
+          h: h / 6,
+        };
       });
     case "dome":
       return [{ f, z0: 0, h: h * 0.72 }];
@@ -152,7 +166,10 @@ function Sign({
 }) {
   const w = Math.max(28, width);
   return (
-    <g transform={`matrix(0.894 0.447 0 1 ${at[0]} ${at[1]})`} className={className}>
+    <g
+      transform={`matrix(0.894 0.447 0 1 ${at[0]} ${at[1]})`}
+      className={className}
+    >
       <path d={`M4 0V10M${w - 4} 0V10`} className="mc-sign-pole" />
       <rect x="0" y="-12" width={w} height="13" rx="1.5" />
       <text
@@ -176,7 +193,10 @@ function Hologram({ product }: { product: Product }) {
       <strong className="mc-holo-name" dir="ltr">
         {product.name}
       </strong>
-      <p className="mc-holo-status" data-soon={facts.available ? undefined : ""}>
+      <p
+        className="mc-holo-status"
+        data-soon={facts.available ? undefined : ""}
+      >
         <i aria-hidden="true" />
         {facts.status}
         {facts.launch ? ` · ${facts.launch}` : ""}
@@ -235,7 +255,10 @@ export default function MetropolisStage({ products, settings }: StageProps) {
       const cy = rtl ? lot.cx : lot.cy;
       const spec = buildingFor(product.id, product.features.length, [cx, cy]);
       const route = lot.route.map(([x, y]): GPt => (rtl ? [y, x] : [x, y]));
-      const top = spec.kind === "dome" ? spec.height * 0.72 + spec.footprint.w * 12 : spec.height;
+      const top =
+        spec.kind === "dome"
+          ? spec.height * 0.72 + spec.footprint.w * 12
+          : spec.height;
       return { product, spec, cx, cy, route, top };
     });
   }, [list, rtl]);
@@ -302,8 +325,14 @@ export default function MetropolisStage({ products, settings }: StageProps) {
       node.style.setProperty("--sky-hz", sky.horizon);
       node.style.setProperty("--night", night.toFixed(3));
       const sun = phase < 0.62 ? phase / 0.62 : (phase - 0.62) / 0.38;
-      node.style.setProperty("--orb-x", `${(rtl ? 92 - sun * 84 : 8 + sun * 84).toFixed(2)}%`);
-      node.style.setProperty("--orb-y", `${(58 - Math.sin(sun * Math.PI) * 46).toFixed(2)}%`);
+      node.style.setProperty(
+        "--orb-x",
+        `${(rtl ? 92 - sun * 84 : 8 + sun * 84).toFixed(2)}%`,
+      );
+      node.style.setProperty(
+        "--orb-y",
+        `${(58 - Math.sin(sun * Math.PI) * 46).toFixed(2)}%`,
+      );
       node.dataset["orb"] = phase < 0.62 ? "sun" : "moon";
     };
     const place = (s: number) => {
@@ -311,9 +340,14 @@ export default function MetropolisStage({ products, settings }: StageProps) {
       cars.forEach((c, i) => {
         const span = max - min;
         const u = min + ((c.offset + s * c.speed) % span);
-        const [gx, gy] = c.vertical ? [c.road + c.lane, u] : [u, c.road + c.lane];
+        const [gx, gy] = c.vertical
+          ? [c.road + c.lane, u]
+          : [u, c.road + c.lane];
         const [x, y] = iso(gx, gy, 1);
-        R[`car${i}`]?.setAttribute("transform", `translate(${x.toFixed(1)} ${y.toFixed(1)})`);
+        R[`car${i}`]?.setAttribute(
+          "transform",
+          `translate(${x.toFixed(1)} ${y.toFixed(1)})`,
+        );
       });
       const [hx, hy] = [0, 0];
       drones.forEach((d, i) => {
@@ -322,10 +356,14 @@ export default function MetropolisStage({ products, settings }: StageProps) {
         const e = k * k * (3 - 2 * k);
         const gx = hx + (d.cx - hx) * e;
         const gy = hy + (d.cy - hy) * e;
-        const z = hqH + 10 + (d.top + 14 - hqH - 10) * e + Math.sin(e * Math.PI) * 70;
+        const z =
+          hqH + 10 + (d.top + 14 - hqH - 10) * e + Math.sin(e * Math.PI) * 70;
         const [x, y] = iso(gx, gy, z);
         const el = R[`drone${i}`];
-        el?.setAttribute("transform", `translate(${x.toFixed(1)} ${y.toFixed(1)})`);
+        el?.setAttribute(
+          "transform",
+          `translate(${x.toFixed(1)} ${y.toFixed(1)})`,
+        );
         el?.setAttribute("data-carry", raw < 1 ? "1" : "0");
       });
       sites.forEach((p, i) => {
@@ -346,17 +384,26 @@ export default function MetropolisStage({ products, settings }: StageProps) {
         const back = iso(mx - Math.cos(th) * 0.8, my - Math.sin(th) * 0.8, H);
         const mast = iso(mx, my, H);
         const tr = 0.55 + 0.25 * Math.sin(s * 0.3 + i);
-        const hookG: [number, number] = [mx + Math.cos(th) * L * tr, my + Math.sin(th) * L * tr];
+        const hookG: [number, number] = [
+          mx + Math.cos(th) * L * tr,
+          my + Math.sin(th) * L * tr,
+        ];
         const lift = 0.5 - 0.5 * Math.cos(s * 0.35 + i * 2);
         const blockZ = h + 6 + lift * (H - h - 24);
         const hookTop = iso(hookG[0], hookG[1], H);
         const hookBot = iso(hookG[0], hookG[1], blockZ + 10);
-        R[`jib${i}`]?.setAttribute("d", `M${back.join(",")}L${mast.join(",")}L${end.join(",")}`);
+        R[`jib${i}`]?.setAttribute(
+          "d",
+          `M${back.join(",")}L${mast.join(",")}L${end.join(",")}`,
+        );
         R[`tie${i}`]?.setAttribute(
           "d",
           `M${back.join(",")}L${iso(mx, my, H + 22).join(",")}L${end.join(",")}`,
         );
-        R[`cable${i}`]?.setAttribute("d", `M${hookTop.join(",")}L${hookBot.join(",")}`);
+        R[`cable${i}`]?.setAttribute(
+          "d",
+          `M${hookTop.join(",")}L${hookBot.join(",")}`,
+        );
         const bf = boxFaces(
           { x: hookG[0] - 0.22, y: hookG[1] - 0.22, w: 0.44, d: 0.44 },
           blockZ,
@@ -382,7 +429,8 @@ export default function MetropolisStage({ products, settings }: StageProps) {
       last = now;
       if (motion.running) {
         s += dt;
-        if (!cyclePaused) phaseRef.current = (phaseRef.current + dt / cycle) % 1;
+        if (!cyclePaused)
+          phaseRef.current = (phaseRef.current + dt / cycle) % 1;
         skyAcc += dt;
         if (skyAcc > 1 / 15) {
           skyAcc = 0;
@@ -451,21 +499,38 @@ export default function MetropolisStage({ products, settings }: StageProps) {
     if (!product.publicationDate) return t("mcSoon");
     const at = new Date(`${product.publicationDate}T12:00:00Z`);
     if (Number.isNaN(at.getTime())) return t("mcSoon");
-    const day = new Intl.DateTimeFormat(language === "ar" ? "ar-u-nu-arab" : "en-GB", {
-      day: "numeric",
-      month: language === "ar" ? "long" : "short",
-      timeZone: "Asia/Riyadh",
-    }).format(at);
+    const day = new Intl.DateTimeFormat(
+      language === "ar" ? "ar-u-nu-arab" : "en-GB",
+      {
+        day: "numeric",
+        month: language === "ar" ? "long" : "short",
+        timeZone: "Asia/Riyadh",
+      },
+    ).format(at);
     return fill(t("mcOpening"), day);
   };
 
   const activePlaced = placed.find((p) => p.product.id === active) ?? null;
   // Back-to-front draw order (HQ sits at depth 0).
-  const drawOrder = [...placed].sort((a, b) => a.cx + a.cy - (b.cx + b.cy) || a.cx - b.cx);
+  const drawOrder = [...placed].sort(
+    (a, b) => a.cx + a.cy - (b.cx + b.cy) || a.cx - b.cx,
+  );
   const hqIndex = drawOrder.findIndex((p) => p.cx + p.cy > 0);
   const layers = [
-    { z: TECH_Z, th: 16, cls: "mc-slab-tech", label: t("mcLayerTech"), code: "L1" },
-    { z: DATA_Z, th: 8, cls: "mc-slab-data", label: t("mcLayerData"), code: "L2" },
+    {
+      z: TECH_Z,
+      th: 16,
+      cls: "mc-slab-tech",
+      label: t("mcLayerTech"),
+      code: "L1",
+    },
+    {
+      z: DATA_Z,
+      th: 8,
+      cls: "mc-slab-data",
+      label: t("mcLayerData"),
+      code: "L2",
+    },
     { z: 0, th: 12, cls: "mc-slab-app", label: t("mcLayerApps"), code: "L3" },
   ];
   const labelAt = (z: number): [number, number] => {
@@ -499,9 +564,18 @@ export default function MetropolisStage({ products, settings }: StageProps) {
         onKeyDown={onKey(p)}
       >
         {/* hit area: the whole lot volume */}
-        <polygon points={boxFaces(f, 0, p.spec.height).left} className="mc-hit" />
-        <polygon points={boxFaces(f, 0, p.spec.height).right} className="mc-hit" />
-        <polygon points={boxFaces(f, 0, p.spec.height).top} className="mc-hit" />
+        <polygon
+          points={boxFaces(f, 0, p.spec.height).left}
+          className="mc-hit"
+        />
+        <polygon
+          points={boxFaces(f, 0, p.spec.height).right}
+          className="mc-hit"
+        />
+        <polygon
+          points={boxFaces(f, 0, p.spec.height).top}
+          className="mc-hit"
+        />
         <g className="mc-lift">
           {soon && siteIndex >= 0 ? (
             <>
@@ -522,7 +596,10 @@ export default function MetropolisStage({ products, settings }: StageProps) {
                 className="mc-face mc-t mc-concrete"
               />
               <polygon points={boxFaces(f, 0, 9).left} fill="url(#mc-hazard)" />
-              <polygon points={boxFaces(f, 0, 9).right} fill="url(#mc-hazard)" />
+              <polygon
+                points={boxFaces(f, 0, 9).right}
+                fill="url(#mc-hazard)"
+              />
               {/* scaffold wireframe to full height */}
               <Scaffold f={f} h={p.spec.height} />
               {/* crane */}
@@ -538,9 +615,18 @@ export default function MetropolisStage({ products, settings }: StageProps) {
                 <path ref={ref(`tie${siteIndex}`)} className="mc-tie" />
                 <path ref={ref(`jib${siteIndex}`)} className="mc-jib" />
                 <path ref={ref(`cable${siteIndex}`)} className="mc-cable" />
-                <polygon ref={ref(`kl${siteIndex}`)} className="mc-block mc-l" />
-                <polygon ref={ref(`kr${siteIndex}`)} className="mc-block mc-r" />
-                <polygon ref={ref(`kt${siteIndex}`)} className="mc-block mc-t" />
+                <polygon
+                  ref={ref(`kl${siteIndex}`)}
+                  className="mc-block mc-l"
+                />
+                <polygon
+                  ref={ref(`kr${siteIndex}`)}
+                  className="mc-block mc-r"
+                />
+                <polygon
+                  ref={ref(`kt${siteIndex}`)}
+                  className="mc-block mc-t"
+                />
               </g>
             </>
           ) : (
@@ -556,14 +642,19 @@ export default function MetropolisStage({ products, settings }: StageProps) {
                   windows={!mobile || k === 0}
                 />
               ))}
-              {p.spec.kind === "dome" ? <Dome f={f} z={p.spec.height * 0.72} /> : null}
+              {p.spec.kind === "dome" ? (
+                <Dome f={f} z={p.spec.height * 0.72} />
+              ) : null}
             </>
           )}
           {!soon ? (
             <Sign
               at={signAt}
               text={p.product.name}
-              width={Math.min(96, Math.max(f.w * 36, p.product.name.length * 5.6 + 8))}
+              width={Math.min(
+                96,
+                Math.max(f.w * 36, p.product.name.length * 5.6 + 8),
+              )}
             />
           ) : (
             <Sign
@@ -580,11 +671,34 @@ export default function MetropolisStage({ products, settings }: StageProps) {
   };
 
   const hq = (
-    <g key="hq" className="mc-hq" aria-hidden="true" style={{ "--h": 220 } as CSSProperties}>
-      <Box f={{ x: -0.95, y: -0.95, w: 1.9, d: 1.9 }} z0={0} h={hqH * 0.55} seed="hq0" />
-      <Box f={{ x: -0.7, y: -0.7, w: 1.4, d: 1.4 }} z0={hqH * 0.55} h={hqH * 0.3} seed="hq1" />
-      <Box f={{ x: -0.42, y: -0.42, w: 0.84, d: 0.84 }} z0={hqH * 0.85} h={hqH * 0.15} seed="hq2" />
-      <path d={`M${pt(0, 0, hqH)}L${pt(0, 0, hqH + 46)}`} className="mc-antenna" />
+    <g
+      key="hq"
+      className="mc-hq"
+      aria-hidden="true"
+      style={{ "--h": 220 } as CSSProperties}
+    >
+      <Box
+        f={{ x: -0.95, y: -0.95, w: 1.9, d: 1.9 }}
+        z0={0}
+        h={hqH * 0.55}
+        seed="hq0"
+      />
+      <Box
+        f={{ x: -0.7, y: -0.7, w: 1.4, d: 1.4 }}
+        z0={hqH * 0.55}
+        h={hqH * 0.3}
+        seed="hq1"
+      />
+      <Box
+        f={{ x: -0.42, y: -0.42, w: 0.84, d: 0.84 }}
+        z0={hqH * 0.85}
+        h={hqH * 0.15}
+        seed="hq2"
+      />
+      <path
+        d={`M${pt(0, 0, hqH)}L${pt(0, 0, hqH + 46)}`}
+        className="mc-antenna"
+      />
       {/* rooftop billboard with the logo */}
       <g
         transform={`matrix(0.894 0.447 0 1 ${iso(-0.66, 0.62, hqH * 0.85)[0]} ${iso(-0.66, 0.62, hqH * 0.85)[1]})`}
@@ -644,7 +758,10 @@ export default function MetropolisStage({ products, settings }: StageProps) {
           <stop offset="1" stopColor="#FFF3C4" stopOpacity="0" />
         </linearGradient>
       </defs>
-      <g className="mc-camera" style={{ transform: zoom, transformOrigin: "0 0" }}>
+      <g
+        className="mc-camera"
+        style={{ transform: zoom, transformOrigin: "0 0" }}
+      >
         <g transform={`translate(${ox} ${oy})`}>
           {/* exploded-view connectors between layers */}
           {[
@@ -708,31 +825,47 @@ export default function MetropolisStage({ products, settings }: StageProps) {
           {roads.map((g) => (
             <g key={`road${g}`}>
               <polygon
-                points={boxFaces({ x: g - 0.5, y: min, w: 1, d: max - min }, 0, 0.5).top}
+                points={
+                  boxFaces({ x: g - 0.5, y: min, w: 1, d: max - min }, 0, 0.5)
+                    .top
+                }
                 className="mc-road"
               />
               <polygon
-                points={boxFaces({ x: min, y: g - 0.5, w: max - min, d: 1 }, 0, 0.5).top}
+                points={
+                  boxFaces({ x: min, y: g - 0.5, w: max - min, d: 1 }, 0, 0.5)
+                    .top
+                }
                 className="mc-road"
               />
             </g>
           ))}
           {roads.map((g) => (
             <g key={`lane${g}`}>
-              <path d={`M${pt(g, min, 1)}L${pt(g, max, 1)}`} className="mc-lane" />
-              <path d={`M${pt(min, g, 1)}L${pt(max, g, 1)}`} className="mc-lane" />
+              <path
+                d={`M${pt(g, min, 1)}L${pt(g, max, 1)}`}
+                className="mc-lane"
+              />
+              <path
+                d={`M${pt(min, g, 1)}L${pt(max, g, 1)}`}
+                className="mc-lane"
+              />
             </g>
           ))}
           {activePlaced ? (
             <path
-              d={activePlaced.route.map(([x, y], i) => `${i ? "L" : "M"}${pt(x, y, 2)}`).join("")}
+              d={activePlaced.route
+                .map(([x, y], i) => `${i ? "L" : "M"}${pt(x, y, 2)}`)
+                .join("")}
               className="mc-route"
             />
           ) : null}
           {placed.map((p) => (
             <polygon
               key={`plaza${p.product.id}`}
-              points={boxFaces({ x: p.cx - 1, y: p.cy - 1, w: 2, d: 2 }, 0, 2).top}
+              points={
+                boxFaces({ x: p.cx - 1, y: p.cy - 1, w: 2, d: 2 }, 0, 2).top
+              }
               className="mc-plaza"
             />
           ))}
@@ -746,7 +879,13 @@ export default function MetropolisStage({ products, settings }: StageProps) {
             return (
               <g key={`park${gx}${gy}`}>
                 <polygon
-                  points={boxFaces({ x: gx - 0.95, y: gy - 0.95, w: 1.9, d: 1.9 }, 0, 2).top}
+                  points={
+                    boxFaces(
+                      { x: gx - 0.95, y: gy - 0.95, w: 1.9, d: 1.9 },
+                      0,
+                      2,
+                    ).top
+                  }
                   className="mc-park"
                 />
                 <path
@@ -762,7 +901,11 @@ export default function MetropolisStage({ products, settings }: StageProps) {
                 ].map(([dx, dy], k) => {
                   const [x, y] = iso(gx + dx!, gy + dy!, 2);
                   return (
-                    <g key={k} transform={`translate(${x} ${y})`} className="mc-tree">
+                    <g
+                      key={k}
+                      transform={`translate(${x} ${y})`}
+                      className="mc-tree"
+                    >
                       <path d="M0 0V-7" />
                       <circle cy="-11" r={k === 4 ? 3 : 4.5 + r() * 2.5} />
                     </g>
@@ -792,7 +935,11 @@ export default function MetropolisStage({ products, settings }: StageProps) {
 
           {/* cars and light packets */}
           {cars.map((c, i) => (
-            <g key={`car${i}`} ref={ref(`car${i}`)} className={c.packet ? "mc-packet" : "mc-car"}>
+            <g
+              key={`car${i}`}
+              ref={ref(`car${i}`)}
+              className={c.packet ? "mc-packet" : "mc-car"}
+            >
               {c.packet ? (
                 <circle r="3" />
               ) : (
@@ -856,7 +1003,9 @@ export default function MetropolisStage({ products, settings }: StageProps) {
             .slice(0, hqIndex < 0 ? drawOrder.length : hqIndex)
             .map((p, i) => renderBuilding(p, i))}
           {hq}
-          {hqIndex < 0 ? null : drawOrder.slice(hqIndex).map((p, i) => renderBuilding(p, i))}
+          {hqIndex < 0
+            ? null
+            : drawOrder.slice(hqIndex).map((p, i) => renderBuilding(p, i))}
 
           {/* drones */}
           {drones.map((d, i) => (
@@ -874,7 +1023,11 @@ export default function MetropolisStage({ products, settings }: StageProps) {
           {/* business layer: glass ceiling the skyline rises into */}
           <g className="mc-biz">
             <polygon points={boxFaces(slab, BIZ_Z, 0).top} />
-            <text x={labelAt(BIZ_Z)[0]} y={labelAt(BIZ_Z)[1]} className="mc-layer-label">
+            <text
+              x={labelAt(BIZ_Z)[0]}
+              y={labelAt(BIZ_Z)[1]}
+              className="mc-layer-label"
+            >
               <tspan className="mc-layer-code">L4</tspan> {t("mcLayerBusiness")}
             </text>
           </g>
@@ -919,7 +1072,9 @@ export default function MetropolisStage({ products, settings }: StageProps) {
       <div ref={scroller} className="mc-scroll">
         <div
           className="mc-canvas"
-          style={mobile ? { inlineSize: `${Math.round(VW * 0.9)}px` } : undefined}
+          style={
+            mobile ? { inlineSize: `${Math.round(VW * 0.9)}px` } : undefined
+          }
         >
           {svgScene}
           {mobile
@@ -927,7 +1082,9 @@ export default function MetropolisStage({ products, settings }: StageProps) {
                 <span
                   key={`snap${p.product.id}`}
                   className="mc-snap"
-                  style={{ insetInlineStart: `${((iso(p.cx, p.cy)[0] + ox) / VW) * 100}%` }}
+                  style={{
+                    insetInlineStart: `${((iso(p.cx, p.cy)[0] + ox) / VW) * 100}%`,
+                  }}
                   aria-hidden="true"
                 />
               ))
@@ -942,11 +1099,18 @@ export default function MetropolisStage({ products, settings }: StageProps) {
         <p className="mc-title" aria-hidden="true">
           {settings.displayTitle}
         </p>
-        {settings.tagline ? <p className="mc-tagline">{settings.tagline}</p> : null}
+        {settings.tagline ? (
+          <p className="mc-tagline">{settings.tagline}</p>
+        ) : null}
         {mobile ? <p className="mc-swipe">{t("mcSwipe")} ⟷</p> : null}
       </div>
       {!mobile && motion.animate ? (
-        <div className="mc-controls" role="group" aria-label={t("mcControls")} dir={dir}>
+        <div
+          className="mc-controls"
+          role="group"
+          aria-label={t("mcControls")}
+          dir={dir}
+        >
           <button
             type="button"
             onClick={() => setCyclePaused((v) => !v)}
@@ -965,7 +1129,9 @@ export default function MetropolisStage({ products, settings }: StageProps) {
       ) : null}
       {openPlaced ? (
         <>
-          {!mobile ? <span className="mc-projector" aria-hidden="true" /> : null}
+          {!mobile ? (
+            <span className="mc-projector" aria-hidden="true" />
+          ) : null}
           <InspectorPanel
             product={openPlaced.product}
             className="mc-holo"
@@ -989,7 +1155,9 @@ function Scaffold({ f, h }: { f: Footprint; h: number }) {
     [x1, y1],
     [x1, f.y],
   ];
-  corners.forEach(([gx, gy]) => lines.push(`M${pt(gx, gy, 0)}L${pt(gx, gy, h)}`));
+  corners.forEach(([gx, gy]) =>
+    lines.push(`M${pt(gx, gy, 0)}L${pt(gx, gy, h)}`),
+  );
   for (let z = 0; z <= h; z += 18) {
     lines.push(`M${pt(f.x, y1, z)}L${pt(x1, y1, z)}L${pt(x1, f.y, z)}`);
     if (z + 18 <= h) {
@@ -997,7 +1165,9 @@ function Scaffold({ f, h }: { f: Footprint; h: number }) {
       lines.push(`M${pt(x1, y1, z)}L${pt(x1, f.y, z + 18)}`);
     }
   }
-  lines.push(`M${pt(f.x, f.y, h)}L${pt(x1, f.y, h)}L${pt(x1, y1, h)}L${pt(f.x, y1, h)}Z`);
+  lines.push(
+    `M${pt(f.x, f.y, h)}L${pt(x1, f.y, h)}L${pt(x1, y1, h)}L${pt(f.x, y1, h)}Z`,
+  );
   return <path d={lines.join("")} className="mc-scaffold" />;
 }
 
@@ -1014,8 +1184,14 @@ function Dome({ f, z }: { f: Footprint; z: number }) {
         fill="url(#mc-dome)"
         className="mc-dome"
       />
-      <path d={`M${x - rx} ${y}A${rx} ${ry} 0 0 0 ${x + rx} ${y}`} className="mc-neon" />
-      <path d={`M${x} ${y - rx * 1.05}V${y - rx * 1.05 - 14}`} className="mc-antenna" />
+      <path
+        d={`M${x - rx} ${y}A${rx} ${ry} 0 0 0 ${x + rx} ${y}`}
+        className="mc-neon"
+      />
+      <path
+        d={`M${x} ${y - rx * 1.05}V${y - rx * 1.05 - 14}`}
+        className="mc-antenna"
+      />
     </g>
   );
 }

@@ -25,25 +25,38 @@ vi.mock("@tanstack/react-start", () => ({
         validate = validator;
         return builder;
       },
-      handler: (handler: (args: unknown) => unknown) => async (args?: { data?: unknown }) =>
-        handler({ data: validate(args?.data) }),
+      handler:
+        (handler: (args: unknown) => unknown) =>
+        async (args?: { data?: unknown }) =>
+          handler({ data: validate(args?.data) }),
     };
     return builder;
   },
 }));
-vi.mock("@tanstack/react-start/server", () => ({ getRequest: () => ({ headers: m.headers }) }));
+vi.mock("@tanstack/react-start/server", () => ({
+  getRequest: () => ({ headers: m.headers }),
+}));
 vi.mock("@/lib/rate-limit.server", () => ({
   clientIp: () => "203.0.113.9",
   consumeLimits: async () => true,
   noteBudgetUsage: async () => undefined,
 }));
-vi.mock("@/lib/telemetry.server", () => ({ recordTelemetry: async () => undefined }));
-vi.mock("@/lib/recommend.server", () => ({ liveCatalog: async () => [{ id: "itfm" }] }));
-vi.mock("@/lib/contact-notify.server", () => ({ notifyContactSubmission: m.notify }));
+vi.mock("@/lib/telemetry.server", () => ({
+  recordTelemetry: async () => undefined,
+}));
+vi.mock("@/lib/recommend.server", () => ({
+  liveCatalog: async () => [{ id: "itfm" }],
+}));
+vi.mock("@/lib/contact-notify.server", () => ({
+  notifyContactSubmission: m.notify,
+}));
 vi.mock("@/lib/journey.server", () => ({ recordJourney: m.journey }));
 vi.mock("@/lib/live-chat.server", () => ({
   verifyVisitor: m.verifyVisitor,
-  openChatFor: async () => ({ id: "f8bcd11c-a841-40d4-a501-13b8f28d74ca", status: "ai" }),
+  openChatFor: async () => ({
+    id: "f8bcd11c-a841-40d4-a501-13b8f28d74ca",
+    status: "ai",
+  }),
 }));
 vi.mock("@/integrations/supabase/client.server", () => {
   const table = (name: string) => {
@@ -57,11 +70,15 @@ vi.mock("@/integrations/supabase/client.server", () => {
       gte: () => Promise.resolve({ count: m.recent, error: null }),
       maybeSingle: () =>
         Promise.resolve({
-          data: name === "request_identities" ? m.link : byId ? m.existing : null,
+          data:
+            name === "request_identities" ? m.link : byId ? m.existing : null,
           error: null,
         }),
       single: () =>
-        Promise.resolve({ data: { id: RID, created_at: "2026-11-14T10:00:00Z" }, error: null }),
+        Promise.resolve({
+          data: { id: RID, created_at: "2026-11-14T10:00:00Z" },
+          error: null,
+        }),
       insert: () => {
         m.inserts.push(name);
         if (name === "suggestion_requests" && m.insertError) {
@@ -123,12 +140,19 @@ beforeEach(() => {
 });
 
 describe("request resend after a lost response", () => {
-  const stored = { id: RID, created_at: "2026-11-14T09:00:00Z", email: "ea@example.com" };
+  const stored = {
+    id: RID,
+    created_at: "2026-11-14T09:00:00Z",
+    email: "ea@example.com",
+  };
   const guestA = { id: "guest-a", email: "ea@example.com", name: "K" };
 
   it("refuses a resend with only the request number and email (no proven owner)", async () => {
     m.existing = stored;
-    expect(await submitRequest({ data: form() })).toEqual({ ok: false, message: "rqErrReceipt" });
+    expect(await submitRequest({ data: form() })).toEqual({
+      ok: false,
+      message: "rqErrReceipt",
+    });
     expect(m.inserts).toEqual([]);
   });
 
@@ -136,7 +160,9 @@ describe("request resend after a lost response", () => {
     m.verifyVisitor.mockResolvedValue(guestA);
     m.existing = stored;
     m.link = { visitor_id: "guest-a", account_id: null };
-    expect(await submitRequest({ data: form({ visitorAccess: "pass-a" }) })).toEqual({
+    expect(
+      await submitRequest({ data: form({ visitorAccess: "pass-a" }) }),
+    ).toEqual({
       ok: true,
       id: RID,
       createdAt: "2026-11-14T09:00:00Z",
@@ -151,7 +177,9 @@ describe("request resend after a lost response", () => {
     m.verifyVisitor.mockResolvedValue(guestA);
     m.existing = stored;
     m.link = { visitor_id: "guest-b", account_id: null };
-    expect(await submitRequest({ data: form({ visitorAccess: "pass-a" }) })).toEqual({
+    expect(
+      await submitRequest({ data: form({ visitorAccess: "pass-a" }) }),
+    ).toEqual({
       ok: false,
       message: "rqErrReceipt",
     });
@@ -159,21 +187,30 @@ describe("request resend after a lost response", () => {
 
   it("answers a concurrent duplicate insert with the same ownership rule", async () => {
     m.insertError = { code: "23505" };
-    expect(await submitRequest({ data: form() })).toEqual({ ok: false, message: "rqErrReceipt" });
+    expect(await submitRequest({ data: form() })).toEqual({
+      ok: false,
+      message: "rqErrReceipt",
+    });
     expect(m.notify).not.toHaveBeenCalled();
   });
 });
 
 describe("expired or unverifiable guest chat pass", () => {
   it("still saves an ordinary request, untracked", async () => {
-    const result = await submitRequest({ data: form({ visitorAccess: "expired-pass" }) });
+    const result = await submitRequest({
+      data: form({ visitorAccess: "expired-pass" }),
+    });
     expect(result).toMatchObject({ ok: true, tracking: "none" });
     expect(m.inserts).toEqual(["suggestion_requests"]);
   });
 
   it("still rejects a chat-linked request", async () => {
     const result = await submitRequest({
-      data: form({ visitorAccess: "expired-pass", fromChat: "1", chatAccess: "expired-pass" }),
+      data: form({
+        visitorAccess: "expired-pass",
+        fromChat: "1",
+        chatAccess: "expired-pass",
+      }),
     });
     expect(result).toEqual({ ok: false, message: "rqErrRejected" });
     expect(m.inserts).toEqual([]);
@@ -181,8 +218,13 @@ describe("expired or unverifiable guest chat pass", () => {
 
   it("still rejects an invalid account session", async () => {
     m.headers = new Headers({ authorization: "Bearer not-valid" });
-    m.getUser.mockResolvedValue({ data: { user: null }, error: { message: "bad jwt" } });
-    const result = await submitRequest({ data: form({ visitorAccess: "expired-pass" }) });
+    m.getUser.mockResolvedValue({
+      data: { user: null },
+      error: { message: "bad jwt" },
+    });
+    const result = await submitRequest({
+      data: form({ visitorAccess: "expired-pass" }),
+    });
     expect(result).toEqual({ ok: false, message: "rqErrRejected" });
     expect(m.inserts).toEqual([]);
   });
@@ -191,10 +233,16 @@ describe("expired or unverifiable guest chat pass", () => {
 describe("resend and optional follow-up steps", () => {
   it("returns the owner's stored receipt even though the email sent a request moments ago", async () => {
     m.recent = 1;
-    m.verifyVisitor.mockResolvedValue({ id: "guest-a", email: "ea@example.com", name: "K" });
+    m.verifyVisitor.mockResolvedValue({
+      id: "guest-a",
+      email: "ea@example.com",
+      name: "K",
+    });
     m.existing = { id: RID, created_at: "2026-11-14T09:00:00Z" };
     m.link = { visitor_id: "guest-a", account_id: null };
-    expect(await submitRequest({ data: form({ visitorAccess: "pass-a" }) })).toMatchObject({
+    expect(
+      await submitRequest({ data: form({ visitorAccess: "pass-a" }) }),
+    ).toMatchObject({
       ok: true,
       id: RID,
     });
@@ -202,16 +250,25 @@ describe("resend and optional follow-up steps", () => {
 
   it("still refuses a new request number from the same email within two minutes", async () => {
     m.recent = 1;
-    expect(await submitRequest({ data: form() })).toEqual({ ok: false, message: "rqErrRecent" });
+    expect(await submitRequest({ data: form() })).toEqual({
+      ok: false,
+      message: "rqErrRecent",
+    });
   });
 
   it("reports a committed request as saved when the alert email step fails", async () => {
     m.notify.mockRejectedValue(new Error("mail down"));
-    expect(await submitRequest({ data: form() })).toMatchObject({ ok: true, id: RID });
+    expect(await submitRequest({ data: form() })).toMatchObject({
+      ok: true,
+      id: RID,
+    });
   });
 
   it("reports a committed request as saved when the visit count step fails", async () => {
     m.journey.mockRejectedValue(new Error("db down"));
-    expect(await submitRequest({ data: form() })).toMatchObject({ ok: true, id: RID });
+    expect(await submitRequest({ data: form() })).toMatchObject({
+      ok: true,
+      id: RID,
+    });
   });
 });

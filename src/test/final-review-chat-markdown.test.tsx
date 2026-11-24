@@ -12,7 +12,8 @@ import type React from "react";
 import { ChatMarkdown } from "@/components/chat-markdown";
 import { chatLinkTarget, chatProductId } from "@/lib/chat-links";
 
-const html = (text: string) => render(<ChatMarkdown>{text}</ChatMarkdown>).container;
+const html = (text: string) =>
+  render(<ChatMarkdown>{text}</ChatMarkdown>).container;
 
 describe("chat replies never load remote images", () => {
   it("shows the image description instead of an image", () => {
@@ -32,7 +33,9 @@ describe("chat reply links", () => {
   it("never turns a backslash path into another host", () => {
     expect(chatLinkTarget("/\\evil.example")).toBeNull();
     // Markdown percent-encodes the backslash, leaving a harmless same-site path.
-    const href = html("[x](/\\evil.example)").querySelector("a")?.getAttribute("href") ?? "";
+    const href =
+      html("[x](/\\evil.example)").querySelector("a")?.getAttribute("href") ??
+      "";
     expect(href.startsWith("//")).toBe(false);
     expect(href === "" || href.startsWith("/%5C")).toBe(true);
   });

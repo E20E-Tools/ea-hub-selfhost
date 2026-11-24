@@ -16,7 +16,11 @@ export function RequestDraftControls({
   const { t } = useLanguage();
   return (
     <div className="bx-draft">
-      <p>{status === "unavailable" ? t("bxDraftUnavailable") : t("bxDraftSession")}</p>
+      <p>
+        {status === "unavailable"
+          ? t("bxDraftUnavailable")
+          : t("bxDraftSession")}
+      </p>
       {status !== "unavailable" && (
         <label>
           <input
@@ -37,10 +41,17 @@ export function RequestDraftControls({
   );
 }
 
-export function RequestReview({ items }: { items: { label: string; value: string }[] }) {
+export function RequestReview({
+  items,
+}: {
+  items: { label: string; value: string }[];
+}) {
   const { t } = useLanguage();
   return (
-    <section className="bx-panel bx-review" aria-labelledby="request-review-title">
+    <section
+      className="bx-panel bx-review"
+      aria-labelledby="request-review-title"
+    >
       <h2 id="request-review-title">{t("bxReviewTitle")}</h2>
       <p>{t("bxReviewBody")}</p>
       <dl>
@@ -57,7 +68,13 @@ export function RequestReview({ items }: { items: { label: string; value: string
   );
 }
 
-export function FieldError({ id, message }: { id: string; message: string | undefined }) {
+export function FieldError({
+  id,
+  message,
+}: {
+  id: string;
+  message: string | undefined;
+}) {
   return message ? (
     <p id={id} className="request-error mt-1" role="alert">
       {message}

@@ -16,7 +16,10 @@ vi.mock("@tanstack/react-router", () => ({
     </a>
   ),
 }));
-import { InspectorPanel, useProductInspector } from "@/themes/product-inspector";
+import {
+  InspectorPanel,
+  useProductInspector,
+} from "@/themes/product-inspector";
 import { products } from "@/lib/products";
 import type { Product } from "@/lib/catalog";
 
@@ -26,12 +29,19 @@ function Harness({ product }: { product: Product }) {
   const inspector = useProductInspector();
   return (
     <div>
-      <button type="button" onClick={(e) => inspector.open(product.id, e.currentTarget)}>
+      <button
+        type="button"
+        onClick={(e) => inspector.open(product.id, e.currentTarget)}
+      >
         node
       </button>
       <span>outside</span>
       {inspector.openId ? (
-        <InspectorPanel product={product} title="inspect" onClose={inspector.close} />
+        <InspectorPanel
+          product={product}
+          title="inspect"
+          onClose={inspector.close}
+        />
       ) : null}
     </div>
   );
@@ -83,7 +93,9 @@ describe("product inspector", () => {
     render(<Harness product={soon} />);
     fireEvent.click(screen.getByRole("button", { name: "node" }));
     const links = screen.getAllByRole("link");
-    expect(links.map((a) => a.getAttribute("href"))).toEqual(["/product/future"]);
+    expect(links.map((a) => a.getAttribute("href"))).toEqual([
+      "/product/future",
+    ]);
     expect(screen.getByRole("dialog").textContent).toMatch(/2099/);
     expect(screen.getByRole("dialog").textContent).toMatch(/\d+ (days|يوم)/);
   });

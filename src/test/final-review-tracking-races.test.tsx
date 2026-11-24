@@ -29,7 +29,9 @@ vi.mock("@/integrations/supabase/client", () => ({
 vi.mock("@/lib/current-visitor-access", () => ({
   currentViewer: () =>
     new Promise<{ token: string; accountId: string }>((resolve) => {
-      h.access.push({ resolve: (token, accountId = "") => resolve({ token, accountId }) });
+      h.access.push({
+        resolve: (token, accountId = "") => resolve({ token, accountId }),
+      });
     }),
 }));
 vi.mock("@/lib/tracking.functions", () => ({
@@ -46,7 +48,8 @@ const journeyFor = (token: string) => ({
   owner: "guest",
   requests: [
     {
-      id: token === "pass-a" ? receiptA : "bbbbbbbb-0000-4000-8000-00000000000b",
+      id:
+        token === "pass-a" ? receiptA : "bbbbbbbb-0000-4000-8000-00000000000b",
       request_type: "general",
       need: `need for ${token}`,
       product_id: null,
@@ -66,7 +69,9 @@ const journeyFor = (token: string) => ({
 
 async function mount() {
   const Page = Route.options.component as () => React.ReactElement;
-  const client = new QueryClient({ defaultOptions: { queries: { retry: false } } });
+  const client = new QueryClient({
+    defaultOptions: { queries: { retry: false } },
+  });
   const root = createRootRoute({
     component: () => (
       <QueryClientProvider client={client}>
@@ -82,7 +87,8 @@ async function mount() {
   render(<RouterProvider router={router} />);
   await waitFor(() => expect(h.access.length).toBeGreaterThan(0));
 }
-const emit = (event: string) => act(() => h.listeners.forEach((listener) => listener(event)));
+const emit = (event: string) =>
+  act(() => h.listeners.forEach((listener) => listener(event)));
 const resolveAccess = (index: number, token: string, accountId = "") =>
   act(async () => {
     h.access[index]?.resolve(token, accountId);
@@ -106,7 +112,9 @@ describe("My requests never paints a previous owner's data", () => {
     emit("SIGNED_OUT");
     await resolveAccess(1, "");
     await resolveAccess(0, "pass-a");
-    expect(await screen.findByRole("button", { name: "Verify with Archy" })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("button", { name: "Verify with Archy" }),
+    ).toBeInTheDocument();
     expect(h.journey).toHaveBeenCalledWith({ data: { access: "" } });
     expect(h.journey).not.toHaveBeenCalledWith({ data: { access: "pass-a" } });
     expect(screen.queryByText(receiptA)).toBeNull();
@@ -124,7 +132,9 @@ describe("My requests never paints a previous owner's data", () => {
   it("re-reads the pass after Archy saves one, so the list appears without reloading", async () => {
     await mount();
     await resolveAccess(0, "");
-    expect(await screen.findByRole("button", { name: "Verify with Archy" })).toBeInTheDocument();
+    expect(
+      await screen.findByRole("button", { name: "Verify with Archy" }),
+    ).toBeInTheDocument();
     act(() => window.dispatchEvent(new Event(ASSISTANT_SESSION_EVENT)));
     await resolveAccess(1, "pass-b");
     expect(await screen.findByText("need for pass-b")).toBeInTheDocument();
@@ -142,7 +152,9 @@ describe("My requests never paints a previous owner's data", () => {
     h.journey.mockResolvedValueOnce(journeyFor("cookie-owner"));
     await mount();
     await resolveAccess(0, "");
-    expect(await screen.findByText("need for cookie-owner")).toBeInTheDocument();
+    expect(
+      await screen.findByText("need for cookie-owner"),
+    ).toBeInTheDocument();
   });
 
   it("hides rows at once when the Archy guest pass changes", async () => {

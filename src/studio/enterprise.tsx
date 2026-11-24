@@ -54,14 +54,25 @@ function EnterpriseContent() {
     "training",
     "support",
   ] as const;
-  const available = data.products.filter((p) => !p.comingSoon && p.servicesEnabled !== false);
-  useEffect(()=>{
-    const q=new URLSearchParams(window.location.search);
-    const index=["implementation","rollout","training","support"].indexOf(q.get("service")??"");
-    if(index>=0)setActive(index);
-    const id=q.get("tool"); if(id && data.products.some(p=>p.id===id&&!p.comingSoon&&p.servicesEnabled!==false))setTool(id);
-  },[data.products]);
-  const [prepare,deliver]=scopeDetails(tool,serviceIds[active]!,ar);
+  const available = data.products.filter(
+    (p) => !p.comingSoon && p.servicesEnabled !== false,
+  );
+  useEffect(() => {
+    const q = new URLSearchParams(window.location.search);
+    const index = ["implementation", "rollout", "training", "support"].indexOf(
+      q.get("service") ?? "",
+    );
+    if (index >= 0) setActive(index);
+    const id = q.get("tool");
+    if (
+      id &&
+      data.products.some(
+        (p) => p.id === id && !p.comingSoon && p.servicesEnabled !== false,
+      )
+    )
+      setTool(id);
+  }, [data.products]);
+  const [prepare, deliver] = scopeDetails(tool, serviceIds[active]!, ar);
   const toolName = available.find((p) => p.id === tool)?.name;
   const startSelection = () => {
     void trackJourney("service_started", language, { oncePerSession: true });
@@ -85,7 +96,11 @@ function EnterpriseContent() {
   if (tool) params.set("tool", tool);
   const requestUrl = "/enterprise-services/request?" + params.toString();
   return (
-    <main className="s-enterprise" data-archy-tool={tool} data-archy-service={serviceIds[active]}>
+    <main
+      className="s-enterprise"
+      data-archy-tool={tool}
+      data-archy-service={serviceIds[active]}
+    >
       <div className="s-enter-hero">
         <div className="s-section">
           <p className="s-eyebrow">
@@ -95,13 +110,13 @@ function EnterpriseContent() {
           <h1>{t("navEnterprise")}</h1>
           <p>{t("esLead")}</p>
           <div className="ea-service-entry">
-          <a className="s-solid" href="#choose-service">
-            {dictionaries[ar ? "ar" : "en"].enterpriseChooseAServiceAnd}
-          </a>
-          <a href={requestUrl} onClick={startSelection}>
-            {t("esCta")}
-            <ArrowUpRight size={16} />
-          </a>
+            <a className="s-solid" href="#choose-service">
+              {dictionaries[ar ? "ar" : "en"].enterpriseChooseAServiceAnd}
+            </a>
+            <a href={requestUrl} onClick={startSelection}>
+              {t("esCta")}
+              <ArrowUpRight size={16} />
+            </a>
           </div>
         </div>
       </div>
@@ -147,7 +162,9 @@ function EnterpriseContent() {
               value={tool}
               onChange={(e) => setTool(e.target.value)}
             >
-              <option value="">{dictionaries[ar ? "ar" : "en"].enterpriseDecideLater}</option>
+              <option value="">
+                {dictionaries[ar ? "ar" : "en"].enterpriseDecideLater}
+              </option>
               {available.map((p) => (
                 <option key={p.id} value={p.id}>
                   {p.name}
@@ -155,7 +172,12 @@ function EnterpriseContent() {
               ))}
             </select>
           </label>
-          <dl aria-live="polite" className="ea-scope-deliverables"><dt>{dictionaries[ar ? "ar" : "en"].enterpriseBeforeYouStart}</dt><dd>{prepare}</dd><dt>{dictionaries[ar ? "ar" : "en"].enterpriseWhatYouLlReceive}</dt><dd>{deliver}</dd></dl>
+          <dl aria-live="polite" className="ea-scope-deliverables">
+            <dt>{dictionaries[ar ? "ar" : "en"].enterpriseBeforeYouStart}</dt>
+            <dd>{prepare}</dd>
+            <dt>{dictionaries[ar ? "ar" : "en"].enterpriseWhatYouLlReceive}</dt>
+            <dd>{deliver}</dd>
+          </dl>
           <a className="s-solid" href={requestUrl} onClick={startSelection}>
             {dictionaries[ar ? "ar" : "en"].enterpriseContinueWith}
             {t(disciplines[active]![1])}
@@ -185,14 +207,19 @@ function EnterpriseContent() {
         </div>
         <div className="s-tools-list">
           {[false, true].map((soon) => {
-            const tools = data.products.filter((p) => Boolean(p.comingSoon) === soon && (soon || p.servicesEnabled !== false));
+            const tools = data.products.filter(
+              (p) =>
+                Boolean(p.comingSoon) === soon &&
+                (soon || p.servicesEnabled !== false),
+            );
             return (
               tools.length > 0 && (
                 <section key={String(soon)}>
                   <h3>
                     {soon
                       ? t("comingSoonBadge")
-                      : dictionaries[ar ? "ar" : "en"].enterpriseAvailableForServices}
+                      : dictionaries[ar ? "ar" : "en"]
+                          .enterpriseAvailableForServices}
                   </h3>
                   {tools.map((item) => {
                     const p = localizedProduct(item, language);
@@ -203,7 +230,8 @@ function EnterpriseContent() {
                         href={
                           soon
                             ? newsletterOn
-                              ? "/newsletter#product=" + encodeURIComponent(p.id)
+                              ? "/newsletter#product=" +
+                                encodeURIComponent(p.id)
                               : "/product/" + encodeURIComponent(p.id)
                             : "/enterprise-services/request?service=" +
                               serviceIds[active] +
@@ -214,8 +242,10 @@ function EnterpriseContent() {
                         <strong dir="auto">{p.name}</strong>
                         <small>
                           {soon
-                            ? dictionaries[ar ? "ar" : "en"].layoutsNotifyMeAtLaunch
-                            : dictionaries[ar ? "ar" : "en"].enterpriseRequestAService}
+                            ? dictionaries[ar ? "ar" : "en"]
+                                .layoutsNotifyMeAtLaunch
+                            : dictionaries[ar ? "ar" : "en"]
+                                .enterpriseRequestAService}
                         </small>
                         <ArrowUpRight size={16} />
                       </a>

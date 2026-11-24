@@ -40,7 +40,10 @@ describe("consultant contact per design", () => {
   });
 
   it("a design with only WhatsApp shows no email", () => {
-    const entry = { ...emptyCustomization(), consultants: { whatsapp: "966500000000" } };
+    const entry = {
+      ...emptyCustomization(),
+      consultants: { whatsapp: "966500000000" },
+    };
     expect(consultantContact(entry, "ea@20e.tools").email).toBe("");
   });
 
@@ -55,11 +58,16 @@ describe("consultant contact per design", () => {
   it("rejects an invalid email or number when saving", () => {
     const base = { ...emptyCustomization() };
     expect(
-      themeCustomizationSchema.safeParse({ ...base, consultants: { email: "not-an-email" } })
-        .success,
+      themeCustomizationSchema.safeParse({
+        ...base,
+        consultants: { email: "not-an-email" },
+      }).success,
     ).toBe(false);
     expect(
-      themeCustomizationSchema.safeParse({ ...base, consultants: { whatsapp: "+966500" } }).success,
+      themeCustomizationSchema.safeParse({
+        ...base,
+        consultants: { whatsapp: "+966500" },
+      }).success,
     ).toBe(false);
     expect(
       themeCustomizationSchema.safeParse({
@@ -70,13 +78,18 @@ describe("consultant contact per design", () => {
   });
 
   it("empty contact fields are dropped so the design counts as not customised", () => {
-    const value = { ...emptyCustomization(), consultants: { email: "", whatsapp: "" } };
+    const value = {
+      ...emptyCustomization(),
+      consultants: { email: "", whatsapp: "" },
+    };
     expect(compactCustomization(value).consultants).toBeUndefined();
     expect(isEmptyCustomization(value)).toBe(true);
     const saved = normalizeThemeCustomizations({
       "transformation-board": { consultants: { email: "tb@e20e.tools" } },
     });
-    expect(saved["transformation-board"]?.consultants).toEqual({ email: "tb@e20e.tools" });
+    expect(saved["transformation-board"]?.consultants).toEqual({
+      email: "tb@e20e.tools",
+    });
   });
 });
 
@@ -96,17 +109,26 @@ describe("customer testimonials", () => {
 
   it("needs a name and text in at least one language", () => {
     expect(testimonialInputSchema.safeParse(valid).success).toBe(true);
-    expect(testimonialInputSchema.safeParse({ ...valid, name: " " }).success).toBe(false);
-    expect(testimonialInputSchema.safeParse({ ...valid, quoteEn: "" }).success).toBe(false);
+    expect(
+      testimonialInputSchema.safeParse({ ...valid, name: " " }).success,
+    ).toBe(false);
+    expect(
+      testimonialInputSchema.safeParse({ ...valid, quoteEn: "" }).success,
+    ).toBe(false);
   });
 
   it("only accepts photos from the site's picture library", () => {
     expect(
-      testimonialInputSchema.safeParse({ ...valid, imagePath: "branding/a.jpg" }).success,
+      testimonialInputSchema.safeParse({
+        ...valid,
+        imagePath: "branding/a.jpg",
+      }).success,
     ).toBe(true);
     expect(
-      testimonialInputSchema.safeParse({ ...valid, imagePath: "https://evil.example/a.jpg" })
-        .success,
+      testimonialInputSchema.safeParse({
+        ...valid,
+        imagePath: "https://evil.example/a.jpg",
+      }).success,
     ).toBe(false);
   });
 

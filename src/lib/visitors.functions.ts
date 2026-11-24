@@ -7,10 +7,12 @@ export const listVisitorProfiles = createServerFn({ method: "GET" })
   .handler(async ({ context }) => {
     const { requireAdmin } = await import("./admin-guard.server");
     await requireAdmin(context);
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { supabaseAdmin } =
+      await import("@/integrations/supabase/client.server");
     // Service-only registration rows and Auth account dates require privileged reads.
     // Paginate all sources rather than presenting truncated counts as totals.
-    const registrations: { email: string; name: string; created_at: string }[] = [];
+    const registrations: { email: string; name: string; created_at: string }[] =
+      [];
     const requests: {
       email: string;
       name: string;
@@ -28,9 +30,13 @@ export const listVisitorProfiles = createServerFn({ method: "GET" })
       visitor_name: string;
       created_at: string;
     }[] = [];
-    const accounts: { email: string; created_at: string; verified: boolean }[] = [];
+    const accounts: { email: string; created_at: string; verified: boolean }[] =
+      [];
     for (let page = 1; ; page++) {
-      const { data, error } = await supabaseAdmin.auth.admin.listUsers({ page, perPage: 1000 });
+      const { data, error } = await supabaseAdmin.auth.admin.listUsers({
+        page,
+        perPage: 1000,
+      });
       if (error) throw new Error("visitor load failed");
       for (const u of data.users)
         if (u.email)

@@ -16,7 +16,9 @@ import {
 export const Route = createFileRoute("/testimonials")({
   // Return the rows so the browser reuses the server's signed photo links (no hydration mismatch).
   loader: async ({ context }) => ({
-    testimonials: await context.queryClient.ensureQueryData(testimonialsQueryOptions),
+    testimonials: await context.queryClient.ensureQueryData(
+      testimonialsQueryOptions,
+    ),
   }),
   head: ({ loaderData }) => {
     const list = loaderData?.testimonials ?? [];
@@ -30,7 +32,10 @@ export const Route = createFileRoute("/testimonials")({
       meta: [
         { title: "Customer testimonials — E20E Tools | شهادات العملاء" },
         { name: "description", content: description },
-        { property: "og:title", content: "Customer testimonials — E20E Tools | شهادات العملاء" },
+        {
+          property: "og:title",
+          content: "Customer testimonials — E20E Tools | شهادات العملاء",
+        },
         { property: "og:description", content: description },
         { property: "og:url", content: TESTIMONIALS_URL },
         { property: "og:type", content: "website" },
@@ -40,7 +45,12 @@ export const Route = createFileRoute("/testimonials")({
       ],
       links: [{ rel: "canonical", href: TESTIMONIALS_URL }],
       scripts: seo.jsonLd
-        ? [{ type: "application/ld+json", children: JSON.stringify(seo.jsonLd) }]
+        ? [
+            {
+              type: "application/ld+json",
+              children: JSON.stringify(seo.jsonLd),
+            },
+          ]
         : [],
     };
   },
@@ -81,14 +91,23 @@ function TestimonialsContent() {
   const { dir, t, language } = useLanguage();
   const queryClient = useQueryClient();
   const loaded = Route.useLoaderData();
-  if (queryClient.getQueryData(testimonialsQueryOptions.queryKey) === undefined) {
-    queryClient.setQueryData(testimonialsQueryOptions.queryKey, loaded.testimonials);
+  if (
+    queryClient.getQueryData(testimonialsQueryOptions.queryKey) === undefined
+  ) {
+    queryClient.setQueryData(
+      testimonialsQueryOptions.queryKey,
+      loaded.testimonials,
+    );
   }
   const { data } = useSuspenseQuery(testimonialsQueryOptions);
   return (
     <main className="library-page ea-workspace ea-testimonials" dir={dir}>
       <section className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6">
-        <JourneyHeading icon={Quote} title={t("navTestimonials")} description={t("testimonialsLead")} />
+        <JourneyHeading
+          icon={Quote}
+          title={t("navTestimonials")}
+          description={t("testimonialsLead")}
+        />
         {data.length === 0 ? (
           <div className="flex flex-col items-start gap-4 rounded-lg border border-dashed border-border bg-card p-8 text-card-foreground">
             <Quote className="size-8 text-primary" aria-hidden="true" />
@@ -103,7 +122,9 @@ function TestimonialsContent() {
           <div className="grid gap-6 md:grid-cols-2">
             {data.map((item) => {
               const text = testimonialText(item, language);
-              const meta = [text.role, text.organization].filter(Boolean).join(" · ");
+              const meta = [text.role, text.organization]
+                .filter(Boolean)
+                .join(" · ");
               return (
                 <figure
                   key={item.id}
@@ -116,7 +137,10 @@ function TestimonialsContent() {
                   <figcaption className="flex items-center gap-4 border-t border-border pt-5">
                     <Avatar
                       item={item}
-                      alt={t("testimonialPhotoAlt").replace("{name}", item.name)}
+                      alt={t("testimonialPhotoAlt").replace(
+                        "{name}",
+                        item.name,
+                      )}
                     />
                     <div className="min-w-0">
                       <p className="font-semibold" dir="auto">

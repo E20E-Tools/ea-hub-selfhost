@@ -21,19 +21,30 @@ afterEach(() => {
 describe("optional product events follow the privacy choice", () => {
   it("sends nothing after the visitor opts out", () => {
     setMetricsOptOut(true);
-    trackProductEvent("project.request_receipt_confirmed", { request_type: "general" });
+    trackProductEvent("project.request_receipt_confirmed", {
+      request_type: "general",
+    });
     expect(track).not.toHaveBeenCalled();
   });
 
   it("sends when allowed", () => {
     trackProductEvent("project.request_receipt_confirmed");
-    expect(track).toHaveBeenCalledWith(expect.objectContaining({ detail: { name: "project.request_receipt_confirmed", properties: undefined } }));
+    expect(track).toHaveBeenCalledWith(
+      expect.objectContaining({
+        detail: {
+          name: "project.request_receipt_confirmed",
+          properties: undefined,
+        },
+      }),
+    );
   });
 
   it("contains a collector failure", () => {
-    const dispatch = vi.spyOn(window, "dispatchEvent").mockImplementation(() => {
-      throw new Error("collector down");
-    });
+    const dispatch = vi
+      .spyOn(window, "dispatchEvent")
+      .mockImplementation(() => {
+        throw new Error("collector down");
+      });
     expect(() => trackProductEvent("project.archy_tour_started")).not.toThrow();
     dispatch.mockRestore();
   });

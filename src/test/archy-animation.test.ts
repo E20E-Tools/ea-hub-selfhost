@@ -6,7 +6,11 @@ import {
   LoopOnce,
   LoopRepeat,
 } from "three";
-import { finishArchyClip, playArchyClip, type ArchyActions } from "@/components/archy-animation";
+import {
+  finishArchyClip,
+  playArchyClip,
+  type ArchyActions,
+} from "@/components/archy-animation";
 import { shouldAnimateArchy } from "@/lib/archy-mascot";
 
 function rig() {

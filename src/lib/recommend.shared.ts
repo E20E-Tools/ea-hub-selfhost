@@ -25,8 +25,8 @@ export type CatalogEntry = {
   label: string;
   description: string;
   comingSoon?: boolean;
-  features?:string[];
-  featuresEn?:string[];
+  features?: string[];
+  featuresEn?: string[];
   labelEn?: string;
   descriptionEn?: string;
 };
@@ -36,7 +36,10 @@ export function availableProducts(list: CatalogEntry[] = products) {
 }
 
 /** The catalogue exactly as the model is allowed to see it, in the reply language. */
-export function catalogLines(list: CatalogEntry[] = products, language: ReplyLanguage = "ar") {
+export function catalogLines(
+  list: CatalogEntry[] = products,
+  language: ReplyLanguage = "ar",
+) {
   return availableProducts(list)
     .map((product) =>
       language === "en"
@@ -52,18 +55,25 @@ export function sanitizeRecommendation(
   list: CatalogEntry[] = products,
 ): Recommendation {
   const eligible = availableProducts(list);
-  const source = raw && typeof raw === "object" ? (raw as Record<string, unknown>) : {};
-  const summary = typeof source["summary"] === "string" ? source["summary"].trim() : "";
+  const source =
+    raw && typeof raw === "object" ? (raw as Record<string, unknown>) : {};
+  const summary =
+    typeof source["summary"] === "string" ? source["summary"].trim() : "";
   const rawPicks = Array.isArray(source["picks"]) ? source["picks"] : [];
   const seen = new Set<string>();
   const picks: RecommendationPick[] = [];
 
   for (const item of rawPicks) {
-    const entry = item && typeof item === "object" ? (item as Record<string, unknown>) : {};
+    const entry =
+      item && typeof item === "object" ? (item as Record<string, unknown>) : {};
     const id = typeof entry["id"] === "string" ? entry["id"].trim() : "";
-    if (!id || seen.has(id) || !eligible.some((product) => product.id === id)) continue;
+    if (!id || seen.has(id) || !eligible.some((product) => product.id === id))
+      continue;
     seen.add(id);
-    picks.push({ id, reason: typeof entry["reason"] === "string" ? entry["reason"].trim() : "" });
+    picks.push({
+      id,
+      reason: typeof entry["reason"] === "string" ? entry["reason"].trim() : "",
+    });
     if (picks.length === 3) break;
   }
 

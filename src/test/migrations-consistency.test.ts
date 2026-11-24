@@ -3,12 +3,17 @@ import { describe, expect, it } from "vitest";
 
 const DRIZZLE = "drizzle/migrations";
 const LOCAL = "local-backend/supabase/migrations";
-const sqlFiles = (dir: string) => readdirSync(dir).filter((f) => /^\d{4}_.+\.sql$/.test(f)).sort();
+const sqlFiles = (dir: string) =>
+  readdirSync(dir)
+    .filter((f) => /^\d{4}_.+\.sql$/.test(f))
+    .sort();
 const topic = (file: string) => file.replace(/^\d{4}_/, "");
 
 describe("migration sources stay in step", () => {
   it("every Drizzle migration file is registered in the journal, in order", () => {
-    const journal = JSON.parse(readFileSync(`${DRIZZLE}/meta/_journal.json`, "utf8")) as {
+    const journal = JSON.parse(
+      readFileSync(`${DRIZZLE}/meta/_journal.json`, "utf8"),
+    ) as {
       entries: { idx: number; tag: string }[];
     };
     const tags = sqlFiles(DRIZZLE).map((f) => f.slice(0, -4));

@@ -12,7 +12,10 @@ export const LANGUAGE_STORAGE_KEY = "e20e-language";
  * Visitor's saved choice wins; with none, the site opens in Arabic.
  * Browser locale does not override the site's default.
  */
-export function resolveLanguage(stored: string | null, browserLanguage: string): Language {
+export function resolveLanguage(
+  stored: string | null,
+  browserLanguage: string,
+): Language {
   if (stored === "ar" || stored === "en") return stored;
   void browserLanguage;
   return "ar";
@@ -37,7 +40,9 @@ export const LANGUAGE_COOKIE = "e20e-language";
 const COOKIE_MAX_AGE = 60 * 60 * 24 * 365;
 
 /** Reads the saved language from a Cookie header or document.cookie string. */
-export function languageFromCookie(cookies: string | null | undefined): Language | null {
+export function languageFromCookie(
+  cookies: string | null | undefined,
+): Language | null {
   if (!cookies) return null;
   for (const part of cookies.split(";")) {
     const [name, ...rest] = part.trim().split("=");
@@ -62,14 +67,22 @@ export function directionOf(language: Language): Direction {
  * Picks the wording for the visitor's language and falls back to the other one
  * when a field has not been filled in yet, so nothing ever renders blank.
  */
-export function pick(language: Language, arabic: string, english: string): string {
+export function pick(
+  language: Language,
+  arabic: string,
+  english: string,
+): string {
   const wanted = (language === "en" ? english : arabic).trim();
   if (wanted) return wanted;
   return (language === "en" ? arabic : english).trim();
 }
 
 /** Same rule for lists: an empty English list falls back to the Arabic one. */
-export function pickList(language: Language, arabic: string[], english: string[]): string[] {
+export function pickList(
+  language: Language,
+  arabic: string[],
+  english: string[],
+): string[] {
   const usable = (items: string[]) =>
     Array.isArray(items)
       ? items.filter((item) => typeof item === "string" && item.trim() !== "")
