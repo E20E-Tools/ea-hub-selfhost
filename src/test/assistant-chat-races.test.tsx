@@ -141,7 +141,15 @@ async function mount(initial: Promise<{ data: { user: User | null } }>) {
       <AssistantChat />
     </QueryClientProvider>,
   );
-  fireEvent.click(view.container.querySelector(".assistant-toggle")!);
+  // The launcher commits a tick after the first render; clicking before then found nothing.
+  // Flush microtasks rather than waitFor, which stalls when a test runs on fake timers.
+  let toggle = view.container.querySelector(".assistant-toggle");
+  for (let i = 0; !toggle && i < 50; i++) {
+    await act(async () => undefined);
+    toggle = view.container.querySelector(".assistant-toggle");
+  }
+  if (!toggle) throw new Error("Archy launcher did not render");
+  fireEvent.click(toggle);
   // Owner request: clicking Archy opens the existing chat directly (no floating card).
   return view;
 }
@@ -153,6 +161,9 @@ async function sendMessage(container: HTMLElement, text: string) {
   });
 }
 const reply = (summary: string) => ({ ok: true, reply: { summary, picks: [] } });
+
+// The first test loads the whole chat module graph; on a cold cache that alone can pass 5s.
+vi.setConfig({ testTimeout: 20_000 });
 
 beforeEach(() => {
   routerPath.value = "/";
