@@ -4,6 +4,7 @@ import { Button } from "./ui/button";
 import { CloudOption, useWorkPolicy } from "./work-assistant";
 import { allTrials } from "@/lib/team-trials";
 import { productPractice } from "@/lib/product-practice";
+import { dictionaries } from "@/lib/copy";
 const cardSchema = z.object({
   title: z.string(),
   owner: z.string(),
@@ -42,7 +43,7 @@ export function WorkCard({
       set(read(id));
       loaded(true);
     } catch {
-      note(ar ? "تعذرت قراءة المسودة" : "Draft could not be loaded");
+      note(dictionaries[ar ? "ar" : "en"].workCardsDraftCouldNotBe);
     }
   }, [id, ar]);
   if (!policy?.start.enabled && !policy?.review.enabled) return null;

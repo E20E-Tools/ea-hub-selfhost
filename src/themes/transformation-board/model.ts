@@ -2,7 +2,12 @@
  * Pure helpers for Transformation Board (browser-safe, deterministic). The board geometry is
  * Circuit Core's layout; legacy filenames, slider keys and interpolation come from Legacy → Digital.
  */
-import { chipCode, circuitLayout, type Box, type CircuitLayout } from "../circuit-core/layout";
+import {
+  chipCode,
+  circuitLayout,
+  type Box,
+  type CircuitLayout,
+} from "../circuit-core/layout";
 import {
   cubicPath,
   lerp,
@@ -112,9 +117,16 @@ export function subdivide(pts: Pt[], maxLen: number): Pt[] {
   for (let i = 1; i < pts.length; i++) {
     const a = pts[i - 1]!;
     const b = pts[i]!;
-    const k = Math.max(1, Math.ceil(Math.hypot(b[0] - a[0], b[1] - a[1]) / maxLen));
+    const k = Math.max(
+      1,
+      Math.ceil(Math.hypot(b[0] - a[0], b[1] - a[1]) / maxLen),
+    );
     for (let j = 1; j <= k; j++)
-      out.push(j === k ? [b[0], b[1]] : [lerp(a[0], b[0], j / k), lerp(a[1], b[1], j / k)]);
+      out.push(
+        j === k
+          ? [b[0], b[1]]
+          : [lerp(a[0], b[0], j / k), lerp(a[1], b[1], j / k)],
+      );
   }
   return out;
 }
@@ -132,8 +144,14 @@ export type TbBoard = CircuitLayout & { cables: TbCable[] };
 export function tbBoard(count: number, mobile: boolean): TbBoard {
   const layout = circuitLayout(count, mobile);
   const cables = layout.traces.map((tr, i) => {
-    const trace = polylineToCubic(subdivide([...tr.pts].reverse() as Pt[], mobile ? 40 : 46));
-    return { trace, mess: spaghetti(trace, i + 1, layout, mobile ? 30 : 46), vias: tr.vias };
+    const trace = polylineToCubic(
+      subdivide([...tr.pts].reverse() as Pt[], mobile ? 40 : 46),
+    );
+    return {
+      trace,
+      mess: spaghetti(trace, i + 1, layout, mobile ? 30 : 46),
+      vias: tr.vias,
+    };
   });
   return { ...layout, cables };
 }
@@ -148,10 +166,15 @@ export function cableAt(cable: TbCable, m: number): Pt[] {
 
 /** On-curve joints (every third point, excluding the ends) for burnt legacy vias. */
 export function cableJoints(points: Pt[], max = 2): Pt[] {
-  const joints = points.filter((_, i) => i > 0 && i < points.length - 1 && i % 3 === 0);
+  const joints = points.filter(
+    (_, i) => i > 0 && i < points.length - 1 && i % 3 === 0,
+  );
   if (joints.length <= max) return joints;
   const step = joints.length / max;
-  return Array.from({ length: max }, (_, k) => joints[Math.floor(k * step + step / 2)]!);
+  return Array.from(
+    { length: max },
+    (_, k) => joints[Math.floor(k * step + step / 2)]!,
+  );
 }
 
 /**
@@ -166,16 +189,28 @@ export function restPosition(
 ): number {
   const ok = (h: number) => us.every((u) => Math.abs(u - h) >= clear);
   for (let k = 0; k <= 60; k++) {
-    for (const h of k === 0 ? [preferred] : [preferred + k * 0.005, preferred - k * 0.005]) {
-      if (h >= range[0] && h <= range[1] && ok(h)) return Math.round(h * 1000) / 1000;
+    for (const h of k === 0
+      ? [preferred]
+      : [preferred + k * 0.005, preferred - k * 0.005]) {
+      if (h >= range[0] && h <= range[1] && ok(h))
+        return Math.round(h * 1000) / 1000;
     }
   }
   return preferred;
 }
 
 /** Handle position the board settles to after a drag: the nearest spot where nothing is mid-morph. */
-export function settlePosition(us: number[], at: number, clear: number): number {
-  return restPosition(us, Math.max(0.02, Math.min(0.98, at)), clear, [0.02, 0.98]);
+export function settlePosition(
+  us: number[],
+  at: number,
+  clear: number,
+): number {
+  return restPosition(
+    us,
+    Math.max(0.02, Math.min(0.98, at)),
+    clear,
+    [0.02, 0.98],
+  );
 }
 
 /** Ease that runs slightly past the target and comes back — the elastic settle after a drag. */
@@ -193,20 +228,29 @@ export type TbTelemetry = {
   nextLaunch: { id: string; name: string; date: string } | null;
 };
 
-type TelemetryInput = { id: string; name: string; comingSoon?: boolean; publicationDate?: string };
+type TelemetryInput = {
+  id: string;
+  name: string;
+  comingSoon?: boolean;
+  publicationDate?: string;
+};
 
 export function boardTelemetry(products: TelemetryInput[]): TbTelemetry {
   const soon = products.filter((p) => p.comingSoon);
   const upcoming = soon
     .filter(
-      (p) => typeof p.publicationDate === "string" && /^\d{4}-\d{2}-\d{2}$/.test(p.publicationDate),
+      (p) =>
+        typeof p.publicationDate === "string" &&
+        /^\d{4}-\d{2}-\d{2}$/.test(p.publicationDate),
     )
     .sort((a, b) => (a.publicationDate! < b.publicationDate! ? -1 : 1));
   const next = upcoming[0];
   return {
     available: products.length - soon.length,
     soon: soon.length,
-    nextLaunch: next ? { id: next.id, name: next.name, date: next.publicationDate! } : null,
+    nextLaunch: next
+      ? { id: next.id, name: next.name, date: next.publicationDate! }
+      : null,
   };
 }
 
@@ -218,12 +262,24 @@ export type TbStop = { id: TbStopId; h: number };
 export function boardCentres(
   board: CircuitLayout,
   count: number,
-  o: { vertical: boolean; rtl: boolean; width: number; height: number; top: number },
+  o: {
+    vertical: boolean;
+    rtl: boolean;
+    width: number;
+    height: number;
+    top: number;
+  },
 ): number[] {
   const scale = o.width / board.w;
   const uOf = (b: Box) =>
     o.vertical
-      ? Math.max(0, Math.min(1, (o.top + (b.y + b.h / 2) * scale) / Math.max(1, o.height)))
+      ? Math.max(
+          0,
+          Math.min(
+            1,
+            (o.top + (b.y + b.h / 2) * scale) / Math.max(1, o.height),
+          ),
+        )
       : o.rtl
         ? 1 - (b.x + b.w / 2) / board.w
         : (b.x + b.w / 2) / board.w;
@@ -253,11 +309,19 @@ export function journeyStops(us: number[], clear: number): TbStop[] {
   const near = (target: number, pred: (h: number) => boolean) => {
     let best: number | null = null;
     for (const h of cands)
-      if (pred(h) && (best === null || Math.abs(h - target) < Math.abs(best - target))) best = h;
+      if (
+        pred(h) &&
+        (best === null || Math.abs(h - target) < Math.abs(best - target))
+      )
+        best = h;
     if (best !== null) return settlePosition(us, best, clear);
     // Dense layouts (many products on a phone) have no fully clear spot: use the most open gap instead.
     for (const h of mids)
-      if (pred(h) && (best === null || Math.abs(h - target) < Math.abs(best - target))) best = h;
+      if (
+        pred(h) &&
+        (best === null || Math.abs(h - target) < Math.abs(best - target))
+      )
+        best = h;
     return best;
   };
   const s1 = settlePosition(us, 0.96, clear);
@@ -265,7 +329,10 @@ export function journeyStops(us: number[], clear: number): TbStop[] {
   const s3 = near(core, (h) => h < core && h < s1 && h > s4);
   const after = chips.filter((u) => u > core);
   const far = after.length ? Math.max(...after) : core;
-  const s2 = near((core + far) / 2, (h) => h > core && h < s1 && chips.some((u) => u > h));
+  const s2 = near(
+    (core + far) / 2,
+    (h) => h > core && h < s1 && chips.some((u) => u > h),
+  );
   const raw: Array<{ id: TbStopId; h: number | null }> = [
     { id: 1, h: s1 },
     { id: 2, h: s2 },
@@ -313,7 +380,8 @@ export function spreadLabels(
   pad = 6,
 ): number[] | null {
   const n = xs.length;
-  const sum = widths.reduce((a, b) => a + b, 0) + gap * Math.max(0, n - 1) + pad * 2;
+  const sum =
+    widths.reduce((a, b) => a + b, 0) + gap * Math.max(0, n - 1) + pad * 2;
   if (sum > total) return null;
   const order = xs.map((_, i) => i).sort((a, b) => xs[a]! - xs[b]!);
   const pos = xs.slice();

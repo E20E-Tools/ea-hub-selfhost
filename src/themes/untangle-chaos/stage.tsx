@@ -112,7 +112,10 @@ export default function UntangleChaosStage({ products, settings }: StageProps) {
   const core = corePoint(size.w, size.h, mobile);
   const finished = !motion.animate || (n > 0 && fixedCount >= n);
 
-  useEffect(() => () => timers.current.forEach((id) => window.clearTimeout(id)), []);
+  useEffect(
+    () => () => timers.current.forEach((id) => window.clearTimeout(id)),
+    [],
+  );
 
   const fix = useCallback(
     (i: number) => {
@@ -121,7 +124,11 @@ export default function UntangleChaosStage({ products, settings }: StageProps) {
       fixedAt.current.set(i, at);
       const d = drone.current;
       const cur = along([d.from, d.to], Math.min(1, (at - d.at) / FLY_MS));
-      drone.current = { from: cur, to: { x: slots[i].x, y: slots[i].y - 52 }, at };
+      drone.current = {
+        from: cur,
+        to: { x: slots[i].x, y: slots[i].y - 52 },
+        at,
+      };
       const id = window.setTimeout(() => {
         const name = list[i]?.name ?? "";
         log.current = [...log.current, `> ${name} ... OK`].slice(-5);
@@ -196,7 +203,9 @@ export default function UntangleChaosStage({ products, settings }: StageProps) {
         if (!from) return;
         const st = still
           ? { phase: "done" as const, k: 1 }
-          : fixPhase(fixedAt.current.has(i) ? time - fixedAt.current.get(i)! : null);
+          : fixPhase(
+              fixedAt.current.has(i) ? time - fixedAt.current.get(i)! : null,
+            );
         if (st.phase === "done" || st.phase === "morph") {
           const route = orthoRoute(from, core);
           const reveal = st.phase === "morph" ? st.k : 1;
@@ -215,7 +224,9 @@ export default function UntangleChaosStage({ products, settings }: StageProps) {
             for (let j = 0; j < dots; j++) {
               const p = along(
                 route,
-                still ? (j + 0.5) / dots : (time * 0.00035 + j / dots + i * 0.13) % 1,
+                still
+                  ? (j + 0.5) / dots
+                  : (time * 0.00035 + j / dots + i * 0.13) % 1,
               );
               ctx.fillStyle = j % 2 ? VIOLET : CYAN;
               ctx.beginPath();
@@ -229,7 +240,9 @@ export default function UntangleChaosStage({ products, settings }: StageProps) {
           ctx.strokeStyle = `rgba(74,69,54,${st.phase === "morph" ? 1 - st.k : 0.85})`;
           ctx.lineWidth = 2;
           ctx.beginPath();
-          pts.forEach((p, k) => (k ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y)));
+          pts.forEach((p, k) =>
+            k ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y),
+          );
           ctx.stroke();
           const end = pts[pts.length - 1]!;
           ctx.fillStyle = INK;
@@ -246,19 +259,38 @@ export default function UntangleChaosStage({ products, settings }: StageProps) {
         ctx.fillStyle = "#D8CFB8";
         ctx.strokeStyle = INK;
         ctx.lineWidth = 2;
-        roundRect(ctx, core.x - coreW / 2, core.y - coreH / 2, coreW, coreH, 14);
+        roundRect(
+          ctx,
+          core.x - coreW / 2,
+          core.y - coreH / 2,
+          coreW,
+          coreH,
+          14,
+        );
         ctx.fill();
         ctx.stroke();
-        const flicker = 0.75 + 0.25 * Math.sin(time * 0.03) * Math.sin(time * 0.011);
+        const flicker =
+          0.75 + 0.25 * Math.sin(time * 0.03) * Math.sin(time * 0.011);
         ctx.fillStyle = `rgba(16,24,20,${flicker})`;
-        roundRect(ctx, core.x - coreW / 2 + 12, core.y - coreH / 2 + 12, coreW - 24, coreH - 30, 8);
+        roundRect(
+          ctx,
+          core.x - coreW / 2 + 12,
+          core.y - coreH / 2 + 12,
+          coreW - 24,
+          coreH - 30,
+          8,
+        );
         ctx.fill();
         ctx.fillStyle = "#39FF6A";
         ctx.font = `${mobile ? 15 : 18}px "VT323", "IBM Plex Mono", monospace`;
         ctx.textAlign = "center";
         ctx.fillText(t("ucCrt"), core.x, core.y - coreH / 2 + 32);
         ctx.font = `${mobile ? 13 : 15}px "VT323", "IBM Plex Mono", monospace`;
-        log.current.slice(-3).forEach((line, k) => ctx.fillText(line, core.x, core.y - 4 + k * 16));
+        log.current
+          .slice(-3)
+          .forEach((line, k) =>
+            ctx.fillText(line, core.x, core.y - 4 + k * 16),
+          );
       } else {
         const since = still ? 9999 : time - (allDoneAt.current ?? 0);
         for (let w = 0; w < 3; w++) {
@@ -267,12 +299,23 @@ export default function UntangleChaosStage({ products, settings }: StageProps) {
             ctx.strokeStyle = `rgba(0,212,255,${1 - k})`;
             ctx.lineWidth = 3;
             ctx.beginPath();
-            ctx.arc(core.x, core.y, 40 + k * Math.max(size.w, size.h) * 0.6, 0, Math.PI * 2);
+            ctx.arc(
+              core.x,
+              core.y,
+              40 + k * Math.max(size.w, size.h) * 0.6,
+              0,
+              Math.PI * 2,
+            );
             ctx.stroke();
           }
         }
         const r = mobile ? 50 : 62;
-        const cg = ctx.createLinearGradient(core.x - r, core.y - r, core.x + r, core.y + r);
+        const cg = ctx.createLinearGradient(
+          core.x - r,
+          core.y - r,
+          core.x + r,
+          core.y + r,
+        );
         cg.addColorStop(0, BLUE);
         cg.addColorStop(0.5, CYAN);
         cg.addColorStop(1, VIOLET);
@@ -302,9 +345,15 @@ export default function UntangleChaosStage({ products, settings }: StageProps) {
         if (!s) return;
         const st = still
           ? { phase: "done" as const, k: 1 }
-          : fixPhase(fixedAt.current.has(i) ? time - fixedAt.current.get(i)! : null);
+          : fixPhase(
+              fixedAt.current.has(i) ? time - fixedAt.current.get(i)! : null,
+            );
         const fileScale =
-          st.phase === "morph" ? Math.max(0, 1 - st.k * 2) : st.phase === "done" ? 0 : 1;
+          st.phase === "morph"
+            ? Math.max(0, 1 - st.k * 2)
+            : st.phase === "done"
+              ? 0
+              : 1;
         if (fileScale > 0) {
           ctx.save();
           ctx.translate(s.x, s.y);
@@ -323,7 +372,12 @@ export default function UntangleChaosStage({ products, settings }: StageProps) {
           ctx.font = `${mobile ? 14 : 16}px "VT323", "IBM Plex Mono", monospace`;
           ctx.direction = "ltr";
           const label = legacyFileName(product);
-          ctx.fillText(label.length > 22 ? `${label.slice(0, 21)}…` : label, 0, 5, cardW - 12);
+          ctx.fillText(
+            label.length > 22 ? `${label.slice(0, 21)}…` : label,
+            0,
+            5,
+            cardW - 12,
+          );
           ctx.restore();
           ctx.direction = rtl ? "rtl" : "ltr";
         }
@@ -338,9 +392,15 @@ export default function UntangleChaosStage({ products, settings }: StageProps) {
           ctx.closePath();
           ctx.fill();
           ctx.fillStyle = CYAN;
-          ctx.fillRect(s.x - cardW / 2, s.y - cardH / 2 + cardH * st.k, cardW, 2);
+          ctx.fillRect(
+            s.x - cardW / 2,
+            s.y - cardH / 2 + cardH * st.k,
+            cardW,
+            2,
+          );
         }
-        const chipScale = st.phase === "done" ? 1 : st.phase === "morph" ? elastic(st.k) : 0;
+        const chipScale =
+          st.phase === "done" ? 1 : st.phase === "morph" ? elastic(st.k) : 0;
         if (chipScale > 0) {
           ctx.save();
           ctx.translate(s.x, s.y);
@@ -355,7 +415,12 @@ export default function UntangleChaosStage({ products, settings }: StageProps) {
           ctx.textAlign = "center";
           ctx.direction = "ltr";
           ctx.font = `700 ${mobile ? 14 : 16}px "Sora", sans-serif`;
-          ctx.fillText(product.name, 0, product.comingSoon ? -1 : 6, cardW - 16);
+          ctx.fillText(
+            product.name,
+            0,
+            product.comingSoon ? -1 : 6,
+            cardW - 16,
+          );
           if (product.comingSoon) {
             ctx.direction = rtl ? "rtl" : "ltr";
             ctx.font = `500 11px "Sora", "IBM Plex Sans Arabic", sans-serif`;
@@ -405,13 +470,20 @@ export default function UntangleChaosStage({ products, settings }: StageProps) {
             key={product.id}
             type="button"
             className="uc-hit"
-            style={{ left: s.x - cardW / 2, top: s.y - cardH / 2, width: cardW, height: cardH }}
+            style={{
+              left: s.x - cardW / 2,
+              top: s.y - cardH / 2,
+              width: cardW,
+              height: cardH,
+            }}
             aria-label={
               isFixed
                 ? fill(t("ucToolLabel"), product.name)
                 : fill2(t("ucFileLabel"), legacyFileName(product), product.name)
             }
-            onClick={(e) => (isFixed ? inspector.open(product.id, e.currentTarget) : fix(i))}
+            onClick={(e) =>
+              isFixed ? inspector.open(product.id, e.currentTarget) : fix(i)
+            }
           />
         );
       })}

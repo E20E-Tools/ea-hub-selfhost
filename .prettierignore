@@ -1,0 +1,13 @@
+# Lockfiles and generated files keep their own formatting.
+bun.lock
+package-lock.json
+local-backend/package-lock.json
+src/routeTree.gen.ts
+src/integrations/supabase/
+drizzle/migrations/meta/
+# Assets and local data
+public/
+design-lab.html
+.local/
+.output/
+graphify-out/

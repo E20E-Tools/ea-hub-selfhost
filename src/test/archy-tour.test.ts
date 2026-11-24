@@ -54,7 +54,14 @@ it("arcs touch both endpoints and lift through the midpoint", () => {
   expect(tourEase(1)).toBe(1);
 });
 it("preserves the choreography order and scales every duration", () => {
-  expect(ARCHY_TOUR_PHASES).toEqual(["rewind", "fly", "grab", "drag", "celebrate", "return"]);
+  expect(ARCHY_TOUR_PHASES).toEqual([
+    "rewind",
+    "fly",
+    "grab",
+    "drag",
+    "celebrate",
+    "return",
+  ]);
   expect(ARCHY_TOUR_MS).toEqual({
     wait: 250,
     rewind: 500,
@@ -64,7 +71,9 @@ it("preserves the choreography order and scales every duration", () => {
     celebrate: 2200,
     return: 1000,
   });
-  for (const phase of Object.keys(ARCHY_TOUR_MS) as Array<keyof typeof ARCHY_TOUR_MS>) {
+  for (const phase of Object.keys(ARCHY_TOUR_MS) as Array<
+    keyof typeof ARCHY_TOUR_MS
+  >) {
     expect(tourDuration(phase, 2)).toBe(ARCHY_TOUR_MS[phase] / 2);
   }
 });
@@ -93,7 +102,9 @@ describe("greeting-delivered readiness", () => {
   it("waits for the first Wave and speech to finish", () => {
     expect(archyTourRobotReady({ ...ready, animation: "Wave" })).toBe(false);
     expect(archyTourRobotReady({ ...ready, speaking: true })).toBe(false);
-    expect(archyTourRobotReady({ ...ready, greetingPending: true })).toBe(false);
+    expect(archyTourRobotReady({ ...ready, greetingPending: true })).toBe(
+      false,
+    );
     expect(archyTourRobotReady({ ...ready, sceneFinal: false })).toBe(false);
   });
   it("proceeds when speech passes the six-second safety cap", () => {
@@ -114,10 +125,19 @@ describe("greeting-delivered readiness", () => {
   });
   it("is immediately ready after the scene settles in an already-greeted session", () => {
     expect(
-      archyTourRobotReady({ ...ready, greetingStartedAt: null, animation: "Wave", speaking: true }),
+      archyTourRobotReady({
+        ...ready,
+        greetingStartedAt: null,
+        animation: "Wave",
+        speaking: true,
+      }),
     ).toBe(true);
-    expect(archyTourRobotReady({ ...ready, greetingStartedAt: null, open: true })).toBe(false);
-    expect(archyTourRobotReady({ ...ready, greetingStartedAt: null, hidden: true })).toBe(false);
+    expect(
+      archyTourRobotReady({ ...ready, greetingStartedAt: null, open: true }),
+    ).toBe(false);
+    expect(
+      archyTourRobotReady({ ...ready, greetingStartedAt: null, hidden: true }),
+    ).toBe(false);
   });
 });
 

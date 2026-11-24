@@ -53,7 +53,10 @@ const LanguageContext = createContext<LanguageValue>({
 /** Mirrors the choice into the language cookie the server reads for lang/dir. */
 function rememberCookie(language: Language) {
   try {
-    document.cookie = languageCookie(language, window.location.protocol === "https:");
+    document.cookie = languageCookie(
+      language,
+      window.location.protocol === "https:",
+    );
   } catch {
     /* cookies blocked: the browser-only choice still applies */
   }
@@ -101,7 +104,8 @@ export function LanguageProvider({
       window.navigator.language || "ar",
     );
     // Returning visitors who chose before the cookie existed get it now; no choice, no cookie.
-    if (stored && languageFromCookie(document.cookie) !== resolved) rememberCookie(resolved);
+    if (stored && languageFromCookie(document.cookie) !== resolved)
+      rememberCookie(resolved);
     setLanguageState(resolved);
   }, [initialLanguage]);
 
@@ -140,7 +144,11 @@ export function LanguageProvider({
     [language, setLanguage, arabicAvailable],
   );
 
-  return <LanguageContext.Provider value={value}>{children}</LanguageContext.Provider>;
+  return (
+    <LanguageContext.Provider value={value}>
+      {children}
+    </LanguageContext.Provider>
+  );
 }
 
 export function useLanguage(): LanguageValue {

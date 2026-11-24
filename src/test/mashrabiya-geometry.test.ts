@@ -22,7 +22,9 @@ describe("star geometry", () => {
   it("an 8-point star has 16 vertices on two exact radii", () => {
     const s = khatam(0, 0, 10);
     expect(s).toHaveLength(16);
-    s.forEach((p, i) => expect(Math.hypot(...p)).toBeCloseTo(i % 2 ? 10 * KHATAM_RATIO : 10, 9));
+    s.forEach((p, i) =>
+      expect(Math.hypot(...p)).toBeCloseTo(i % 2 ? 10 * KHATAM_RATIO : 10, 9),
+    );
     expect(starPoints(0, 0, 5, 2, 6)).toHaveLength(12);
     expect(polygon(0, 0, 3, 8)).toHaveLength(8);
   });
@@ -80,10 +82,14 @@ describe("ring placement", () => {
         for (let j = i + 1; j < n; j++) {
           const a = c.tiles[i]!;
           const b = c.tiles[j]!;
-          expect(Math.hypot(a.x - b.x, a.y - b.y)).toBeGreaterThan((a.size + b.size) / 2);
+          expect(Math.hypot(a.x - b.x, a.y - b.y)).toBeGreaterThan(
+            (a.size + b.size) / 2,
+          );
         }
       c.tiles.forEach((t) => {
-        expect(Math.hypot(t.x - c.cx, t.y - c.cy)).toBeGreaterThan(c.medallion + t.size / 2);
+        expect(Math.hypot(t.x - c.cx, t.y - c.cy)).toBeGreaterThan(
+          c.medallion + t.size / 2,
+        );
         expect(t.x - t.size / 2).toBeGreaterThanOrEqual(0);
         expect(t.y - t.size / 2).toBeGreaterThanOrEqual(0);
         expect(t.y + t.size / 2).toBeLessThanOrEqual(c.h);

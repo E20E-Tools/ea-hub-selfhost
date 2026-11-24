@@ -20,7 +20,12 @@ import {
   type RequestType,
 } from "./requests.shared";
 import type { AdminImage } from "./admin-gallery.shared";
-import { FEATURE_KEYS, LEGACY_FEATURE_KEYS, normalizeFeatureFlags, type FeatureKey } from "./site-features";
+import {
+  FEATURE_KEYS,
+  LEGACY_FEATURE_KEYS,
+  normalizeFeatureFlags,
+  type FeatureKey,
+} from "./site-features";
 import { navigationSchema } from "./navigation.shared";
 import { isPublicationDate } from "./publication-date";
 import { beneficiaryDetailsSchema } from "./beneficiary-metadata";
@@ -35,7 +40,11 @@ import {
 
 export type AdminResult = { ok: true } | { ok: false; message: string };
 
-type AdminContext = { supabase: SupabaseClient<Database>; userId: string; claims: unknown };
+type AdminContext = {
+  supabase: SupabaseClient<Database>;
+  userId: string;
+  claims: unknown;
+};
 
 /** Shared server-only admin guard (loaded lazily so it never enters the client bundle). */
 export async function requireAdmin(context: AdminContext) {
@@ -44,12 +53,17 @@ export async function requireAdmin(context: AdminContext) {
 }
 
 /** Best-effort append to the admin audit log; never blocks the change itself. */
-export async function logActivity(context: AdminContext, action: string, target = "") {
+export async function logActivity(
+  context: AdminContext,
+  action: string,
+  target = "",
+) {
   // Every admin save logs here, so this is also where the visitor catalog cache is cleared.
   (await import("./catalog-cache.server")).invalidateCatalogCache();
   try {
     const email = (context.claims as { email?: unknown } | null)?.email;
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { supabaseAdmin } =
+      await import("@/integrations/supabase/client.server");
     await supabaseAdmin.from("admin_activity").insert({
       actor_id: context.userId,
       actor_email: typeof email === "string" ? email : "",
@@ -78,20 +92,28 @@ const productSchema = z.object({
   label: z.string().trim().min(2, "اكتب الوصف التعريفي.").max(60),
   description: z.string().trim().min(10, "الوصف المختصر قصير جدًا.").max(300),
   overview: z.string().trim().min(10, "الوصف الكامل قصير جدًا.").max(1200),
-  features: z.array(z.string().trim().min(1, "اكتب الميزة أو احذف السطر.").max(200)).max(20),
+  features: z
+    .array(z.string().trim().min(1, "اكتب الميزة أو احذف السطر.").max(200))
+    .max(20),
   version: z.string().trim().max(40),
   whatsNew: z.string().trim().max(1500),
   url: z
     .string()
     .trim()
     .max(500)
-    .refine((value) => value === "" || /^https?:\/\/\S+$/i.test(value), "رابط النظام غير صحيح."),
+    .refine(
+      (value) => value === "" || /^https?:\/\/\S+$/i.test(value),
+      "رابط النظام غير صحيح.",
+    ),
   keywords: z.string().trim().max(500),
   comingSoon: z.boolean(),
   servicesEnabled: z.boolean().optional(),
   publicationDate: z
     .string()
-    .refine((value) => value === "" || isPublicationDate(value), "Invalid publication date")
+    .refine(
+      (value) => value === "" || isPublicationDate(value),
+      "Invalid publication date",
+    )
     .optional(),
   imageUrl: z.string().trim().max(500),
   imageAlt: z.string().trim().max(200),
@@ -104,7 +126,10 @@ const productSchema = z.object({
     .string()
     .trim()
     .max(500)
-    .refine((value) => value === "" || /^https:\/\/\S+$/i.test(value), "رابط GitHub غير صحيح.")
+    .refine(
+      (value) => value === "" || /^https:\/\/\S+$/i.test(value),
+      "رابط GitHub غير صحيح.",
+    )
     .default(""),
   imageAltEn: z.string().trim().max(200).default(""),
   sortOrder: z.number().int().min(0).max(9999),
@@ -172,7 +197,9 @@ export const saveProduct = createServerFn({ method: "POST" })
       url: data.url,
       keywords: data.keywords,
       coming_soon: data.comingSoon,
-      ...(data.servicesEnabled !== undefined && {services_enabled:data.servicesEnabled}),
+      ...(data.servicesEnabled !== undefined && {
+        services_enabled: data.servicesEnabled,
+      }),
       ...(data.publicationDate !== undefined
         ? { publication_date: data.publicationDate || null }
         : {}),
@@ -200,7 +227,10 @@ export const deleteProduct = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ data, context }): Promise<AdminResult> => {
     await requireAdmin(context);
-    const { error } = await context.supabase.from("products").delete().eq("id", data.id);
+    const { error } = await context.supabase
+      .from("products")
+      .delete()
+      .eq("id", data.id);
     if (!error) await logActivity(context, "product.delete", data.id);
     return error ? { ok: false, message: "errDeleteProduct" } : { ok: true };
   });
@@ -232,27 +262,43 @@ export type RequestRow = {
   status: RequestStatus;
   status_updated_at: string | null;
   attachments: (RequestAttachment & { url: string })[];
-  details: { exercise?:string; services?: string[]; tools?: string[]; teamSize?: string; timeline?: string } | null;
+  details: {
+    exercise?: string;
+    services?: string[];
+    tools?: string[];
+    teamSize?: string;
+    timeline?: string;
+  } | null;
 };
 
 export const setRequestStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((value: unknown) =>
-    z.object({ id: z.string().uuid(), status: z.enum(REQUEST_STATUSES) }).parse(value),
+    z
+      .object({ id: z.string().uuid(), status: z.enum(REQUEST_STATUSES) })
+      .parse(value),
   )
   .handler(async ({ data, context }): Promise<AdminResult> => {
     await requireAdmin(context);
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { supabaseAdmin } =
+      await import("@/integrations/supabase/client.server");
     const { data: row, error } = await supabaseAdmin
       .from("suggestion_requests")
-      .update({ status: data.status, status_updated_at: new Date().toISOString() })
+      .update({
+        status: data.status,
+        status_updated_at: new Date().toISOString(),
+      })
       .eq("id", data.id)
       .select("id")
       .maybeSingle();
     if (error || !row) return { ok: false, message: "errRequestStatus" };
     await logActivity(context, `request.${data.status}`, data.id);
     const { notifyCustomer } = await import("./customer-notify.server");
-    await notifyCustomer({ kind: "status", requestId: data.id, status: data.status });
+    await notifyCustomer({
+      kind: "status",
+      requestId: data.id,
+      status: data.status,
+    });
     return { ok: true };
   });
 
@@ -282,10 +328,13 @@ const requestSearchInput = z
 
 export const listRequests = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((value: unknown) => requestSearchInput.parse(value ?? undefined))
+  .inputValidator((value: unknown) =>
+    requestSearchInput.parse(value ?? undefined),
+  )
   .handler(async ({ data: search, context }) => {
     await requireAdmin(context);
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { supabaseAdmin } =
+      await import("@/integrations/supabase/client.server");
     let query = supabaseAdmin
       .from("suggestion_requests")
       .select(
@@ -293,16 +342,25 @@ export const listRequests = createServerFn({ method: "GET" })
       );
     if (search?.waiting) {
       query = query.in("status", [...OPEN_REQUEST_STATUSES]);
-      query = search.waiting === "team" ? query.eq("pending_question", "") : query.neq("pending_question", "");
+      query =
+        search.waiting === "team"
+          ? query.eq("pending_question", "")
+          : query.neq("pending_question", "");
     }
     const term = requestSearchTerm(search?.q ?? "");
     if (term)
       query = query.or(
-        ["name", "email", "company", "need", "impact"].map((c) => `${c}.ilike.%${term}%`).join(","),
+        ["name", "email", "company", "need", "impact"]
+          .map((c) => `${c}.ilike.%${term}%`)
+          .join(","),
       );
-    if (search?.from) query = query.gte("created_at", `${search.from}T00:00:00Z`);
-    if (search?.to) query = query.lte("created_at", `${search.to}T23:59:59.999Z`);
-    const { data, error } = await query.order("created_at", { ascending: false }).limit(500);
+    if (search?.from)
+      query = query.gte("created_at", `${search.from}T00:00:00Z`);
+    if (search?.to)
+      query = query.lte("created_at", `${search.to}T23:59:59.999Z`);
+    const { data, error } = await query
+      .order("created_at", { ascending: false })
+      .limit(500);
     if (error) throw new Error("تعذّر تحميل الطلبات.");
     return (await Promise.all(
       (data ?? []).map(async (row) => {
@@ -311,7 +369,10 @@ export const listRequests = createServerFn({ method: "GET" })
           : [];
         // No signed links: each photo is fetched through getRequestAttachment, which
         // re-checks admin access on every view, so removal takes effect immediately.
-        const signed = attachments.map((attachment) => ({ ...attachment, url: "" }));
+        const signed = attachments.map((attachment) => ({
+          ...attachment,
+          url: "",
+        }));
         return { ...row, attachments: signed };
       }),
     )) as RequestRow[];
@@ -328,32 +389,44 @@ const ATTACHMENT_TYPES: Record<string, string> = {
 export const getRequestAttachment = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((value: unknown) =>
-    z.object({ id: z.string().uuid(), path: z.string().min(1).max(300) }).parse(value),
+    z
+      .object({ id: z.string().uuid(), path: z.string().min(1).max(300) })
+      .parse(value),
   )
-  .handler(async ({ data, context }): Promise<{ ok: true; src: string } | { ok: false }> => {
-    await requireAdmin(context);
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { data: row, error } = await supabaseAdmin
-      .from("suggestion_requests")
-      .select("attachments")
-      .eq("id", data.id)
-      .maybeSingle();
-    if (error || !row) return { ok: false };
-    const list = Array.isArray(row.attachments) ? (row.attachments as RequestAttachment[]) : [];
-    // Only paths recorded on this request can be read.
-    if (!list.some((item) => item.path === data.path)) return { ok: false };
-    const type = ATTACHMENT_TYPES[data.path.split(".").pop()?.toLowerCase() ?? ""];
-    if (!type) return { ok: false };
-    const { data: file, error: readError } = await supabaseAdmin.storage
-      .from("request-attachments")
-      .download(data.path);
-    if (readError || !file || file.size > 10 * 1024 * 1024) return { ok: false };
-    const bytes = new Uint8Array(await file.arrayBuffer());
-    let binary = "";
-    for (let i = 0; i < bytes.length; i += 0x8000)
-      binary += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
-    return { ok: true, src: `data:${type};base64,${btoa(binary)}` };
-  });
+  .handler(
+    async ({
+      data,
+      context,
+    }): Promise<{ ok: true; src: string } | { ok: false }> => {
+      await requireAdmin(context);
+      const { supabaseAdmin } =
+        await import("@/integrations/supabase/client.server");
+      const { data: row, error } = await supabaseAdmin
+        .from("suggestion_requests")
+        .select("attachments")
+        .eq("id", data.id)
+        .maybeSingle();
+      if (error || !row) return { ok: false };
+      const list = Array.isArray(row.attachments)
+        ? (row.attachments as RequestAttachment[])
+        : [];
+      // Only paths recorded on this request can be read.
+      if (!list.some((item) => item.path === data.path)) return { ok: false };
+      const type =
+        ATTACHMENT_TYPES[data.path.split(".").pop()?.toLowerCase() ?? ""];
+      if (!type) return { ok: false };
+      const { data: file, error: readError } = await supabaseAdmin.storage
+        .from("request-attachments")
+        .download(data.path);
+      if (readError || !file || file.size > 10 * 1024 * 1024)
+        return { ok: false };
+      const bytes = new Uint8Array(await file.arrayBuffer());
+      let binary = "";
+      for (let i = 0; i < bytes.length; i += 0x8000)
+        binary += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+      return { ok: true, src: `data:${type};base64,${btoa(binary)}` };
+    },
+  );
 
 export type SupportOfferRow = {
   id: string;
@@ -373,7 +446,8 @@ export const listSupportOffers = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<SupportOfferRow[]> => {
     await requireAdmin(context);
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { supabaseAdmin } =
+      await import("@/integrations/supabase/client.server");
     const { data, error } = await supabaseAdmin
       .from("support_offers")
       .select(
@@ -388,14 +462,20 @@ export const listSupportOffers = createServerFn({ method: "GET" })
 export const setSupportOfferStatus = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((value: unknown) =>
-    z.object({ id: z.string().uuid(), status: z.enum(OFFER_STATUSES) }).parse(value),
+    z
+      .object({ id: z.string().uuid(), status: z.enum(OFFER_STATUSES) })
+      .parse(value),
   )
   .handler(async ({ data, context }): Promise<AdminResult> => {
     await requireAdmin(context);
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { supabaseAdmin } =
+      await import("@/integrations/supabase/client.server");
     const { data: row, error } = await supabaseAdmin
       .from("support_offers")
-      .update({ status: data.status, status_updated_at: new Date().toISOString() })
+      .update({
+        status: data.status,
+        status_updated_at: new Date().toISOString(),
+      })
       .eq("id", data.id)
       .select("id")
       .maybeSingle();
@@ -404,9 +484,14 @@ export const setSupportOfferStatus = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-export const ADMIN_UPLOAD_FOLDERS = ["branding", "products", "affiliates"] as const;
+export const ADMIN_UPLOAD_FOLDERS = [
+  "branding",
+  "products",
+  "affiliates",
+] as const;
 
-export type UploadResult = { ok: true; path: string } | { ok: false; message: string };
+export type UploadResult =
+  { ok: true; path: string } | { ok: false; message: string };
 
 export const listAdminImages = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
@@ -429,12 +514,15 @@ export const listAdminImages = createServerFn({ method: "GET" })
         for (const entry of data ?? []) {
           const path = folder ? `${folder}/${entry.name}` : entry.name;
           if (!entry.id) {
-            if (folders.length < 100 && path.split("/").length < 5) folders.push(path);
+            if (folders.length < 100 && path.split("/").length < 5)
+              folders.push(path);
             continue;
           }
           if (!/\.(png|jpe?g|webp|svg)$/i.test(entry.name)) continue;
           const metadata = entry.metadata as Record<string, unknown> | null;
-          const bytes = Number(metadata?.["size"] ?? metadata?.["contentLength"]);
+          const bytes = Number(
+            metadata?.["size"] ?? metadata?.["contentLength"],
+          );
           rows.push({
             path,
             name: entry.name,
@@ -479,11 +567,19 @@ export const uploadAdminImage = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ data, context }): Promise<UploadResult> => {
     await requireAdmin(context);
-    const { matchesImageSignature, imageDimensions, stripJpegMetadata, MAX_IMAGE_SIDE } =
-      await import("./suggestion.shared");
+    const {
+      matchesImageSignature,
+      imageDimensions,
+      stripJpegMetadata,
+      MAX_IMAGE_SIDE,
+    } = await import("./suggestion.shared");
     const { file, folder } = data;
     const types = ["image/jpeg", "image/png", "image/webp"];
-    if (!types.includes(file.type) || file.size === 0 || file.size > 4 * 1024 * 1024) {
+    if (
+      !types.includes(file.type) ||
+      file.size === 0 ||
+      file.size > 4 * 1024 * 1024
+    ) {
       return { ok: false, message: "errImageType" };
     }
     const original = new Uint8Array(await file.arrayBuffer());
@@ -498,14 +594,24 @@ export const uploadAdminImage = createServerFn({ method: "POST" })
     ) {
       return { ok: false, message: "errImageInvalid" };
     }
-    const bytes = file.type === "image/jpeg" ? stripJpegMetadata(original) : original;
+    const bytes =
+      file.type === "image/jpeg" ? stripJpegMetadata(original) : original;
     const extension =
-      file.type === "image/jpeg" ? "jpg" : file.type === "image/png" ? "png" : "webp";
+      file.type === "image/jpeg"
+        ? "jpg"
+        : file.type === "image/png"
+          ? "png"
+          : "webp";
     const path = `${folder}/${crypto.randomUUID()}.${extension}`;
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { supabaseAdmin } =
+      await import("@/integrations/supabase/client.server");
     const { error } = await supabaseAdmin.storage
       .from("library-assets")
-      .upload(path, bytes, { contentType: file.type, cacheControl: "3600", upsert: false });
+      .upload(path, bytes, {
+        contentType: file.type,
+        cacheControl: "3600",
+        upsert: false,
+      });
     if (error) return { ok: false, message: "errImageUpload" };
     await logActivity(context, "image.upload", path);
     return { ok: true, path };
@@ -539,41 +645,49 @@ export const getAdminDashboard = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<AdminDashboard> => {
     await requireAdmin(context);
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { supabaseAdmin } =
+      await import("@/integrations/supabase/client.server");
     const countNewRequests = () =>
       supabaseAdmin
         .from("suggestion_requests")
         .select("id", { count: "exact", head: true })
         .eq("status", "new");
-    const [fresh, urgent, offers, latestRequests, latestOffers, activity] = await Promise.all([
-      Promise.all(
-        REQUEST_TYPES.map(async (type) => {
-          const { count, error } = await countNewRequests().eq("request_type", type);
-          if (error || count === null) throw new Error("تعذّر تحميل لوحة المتابعة.");
-          return [type, count] as const;
-        }),
-      ),
-      countNewRequests().eq("request_type", "support").eq("urgency", "urgent"),
-      supabaseAdmin
-        .from("support_offers")
-        .select("id", { count: "exact", head: true })
-        .eq("status", "new"),
-      supabaseAdmin
-        .from("suggestion_requests")
-        .select("id, request_type, name, status, created_at")
-        .order("created_at", { ascending: false })
-        .limit(5),
-      supabaseAdmin
-        .from("support_offers")
-        .select("id, offer_type, name, organization, status, created_at")
-        .order("created_at", { ascending: false })
-        .limit(5),
-      context.supabase
-        .from("admin_activity")
-        .select("id, actor_email, action, target, created_at")
-        .order("created_at", { ascending: false })
-        .limit(5),
-    ]);
+    const [fresh, urgent, offers, latestRequests, latestOffers, activity] =
+      await Promise.all([
+        Promise.all(
+          REQUEST_TYPES.map(async (type) => {
+            const { count, error } = await countNewRequests().eq(
+              "request_type",
+              type,
+            );
+            if (error || count === null)
+              throw new Error("تعذّر تحميل لوحة المتابعة.");
+            return [type, count] as const;
+          }),
+        ),
+        countNewRequests()
+          .eq("request_type", "support")
+          .eq("urgency", "urgent"),
+        supabaseAdmin
+          .from("support_offers")
+          .select("id", { count: "exact", head: true })
+          .eq("status", "new"),
+        supabaseAdmin
+          .from("suggestion_requests")
+          .select("id, request_type, name, status, created_at")
+          .order("created_at", { ascending: false })
+          .limit(5),
+        supabaseAdmin
+          .from("support_offers")
+          .select("id, offer_type, name, organization, status, created_at")
+          .order("created_at", { ascending: false })
+          .limit(5),
+        context.supabase
+          .from("admin_activity")
+          .select("id, actor_email, action, target, created_at")
+          .order("created_at", { ascending: false })
+          .limit(5),
+      ]);
     if (
       urgent.error ||
       urgent.count === null ||
@@ -590,7 +704,8 @@ export const getAdminDashboard = createServerFn({ method: "GET" })
       newByType,
       urgentSupport: urgent.count,
       newOffers: offers.count,
-      latestRequests: (latestRequests.data ?? []) as AdminDashboard["latestRequests"],
+      latestRequests: (latestRequests.data ??
+        []) as AdminDashboard["latestRequests"],
       latestOffers: (latestOffers.data ?? []) as AdminDashboard["latestOffers"],
       latestActivity: activity.data ?? [],
     };
@@ -627,7 +742,8 @@ export const saveAffiliate = createServerFn({ method: "POST" })
   .handler(async ({ data, context }): Promise<AdminResult> => {
     await requireAdmin(context);
     try {
-      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { supabaseAdmin } =
+        await import("@/integrations/supabase/client.server");
       const { error } = await supabaseAdmin.from("affiliates").upsert({
         id: data.id,
         title_ar: data.titleAr,
@@ -649,12 +765,18 @@ export const saveAffiliate = createServerFn({ method: "POST" })
 
 export const deleteAffiliate = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((value: unknown) => z.object({ id: affiliateIdSchema }).parse(value))
+  .inputValidator((value: unknown) =>
+    z.object({ id: affiliateIdSchema }).parse(value),
+  )
   .handler(async ({ data, context }): Promise<AdminResult> => {
     await requireAdmin(context);
     try {
-      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-      const { error } = await supabaseAdmin.from("affiliates").delete().eq("id", data.id);
+      const { supabaseAdmin } =
+        await import("@/integrations/supabase/client.server");
+      const { error } = await supabaseAdmin
+        .from("affiliates")
+        .delete()
+        .eq("id", data.id);
       if (error) throw error;
       await logActivity(context, "affiliate.delete", data.id);
       return { ok: true };
@@ -671,7 +793,9 @@ export const featureFlagsSchema = z
     Object.fromEntries(
       FEATURE_KEYS.map((key) => [
         key,
-        LEGACY_FEATURE_KEYS.includes(key) ? z.boolean() : z.boolean().optional(),
+        LEGACY_FEATURE_KEYS.includes(key)
+          ? z.boolean()
+          : z.boolean().optional(),
       ]),
     ) as Record<FeatureKey, z.ZodBoolean>,
   )
@@ -713,7 +837,10 @@ const categoryIdSchema = z
   .regex(/^[a-z0-9-]{2,40}$/, "معرّف التصنيف غير صالح.");
 const categoryMapSchema = z
   .record(categoryIdSchema, z.string().trim().min(2).max(60))
-  .refine((value) => Object.keys(value).length <= 50, "عدد التصنيفات كبير جدًا.");
+  .refine(
+    (value) => Object.keys(value).length <= 50,
+    "عدد التصنيفات كبير جدًا.",
+  );
 
 export const generalSettingsSchema = z.object({
   displayTitle: z.string().trim().min(2, "العنوان قصير جدًا.").max(80),
@@ -758,7 +885,9 @@ export const saveGeneralSettings = createServerFn({ method: "POST" })
         description_en: data.descriptionEn,
         footer_text: data.footerText,
         footer_text_en: data.footerTextEn,
-        ...(data.footerLinks !== undefined ? { footer_links: data.footerLinks } : {}),
+        ...(data.footerLinks !== undefined
+          ? { footer_links: data.footerLinks }
+          : {}),
         logo_url: data.logoUrl,
         updated_at: new Date().toISOString(),
       })
@@ -788,7 +917,10 @@ export const appearanceSettingsSchema = z
           .regex(/^--[a-z0-9-]+$/i, "اسم اللون غير صالح."),
         z.string().trim().max(80).refine(isValidColor, "قيمة اللون غير صحيحة."),
       )
-      .refine((value) => Object.keys(value).length <= 40, "عدد الألوان كبير جدًا."),
+      .refine(
+        (value) => Object.keys(value).length <= 40,
+        "عدد الألوان كبير جدًا.",
+      ),
     designTheme: designThemeSchema,
     imageFit: z.enum(["contain", "cover"]),
     imageBrightness: z.number().min(0.5).max(1.5),
@@ -816,14 +948,22 @@ export const saveAppearanceSettings = createServerFn({ method: "POST" })
     if (data.colors !== undefined) row.colors = data.colors;
     if (data.designTheme !== undefined) row.design_theme = data.designTheme;
     if (data.imageFit !== undefined) row.image_fit = data.imageFit;
-    if (data.imageBrightness !== undefined) row.image_brightness = data.imageBrightness;
-    if (data.imageContrast !== undefined) row.image_contrast = data.imageContrast;
-    if (data.imageSaturation !== undefined) row.image_saturation = data.imageSaturation;
+    if (data.imageBrightness !== undefined)
+      row.image_brightness = data.imageBrightness;
+    if (data.imageContrast !== undefined)
+      row.image_contrast = data.imageContrast;
+    if (data.imageSaturation !== undefined)
+      row.image_saturation = data.imageSaturation;
     if (data.imageSharpen !== undefined) row.image_sharpen = data.imageSharpen;
-    if (data.motionEnabled !== undefined) row.motion_enabled = data.motionEnabled;
+    if (data.motionEnabled !== undefined)
+      row.motion_enabled = data.motionEnabled;
     if (data.motionSpeed !== undefined) row.motion_speed = data.motionSpeed;
-    if (data.motionDirection !== undefined) row.motion_direction = data.motionDirection;
-    const { error } = await context.supabase.from("site_settings").update(row).eq("id", true);
+    if (data.motionDirection !== undefined)
+      row.motion_direction = data.motionDirection;
+    const { error } = await context.supabase
+      .from("site_settings")
+      .update(row)
+      .eq("id", true);
     if (error) return { ok: false, message: "errSaveAppearance" };
     await logActivity(context, "settings.save", "appearance");
     return { ok: true };
@@ -845,7 +985,9 @@ export const saveThemeCustomization = createServerFn({ method: "POST" })
       .eq("id", true)
       .maybeSingle();
     if (current.error) return { ok: false, message: "errSaveCustomize" };
-    const map = normalizeThemeCustomizations(current.data?.theme_customizations);
+    const map = normalizeThemeCustomizations(
+      current.data?.theme_customizations,
+    );
     const value = compactCustomization(data.value as ThemeCustomization);
     if (isEmptyCustomization(value)) delete map[data.theme];
     else map[data.theme] = value;
@@ -893,8 +1035,12 @@ export const saveNavigationSettings = createServerFn({ method: "POST" })
     };
     if (data.items !== undefined) row.navigation_items = data.items;
     if (data.navStyle !== undefined) row.nav_style = data.navStyle;
-    if (data.mobileNavStyle !== undefined) row.mobile_nav_style = data.mobileNavStyle;
-    const { error } = await context.supabase.from("site_settings").update(row).eq("id", true);
+    if (data.mobileNavStyle !== undefined)
+      row.mobile_nav_style = data.mobileNavStyle;
+    const { error } = await context.supabase
+      .from("site_settings")
+      .update(row)
+      .eq("id", true);
     if (error) return { ok: false, message: "errSaveNavigation" };
     await logActivity(context, "settings.save", "navigation");
     return { ok: true };
@@ -967,7 +1113,8 @@ export const listAdminActivity = createServerFn({ method: "GET" })
       .select("id, actor_email, action, target, created_at")
       .order("created_at", { ascending: false });
     if (data.action) query = query.like("action", `${data.action}%`);
-    if (data.group && data.group !== "all") query = query.like("action", `${data.group}.%`);
+    if (data.group && data.group !== "all")
+      query = query.like("action", `${data.group}.%`);
     if (data.search) {
       // Strip PostgREST filter syntax characters before building the OR filter.
       const needle = data.search.replace(/[,()*%\\]/g, " ").trim();
@@ -979,7 +1126,10 @@ export const listAdminActivity = createServerFn({ method: "GET" })
     if (data.actor) query = query.eq("actor_email", data.actor.toLowerCase());
     if (data.from) query = query.gte("created_at", data.from);
     if (data.to) query = query.lte("created_at", data.to);
-    const { data: rows, error } = await query.range(data.offset, data.offset + data.limit - 1);
+    const { data: rows, error } = await query.range(
+      data.offset,
+      data.offset + data.limit - 1,
+    );
     if (error) throw new Error("تعذّر تحميل السجل.");
     return rows ?? [];
   });
@@ -997,7 +1147,8 @@ export const listAdmins = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }): Promise<AdminAccountRow[]> => {
     await requireAdmin(context);
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { supabaseAdmin } =
+      await import("@/integrations/supabase/client.server");
     const { data: roles, error } = await supabaseAdmin
       .from("user_roles")
       .select("user_id")
@@ -1006,7 +1157,8 @@ export const listAdmins = createServerFn({ method: "GET" })
     if (error) throw new Error("تعذّر تحميل قائمة المشرفين.");
     const rows: AdminAccountRow[] = [];
     for (const { user_id } of roles ?? []) {
-      const { data: found } = await supabaseAdmin.auth.admin.getUserById(user_id);
+      const { data: found } =
+        await supabaseAdmin.auth.admin.getUserById(user_id);
       if (!found.user) continue;
       rows.push({
         email: found.user.email ?? "",
@@ -1036,46 +1188,70 @@ export const changeAdminPassword = createServerFn({ method: "POST" })
     await requireAdmin(context);
     const { consumeLimits } = await import("./rate-limit.server");
     const allowed = await consumeLimits([
-      { bucket: "admin-password", subject: context.userId, limit: 5, windowSeconds: 900 },
+      {
+        bucket: "admin-password",
+        subject: context.userId,
+        limit: 5,
+        windowSeconds: 900,
+      },
     ]);
     if (!allowed) return { ok: false, message: "errPasswordRate" };
     // Email comes from the verified session only, never from input.
     const { data: identity } = await context.supabase.auth.getUser();
-    const email = identity.user?.id === context.userId ? identity.user.email : undefined;
+    const email =
+      identity.user?.id === context.userId ? identity.user.email : undefined;
     if (!email) return { ok: false, message: "errPasswordIdentity" };
     if (data.password.trim().toLowerCase() === email.toLowerCase())
       return { ok: false, message: "errPasswordEmail" };
-    if (data.password === data.currentPassword) return { ok: false, message: "errPasswordSame" };
+    if (data.password === data.currentPassword)
+      return { ok: false, message: "errPasswordSame" };
     const verified = await verifyPassword(email, data.currentPassword);
     if (!verified) return { ok: false, message: "errPasswordCurrent" };
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const { error } = await supabaseAdmin.auth.admin.updateUserById(context.userId, {
-      password: data.password,
-    });
+    const { supabaseAdmin } =
+      await import("@/integrations/supabase/client.server");
+    const { error } = await supabaseAdmin.auth.admin.updateUserById(
+      context.userId,
+      {
+        password: data.password,
+      },
+    );
     if (error) return { ok: false, message: "errPasswordUpdate" };
     await logActivity(context, "password.change");
     return { ok: true };
   });
 
 /** Throwaway, non-persistent sign-in used only to confirm the current password. */
-async function verifyPassword(email: string, password: string): Promise<boolean> {
+async function verifyPassword(
+  email: string,
+  password: string,
+): Promise<boolean> {
   const { createClient } = await import("@supabase/supabase-js");
   const url = process.env["SUPABASE_URL"];
   const key = process.env["SUPABASE_PUBLISHABLE_KEY"];
   if (!url || !key) return false;
   const client = createClient(url, key, {
-    auth: { persistSession: false, autoRefreshToken: false, storage: undefined },
+    auth: {
+      persistSession: false,
+      autoRefreshToken: false,
+      storage: undefined,
+    },
     global: {
       fetch: (input, init) => {
         const headers = new Headers(init?.headers);
-        if (key.startsWith("sb_") && headers.get("Authorization") === `Bearer ${key}`)
+        if (
+          key.startsWith("sb_") &&
+          headers.get("Authorization") === `Bearer ${key}`
+        )
           headers.delete("Authorization");
         headers.set("apikey", key);
         return fetch(input, { ...init, headers });
       },
     },
   });
-  const { data, error } = await client.auth.signInWithPassword({ email, password });
+  const { data, error } = await client.auth.signInWithPassword({
+    email,
+    password,
+  });
   if (error || !data.session) return false;
   await client.auth.signOut({ scope: "local" }).catch(() => undefined);
   return true;
@@ -1089,7 +1265,11 @@ export const saveTerms = createServerFn({ method: "POST" })
     const { error } = await context.supabase
       .from("site_settings")
       .update({
-        terms_content: { ar: data.ar, en: data.en, updatedAt: new Date().toISOString() },
+        terms_content: {
+          ar: data.ar,
+          en: data.en,
+          updatedAt: new Date().toISOString(),
+        },
         updated_at: new Date().toISOString(),
       })
       .eq("id", true);
@@ -1112,15 +1292,24 @@ export const saveArchyGreeting = createServerFn({ method: "POST" })
     return { ok: true };
   });
 
-export type RequestReply = { id: string; author_email: string; author_kind?:string; body: string; created_at: string };
+export type RequestReply = {
+  id: string;
+  author_email: string;
+  author_kind?: string;
+  body: string;
+  created_at: string;
+};
 
 /** Saved team replies on one request, oldest first. */
 export const listRequestReplies = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((value: unknown) => z.object({ id: z.string().uuid() }).parse(value))
+  .inputValidator((value: unknown) =>
+    z.object({ id: z.string().uuid() }).parse(value),
+  )
   .handler(async ({ data, context }): Promise<RequestReply[]> => {
     await requireAdmin(context);
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { supabaseAdmin } =
+      await import("@/integrations/supabase/client.server");
     const { data: rows, error } = await supabaseAdmin
       .from("request_replies")
       .select("id, author_email, author_kind, body, created_at")
@@ -1135,12 +1324,19 @@ export const listRequestReplies = createServerFn({ method: "GET" })
 export const addRequestReply = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((value: unknown) =>
-    z.object({ id: z.string().uuid(), body: z.string().trim().min(1).max(5000), needsReply:z.boolean().optional() }).parse(value),
+    z
+      .object({
+        id: z.string().uuid(),
+        body: z.string().trim().min(1).max(5000),
+        needsReply: z.boolean().optional(),
+      })
+      .parse(value),
   )
   .handler(async ({ data, context }): Promise<AdminResult> => {
     await requireAdmin(context);
     const { actorEmail } = await import("./admin-guard.server");
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { supabaseAdmin } =
+      await import("@/integrations/supabase/client.server");
     const { data: saved, error } = await supabaseAdmin
       .from("request_replies")
       .insert({
@@ -1153,10 +1349,18 @@ export const addRequestReply = createServerFn({ method: "POST" })
       .single();
     if (error || !saved) return { ok: false, message: "errReplySave" };
     const { notifyCustomer } = await import("./customer-notify.server");
-    await notifyCustomer({ kind: "reply", requestId: data.id, replyId: saved.id, body: data.body });
+    await notifyCustomer({
+      kind: "reply",
+      requestId: data.id,
+      replyId: saved.id,
+      body: data.body,
+    });
     await supabaseAdmin
       .from("suggestion_requests")
-      .update({ status: "in_progress", status_updated_at: new Date().toISOString() })
+      .update({
+        status: "in_progress",
+        status_updated_at: new Date().toISOString(),
+      })
       .eq("id", data.id)
       .eq("status", "new");
     await logActivity(context, "request.reply", data.id);

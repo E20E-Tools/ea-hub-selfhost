@@ -2,16 +2,28 @@ import { act, cleanup, fireEvent, render } from "@testing-library/react";
 import { afterEach, beforeEach, expect, it, vi } from "vitest";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ArchyLauncher } from "@/components/archy-launcher";
-import { LanguageProvider, LANGUAGE_STORAGE_KEY, useLanguage } from "@/lib/language";
+import {
+  LanguageProvider,
+  LANGUAGE_STORAGE_KEY,
+  useLanguage,
+} from "@/lib/language";
 import {
   ARCHY_GREETING_VISIBLE_MS,
   ARCHY_MUTED_STORAGE_KEY,
 } from "@/lib/archy-mascot";
 import { pickArchyVoice } from "@/lib/archy-speech";
 
-const gesture = () => document.querySelector(".archy-dock")?.getAttribute("data-gesture");
+const gesture = () =>
+  document.querySelector(".archy-dock")?.getAttribute("data-gesture");
 vi.mock("@tanstack/react-router", () => ({
-  Link: ({ children, to, ...props }: { children: React.ReactNode; to: string }) => (
+  Link: ({
+    children,
+    to,
+    ...props
+  }: {
+    children: React.ReactNode;
+    to: string;
+  }) => (
     <a href={to} {...props}>
       {children}
     </a>
@@ -49,17 +61,22 @@ class MockUtterance {
   }
 }
 
-
 function mount(withLanguageSwitch = false, open = false) {
   function SwitchLanguage() {
     const { setLanguage } = useLanguage();
-    return <button onClick={() => setLanguage("ar")}>Switch test language</button>;
+    return (
+      <button onClick={() => setLanguage("ar")}>Switch test language</button>
+    );
   }
   return render(
     <QueryClientProvider client={new QueryClient()}>
       <LanguageProvider>
         {withLanguageSwitch && <SwitchLanguage />}
-        <ArchyLauncher open={open} onClose={() => undefined} onChoose={() => undefined} />
+        <ArchyLauncher
+          open={open}
+          onClose={() => undefined}
+          onChoose={() => undefined}
+        />
       </LanguageProvider>
     </QueryClientProvider>,
   );
@@ -71,8 +88,15 @@ beforeEach(() => {
   speech.speak.mockClear();
   speech.cancel.mockReset();
   speech.getVoices.mockReset();
-  speech.getVoices.mockImplementation(() => [voice("en-US"), voice("ar-EG"), voice("ar-SA")]);
-  Object.defineProperty(window, "speechSynthesis", { configurable: true, value: speech });
+  speech.getVoices.mockImplementation(() => [
+    voice("en-US"),
+    voice("ar-EG"),
+    voice("ar-SA"),
+  ]);
+  Object.defineProperty(window, "speechSynthesis", {
+    configurable: true,
+    value: speech,
+  });
   Object.defineProperty(window, "SpeechSynthesisUtterance", {
     configurable: true,
     value: MockUtterance,
@@ -91,15 +115,21 @@ it("automatically waves and speaks on arrival only once per session", async () =
   vi.useFakeTimers();
   const first = mount();
   await act(async () => undefined);
-  expect(first.getByText("Hello! I’m Archy, and I’m ready to help.")).toBeInTheDocument();
+  expect(
+    first.getByText("Hello! I’m Archy, and I’m ready to help."),
+  ).toBeInTheDocument();
   expect(gesture()).toBe("Wave");
   expect(speech.speak).toHaveBeenCalledTimes(1);
   act(() => vi.advanceTimersByTime(ARCHY_GREETING_VISIBLE_MS));
-  expect(first.queryByText("Hello! I’m Archy, and I’m ready to help.")).toBeNull();
+  expect(
+    first.queryByText("Hello! I’m Archy, and I’m ready to help."),
+  ).toBeNull();
   first.unmount();
   const second = mount();
   await act(async () => undefined);
-  expect(second.queryByText("Hello! I’m Archy, and I’m ready to help.")).toBeNull();
+  expect(
+    second.queryByText("Hello! I’m Archy, and I’m ready to help."),
+  ).toBeNull();
   expect(speech.speak).toHaveBeenCalledTimes(1);
 });
 
@@ -119,15 +149,16 @@ it("keeps Archy static with reduced motion", async () => {
 });
 
 it("keeps Atlas visible in both display modes", async () => {
-  const view=mount(); await act(async()=>undefined);
+  const view = mount();
+  await act(async () => undefined);
   expect(view.container.querySelector(".atlas-head")).toBeVisible();
-  fireEvent.click(view.getByRole("button",{name:"Play with Archy"}));
-  fireEvent.click(view.getByRole("button",{name:"Read a book"}));
+  fireEvent.click(view.getByRole("button", { name: "Play with Archy" }));
+  fireEvent.click(view.getByRole("button", { name: "Read a book" }));
   expect(gesture()).toBe("Read");
-  fireEvent.click(view.getByRole("button",{name:"Archy lightweight mode"}));
+  fireEvent.click(view.getByRole("button", { name: "Archy lightweight mode" }));
   expect(gesture()).toBe("Idle");
   expect(view.container.querySelector(".archy-poster")).toBeVisible();
-  fireEvent.click(view.getByRole("button",{name:"Animate Archy"}));
+  fireEvent.click(view.getByRole("button", { name: "Animate Archy" }));
   expect(view.container.querySelectorAll(".atlas-joint")).toHaveLength(4);
 });
 
@@ -143,7 +174,10 @@ it("pauses the scene when the document becomes hidden", async () => {
   mount();
   await act(async () => undefined);
   const original = Object.getOwnPropertyDescriptor(document, "hidden");
-  Object.defineProperty(document, "hidden", { configurable: true, value: true });
+  Object.defineProperty(document, "hidden", {
+    configurable: true,
+    value: true,
+  });
   fireEvent(document, new Event("visibilitychange"));
   expect(gesture()).toBe("Idle");
   // document.hidden lives on Document.prototype; drop the own override so later tests see a visible tab.
@@ -194,15 +228,20 @@ it("honors saved mute and reports a missing matching voice without speaking", as
   fireEvent.click(view.getByRole("button", { name: "Hear greeting" }));
   expect(speech.speak).not.toHaveBeenCalled();
   expect(
-    view.getByText("A matching voice is unavailable here; you can read the greeting instead."),
+    view.getByText(
+      "A matching voice is unavailable here; you can read the greeting instead.",
+    ),
   ).toBeInTheDocument();
 });
 
 it("chooses a Saudi Arabic voice first, then any Arabic voice", () => {
-  expect(pickArchyVoice([voice("en-US"), voice("ar-EG"), voice("ar-SA")], "ar")?.lang).toBe(
-    "ar-SA",
+  expect(
+    pickArchyVoice([voice("en-US"), voice("ar-EG"), voice("ar-SA")], "ar")
+      ?.lang,
+  ).toBe("ar-SA");
+  expect(pickArchyVoice([voice("en-US"), voice("ar-EG")], "ar")?.lang).toBe(
+    "ar-EG",
   );
-  expect(pickArchyVoice([voice("en-US"), voice("ar-EG")], "ar")?.lang).toBe("ar-EG");
   expect(pickArchyVoice([voice("fr-FR")], "en")).toBeNull();
 });
 
@@ -214,7 +253,9 @@ it("replays a wave and renews the bubble interval on Hear greeting", async () =>
   fireEvent.click(view.getByRole("button", { name: "Hear greeting" }));
   expect(gesture()).toBe("Wave");
   act(() => vi.advanceTimersByTime(5_000));
-  expect(view.getByText("Hello! I’m Archy, and I’m ready to help.")).toBeInTheDocument();
+  expect(
+    view.getByText("Hello! I’m Archy, and I’m ready to help."),
+  ).toBeInTheDocument();
   expect(speech.speak).toHaveBeenCalledTimes(2);
 });
 
@@ -240,8 +281,12 @@ it.each(["getVoices", "cancel"] as const)(
     });
     const view = mount(true);
     await act(async () => undefined);
-      expect(view.getByRole("button", { name: "Open chat with Archy" })).toBeInTheDocument();
-    expect(view.getByText("Hello! I’m Archy, and I’m ready to help.")).toBeInTheDocument();
+    expect(
+      view.getByRole("button", { name: "Open chat with Archy" }),
+    ).toBeInTheDocument();
+    expect(
+      view.getByText("Hello! I’m Archy, and I’m ready to help."),
+    ).toBeInTheDocument();
     fireEvent.click(view.getByRole("button", { name: "Hear greeting" }));
     fireEvent.click(view.getByRole("button", { name: "Switch test language" }));
     expect(() => view.unmount()).not.toThrow();

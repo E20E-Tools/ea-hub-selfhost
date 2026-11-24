@@ -14,7 +14,10 @@ import {
 /** Counts one anonymous browser per Riyadh day. Stores only a random browser id, never IP or identity. */
 export const recordVisit = createServerFn({ method: "POST" })
   .inputValidator((value: unknown) => {
-    const row = value && typeof value === "object" ? (value as Record<string, unknown>) : {};
+    const row =
+      value && typeof value === "object"
+        ? (value as Record<string, unknown>)
+        : {};
     const key = row["key"];
     if (!isVisitorKey(key)) throw new Error("bad key");
     return { key: key.toLowerCase(), product: row["kind"] === "product" };
@@ -24,19 +27,23 @@ export const recordVisit = createServerFn({ method: "POST" })
       const { getRequest } = await import("@tanstack/react-start/server");
       const { consumeLimits, clientIp } = await import("./rate-limit.server");
       const allowed = await consumeLimits([
-        { bucket: "visit", subject: clientIp(getRequest()), limit: 30, windowSeconds: 3600 },
+        {
+          bucket: "visit",
+          subject: clientIp(getRequest()),
+          limit: 30,
+          windowSeconds: 3600,
+        },
       ]);
       if (!allowed) return { ok: false };
-      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-      const { error } = await supabaseAdmin
-        .from("site_visits")
-        .upsert(
-          {
-            visitor_key: data.product ? PRODUCT_VIEW_PREFIX + data.key : data.key,
-            day: riyadhDay(),
-          },
-          { onConflict: "visitor_key,day", ignoreDuplicates: true },
-        );
+      const { supabaseAdmin } =
+        await import("@/integrations/supabase/client.server");
+      const { error } = await supabaseAdmin.from("site_visits").upsert(
+        {
+          visitor_key: data.product ? PRODUCT_VIEW_PREFIX + data.key : data.key,
+          day: riyadhDay(),
+        },
+        { onConflict: "visitor_key,day", ignoreDuplicates: true },
+      );
       return { ok: !error };
     } catch {
       return { ok: false };
@@ -49,7 +56,8 @@ export const getVisitStats = createServerFn({ method: "GET" })
   .handler(async ({ context }): Promise<VisitStats> => {
     const { requireAdmin } = await import("./admin-guard.server");
     await requireAdmin(context as never);
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { supabaseAdmin } =
+      await import("@/integrations/supabase/client.server");
     const day = riyadhDay();
     const start = new Date(`${day}T00:00:00+03:00`).toISOString();
     const keys: string[] = [];
@@ -97,11 +105,19 @@ export const getVisitStats = createServerFn({ method: "GET" })
   });
 
 /** Distinct keys in site_visits since a day, either site visitors or product-page viewers. */
-async function distinctKeys(since: string, product: boolean, until?: string): Promise<number> {
-  const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+async function distinctKeys(
+  since: string,
+  product: boolean,
+  until?: string,
+): Promise<number> {
+  const { supabaseAdmin } =
+    await import("@/integrations/supabase/client.server");
   const seen = new Set<string>();
   for (let offset = 0; offset < 50_000; offset += 1000) {
-    let query = supabaseAdmin.from("site_visits").select("visitor_key").gte("day", since);
+    let query = supabaseAdmin
+      .from("site_visits")
+      .select("visitor_key")
+      .gte("day", since);
     if (until) query = query.lte("day", until);
     query = product
       ? query.like("visitor_key", `${PRODUCT_VIEW_PREFIX}%`)
@@ -124,29 +140,39 @@ async function distinctKeys(since: string, product: boolean, until?: string): Pr
 export const getFunnel = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((value: unknown) => {
-    const days = value && typeof value === "object" ? (value as Record<string, unknown>)["days"] : 30;
+    const days =
+      value && typeof value === "object"
+        ? (value as Record<string, unknown>)["days"]
+        : 30;
     return { days: days === 7 ? 7 : 30 };
   })
   .handler(async ({ data, context }): Promise<Funnel> => {
     const { requireAdmin } = await import("./admin-guard.server");
     await requireAdmin(context as never);
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    const since = riyadhDay(new Date(Date.now() - (data.days - 1) * 86_400_000));
+    const { supabaseAdmin } =
+      await import("@/integrations/supabase/client.server");
+    const since = riyadhDay(
+      new Date(Date.now() - (data.days - 1) * 86_400_000),
+    );
     const start = new Date(`${since}T00:00:00+03:00`).toISOString();
-    const [visitors, productViewers, chats, requests, waitlist] = await Promise.all([
-      distinctKeys(since, false),
-      distinctKeys(since, true),
-      supabaseAdmin.from("live_chats").select("id", { count: "exact", head: true }).gte("created_at", start),
-      supabaseAdmin
-        .from("suggestion_requests")
-        .select("id", { count: "exact", head: true })
-        .gte("created_at", start),
-      supabaseAdmin
-        .from("suggestion_requests")
-        .select("id", { count: "exact", head: true })
-        .gte("created_at", start)
-        .eq("details->>source", "waitlist"),
-    ]);
+    const [visitors, productViewers, chats, requests, waitlist] =
+      await Promise.all([
+        distinctKeys(since, false),
+        distinctKeys(since, true),
+        supabaseAdmin
+          .from("live_chats")
+          .select("id", { count: "exact", head: true })
+          .gte("created_at", start),
+        supabaseAdmin
+          .from("suggestion_requests")
+          .select("id", { count: "exact", head: true })
+          .gte("created_at", start),
+        supabaseAdmin
+          .from("suggestion_requests")
+          .select("id", { count: "exact", head: true })
+          .gte("created_at", start)
+          .eq("details->>source", "waitlist"),
+      ]);
     if (chats.error || requests.error) throw new Error("funnel load failed");
     return {
       days: data.days,
@@ -171,11 +197,14 @@ export const getWeeklyFunnel = createServerFn({ method: "GET" })
   .handler(async ({ context }): Promise<WeeklyFunnel> => {
     const { requireAdmin } = await import("./admin-guard.server");
     await requireAdmin(context as never);
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { supabaseAdmin } =
+      await import("@/integrations/supabase/client.server");
     const weeks = await Promise.all(
       weekWindows(4).map(async ({ from, to }) => {
         const start = new Date(`${from}T00:00:00+03:00`).toISOString();
-        const end = new Date(new Date(`${to}T00:00:00+03:00`).getTime() + 86_400_000).toISOString();
+        const end = new Date(
+          new Date(`${to}T00:00:00+03:00`).getTime() + 86_400_000,
+        ).toISOString();
         const [productViewers, answers] = await Promise.all([
           distinctKeys(from, true, to),
           supabaseAdmin
@@ -185,7 +214,12 @@ export const getWeeklyFunnel = createServerFn({ method: "GET" })
             .lt("created_at", end)
             .eq("details->>source", "waitlist"),
         ]);
-        return { from, to, productViewers, waitlistAnswers: answers.error ? 0 : (answers.count ?? 0) };
+        return {
+          from,
+          to,
+          productViewers,
+          waitlistAnswers: answers.error ? 0 : (answers.count ?? 0),
+        };
       }),
     );
     let waitlists: WeeklyFunnel["waitlists"] = [];

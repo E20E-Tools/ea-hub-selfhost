@@ -21,10 +21,25 @@ type Rating = {
   stars: number;
   comment: string;
   updated_at: string;
-  chat: { visitor_name: string; visitor_email: string; admin_email: string | null } | null;
+  chat: {
+    visitor_name: string;
+    visitor_email: string;
+    admin_email: string | null;
+  } | null;
 };
-type Faq = { id: string; question: string; answer: string; enabled: boolean; updated_at: string };
-type Draft = { id: string | null; question: string; answer: string; enabled: boolean };
+type Faq = {
+  id: string;
+  question: string;
+  answer: string;
+  enabled: boolean;
+  updated_at: string;
+};
+type Draft = {
+  id: string | null;
+  question: string;
+  answer: string;
+  enabled: boolean;
+};
 
 const key = ["admin", "feedback"] as const;
 
@@ -65,7 +80,9 @@ function Stars({ value }: { value: number }) {
         <Star
           key={n}
           className={
-            n <= value ? "size-4 fill-primary text-primary" : "size-4 text-muted-foreground"
+            n <= value
+              ? "size-4 fill-primary text-primary"
+              : "size-4 text-muted-foreground"
           }
         />
       ))}
@@ -93,10 +110,13 @@ export function FeedbackSection({
 
   const ratings = useMemo(() => {
     const all = (query.data?.ratings ?? []).filter(
-      (r) => !email || r.chat?.visitor_email.toLowerCase() === email.toLowerCase(),
+      (r) =>
+        !email || r.chat?.visitor_email.toLowerCase() === email.toLowerCase(),
     );
     if (filter === "all") return all;
-    return all.filter((r) => (filter === "team") === Boolean(r.chat?.admin_email));
+    return all.filter(
+      (r) => (filter === "team") === Boolean(r.chat?.admin_email),
+    );
   }, [query.data, filter, email]);
   const common = useMemo(
     () =>
@@ -141,7 +161,10 @@ export function FeedbackSection({
   return (
     <div className="grid gap-6">
       {!embedded ? (
-        <PageHeader title={t("navFeedback")} description={t("navFeedbackDesc")} />
+        <PageHeader
+          title={t("navFeedback")}
+          description={t("navFeedbackDesc")}
+        />
       ) : null}
       {query.isPending ? (
         <LoadingBlock rows={4} />
@@ -156,7 +179,11 @@ export function FeedbackSection({
                 variant={filter === f ? "default" : "outline"}
                 onClick={() => setFilter(f)}
               >
-                {f === "all" ? t("fbFilterAll") : f === "team" ? t("fbTeam") : t("fbAi")}
+                {f === "all"
+                  ? t("fbFilterAll")
+                  : f === "team"
+                    ? t("fbTeam")
+                    : t("fbAi")}
               </Button>
             ))}
           >
@@ -174,7 +201,10 @@ export function FeedbackSection({
             ) : (
               <ul className="grid gap-3">
                 {ratings.map((r) => (
-                  <li key={r.chat_id} className="rounded-lg border border-border p-3 text-sm">
+                  <li
+                    key={r.chat_id}
+                    className="rounded-lg border border-border p-3 text-sm"
+                  >
                     <div className="flex flex-wrap items-center gap-2">
                       <Stars value={r.stars} />
                       <Badge variant="secondary">
@@ -184,10 +214,14 @@ export function FeedbackSection({
                         {r.chat?.visitor_name || r.chat?.visitor_email}
                       </span>
                       <span className="ms-auto text-xs text-muted-foreground">
-                        {formatDate(r.updated_at, language, { dateStyle: "medium" })}
+                        {formatDate(r.updated_at, language, {
+                          dateStyle: "medium",
+                        })}
                       </span>
                     </div>
-                    {r.comment ? <p className="mt-2 text-muted-foreground">{r.comment}</p> : null}
+                    {r.comment ? (
+                      <p className="mt-2 text-muted-foreground">{r.comment}</p>
+                    ) : null}
                   </li>
                 ))}
               </ul>
@@ -212,13 +246,20 @@ export function FeedbackSection({
                     className="flex flex-wrap items-center gap-3 rounded-lg border border-border p-3 text-sm"
                   >
                     <span className="min-w-0 flex-1 break-words">{q.text}</span>
-                    <Badge variant="outline">{t("fbTimes", { n: String(q.count) })}</Badge>
+                    <Badge variant="outline">
+                      {t("fbTimes", { n: String(q.count) })}
+                    </Badge>
                     <Button
                       size="sm"
                       variant="outline"
                       onClick={async () => {
                         if (await guard.confirmLeave())
-                          setDraft({ id: null, question: q.text, answer: "", enabled: true });
+                          setDraft({
+                            id: null,
+                            question: q.text,
+                            answer: "",
+                            enabled: true,
+                          });
                       }}
                     >
                       {t("fbWriteAnswer")}
@@ -237,7 +278,12 @@ export function FeedbackSection({
                 size="sm"
                 onClick={async () => {
                   if (await guard.confirmLeave())
-                    setDraft({ id: null, question: "", answer: "", enabled: true });
+                    setDraft({
+                      id: null,
+                      question: "",
+                      answer: "",
+                      enabled: true,
+                    });
                 }}
               >
                 {t("fbNew")}
@@ -251,7 +297,9 @@ export function FeedbackSection({
                   id="faq-q"
                   maxLength={500}
                   value={draft.question}
-                  onChange={(e) => setDraft({ ...draft, question: e.target.value })}
+                  onChange={(e) =>
+                    setDraft({ ...draft, question: e.target.value })
+                  }
                 />
                 <Label htmlFor="faq-a">{t("fbAnswer")}</Label>
                 <Textarea
@@ -259,7 +307,9 @@ export function FeedbackSection({
                   rows={4}
                   maxLength={2000}
                   value={draft.answer}
-                  onChange={(e) => setDraft({ ...draft, answer: e.target.value })}
+                  onChange={(e) =>
+                    setDraft({ ...draft, answer: e.target.value })
+                  }
                 />
                 <label className="flex items-center gap-2 text-sm">
                   <Switch
@@ -270,7 +320,9 @@ export function FeedbackSection({
                 </label>
                 <div className="flex gap-2">
                   <Button
-                    disabled={busy || !draft.question.trim() || !draft.answer.trim()}
+                    disabled={
+                      busy || !draft.question.trim() || !draft.answer.trim()
+                    }
                     onClick={() => void submit()}
                   >
                     {t("fbSave")}
@@ -286,9 +338,14 @@ export function FeedbackSection({
             ) : (
               <ul className="grid gap-3">
                 {(query.data?.faqs as Faq[]).map((f) => (
-                  <li key={f.id} className="rounded-lg border border-border p-3 text-sm">
+                  <li
+                    key={f.id}
+                    className="rounded-lg border border-border p-3 text-sm"
+                  >
                     <div className="flex flex-wrap items-center gap-2">
-                      <strong className="min-w-0 flex-1 break-words">{f.question}</strong>
+                      <strong className="min-w-0 flex-1 break-words">
+                        {f.question}
+                      </strong>
                       {!f.enabled ? <Badge variant="outline">—</Badge> : null}
                       <Button
                         size="sm"
@@ -305,11 +362,17 @@ export function FeedbackSection({
                       >
                         {t("fbEdit")}
                       </Button>
-                      <Button size="sm" variant="ghost" onClick={() => void del(f.id)}>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => void del(f.id)}
+                      >
                         {t("fbDelete")}
                       </Button>
                     </div>
-                    <p className="mt-2 whitespace-pre-wrap text-muted-foreground">{f.answer}</p>
+                    <p className="mt-2 whitespace-pre-wrap text-muted-foreground">
+                      {f.answer}
+                    </p>
                   </li>
                 ))}
               </ul>

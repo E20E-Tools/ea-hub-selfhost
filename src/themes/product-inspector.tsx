@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useId, useRef, useState, type ReactNode } from "react";
+import {
+  useCallback,
+  useEffect,
+  useId,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 import { Link } from "@tanstack/react-router";
 import type { Product } from "@/lib/catalog";
 import { fill, fill2 } from "@/lib/copy";
@@ -37,7 +44,10 @@ export function useInspectorFacts(product: Product) {
     status: product.comingSoon ? t("comingSoonBadge") : t("inspectorAvailable"),
     launch:
       product.comingSoon && product.publicationDate
-        ? fill(t("inspectorLaunches"), formatLaunchDate(product.publicationDate, language))
+        ? fill(
+            t("inspectorLaunches"),
+            formatLaunchDate(product.publicationDate, language),
+          )
         : null,
     countdown: parts
       ? fill2(t("inspectorCountdown"), String(parts.days), String(parts.hours))

@@ -27,8 +27,16 @@ export function funnelSteps(stages: Funnel["stages"]) {
     const prev = i === 0 ? null : stages[i - 1]!.count;
     return {
       ...s,
-      ofPrevious: prev === null ? null : prev > 0 ? Math.round((s.count / prev) * 100) : null,
-      ofFirst: i === 0 || !stages[0]!.count ? null : Math.round((s.count / stages[0]!.count) * 100),
+      ofPrevious:
+        prev === null
+          ? null
+          : prev > 0
+            ? Math.round((s.count / prev) * 100)
+            : null,
+      ofFirst:
+        i === 0 || !stages[0]!.count
+          ? null
+          : Math.round((s.count / stages[0]!.count) * 100),
     };
   });
 }
@@ -54,12 +62,18 @@ export function summarizeContacts(
   const map = new Map<string, VisitStats["contacts"][number]>();
   const get = (email: string, name: string) => {
     const key = email.trim().toLowerCase();
-    const row = map.get(key) ?? { email: key, name, chat: false, request: false };
+    const row = map.get(key) ?? {
+      email: key,
+      name,
+      chat: false,
+      request: false,
+    };
     if (!row.name && name) row.name = name;
     map.set(key, row);
     return row;
   };
-  for (const c of chats) if (c.visitor_email) get(c.visitor_email, c.visitor_name).chat = true;
+  for (const c of chats)
+    if (c.visitor_email) get(c.visitor_email, c.visitor_name).chat = true;
   for (const r of requests) if (r.email) get(r.email, r.name).request = true;
   const contacts = [...map.values()];
   return {
@@ -84,16 +98,26 @@ export type WeeklyFunnel = {
 };
 
 /** The last `count` 7-day Riyadh windows ending today, newest first. */
-export function weekWindows(count: number, today: string = riyadhDay()): { from: string; to: string }[] {
+export function weekWindows(
+  count: number,
+  today: string = riyadhDay(),
+): { from: string; to: string }[] {
   const end = new Date(`${today}T00:00:00Z`).getTime();
   return Array.from({ length: count }, (_, i) => {
     const to = new Date(end - i * 7 * 86_400_000);
     const from = new Date(to.getTime() - 6 * 86_400_000);
-    return { from: from.toISOString().slice(0, 10), to: to.toISOString().slice(0, 10) };
+    return {
+      from: from.toISOString().slice(0, 10),
+      to: to.toISOString().slice(0, 10),
+    };
   });
 }
 
 /** Waitlist answers per 100 product-page viewers, rounded; null when nobody viewed a product. */
-export function waitlistRate(row: Pick<WeeklyFunnelRow, "productViewers" | "waitlistAnswers">) {
-  return row.productViewers > 0 ? Math.round((row.waitlistAnswers / row.productViewers) * 100) : null;
+export function waitlistRate(
+  row: Pick<WeeklyFunnelRow, "productViewers" | "waitlistAnswers">,
+) {
+  return row.productViewers > 0
+    ? Math.round((row.waitlistAnswers / row.productViewers) * 100)
+    : null;
 }

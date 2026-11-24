@@ -8,7 +8,8 @@ export async function recordJourney(
   rating?: number,
 ): Promise<boolean> {
   try {
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { supabaseAdmin } =
+      await import("@/integrations/supabase/client.server");
     const { data, error } = await supabaseAdmin.rpc("record_journey_event", {
       _event: event,
       _language: language,

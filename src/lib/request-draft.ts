@@ -12,12 +12,24 @@ import {
 
 export type RequestDraftKind = "request" | "service";
 export type DraftStatus = "loading" | "saved" | "unavailable";
-type DraftRecord = { version: 1; includePersonal: boolean; values: Record<string, unknown> };
+type DraftRecord = {
+  version: 1;
+  includePersonal: boolean;
+  values: Record<string, unknown>;
+};
 const NON_SENSITIVE: Record<RequestDraftKind, string[]> = {
   request: ["type", "productId", "urgency"],
   service: ["services", "tools", "teamSize", "timeline"],
 };
-const PERSONAL = ["name", "email", "company", "phone", "need", "impact", "exercise"];
+const PERSONAL = [
+  "name",
+  "email",
+  "company",
+  "phone",
+  "need",
+  "impact",
+  "exercise",
+];
 const MAX: Record<string, number> = {
   name: 100,
   email: 255,
@@ -25,7 +37,7 @@ const MAX: Record<string, number> = {
   phone: 20,
   need: 2000,
   impact: 1000,
-  exercise:2000,
+  exercise: 2000,
   urgency: 10,
   teamSize: 20,
   timeline: 20,
@@ -37,29 +49,39 @@ function cleanString(value: unknown, key: string): string {
 function cleanField(key: string, value: unknown): unknown {
   if (key === "productId") return isPublicProductId(value) ? value : "";
   if (key === "type")
-    return typeof value === "string" && PUBLIC_REQUEST_TYPES.includes(value as never)
+    return typeof value === "string" &&
+      PUBLIC_REQUEST_TYPES.includes(value as never)
       ? value
       : "new";
   if (key === "urgency")
-    return typeof value === "string" && URGENCIES.includes(value as never) ? value : "";
+    return typeof value === "string" && URGENCIES.includes(value as never)
+      ? value
+      : "";
   if (key === "teamSize")
-    return typeof value === "string" && (value === "" || TEAM_SIZES.includes(value as never))
+    return typeof value === "string" &&
+      (value === "" || TEAM_SIZES.includes(value as never))
       ? value
       : "";
   if (key === "timeline")
-    return typeof value === "string" && (value === "" || SERVICE_TIMELINES.includes(value as never))
+    return typeof value === "string" &&
+      (value === "" || SERVICE_TIMELINES.includes(value as never))
       ? value
       : "";
   if (key === "services")
     return Array.isArray(value)
       ? [
           ...new Set(
-            value.filter((x) => typeof x === "string" && SERVICE_KINDS.includes(x as never)),
+            value.filter(
+              (x) =>
+                typeof x === "string" && SERVICE_KINDS.includes(x as never),
+            ),
           ),
         ].slice(0, 4)
       : [];
   if (key === "tools")
-    return Array.isArray(value) ? [...new Set(value.filter(isPublicProductId))].slice(0, 60) : [];
+    return Array.isArray(value)
+      ? [...new Set(value.filter(isPublicProductId))].slice(0, 60)
+      : [];
   return cleanString(value, key);
 }
 
@@ -70,9 +92,11 @@ export function sanitizeRequestDraft(
   includePersonal: boolean,
 ): DraftRecord {
   const values: Record<string, unknown> = {};
-  for (const key of NON_SENSITIVE[kind]) values[key] = cleanField(key, value[key]);
+  for (const key of NON_SENSITIVE[kind])
+    values[key] = cleanField(key, value[key]);
   if (includePersonal)
-    for (const key of PERSONAL) if (key in value) values[key] = cleanField(key, value[key]);
+    for (const key of PERSONAL)
+      if (key in value) values[key] = cleanField(key, value[key]);
   return { version: 1, includePersonal, values };
 }
 export function parseRequestDraft(raw: string | null): DraftRecord | null {
@@ -89,8 +113,13 @@ export function parseRequestDraft(raw: string | null): DraftRecord | null {
     )
       return null;
     const includePersonal = row["includePersonal"];
-    const kind: RequestDraftKind = "services" in (row["values"] as object) ? "service" : "request";
-    return sanitizeRequestDraft(kind, row["values"] as Record<string, unknown>, includePersonal);
+    const kind: RequestDraftKind =
+      "services" in (row["values"] as object) ? "service" : "request";
+    return sanitizeRequestDraft(
+      kind,
+      row["values"] as Record<string, unknown>,
+      includePersonal,
+    );
   } catch {
     return null;
   }
@@ -154,7 +183,9 @@ export function useRequestDraft<T extends Record<string, unknown>>(
       ownerRef.current = next;
       let record: DraftRecord | null = null;
       try {
-        record = parseRequestDraft(store?.getItem(requestDraftKey(kind, next)) ?? null);
+        record = parseRequestDraft(
+          store?.getItem(requestDraftKey(kind, next)) ?? null,
+        );
       } catch {
         record = null;
       }
@@ -162,7 +193,10 @@ export function useRequestDraft<T extends Record<string, unknown>>(
         // Never carry the previous owner's fields (or opt-in) into the new identity.
         resetRef.current();
         if (record) restoreRef.current(record.values);
-      } else if (record && JSON.stringify(valueRef.current) === initialValueRef.current) {
+      } else if (
+        record &&
+        JSON.stringify(valueRef.current) === initialValueRef.current
+      ) {
         // First owner resolution: restore only if the visitor has not started typing.
         restoreRef.current(record.values);
       }
@@ -175,7 +209,8 @@ export function useRequestDraft<T extends Record<string, unknown>>(
     // Only a true guest (no stored sign-in) uses the guest draft; a stored sign-in that
     // cannot be confirmed loads no draft until the next auth event settles the owner.
     void currentAuthUser().then((auth) => {
-      if (!authEventApplied && auth) apply(auth.kind === "account" ? auth.user.id : "guest");
+      if (!authEventApplied && auth)
+        apply(auth.kind === "account" ? auth.user.id : "guest");
     });
     const { data } = supabase.auth.onAuthStateChange((_event, session) => {
       authEventApplied = true;
@@ -204,7 +239,9 @@ export function useRequestDraft<T extends Record<string, unknown>>(
       if (!store) throw new Error("unavailable");
       store.setItem(
         requestDraftKey(kind, owner),
-        JSON.stringify(sanitizeRequestDraft(kind, valueRef.current, includePersonal)),
+        JSON.stringify(
+          sanitizeRequestDraft(kind, valueRef.current, includePersonal),
+        ),
       );
       setStatus("saved");
     } catch {
@@ -214,7 +251,8 @@ export function useRequestDraft<T extends Record<string, unknown>>(
 
   const clear = () => {
     try {
-      if (ownerRef.current) sessionStore()?.removeItem(requestDraftKey(kind, ownerRef.current));
+      if (ownerRef.current)
+        sessionStore()?.removeItem(requestDraftKey(kind, ownerRef.current));
     } catch {
       /* unavailable */
     }

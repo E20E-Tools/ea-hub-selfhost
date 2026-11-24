@@ -6,7 +6,10 @@ const mocks = vi.hoisted(() => ({
     userId: string;
     claims: unknown;
     supabase: {
-      rpc: (name: string, args: unknown) => PromiseLike<{ data: unknown; error: unknown }>;
+      rpc: (
+        name: string,
+        args: unknown,
+      ) => PromiseLike<{ data: unknown; error: unknown }>;
     };
   },
   role: vi.fn(),
@@ -27,20 +30,32 @@ vi.mock("@tanstack/react-start", () => ({
         validate = validator;
         return builder;
       },
-      handler: (handler: (args: unknown) => unknown) => async (args?: { data?: unknown }) => {
-        if (protectedEndpoint && !mocks.context) throw new Error("Unauthorized");
-        return handler({ context: mocks.context, data: validate(args?.data) });
-      },
+      handler:
+        (handler: (args: unknown) => unknown) =>
+        async (args?: { data?: unknown }) => {
+          if (protectedEndpoint && !mocks.context)
+            throw new Error("Unauthorized");
+          return handler({
+            context: mocks.context,
+            data: validate(args?.data),
+          });
+        },
     };
     return builder;
   },
 }));
-vi.mock("@/integrations/supabase/auth-middleware", () => ({ requireSupabaseAuth: {} }));
+vi.mock("@/integrations/supabase/auth-middleware", () => ({
+  requireSupabaseAuth: {},
+}));
 vi.mock("@/integrations/supabase/client.server", () => ({
   supabaseAdmin: { from: mocks.privilegedFrom },
 }));
 
-import { affiliateInputSchema, deleteAffiliate, saveAffiliate } from "@/lib/admin.functions";
+import {
+  affiliateInputSchema,
+  deleteAffiliate,
+  saveAffiliate,
+} from "@/lib/admin.functions";
 
 const chain = {
   upsert: vi.fn(() => Promise.resolve({ error: null })),
@@ -78,24 +93,38 @@ const validInput = {
 describe("affiliates admin", () => {
   it("rejects anonymous callers", async () => {
     mocks.context = null;
-    await expect(saveAffiliate({ data: validInput })).rejects.toThrow("Unauthorized");
+    await expect(saveAffiliate({ data: validInput })).rejects.toThrow(
+      "Unauthorized",
+    );
   });
 
   it("rejects non-admin sessions", async () => {
-    mocks.context!.supabase.rpc = () => Promise.resolve({ data: false, error: null });
-    await expect(saveAffiliate({ data: validInput })).rejects.toThrow("مخصّصة للإدارة");
+    mocks.context!.supabase.rpc = () =>
+      Promise.resolve({ data: false, error: null });
+    await expect(saveAffiliate({ data: validInput })).rejects.toThrow(
+      "مخصّصة للإدارة",
+    );
     expect(mocks.privilegedFrom).not.toHaveBeenCalled();
   });
 
   it("rejects non-https external links", () => {
-    const result = affiliateInputSchema.safeParse({ ...validInput, url: "javascript:alert(1)" });
+    const result = affiliateInputSchema.safeParse({
+      ...validInput,
+      url: "javascript:alert(1)",
+    });
     expect(result.success).toBe(false);
   });
 
   it("accepts internal paths and rejects overlong fields", () => {
-    expect(affiliateInputSchema.safeParse({ ...validInput, url: "/request" }).success).toBe(true);
     expect(
-      affiliateInputSchema.safeParse({ ...validInput, titleAr: "x".repeat(121) }).success,
+      affiliateInputSchema.safeParse({ ...validInput, url: "/request" })
+        .success,
+    ).toBe(true);
+    expect(
+      affiliateInputSchema.safeParse({
+        ...validInput,
+        titleAr: "x".repeat(121),
+      }).success,
     ).toBe(false);
   });
 

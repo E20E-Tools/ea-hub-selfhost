@@ -16,7 +16,8 @@ import { JourneyHeading } from "@/studio/journey-heading";
 
 export const Route = createFileRoute("/try/$productId")({
   loader: async ({ context, params }) => {
-    const catalog = await context.queryClient.ensureQueryData(catalogQueryOptions);
+    const catalog =
+      await context.queryClient.ensureQueryData(catalogQueryOptions);
     const product = catalog.products.find(
       (item) => item.id === params.productId && !item.comingSoon,
     );
@@ -33,10 +34,14 @@ export const Route = createFileRoute("/try/$productId")({
           name: "description",
           content: `A generic synthetic planning exercise linked to ${name}; it does not invoke the external tool.`,
         },
-        { property: "og:title", content: `${name} planning exercise — E20E Tools` },
+        {
+          property: "og:title",
+          content: `${name} planning exercise — E20E Tools`,
+        },
         {
           property: "og:description",
-          content: "Inspect synthetic inputs and recompute an illustrative initiative plan.",
+          content:
+            "Inspect synthetic inputs and recompute an illustrative initiative plan.",
         },
         { property: "og:url", content: url },
         { property: "og:type", content: "website" },
@@ -56,7 +61,9 @@ function PlanningDemo() {
   const [systems, setSystems] = useState(12);
   const [users, setUsers] = useState(80);
   const [weeks, setWeeks] = useState(12);
-  const [output, setOutput] = useState<ReturnType<typeof planningPhases> | null>(null);
+  const [output, setOutput] = useState<ReturnType<
+    typeof planningPhases
+  > | null>(null);
   const calculate = (event: FormEvent) => {
     event.preventDefault();
     setOutput(planningPhases(systems, users, weeks));
@@ -69,15 +76,35 @@ function PlanningDemo() {
     setWeeks(12);
     setOutput(null);
   };
-  if(cases[product.id])return <main className="bx-page ea-workspace ea-try" dir={dir}><JourneyHeading icon={FlaskConical} title={product.name} description={cases[product.id]!.question[language==="ar"?0:1]}/><ProductExercise key={product.id+language} product={product} language={language}/><MetricsPreference/></main>;
+  if (cases[product.id])
+    return (
+      <main className="bx-page ea-workspace ea-try" dir={dir}>
+        <JourneyHeading
+          icon={FlaskConical}
+          title={product.name}
+          description={cases[product.id]!.question[language === "ar" ? 0 : 1]}
+        />
+        <ProductExercise
+          key={product.id + language}
+          product={product}
+          language={language}
+        />
+        <MetricsPreference />
+      </main>
+    );
   return (
     <main className="bx-page ea-workspace ea-try" dir={dir}>
-      <JourneyHeading icon={FlaskConical} title={t("bxDemoTitle")} description={t("bxDemoLead")} />
+      <JourneyHeading
+        icon={FlaskConical}
+        title={t("bxDemoTitle")}
+        description={t("bxDemoLead")}
+      />
       <p className="bx-synthetic" role="note">
         <Link to="/product/$productId" params={{ productId: product.id }}>
           <bdi dir="ltr">{product.name}</bdi>
         </Link>
-        {" · "}{product.label} · {t("bxSynthetic")}
+        {" · "}
+        {product.label} · {t("bxSynthetic")}
       </p>
       <form className="bx-panel mt-5" onSubmit={calculate}>
         <h2>{t("bxDemoInputs")}</h2>
@@ -142,7 +169,11 @@ function PlanningDemo() {
         </div>
       </form>
       {output && (
-        <section className="bx-panel" aria-labelledby="demo-output" aria-live="polite">
+        <section
+          className="bx-panel"
+          aria-labelledby="demo-output"
+          aria-live="polite"
+        >
           <h2 id="demo-output">{t("bxDemoOutput")}</h2>
           {goal && <p className="my-3">{goal}</p>}
           <div className="bx-phase">
@@ -163,7 +194,9 @@ function PlanningDemo() {
               {output.review} {t("bxWeeksUnit")}
             </strong>
           </div>
-          <p className="mt-4 text-sm text-muted-foreground">{t("bxDemoLimitations")}</p>
+          <p className="mt-4 text-sm text-muted-foreground">
+            {t("bxDemoLimitations")}
+          </p>
         </section>
       )}
       <div className="bx-actions">

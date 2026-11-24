@@ -71,7 +71,9 @@ export function RequestImages({
                 title={t("requestDeleteImage")}
                 aria-label={fill(t("requestDeleteNamed"), file.name)}
                 disabled={disabled}
-                onClick={() => onChange(files.filter((_, index) => index !== i))}
+                onClick={() =>
+                  onChange(files.filter((_, index) => index !== i))
+                }
               >
                 <X size={16} />
               </Button>

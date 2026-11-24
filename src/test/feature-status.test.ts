@@ -18,7 +18,9 @@ describe("admin feature status page", () => {
   it("has an Arabic and English description for every feature", () => {
     for (const key of FEATURE_KEYS) {
       for (const lang of ["ar", "en"] as const) {
-        const text = (adminDictionaries[lang] as Record<string, string>)[`featureAbout_${key}`];
+        const text = (adminDictionaries[lang] as Record<string, string>)[
+          `featureAbout_${key}`
+        ];
         expect(text, `${lang} ${key}`).toBeTruthy();
       }
     }

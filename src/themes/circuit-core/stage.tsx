@@ -25,7 +25,11 @@ function useMobile(): boolean {
   return mobile;
 }
 
-type Line = { text: string; productId?: string; kind: "cmd" | "ok" | "soon" | "sum" };
+type Line = {
+  text: string;
+  productId?: string;
+  kind: "cmd" | "ok" | "soon" | "sum";
+};
 
 function ChipInspectorBody({ product }: { product: Product }) {
   const { t } = useLanguage();
@@ -36,7 +40,10 @@ function ChipInspectorBody({ product }: { product: Product }) {
     ["STATUS", facts.available ? "ONLINE" : "STANDBY"],
   ];
   if (facts.launch)
-    rows.push(["LAUNCH", facts.countdown ? `${facts.launch} · ${facts.countdown}` : facts.launch]);
+    rows.push([
+      "LAUNCH",
+      facts.countdown ? `${facts.launch} · ${facts.countdown}` : facts.launch,
+    ]);
   if (product.version) rows.push(["VERSION", product.version]);
   return (
     <div className="cc-inspect-body">
@@ -53,7 +60,8 @@ function ChipInspectorBody({ product }: { product: Product }) {
       <p className="cc-inspect-desc">{product.description}</p>
       {product.whatsNew ? (
         <p className="cc-inspect-desc">
-          <span className="cc-key">{t("inspectorWhatsNew")}:</span> {product.whatsNew}
+          <span className="cc-key">{t("inspectorWhatsNew")}:</span>{" "}
+          {product.whatsNew}
         </p>
       ) : null}
       {facts.features.length ? (
@@ -84,17 +92,25 @@ export default function CircuitCoreStage({ products, settings }: StageProps) {
   const motion = useStageMotion(root);
   const mobile = useMobile();
   const list = products.slice(0, 12);
-  const layout = useMemo(() => circuitLayout(list.length, mobile), [list.length, mobile]);
+  const layout = useMemo(
+    () => circuitLayout(list.length, mobile),
+    [list.length, mobile],
+  );
   const inspector = useProductInspector();
   const [hot, setHot] = useState<string | null>(null);
   const chipRefs = useRef<Record<string, HTMLButtonElement | null>>({});
   const panelWrap = useRef<HTMLDivElement>(null);
-  const [probe, setProbe] = useState<{ x1: number; y1: number; x2: number; y2: number } | null>(
-    null,
-  );
+  const [probe, setProbe] = useState<{
+    x1: number;
+    y1: number;
+    x2: number;
+    y2: number;
+  } | null>(null);
 
   const listKey = list
-    .map((p) => [p.id, p.name, p.label, p.comingSoon, p.publicationDate].join("~"))
+    .map((p) =>
+      [p.id, p.name, p.label, p.comingSoon, p.publicationDate].join("~"),
+    )
     .join("|");
   const lines = useMemo<Line[]>(() => {
     const out: Line[] = [{ text: "$ e20e boot --enterprise", kind: "cmd" }];
@@ -113,7 +129,11 @@ export default function CircuitCoreStage({ products, settings }: StageProps) {
                   : t("comingSoonBadge")
               }`,
             }
-          : { kind: "ok", productId: p.id, text: `✓ ${p.name} ${t("ccOnline")} · ${p.label}` },
+          : {
+              kind: "ok",
+              productId: p.id,
+              text: `✓ ${p.name} ${t("ccOnline")} · ${p.label}`,
+            },
       );
     }
     out.push({
@@ -157,7 +177,8 @@ export default function CircuitCoreStage({ products, settings }: StageProps) {
       const chip = chipRefs.current[openProduct.id]?.getBoundingClientRect();
       const panel = panelWrap.current?.getBoundingClientRect();
       if (!base || !chip || !panel) return;
-      const toStart = dir === "rtl" ? panel.left - base.left : panel.right - base.left;
+      const toStart =
+        dir === "rtl" ? panel.left - base.left : panel.right - base.left;
       setProbe({
         x1: chip.left + chip.width / 2 - base.left,
         y1: chip.top + chip.height / 2 - base.top,
@@ -188,7 +209,9 @@ export default function CircuitCoreStage({ products, settings }: StageProps) {
         <p className="cc-title" aria-hidden="true">
           {settings.displayTitle}
         </p>
-        {settings.tagline ? <p className="cc-tagline">{settings.tagline}</p> : null}
+        {settings.tagline ? (
+          <p className="cc-tagline">{settings.tagline}</p>
+        ) : null}
       </div>
 
       <div className="cc-board-wrap">
@@ -199,12 +222,22 @@ export default function CircuitCoreStage({ products, settings }: StageProps) {
           role="group"
           aria-label={t("stageProductsLabel")}
         >
-          <svg viewBox={`0 0 ${layout.w} ${layout.h}`} className="cc-svg" aria-hidden="true">
+          <svg
+            viewBox={`0 0 ${layout.w} ${layout.h}`}
+            className="cc-svg"
+            aria-hidden="true"
+          >
             {layout.bus ? <path d={layout.bus} className="cc-bus" /> : null}
             {list.map((p, i) => {
               const trace = layout.traces[i];
               if (!trace) return null;
-              const state = hot ? (hot === p.id ? "hot" : "dim") : powered(i) ? "on" : "off";
+              const state = hot
+                ? hot === p.id
+                  ? "hot"
+                  : "dim"
+                : powered(i)
+                  ? "on"
+                  : "off";
               return (
                 <g
                   key={p.id}
@@ -223,7 +256,9 @@ export default function CircuitCoreStage({ products, settings }: StageProps) {
                           d={trace.d}
                           pathLength={100}
                           className="cc-pulse"
-                          style={{ animationDelay: `${(k * 1.2 + i * 0.37) / motion.scale}s` }}
+                          style={{
+                            animationDelay: `${(k * 1.2 + i * 0.37) / motion.scale}s`,
+                          }}
                         />
                       ))
                     : null}
@@ -305,11 +340,14 @@ export default function CircuitCoreStage({ products, settings }: StageProps) {
           <pre>
             {lines.map((line, i) => {
               if (i > shown.line) return null;
-              const text = i === shown.line ? line.text.slice(0, shown.char) : line.text;
+              const text =
+                i === shown.line ? line.text.slice(0, shown.char) : line.text;
               return (
                 <div key={i} className={`cc-line cc-line-${line.kind}`}>
                   <bdi>{text}</bdi>
-                  {i === shown.line && motion.animate ? <span className="cc-caret">▌</span> : null}
+                  {i === shown.line && motion.animate ? (
+                    <span className="cc-caret">▌</span>
+                  ) : null}
                 </div>
               );
             })}
@@ -319,7 +357,10 @@ export default function CircuitCoreStage({ products, settings }: StageProps) {
 
       {probe ? (
         <svg className="cc-probe" aria-hidden="true">
-          <path d={`M${probe.x1} ${probe.y1}L${probe.x2} ${probe.y2}`} pathLength={100} />
+          <path
+            d={`M${probe.x1} ${probe.y1}L${probe.x2} ${probe.y2}`}
+            pathLength={100}
+          />
           <circle cx={probe.x2} cy={probe.y2} r={4} />
         </svg>
       ) : null}

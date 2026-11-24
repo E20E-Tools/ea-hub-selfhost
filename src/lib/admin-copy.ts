@@ -19,15 +19,18 @@ const ar = {
   consoleLibraryUnavailableRetry: "تعذّر تحميل المكتبة. إعادة المحاولة",
   consoleLoadingLibrary: "تحميل المكتبة…",
   consoleSavedQuestionsAndVisitorFeedback: "الأسئلة المحفوظة وتقييمات الزوار",
-  consoleReplyRatingsBySourceModelAndLanguage: "تقييمات الردود حسب المصدر والموديل واللغة",
+  consoleReplyRatingsBySourceModelAndLanguage:
+    "تقييمات الردود حسب المصدر والموديل واللغة",
   consoleHelpful: "مفيد",
   consoleUnhelpful: "غير مفيد",
   consoleNoRatingsYet: "لا توجد تقييمات بعد",
   consoleRecentUnhelpfulReplies: "آخر الردود غير المفيدة",
   consoleReviewQuestionForSaving: "مراجعة السؤال للحفظ",
-  consoleNewTestQuestionRemovePersonalDetailsBefore: "سؤال اختبار جديد · احذف أي بيانات شخصية قبل الحفظ",
+  consoleNewTestQuestionRemovePersonalDetailsBefore:
+    "سؤال اختبار جديد · احذف أي بيانات شخصية قبل الحفظ",
   consoleQuestionLanguage: "لغة السؤال",
-  consoleExpectedTermsNameLinkOrPhraseOne: "علامات النتيجة المتوقعة (اسم أو رابط أو عبارة، كل علامة في سطر)",
+  consoleExpectedTermsNameLinkOrPhraseOne:
+    "علامات النتيجة المتوقعة (اسم أو رابط أو عبارة، كل علامة في سطر)",
   consoleSaveQuestion: "حفظ السؤال",
   consoleSelectAll: "تحديد الكل",
   consoleEditExpectation: "تعديل التوقع",
@@ -55,10 +58,12 @@ const ar = {
   consoleUpdateInEnglish: "المستجد بالإنجليزية",
   consolePagePath: "مسار الصفحة",
   consoleAdd: "إضافة",
-  consoleOfferProfessionalServicesForThisProductAfter: "إتاحة طلب خدمات لهذا المنتج بعد إطلاقه",
+  consoleOfferProfessionalServicesForThisProductAfter:
+    "إتاحة طلب خدمات لهذا المنتج بعد إطلاقه",
   consoleCustomerExerciseResult: "نتيجة تمرين العميل",
   consoleThisQuestionNeedsACustomerResponse: "هذا سؤال يحتاج إلى رد العميل",
-  consoleConversionByEventLanguageOver30Days: "التحويل حسب لغة الحدث خلال ٣٠ يومًا",
+  consoleConversionByEventLanguageOver30Days:
+    "التحويل حسب لغة الحدث خلال ٣٠ يومًا",
   consoleLanguage: "اللغة",
   consolePreviewAndTestANewsletter: "معاينة النشرة وإرسال تجربة",
   consoleIssueMonth: "شهر المستجدات",
@@ -68,10 +73,12 @@ const ar = {
   consoleEAHubUpdates: "مستجدات EA-Hub",
   consoleNoUpdatesForThisMonth: "لا توجد مستجدات لهذا الشهر.",
   consolePreferencesUnsubscribe: "تفضيلات الاشتراك · إلغاء الاشتراك",
-  consoleTheProviderAcceptedTheTestEmailFor: "قَبِل المزوّد الرسالة التجريبية لبريد حسابك.",
+  consoleTheProviderAcceptedTheTestEmailFor:
+    "قَبِل المزوّد الرسالة التجريبية لبريد حسابك.",
   consoleTestDeliveryFailed: "تعذّر إرسال التجربة.",
   consoleEmailACopyToMe: "أرسل نسخة إلى بريدي",
-  consoleTestDeliveryRequiresEmailProviderSetup: "الإرسال التجريبي ينتظر تهيئة مزوّد البريد.",
+  consoleTestDeliveryRequiresEmailProviderSetup:
+    "الإرسال التجريبي ينتظر تهيئة مزوّد البريد.",
   consoleAccountRequirements: "متطلبات الحساب",
   consoleStartingData: "بيانات البدء",
   consoleVerifiedImportAndExportOptions: "الاستيراد والتصدير المؤكد",
@@ -81,7 +88,8 @@ const ar = {
   consoleProductDataQuality: "مراجعة جودة بيانات المنتجات",
   consoleLoadFailedRetry: "تعذّر التحميل. إعادة المحاولة",
   consoleMissingArabicDescriptionEdit: "الوصف العربي ناقص · تعديل",
-  consoleMissingOrMalformedLaunchURLEdit: "رابط التشغيل ناقص أو صيغته غير صالحة · تعديل",
+  consoleMissingOrMalformedLaunchURLEdit:
+    "رابط التشغيل ناقص أو صيغته غير صالحة · تعديل",
   consoleOpenLaunchURLToVerify: "فتح رابط التشغيل للتحقق",
   consoleLastReviewed: "آخر مراجعة",
   consoleNoDateRecorded: "لم يُسجل تاريخ",
@@ -89,7 +97,8 @@ const ar = {
   consoleRecordReview: "تسجيل المراجعة",
   consoleCompareArchyReplies: "مقارنة ردود Archy",
   consoleOneQuestionForBothEngines: "سؤال واحد للمحركين",
-  consoleSaveOrDiscardYourSettingsChangesBefore: "احفظ تغييرات الإعدادات أو تراجع عنها قبل المقارنة.",
+  consoleSaveOrDiscardYourSettingsChangesBefore:
+    "احفظ تغييرات الإعدادات أو تراجع عنها قبل المقارنة.",
   consoleComparing: "جارٍ المقارنة…",
   consoleCompareReplies: "قارن الردّين",
   consoleNewComparison: "مقارنة جديدة",
@@ -97,16 +106,20 @@ const ar = {
   consoleReportedModel: "الموديل المستخدم",
   consoleModelNotReported: "لم يذكر المصدر اسم الموديل",
   consoleWaitingForReply: "في انتظار الرد…",
-  consoleProviderRejectedAuthentication401UpdateTheKey: "رفض المزود مفتاح الاتصال (401). حدّث المفتاح ثم أعد الاختبار.",
+  consoleProviderRejectedAuthentication401UpdateTheKey:
+    "رفض المزود مفتاح الاتصال (401). حدّث المفتاح ثم أعد الاختبار.",
   consoleThisEngineCouldNotReturnAReply: "تعذّر الحصول على رد من هذا المحرك.",
-  consoleThisEngineIsUnavailableWithTheCurrent: "هذا المحرك غير متاح في الإعدادات الحالية.",
+  consoleThisEngineIsUnavailableWithTheCurrent:
+    "هذا المحرك غير متاح في الإعدادات الحالية.",
   consoleLocalSearch: "البحث المحلي",
   consoleArchyChatEngine: "محرك محادثات Archy",
   consoleCurrentlyServingVisitors: "المستخدم الآن للزوار",
   consoleChooseTheVisitorChatEngine: "اختر محرك محادثات الزوار",
-  consoleAfterComparingRepliesApplyYourChoiceWhen: "بعد مقارنة الردّين، طبّق اختيارك عندما تكون جاهزًا.",
+  consoleAfterComparingRepliesApplyYourChoiceWhen:
+    "بعد مقارنة الردّين، طبّق اختيارك عندما تكون جاهزًا.",
   consoleSaveTheProviderKeyToTryIt: "احفظ مفتاح المزود لتجربته.",
-  consoleLocalSearchIsUnavailableInThisEnvironment: "البحث المحلي غير متاح في هذه البيئة.",
+  consoleLocalSearchIsUnavailableInThisEnvironment:
+    "البحث المحلي غير متاح في هذه البيئة.",
   consoleVisitorEngineUpdated: "تم تطبيق المحرك للزوار",
   consoleCouldNotApplyThisEngine: "تعذّر تطبيق الاختيار",
   consoleApplyToVisitorChats: "تطبيق على محادثات الزوار",
@@ -145,8 +158,7 @@ const ar = {
   settingsStudioScope:
     "يتحكم التصميم المحفوظ بالمشهد المتحرك في الصفحة الرئيسية. جرّب اتجاهات واجهة Studio على هذا المتصفح من مختبر التصميم.",
   settingsCustomModel: "إعداد يدوي",
-  settingsLocalHint:
-    "يستخدم Archy البحث الدلالي المحلي للرد على الزوار.",
+  settingsLocalHint: "يستخدم Archy البحث الدلالي المحلي للرد على الزوار.",
   settingsSearchClear: "مسح البحث",
   settingsBack: "جميع الإعدادات",
   journeyMetrics: "قياسات رحلة المستفيد",
@@ -155,11 +167,15 @@ const ar = {
   journey30Days: "آخر 30 يومًا",
   journeyMonthlyRequests: "عدد الطلبات المؤكدة هذا الشهر",
   journeyRiyadhMonth: "الشهر بتوقيت الرياض",
-  journeyMonthlyRequestRule: "يشمل كل أنواع الطلبات، ويُحسب كل إيصال مرة واحدة فقط.",
+  journeyMonthlyRequestRule:
+    "يشمل كل أنواع الطلبات، ويُحسب كل إيصال مرة واحدة فقط.",
   journeyEventsNotPeople: "الأرقام أحداث وليست أشخاصًا فريدين.",
-  visitorClarification:"توضيح الزائر",
-  exerciseStarts:"بدء التمرين",exerciseFinishes:"إكمال التمرين",exerciseSubmissions:"إرسال نتيجة مع الطلب",
-  caseViewed: "جلسات مشاهدة الحالة", caseOpened: "فتح الأداة من الحالة",
+  visitorClarification: "توضيح الزائر",
+  exerciseStarts: "بدء التمرين",
+  exerciseFinishes: "إكمال التمرين",
+  exerciseSubmissions: "إرسال نتيجة مع الطلب",
+  caseViewed: "جلسات مشاهدة الحالة",
+  caseOpened: "فتح الأداة من الحالة",
   contactStarts: "بدايات نموذج الاتصال",
   contactReceipts: "إيصالات نموذج الاتصال",
   serviceStarts: "جلسات اختيار الخدمة",
@@ -176,7 +192,8 @@ const ar = {
   journeyAverage: "متوسط التقييم من 5",
   journeyCompletionRate: "نسبة إكمال الموجّه من البدايات",
   journeyComparisonRate: "فتح الأدوات من بدايات المقارنة",
-  journeyNoData: "لا أحداث مسجلة؛ العدادات صفر والمعدلات غير معروفة عند غياب المقام.",
+  journeyNoData:
+    "لا أحداث مسجلة؛ العدادات صفر والمعدلات غير معروفة عند غياب المقام.",
   journeyReceiptRule:
     "لا يُحسب الطلب إلا بعد قراءة إيصاله من قاعدة البيانات؛ لا تُقاس المحاولات المرفوضة كنجاح.",
   opsHealth: "صحة التطبيق",
@@ -222,7 +239,8 @@ const ar = {
   opsChatNone: "لا ردود محادثة مقاسة في الساعة الأخيرة",
   opsChatAlertSlow:
     "تنبيه: تراجع وقت الرد — الوسيط {median} مللي ثانية في الساعة الأخيرة ({samples} ردًا).",
-  opsChatAlertLow: "تنبيه: انخفضت الردود الناجحة — {success} من {samples} في الساعة الأخيرة.",
+  opsChatAlertLow:
+    "تنبيه: انخفضت الردود الناجحة — {success} من {samples} في الساعة الأخيرة.",
   act_ai_failure_alert: "تنبيه فشل الذكاء الاصطناعي",
   act_ai_registration_policy: "عدّل حد تسجيل زوار Archy",
   act_retention_daily_cleanup_failed: "تعذّر التنظيف اليومي للبيانات القديمة",
@@ -262,8 +280,10 @@ const ar = {
   slCustomized: "{n} تصاميم مخصّصة",
   slSections: "{n} أقسام",
   opsMethodNote: "كيف تُقاس هذه القيم",
-  cwTilesScope: "إجماليات كل الفترات للزوار المسجّلين في Archy، وليست أرقام اليوم.",
-  navWaitingBreakdown: "بانتظار الفريق: {items} طلبات وعروض جديدة · {live} محادثات مباشرة",
+  cwTilesScope:
+    "إجماليات كل الفترات للزوار المسجّلين في Archy، وليست أرقام اليوم.",
+  navWaitingBreakdown:
+    "بانتظار الفريق: {items} طلبات وعروض جديدة · {live} محادثات مباشرة",
   act_ai_chat_degraded: "تنبيه تراجع أداء محادثة الذكاء الاصطناعي",
   opsDelivery: "التحقق من التسليم",
   opsRefresh: "تحديث الحالة",
@@ -394,9 +414,11 @@ const ar = {
   tabAppearance: "المظهر",
   tabAppearanceDesc: "تصميم الموقع والألوان والخطوط وعرض صور المنتجات.",
   tabCustomize: "تخصيص التصميم",
-  tabCustomizeDesc: "ألوان وأحجام وصور خاصة بكل تصميم، تُحفظ من هنا بدون تعديلات يدوية.",
+  tabCustomizeDesc:
+    "ألوان وأحجام وصور خاصة بكل تصميم، تُحفظ من هنا بدون تعديلات يدوية.",
   customizeDesign: "التصميم الذي تخصّصه",
-  customizeDesignHint: "التغييرات تخص هذا التصميم فقط، ولا تؤثر على التصاميم الأخرى.",
+  customizeDesignHint:
+    "التغييرات تخص هذا التصميم فقط، ولا تؤثر على التصاميم الأخرى.",
   customizeEdited: "مخصّص",
   customizeOpenPreview: "فتح التصميم في نافذة جديدة",
   customizePreviewNote: "النافذة الجديدة تعرض آخر ما حُفظ.",
@@ -555,7 +577,8 @@ const ar = {
   productManage: "إدارة {name}",
   productCatalogStatus: "حالة المنتج في الكتالوج",
   productCatalogPublished: "ظاهر في الكتالوج",
-  productCatalogStatusHint: "يظل المنتج ظاهرًا في الكتالوج؛ حالة «قريبًا» تمنع فتح النظام فقط.",
+  productCatalogStatusHint:
+    "يظل المنتج ظاهرًا في الكتالوج؛ حالة «قريبًا» تمنع فتح النظام فقط.",
   productViewPage: "عرض صفحة المنتج",
   productGithub: "مستودع GitHub",
   newProduct: "منتج جديد",
@@ -576,7 +599,8 @@ const ar = {
   productFitProblemHint:
     "جملة قصيرة يكتبها تصميم «من المشكلة إلى الأداة»؛ إن تُركت فارغة يُستخدم وصف المنتج.",
   productShots: "لقطات من داخل الأداة",
-  productShotsHint: "تظهر في صفحة المنتج ليرى الزائر الأداة قبل الطلب. حتى {max} صور، PNG أو JPG أو WebP.",
+  productShotsHint:
+    "تظهر في صفحة المنتج ليرى الزائر الأداة قبل الطلب. حتى {max} صور، PNG أو JPG أو WebP.",
   productShotUrl: "الصورة (مسار في مكتبة الصور أو رابط https)",
   productShotUrlInvalid: "استخدم رابط https أو ارفع صورة.",
   productShotCaption: "وصف قصير للقطة",
@@ -606,7 +630,8 @@ const ar = {
   productFitPurchaseSteps: "خطوات الشراء",
   productFitPurchaseStepsHint:
     "تظهر للأدوات «قريبًا» في «ابدأ باحتياجك» وصفحة الأداة. إذا تُركت فارغة يظهر للزوار «لم تُقدَّم خطوات الشراء بعد؛ تواصل مع الفريق».",
-  productFitListHint: "سطر واحد لكل عنصر؛ لا تكتب افتراضات أو أسعارًا غير مؤكدة.",
+  productFitListHint:
+    "سطر واحد لكل عنصر؛ لا تكتب افتراضات أو أسعارًا غير مؤكدة.",
   productFit_architecture: "نمذجة البنية المؤسسة",
   productFit_applications: "فهم التطبيقات والأنظمة",
   productFit_technology: "تقييم التقنيات وتبنيها",
@@ -686,7 +711,8 @@ const ar = {
 
   // Media
   mediaTitle: "مكتبة الصور",
-  mediaDesc: "صور محفوظة للإدارة. رفع صورة لا يغيّر المنتجات أو الشعار تلقائيًا.",
+  mediaDesc:
+    "صور محفوظة للإدارة. رفع صورة لا يغيّر المنتجات أو الشعار تلقائيًا.",
   uploadTarget: "مجلد الرفع",
   folder_products: "المنتجات",
   folder_branding: "الهوية",
@@ -720,7 +746,8 @@ const ar = {
   footerLinksHint: "اكتب الاسم كما يظهر في نص التذييل، ثم أضف رابط الموقع.",
   footerTextHint: "استخدم ♥ لإظهار القلب.",
   logo: "الشعار",
-  logoHint: "PNG أو JPG أو WebP، حتى 4 ميجابايت. يُحذف الشعار القديم عند الحفظ.",
+  logoHint:
+    "PNG أو JPG أو WebP، حتى 4 ميجابايت. يُحذف الشعار القديم عند الحفظ.",
   uploadLogo: "رفع شعار",
   removeLogo: "إزالة",
   noLogo: "لا يوجد شعار",
@@ -823,44 +850,59 @@ const ar = {
   feature_assistantDesc:
     "تشغيل أو إيقاف أرشي، بما يشمل الروبوت والترحيب والجولة والمحادثة؛ تبقى المحادثات وطلبات الدعم السابقة محفوظة.",
   feature_recommendations: "اقتراحات الأدوات في الطلبات",
-  feature_recommendationsDesc: "عند الإيقاف لا تقترح صفحة الطلبات أدوات تلقائيًا.",
+  feature_recommendationsDesc:
+    "عند الإيقاف لا تقترح صفحة الطلبات أدوات تلقائيًا.",
   feature_support: "صفحة ادعمنا",
-  feature_supportDesc: "عند الإيقاف تختفي من القائمة والبحث وتعرض إشعارًا قصيرًا.",
+  feature_supportDesc:
+    "عند الإيقاف تختفي من القائمة والبحث وتعرض إشعارًا قصيرًا.",
   feature_affiliates: "صفحة التوابع",
-  feature_affiliatesDesc: "عند الإيقاف تختفي من القائمة والبحث وتعرض إشعارًا قصيرًا.",
+  feature_affiliatesDesc:
+    "عند الإيقاف تختفي من القائمة والبحث وتعرض إشعارًا قصيرًا.",
   feature_roadmap: "خارطة التقنيات",
-  feature_roadmapDesc: "عند الإيقاف تختفي من القائمة والبحث وتعرض إشعارًا قصيرًا.",
+  feature_roadmapDesc:
+    "عند الإيقاف تختفي من القائمة والبحث وتعرض إشعارًا قصيرًا.",
   feature_blog: "صفحة من نحن",
   feature_blogDesc: "عند الإيقاف تختفي من القائمة والبحث وتعرض إشعارًا قصيرًا.",
   feature_enterprise: "الخدمات المؤسسية",
-  feature_enterpriseDesc: "عند الإيقاف تختفي صفحة الخدمات ونموذج طلب الخدمة من القائمة والبحث.",
+  feature_enterpriseDesc:
+    "عند الإيقاف تختفي صفحة الخدمات ونموذج طلب الخدمة من القائمة والبحث.",
   feature_testimonials: "شهادات العملاء",
-  feature_testimonialsDesc: "عند الإيقاف تختفي من القائمة والبحث وتعرض إشعارًا قصيرًا.",
+  feature_testimonialsDesc:
+    "عند الإيقاف تختفي من القائمة والبحث وتعرض إشعارًا قصيرًا.",
   feature_terms: "شروط الخدمة",
-  feature_termsDesc: "عند الإيقاف تختفي من القائمة والروابط أسفل النماذج وتعرض إشعارًا قصيرًا.",
+  feature_termsDesc:
+    "عند الإيقاف تختفي من القائمة والروابط أسفل النماذج وتعرض إشعارًا قصيرًا.",
   feature_contact: "صفحة اتصل بنا",
-  feature_contactDesc: "عند الإيقاف تختفي من القائمة والبحث وتعرض إشعارًا قصيرًا.",
+  feature_contactDesc:
+    "عند الإيقاف تختفي من القائمة والبحث وتعرض إشعارًا قصيرًا.",
   feature_arabic: "اللغة العربية للزوار",
   feature_arabicDesc:
     "عند الإيقاف يظهر الموقع بالإنجليزية فقط ويختفي زر اختيار اللغة؛ تبقى لوحة التحكم بلغتيها.",
   feature_discover: "ابدأ باحتياجك",
-  feature_discoverDesc: "عند الإيقاف تختفي صفحة الأسئلة الموجّهة وروابطها من القائمة والبحث والصفحة الرئيسية.",
+  feature_discoverDesc:
+    "عند الإيقاف تختفي صفحة الأسئلة الموجّهة وروابطها من القائمة والبحث والصفحة الرئيسية.",
   feature_compare: "مقارنة الأدوات",
-  feature_compareDesc: "عند الإيقاف تختفي أزرار «قارن» وشريط المقارنة، وتعرض صفحة المقارنة إشعارًا قصيرًا.",
+  feature_compareDesc:
+    "عند الإيقاف تختفي أزرار «قارن» وشريط المقارنة، وتعرض صفحة المقارنة إشعارًا قصيرًا.",
   feature_myTools: "أدواتي المحفوظة",
-  feature_myToolsDesc: "عند الإيقاف يختفي زر حفظ الأداة وصفحة «أدواتي»؛ ما حفظه الزائر يبقى في متصفحه.",
+  feature_myToolsDesc:
+    "عند الإيقاف يختفي زر حفظ الأداة وصفحة «أدواتي»؛ ما حفظه الزائر يبقى في متصفحه.",
   feature_trials: "تمارين التخطيط",
-  feature_trialsDesc: "عند الإيقاف يختفي رابط «جرّب» من صفحات الأدوات وتعرض صفحة التمرين إشعارًا قصيرًا.",
+  feature_trialsDesc:
+    "عند الإيقاف يختفي رابط «جرّب» من صفحات الأدوات وتعرض صفحة التمرين إشعارًا قصيرًا.",
   feature_waitlist: "قائمة انتظار الأدوات القادمة",
-  feature_waitlistDesc: "عند الإيقاف يختفي نموذج «أبلغني عند الإطلاق» من الأدوات القادمة ويرفض الخادم التسجيلات الجديدة؛ القائمة المحفوظة لا تُحذف.",
+  feature_waitlistDesc:
+    "عند الإيقاف يختفي نموذج «أبلغني عند الإطلاق» من الأدوات القادمة ويرفض الخادم التسجيلات الجديدة؛ القائمة المحفوظة لا تُحذف.",
   feature_newsletter: "الاشتراك في النشرة",
-  feature_newsletterDesc: "عند الإيقاف تختفي صفحة الاشتراك ورابطها أسفل الموقع ويرفض الخادم الاشتراكات الجديدة؛ المشتركون الحاليون وإرسال النشرة لا يتأثران.",
+  feature_newsletterDesc:
+    "عند الإيقاف تختفي صفحة الاشتراك ورابطها أسفل الموقع ويرفض الخادم الاشتراكات الجديدة؛ المشتركون الحاليون وإرسال النشرة لا يتأثران.",
   feature_search: "البحث في الموقع",
   feature_searchDesc: "عند الإيقاف يختفي زر البحث من الترويسة.",
 
   // Feature overview (read-only)
   tabFeatureStatus: "حالة الميزات",
-  tabFeatureStatusDesc: "كل ميزة في الموقع وحالتها الآن، وما تقدمه للزوار وما يتغير عند إيقافها.",
+  tabFeatureStatusDesc:
+    "كل ميزة في الموقع وحالتها الآن، وما تقدمه للزوار وما يتغير عند إيقافها.",
   fsSummary: "{on} مفعّلة · {off} متوقفة",
   fsWhat: "ما تقدمه",
   fsWhenOff: "عند الإيقاف",
@@ -868,26 +910,37 @@ const ar = {
   fsNoPage: "لا تخص صفحة واحدة",
   fsManage: "تغيير",
   fsManageLabel: "تغيير حالة {name} من تبويب الميزات",
-  fsSavedNote: "تعرض هذه الصفحة الإعدادات المحفوظة؛ التغيير يتم من تبويب «الميزات».",
+  fsSavedNote:
+    "تعرض هذه الصفحة الإعدادات المحفوظة؛ التغيير يتم من تبويب «الميزات».",
   featureAbout_assistant:
     "المساعد أرشي في زاوية كل صفحة: ترحيب صوتي، جولة في الموقع، ومحادثة تقترح الأدوات المناسبة ثم تحوّل الزائر إلى أحد الفريق عند الحاجة.",
-  featureAbout_recommendations: "يقترح على الزائر أدوات من المكتبة بحسب ما يكتبه في نموذج الطلب.",
+  featureAbout_recommendations:
+    "يقترح على الزائر أدوات من المكتبة بحسب ما يكتبه في نموذج الطلب.",
   featureAbout_support: "صفحة «ادعمنا» التي تعرض طرق دعم المنصة.",
-  featureAbout_affiliates: "صفحة التوابع التي تجمع روابط الاستشارات والدورات في DT Guide.",
-  featureAbout_roadmap: "خارطة التقنيات التي تعرض مراحل تبنّي الأدوات المقترحة.",
+  featureAbout_affiliates:
+    "صفحة التوابع التي تجمع روابط الاستشارات والدورات في DT Guide.",
+  featureAbout_roadmap:
+    "خارطة التقنيات التي تعرض مراحل تبنّي الأدوات المقترحة.",
   featureAbout_blog: "صفحة «من نحن» بفيديو التعريف ووصف المنصة وأدواتها.",
   featureAbout_enterprise: "صفحة الخدمات المؤسسية ونموذج طلب الخدمة.",
   featureAbout_testimonials: "صفحة شهادات العملاء المنشورة.",
   featureAbout_terms: "صفحة شروط الخدمة والرابط إليها أسفل النماذج.",
   featureAbout_contact: "صفحة «اتصل بنا» ببيانات التواصل العامة.",
-  featureAbout_arabic: "يتيح للزوار عرض الموقع بالعربية واختيار اللغة من زر اللغة في الترويسة.",
-  featureAbout_discover: "أسئلة قصيرة عن احتياج الزائر تقترح عليه الأدوات المناسبة.",
-  featureAbout_compare: "مقارنة أداتين أو ثلاث جنبًا إلى جنب من بطاقات الأدوات.",
-  featureAbout_myTools: "حفظ الأدوات والتمارين في متصفح الزائر وعرضها في صفحة «أدواتي».",
-  featureAbout_trials: "تمرين تخطيط تفاعلي لكل أداة متاحة يجرّبه الزائر قبل استخدامها.",
+  featureAbout_arabic:
+    "يتيح للزوار عرض الموقع بالعربية واختيار اللغة من زر اللغة في الترويسة.",
+  featureAbout_discover:
+    "أسئلة قصيرة عن احتياج الزائر تقترح عليه الأدوات المناسبة.",
+  featureAbout_compare:
+    "مقارنة أداتين أو ثلاث جنبًا إلى جنب من بطاقات الأدوات.",
+  featureAbout_myTools:
+    "حفظ الأدوات والتمارين في متصفح الزائر وعرضها في صفحة «أدواتي».",
+  featureAbout_trials:
+    "تمرين تخطيط تفاعلي لكل أداة متاحة يجرّبه الزائر قبل استخدامها.",
   featureAbout_waitlist: "نموذج «أبلغني عند الإطلاق» في صفحات الأدوات القادمة.",
-  featureAbout_newsletter: "صفحة الاشتراك في النشرة الشهرية والرابط إليها أسفل الموقع.",
-  featureAbout_search: "زر البحث في الترويسة للوصول السريع إلى الأدوات والصفحات.",
+  featureAbout_newsletter:
+    "صفحة الاشتراك في النشرة الشهرية والرابط إليها أسفل الموقع.",
+  featureAbout_search:
+    "زر البحث في الترويسة للوصول السريع إلى الأدوات والصفحات.",
 
   // Contact
   publicContact: "بيانات التواصل العامة",
@@ -897,7 +950,8 @@ const ar = {
   address: "العنوان",
   notifications: "الإشعارات",
   notificationsDesc: "إعدادات خاصة لا يراها الزوار.",
-  emailInactive: "إرسال البريد غير مفعّل حتى يُعدّ نطاق إرسال موثّق؛ الطلبات تُحفظ هنا.",
+  emailInactive:
+    "إرسال البريد غير مفعّل حتى يُعدّ نطاق إرسال موثّق؛ الطلبات تُحفظ هنا.",
   recipientEmail: "بريد استلام الإشعارات",
   recipientEmailHint: "تصل إليه إشعارات الطلبات الجديدة.",
   notifyEnabled: "إشعار عند وصول طلب جديد",
@@ -907,18 +961,22 @@ const ar = {
 
   // AI
   aiProvider: "مزود النموذج",
-  aiProviderDesc: "أي خدمة متوافقة مع OpenAI تعمل. اختر قالبًا جاهزًا أو أدخل الإعدادات يدويًا.",
+  aiProviderDesc:
+    "أي خدمة متوافقة مع OpenAI تعمل. اختر قالبًا جاهزًا أو أدخل الإعدادات يدويًا.",
   aiFree: "مجاني",
   aiImportModels: "استيراد نماذج ChatGPT",
-  aiImportModelsHint: "يجلب أحدث النماذج المتاحة لمفتاح OpenAI المحفوظ، ثم اختر واحدًا واحفظ.",
+  aiImportModelsHint:
+    "يجلب أحدث النماذج المتاحة لمفتاح OpenAI المحفوظ، ثم اختر واحدًا واحفظ.",
   aiImported: "النماذج المستوردة:",
-  errAiOpenAiKey: "رفض OpenAI المفتاح الجديد (401). أدخل مفتاح مشروع صالحًا ثم احفظ مجددًا.",
+  errAiOpenAiKey:
+    "رفض OpenAI المفتاح الجديد (401). أدخل مفتاح مشروع صالحًا ثم احفظ مجددًا.",
   errAiKeyCheck: "تعذّر التحقق من المفتاح الآن. أعد المحاولة.",
   errAiImport: "تعذر جلب النماذج من OpenAI.",
   errAiImportNeedsKey: "احفظ أولًا مزود ChatGPT مع مفتاح OpenAI.",
   aiPaid: "مدفوع",
   aiBaseUrl: "رابط الخدمة",
-  aiBaseUrlHint: "رابط https لخدمة عامة فقط؛ مفتاح الخادم يُرسل إلى api.groq.com وحده.",
+  aiBaseUrlHint:
+    "رابط https لخدمة عامة فقط؛ مفتاح الخادم يُرسل إلى api.groq.com وحده.",
   aiModel: "النموذج",
   aiSpeed: "أسلوب الرد",
   aiSpeed_fast: "سريع ومختصر",
@@ -941,7 +999,8 @@ const ar = {
   aiUsageChat: "رسائل المحادثة",
   aiUsageRecommendations: "اقتراحات صفحة الطلب",
   aiUsageBans: "إيقافات الاشتباه بالروبوتات",
-  aiUsageNote: "الأعداد هي الطلبات المقبولة وليست الردود الناجحة؛ لا تُحفظ أسئلة الزوار.",
+  aiUsageNote:
+    "الأعداد هي الطلبات المقبولة وليست الردود الناجحة؛ لا تُحفظ أسئلة الزوار.",
   aiCustom: "مخصص",
 
   // Security
@@ -961,7 +1020,8 @@ const ar = {
   strength_fair: "مقبولة",
   strength_strong: "قوية",
   adminsDesc: "الحسابات التي تملك صلاحية الإدارة (للعرض فقط).",
-  adminsNote: "يمنح المالك صلاحية الإدارة من الخلفية؛ لا يمكن منحها أو سحبها من هنا.",
+  adminsNote:
+    "يمنح المالك صلاحية الإدارة من الخلفية؛ لا يمكن منحها أو سحبها من هنا.",
   colCreated: "تاريخ الإنشاء",
   colLastSignIn: "آخر دخول",
   noAdmins: "لا يوجد مشرفون.",
@@ -1011,12 +1071,15 @@ const ar = {
   tabTestimonialsDesc:
     "أضف شهادات العملاء وعدّلها وأخفها، وتظهر في صفحة «شهادات العملاء» بالعربية والإنجليزية.",
   testimonialsTitle: "شهادات العملاء",
-  testimonialsDesc: "كل شهادة لها اسم ومنصب وجهة ونص وصورة اختيارية. احفظ لتظهر للزوار مباشرة.",
+  testimonialsDesc:
+    "كل شهادة لها اسم ومنصب وجهة ونص وصورة اختيارية. احفظ لتظهر للزوار مباشرة.",
   testimonialsOpenPage: "فتح الصفحة",
   addTestimonial: "إضافة شهادة",
   testimonialsCount: "الشهادات الظاهرة للزوار: {count}.",
-  testimonialsMenuNote: "رابط الصفحة في القائمة يبقى مخفيًا حتى تُفعّله من «القائمة».",
-  noTestimonials: "لا توجد شهادات بعد. أضف أول شهادة حقيقية من زر «إضافة شهادة».",
+  testimonialsMenuNote:
+    "رابط الصفحة في القائمة يبقى مخفيًا حتى تُفعّله من «القائمة».",
+  noTestimonials:
+    "لا توجد شهادات بعد. أضف أول شهادة حقيقية من زر «إضافة شهادة».",
   newTestimonial: "شهادة جديدة",
   testimonialShown: "ظاهرة للزوار",
   testimonialHidden: "مخفية عن الزوار",
@@ -1025,7 +1088,8 @@ const ar = {
   testimonialRole: "المنصب",
   testimonialOrganization: "الجهة",
   funnelTitle: "رحلة العميل",
-  funnelHint: "كم زائرًا وصل لكل خطوة: زيارة الموقع ثم صفحة منتج ثم محادثة ثم طلب.",
+  funnelHint:
+    "كم زائرًا وصل لكل خطوة: زيارة الموقع ثم صفحة منتج ثم محادثة ثم طلب.",
   funnelRange: "الفترة",
   funnelDays: "آخر {days} يومًا",
   funnel_visitors: "زوار الموقع",
@@ -1034,10 +1098,12 @@ const ar = {
   funnel_requests: "أرسلوا طلبًا",
   funnelOfPrevious: "{pct}% من الخطوة السابقة",
   funnelWaitlist: "منها {count} من إجابات قوائم انتظار المنتجات القادمة.",
-  funnelNote: "الزوار يُعدّون بمعرّف عشوائي للمتصفح بلا هوية. المحادثات والطلبات أعداد في الفترة نفسها وليست تتبعًا للشخص نفسه.",
+  funnelNote:
+    "الزوار يُعدّون بمعرّف عشوائي للمتصفح بلا هوية. المحادثات والطلبات أعداد في الفترة نفسها وليست تتبعًا للشخص نفسه.",
   funnelError: "تعذّر تحميل رحلة العميل.",
   weeklyTitle: "تقرير أسبوعي: صفحات المنتجات وقوائم الانتظار",
-  weeklyHint: "آخر أربعة أسابيع بتوقيت الرياض. كل أسبوع سبعة أيام تنتهي باليوم.",
+  weeklyHint:
+    "آخر أربعة أسابيع بتوقيت الرياض. كل أسبوع سبعة أيام تنتهي باليوم.",
   weeklyWeek: "الأسبوع",
   weeklyViewers: "فتحوا صفحة منتج",
   weeklyAnswers: "إجابات قائمة الانتظار",
@@ -1048,10 +1114,12 @@ const ar = {
   weeklyWaitlists: "حجم قائمة الانتظار الآن",
   weeklyMembers: "{count} مشترك",
   weeklyNoWaitlists: "لا توجد منتجات قادمة حاليًا.",
-  weeklyNote: "زيارات صفحات المنتجات تُعدّ على مستوى الموقع لا لكل منتج، لذلك النسبة تقريبية.",
+  weeklyNote:
+    "زيارات صفحات المنتجات تُعدّ على مستوى الموقع لا لكل منتج، لذلك النسبة تقريبية.",
   weeklyError: "تعذّر تحميل التقرير الأسبوعي.",
   testimonialQuote: "نص الشهادة",
-  testimonialQuoteHint: "اذكر اسم الأداة في النص (مثل Tech Radar) لتظهر الشهادة أيضًا بجانب زر البدء في صفحة تلك الأداة.",
+  testimonialQuoteHint:
+    "اذكر اسم الأداة في النص (مثل Tech Radar) لتظهر الشهادة أيضًا بجانب زر البدء في صفحة تلك الأداة.",
   testimonialPhoto: "الصورة",
   testimonialPhotoHint: "اختيارية. بدونها يظهر الحرف الأول من الاسم.",
   testimonialPublished: "إظهار هذه الشهادة للزوار",
@@ -1091,12 +1159,14 @@ const ar = {
   archyListenEn: "استمع بالإنجليزية",
   archyNoVoice: "لا يتوفر صوت لهذه اللغة في هذا المتصفح.",
   archyAutoGuide: "فتح قائمة التوجيه تلقائيًا",
-  archyAutoGuideHint: "تظهر مرة واحدة لكل زيارة بعد الترحيب، وتقترح المحادثة المناسبة للصفحة.",
+  archyAutoGuideHint:
+    "تظهر مرة واحدة لكل زيارة بعد الترحيب، وتقترح المحادثة المناسبة للصفحة.",
   archyGuideDelay: "مدة الانتظار بعد الترحيب",
   errSaveArchy: "تعذر حفظ ترحيب أرشي.",
   errSaveTerms: "تعذر حفظ شروط الخدمة.",
   navEnterprise: "طلبات المؤسسات",
-  navEnterpriseDesc: "طلبات خدمات التنفيذ والتطبيق والتدريب والدعم مع تفاصيل كل طلب.",
+  navEnterpriseDesc:
+    "طلبات خدمات التنفيذ والتطبيق والتدريب والدعم مع تفاصيل كل طلب.",
   filterService: "تصفية حسب الخدمة",
   allServices: "كل الخدمات",
   consultantsInvalid: "صحّح بريد أو رقم واتساب فريق الخدمات قبل الحفظ.",
@@ -1106,7 +1176,8 @@ const ar = {
   cwVisitors: "الزوار",
   tourVisits: "جولات أرشي — آخر 500 جولة",
   tourEngagement: "التفاعل مع أرشي",
-  tourEngagementScope: "ضمن آخر 500 جولة مسجّلة؛ يُحسب كل متصفح مرة واحدة، وليس عدد أشخاص موثّقين.",
+  tourEngagementScope:
+    "ضمن آخر 500 جولة مسجّلة؛ يُحسب كل متصفح مرة واحدة، وليس عدد أشخاص موثّقين.",
   tourUniqueStarted: "زوار بدأوا الجولة",
   tourUniqueCompleted: "زوار أكملوا 100%",
   tourUniqueChat: "زوار فتحوا الشات بعد الإكمال",
@@ -1133,7 +1204,8 @@ const ar = {
   vsRequested: "أرسلوا طلبًا",
   vsChat: "محادثة",
   vsRequest: "طلب",
-  vsNote: "يُحسب كل متصفح مرة واحدة يوميًا بتوقيت الرياض، دون حفظ عنوان IP أو هوية الزائر.",
+  vsNote:
+    "يُحسب كل متصفح مرة واحدة يوميًا بتوقيت الرياض، دون حفظ عنوان IP أو هوية الزائر.",
   searchDb: "ابحث في كل الطلبات: الاسم، البريد، الشركة أو نص الطلب",
   clearSearch: "مسح البحث",
   repliesNone: "لا توجد ردود بعد",
@@ -1248,8 +1320,10 @@ const ar = {
   errSaveCategories: "تعذّر حفظ التصنيفات.",
   errSaveContactSettings: "تعذّر حفظ إعدادات التواصل.",
   errSaveAi: "تعذّر حفظ إعدادات المساعد.",
-  errAiNeedsKey: "هذه الخدمة تحتاج مفتاح API محفوظًا؛ مفتاح الخادم يُستخدم مع api.groq.com فقط.",
-  errAiKeyOrigin: "غيّرت عنوان الخدمة: أدخل مفتاحًا جديدًا لها أو احذف المفتاح المحفوظ.",
+  errAiNeedsKey:
+    "هذه الخدمة تحتاج مفتاح API محفوظًا؛ مفتاح الخادم يُستخدم مع api.groq.com فقط.",
+  errAiKeyOrigin:
+    "غيّرت عنوان الخدمة: أدخل مفتاحًا جديدًا لها أو احذف المفتاح المحفوظ.",
   errPasswordRate: "محاولات كثيرة. حاول بعد 15 دقيقة.",
   errPasswordIdentity: "تعذّر التحقق من حسابك.",
   errPasswordEmail: "لا تستخدم بريدك كلمةً للمرور.",
@@ -1273,16 +1347,20 @@ const en: Record<AdminCopyKey, string> = {
   consoleCouldNotSave: "Could not save",
   consoleLibraryUnavailableRetry: "Library unavailable. Retry",
   consoleLoadingLibrary: "Loading library…",
-  consoleSavedQuestionsAndVisitorFeedback: "Saved questions and visitor feedback",
-  consoleReplyRatingsBySourceModelAndLanguage: "Reply ratings by source, model and language",
+  consoleSavedQuestionsAndVisitorFeedback:
+    "Saved questions and visitor feedback",
+  consoleReplyRatingsBySourceModelAndLanguage:
+    "Reply ratings by source, model and language",
   consoleHelpful: "Helpful",
   consoleUnhelpful: "Unhelpful",
   consoleNoRatingsYet: "No ratings yet",
   consoleRecentUnhelpfulReplies: "Recent unhelpful replies",
   consoleReviewQuestionForSaving: "Review question for saving",
-  consoleNewTestQuestionRemovePersonalDetailsBefore: "New test question · remove personal details before saving",
+  consoleNewTestQuestionRemovePersonalDetailsBefore:
+    "New test question · remove personal details before saving",
   consoleQuestionLanguage: "Question language",
-  consoleExpectedTermsNameLinkOrPhraseOne: "Expected terms (name, link or phrase, one per line)",
+  consoleExpectedTermsNameLinkOrPhraseOne:
+    "Expected terms (name, link or phrase, one per line)",
   consoleSaveQuestion: "Save question",
   consoleSelectAll: "Select all",
   consoleEditExpectation: "Edit expectation",
@@ -1310,10 +1388,13 @@ const en: Record<AdminCopyKey, string> = {
   consoleUpdateInEnglish: "Update in English",
   consolePagePath: "Page path",
   consoleAdd: "Add",
-  consoleOfferProfessionalServicesForThisProductAfter: "Offer professional services for this product after launch",
+  consoleOfferProfessionalServicesForThisProductAfter:
+    "Offer professional services for this product after launch",
   consoleCustomerExerciseResult: "Customer exercise result",
-  consoleThisQuestionNeedsACustomerResponse: "This question needs a customer response",
-  consoleConversionByEventLanguageOver30Days: "Conversion by event language over 30 days",
+  consoleThisQuestionNeedsACustomerResponse:
+    "This question needs a customer response",
+  consoleConversionByEventLanguageOver30Days:
+    "Conversion by event language over 30 days",
   consoleLanguage: "Language",
   consolePreviewAndTestANewsletter: "Preview and test a newsletter",
   consoleIssueMonth: "Issue month",
@@ -1323,10 +1404,12 @@ const en: Record<AdminCopyKey, string> = {
   consoleEAHubUpdates: "EA-Hub updates",
   consoleNoUpdatesForThisMonth: "No updates for this month.",
   consolePreferencesUnsubscribe: "Preferences · Unsubscribe",
-  consoleTheProviderAcceptedTheTestEmailFor: "The provider accepted the test email for your account.",
+  consoleTheProviderAcceptedTheTestEmailFor:
+    "The provider accepted the test email for your account.",
   consoleTestDeliveryFailed: "Test delivery failed.",
   consoleEmailACopyToMe: "Email a copy to me",
-  consoleTestDeliveryRequiresEmailProviderSetup: "Test delivery requires email provider setup.",
+  consoleTestDeliveryRequiresEmailProviderSetup:
+    "Test delivery requires email provider setup.",
   consoleAccountRequirements: "Account requirements",
   consoleStartingData: "Starting data",
   consoleVerifiedImportAndExportOptions: "Verified import and export options",
@@ -1336,7 +1419,8 @@ const en: Record<AdminCopyKey, string> = {
   consoleProductDataQuality: "Product data quality",
   consoleLoadFailedRetry: "Load failed. Retry",
   consoleMissingArabicDescriptionEdit: "Missing Arabic description · Edit",
-  consoleMissingOrMalformedLaunchURLEdit: "Missing or malformed launch URL · Edit",
+  consoleMissingOrMalformedLaunchURLEdit:
+    "Missing or malformed launch URL · Edit",
   consoleOpenLaunchURLToVerify: "Open launch URL to verify",
   consoleLastReviewed: "Last reviewed",
   consoleNoDateRecorded: "No date recorded",
@@ -1344,7 +1428,8 @@ const en: Record<AdminCopyKey, string> = {
   consoleRecordReview: "Record review",
   consoleCompareArchyReplies: "Compare Archy replies",
   consoleOneQuestionForBothEngines: "One question for both engines",
-  consoleSaveOrDiscardYourSettingsChangesBefore: "Save or discard your settings changes before comparing.",
+  consoleSaveOrDiscardYourSettingsChangesBefore:
+    "Save or discard your settings changes before comparing.",
   consoleComparing: "Comparing…",
   consoleCompareReplies: "Compare replies",
   consoleNewComparison: "New comparison",
@@ -1352,16 +1437,21 @@ const en: Record<AdminCopyKey, string> = {
   consoleReportedModel: "Reported model",
   consoleModelNotReported: "Model not reported",
   consoleWaitingForReply: "Waiting for reply…",
-  consoleProviderRejectedAuthentication401UpdateTheKey: "Provider rejected authentication (401). Update the key and retry.",
-  consoleThisEngineCouldNotReturnAReply: "This engine could not return a reply.",
-  consoleThisEngineIsUnavailableWithTheCurrent: "This engine is unavailable with the current settings.",
+  consoleProviderRejectedAuthentication401UpdateTheKey:
+    "Provider rejected authentication (401). Update the key and retry.",
+  consoleThisEngineCouldNotReturnAReply:
+    "This engine could not return a reply.",
+  consoleThisEngineIsUnavailableWithTheCurrent:
+    "This engine is unavailable with the current settings.",
   consoleLocalSearch: "Local search",
   consoleArchyChatEngine: "Archy chat engine",
   consoleCurrentlyServingVisitors: "Currently serving visitors",
   consoleChooseTheVisitorChatEngine: "Choose the visitor chat engine",
-  consoleAfterComparingRepliesApplyYourChoiceWhen: "After comparing replies, apply your choice when ready.",
+  consoleAfterComparingRepliesApplyYourChoiceWhen:
+    "After comparing replies, apply your choice when ready.",
   consoleSaveTheProviderKeyToTryIt: "Save the provider key to try it.",
-  consoleLocalSearchIsUnavailableInThisEnvironment: "Local search is unavailable in this environment.",
+  consoleLocalSearchIsUnavailableInThisEnvironment:
+    "Local search is unavailable in this environment.",
   consoleVisitorEngineUpdated: "Visitor engine updated",
   consoleCouldNotApplyThisEngine: "Could not apply this engine",
   consoleApplyToVisitorChats: "Apply to visitor chats",
@@ -1400,8 +1490,7 @@ const en: Record<AdminCopyKey, string> = {
   settingsStudioScope:
     "Your saved theme controls the animated scene on the homepage. Explore Studio interface directions in the design lab for this browser.",
   settingsCustomModel: "Manual configuration",
-  settingsLocalHint:
-    "Archy uses local semantic search for visitor chats.",
+  settingsLocalHint: "Archy uses local semantic search for visitor chats.",
   settingsSearchClear: "Clear search",
   settingsBack: "All settings",
   journeyMetrics: "Beneficiary journey metrics",
@@ -1410,11 +1499,15 @@ const en: Record<AdminCopyKey, string> = {
   journey30Days: "Last 30 days",
   journeyMonthlyRequests: "Confirmed requests this month",
   journeyRiyadhMonth: "Riyadh calendar month",
-  journeyMonthlyRequestRule: "Includes every request type; each confirmed receipt counts once.",
+  journeyMonthlyRequestRule:
+    "Includes every request type; each confirmed receipt counts once.",
   journeyEventsNotPeople: "Counts are events, not unique people.",
-  visitorClarification:"Visitor clarification",
-  exerciseStarts:"Exercise starts",exerciseFinishes:"Exercise completions",exerciseSubmissions:"Requests with exercise results",
-  caseViewed: "Use case views", caseOpened: "Tool opens from a use case",
+  visitorClarification: "Visitor clarification",
+  exerciseStarts: "Exercise starts",
+  exerciseFinishes: "Exercise completions",
+  exerciseSubmissions: "Requests with exercise results",
+  caseViewed: "Use case views",
+  caseOpened: "Tool opens from a use case",
   contactStarts: "Contact forms started",
   contactReceipts: "Contact receipts",
   serviceStarts: "Service selection sessions",
@@ -1431,7 +1524,8 @@ const en: Record<AdminCopyKey, string> = {
   journeyAverage: "Average rating out of 5",
   journeyCompletionRate: "Chooser completions / starts",
   journeyComparisonRate: "Tool openings / comparison starts",
-  journeyNoData: "No recorded events; counts are zero and rates are unknown without a denominator.",
+  journeyNoData:
+    "No recorded events; counts are zero and rates are unknown without a denominator.",
   journeyReceiptRule:
     "A request counts only after its database receipt is read; rejected attempts never count as success.",
   opsHealth: "Application health",
@@ -1477,7 +1571,8 @@ const en: Record<AdminCopyKey, string> = {
   opsChatNone: "No measured conversation answers in the last hour",
   opsChatAlertSlow:
     "Alert: reply time dropped — median {median} ms over the last hour ({samples} replies).",
-  opsChatAlertLow: "Alert: successful replies fell to {success} of {samples} in the last hour.",
+  opsChatAlertLow:
+    "Alert: successful replies fell to {success} of {samples} in the last hour.",
   act_ai_failure_alert: "AI failure alert",
   act_ai_registration_policy: "Changed the Archy visitor registration limit",
   act_retention_daily_cleanup_failed: "Daily cleanup of old data failed",
@@ -1517,8 +1612,10 @@ const en: Record<AdminCopyKey, string> = {
   slCustomized: "{n} customised",
   slSections: "{n} sections",
   opsMethodNote: "How these are measured",
-  cwTilesScope: "All-time totals for visitors registered with Archy, not today's figures.",
-  navWaitingBreakdown: "Waiting for the team: {items} new requests and offers · {live} live chats",
+  cwTilesScope:
+    "All-time totals for visitors registered with Archy, not today's figures.",
+  navWaitingBreakdown:
+    "Waiting for the team: {items} new requests and offers · {live} live chats",
   act_ai_chat_degraded: "AI chat performance alert",
   opsDelivery: "Delivery verification",
   opsRefresh: "Refresh status",
@@ -1578,7 +1675,8 @@ const en: Record<AdminCopyKey, string> = {
   saved: "Changes saved.",
   saveFailed: "Couldn't save. Check the fields and try again.",
   cannotUndo: "This can't be undone.",
-  missingTranslation: "Translation missing — visitors will see the other language instead.",
+  missingTranslation:
+    "Translation missing — visitors will see the other language instead.",
   langTagAr: "AR",
   langTagEn: "EN",
   viewSite: "View site",
@@ -1614,7 +1712,8 @@ const en: Record<AdminCopyKey, string> = {
   disabled: "Off",
 
   adminSignOutError: "Could not sign out. Please try again.",
-  adminConnectionError: "Could not reach the account service. Please try again.",
+  adminConnectionError:
+    "Could not reach the account service. Please try again.",
   adminResetError: "The password recovery request failed. Please try again.",
   adminQueue: "New request breakdown",
   adminUpdatedAt: "Last updated",
@@ -1649,7 +1748,8 @@ const en: Record<AdminCopyKey, string> = {
   tabCustomizeDesc:
     "Colors, sizes and pictures for each design, saved from here without manual changes.",
   customizeDesign: "Design to customize",
-  customizeDesignHint: "Changes apply only to this design; the other designs stay as they are.",
+  customizeDesignHint:
+    "Changes apply only to this design; the other designs stay as they are.",
   customizeEdited: "Customized",
   customizeOpenPreview: "Open this design in a new tab",
   customizePreviewNote: "The new tab shows the last saved version.",
@@ -1705,7 +1805,8 @@ const en: Record<AdminCopyKey, string> = {
   signIn: "Sign in",
   forgotPassword: "Forgot password?",
   forgotNeedEmail: "Enter your email first, then press “Forgot password?”.",
-  forgotSent: "If this email is registered, a link to set a new password is on its way.",
+  forgotSent:
+    "If this email is registered, a link to set a new password is on its way.",
   signInFailed: "Incorrect email or password.",
   signInCooldown: "Too many attempts. Wait a minute and try again.",
   notAdminTitle: "This account isn't an admin",
@@ -1825,7 +1926,8 @@ const en: Record<AdminCopyKey, string> = {
   productFitProblemHint:
     "Short sentence typed by the Problem to Tool design; empty uses the product description.",
   productShots: "Screenshots from the tool",
-  productShotsHint: "Shown on the product page so visitors can see the tool before asking. Up to {max} images, PNG, JPG or WebP.",
+  productShotsHint:
+    "Shown on the product page so visitors can see the tool before asking. Up to {max} images, PNG, JPG or WebP.",
   productShotUrl: "Image (a path in the image library or an https link)",
   productShotUrlInvalid: "Use an https link or upload an image.",
   productShotCaption: "Short caption",
@@ -1855,7 +1957,8 @@ const en: Record<AdminCopyKey, string> = {
   productFitPurchaseSteps: "Purchase steps",
   productFitPurchaseStepsHint:
     "Shown for coming-soon tools in “Start with your need” and on the tool page. If left empty, visitors see “The purchase process hasn't been provided yet; contact the team.”",
-  productFitListHint: "One item per line; do not enter assumptions or unconfirmed prices.",
+  productFitListHint:
+    "One item per line; do not enter assumptions or unconfirmed prices.",
   productFit_architecture: "Enterprise architecture modeling",
   productFit_applications: "Applications and systems",
   productFit_technology: "Technology assessment and adoption",
@@ -1918,7 +2021,8 @@ const en: Record<AdminCopyKey, string> = {
     "IDs use lowercase letters, numbers and dashes (2–40); the Arabic name needs at least 2 characters.",
 
   affiliatesTitle: "Affiliates",
-  affiliatesDesc: "Content of the Affiliates page: name, description, image and link for each.",
+  affiliatesDesc:
+    "Content of the Affiliates page: name, description, image and link for each.",
   addAffiliate: "Add affiliate",
   newAffiliate: "New affiliate",
   affiliateTitle: "Name",
@@ -1932,7 +2036,8 @@ const en: Record<AdminCopyKey, string> = {
   noAffiliates: "No affiliates yet.",
 
   mediaTitle: "Media library",
-  mediaDesc: "Images saved for the admin. Uploading never changes products or the logo by itself.",
+  mediaDesc:
+    "Images saved for the admin. Uploading never changes products or the logo by itself.",
   uploadTarget: "Upload folder",
   folder_products: "Products",
   folder_branding: "Branding",
@@ -1955,9 +2060,11 @@ const en: Record<AdminCopyKey, string> = {
   arabicTitle: "Extra Arabic title",
   arabicTitleHint: "Optional — shown next to the name on some pages.",
   tagline: "Tagline",
-  taglineHint: "Shown in smaller text under the site name. Leave empty to hide it.",
+  taglineHint:
+    "Shown in smaller text under the site name. Leave empty to hide it.",
   siteDescription: "Description",
-  siteDescriptionHint: "A short description shown on the homepage and in search results.",
+  siteDescriptionHint:
+    "A short description shown on the homepage and in search results.",
   footerText: "Footer text",
   footerLinks: "Footer site links",
   footerLinkName: "Site name",
@@ -1966,26 +2073,30 @@ const en: Record<AdminCopyKey, string> = {
     "Enter the name exactly as it appears in the footer text, then add its website URL.",
   footerTextHint: "Use ♥ to show a heart.",
   logo: "Logo",
-  logoHint: "PNG, JPG or WebP, up to 4 MB. The old logo is deleted when you save.",
+  logoHint:
+    "PNG, JPG or WebP, up to 4 MB. The old logo is deleted when you save.",
   uploadLogo: "Upload logo",
   removeLogo: "Remove",
   noLogo: "No logo",
   logoAlt: "Current logo",
 
   themeCard: "Site theme",
-  themeCardDesc: "Click a theme to preview it instantly, then save so every visitor sees it.",
+  themeCardDesc:
+    "Click a theme to preview it instantly, then save so every visitor sees it.",
   themeSelected: "Selected",
   themeLive: "Live now",
   themePreviewHome: "Preview homepage",
   animations: "Enable animations",
-  animationsHint: "Visitors who prefer reduced motion always see a still background.",
+  animationsHint:
+    "Visitors who prefer reduced motion always see a still background.",
   intensity: "Animation intensity",
   intensity_low: "Low",
   intensity_medium: "Medium",
   intensity_high: "High",
   resetClassic: "Reset to Classic",
   brandCard: "Colors & fonts",
-  brandCardDesc: "Changes show instantly in the preview, and for all visitors after saving.",
+  brandCardDesc:
+    "Changes show instantly in the preview, and for all visitors after saving.",
   headingFont: "Heading font",
   bodyFont: "Body font",
   arabicFont: "Supports Arabic",
@@ -2003,7 +2114,8 @@ const en: Record<AdminCopyKey, string> = {
   previewBody: "This is how body text looks on the site.",
   previewButton: "Button",
   imagesCard: "Product images",
-  imagesCardDesc: "How product images are shown, adjusted and animated on the homepage.",
+  imagesCardDesc:
+    "How product images are shown, adjusted and animated on the homepage.",
   imageFit: "Display mode",
   imageFit_contain: "Show the whole image",
   imageFit_cover: "Fill the card (edges may be cropped)",
@@ -2061,45 +2173,59 @@ const en: Record<AdminCopyKey, string> = {
   mobileNav_compact: "Compact",
   mobileNav_compactDesc: "Horizontally scrolling links.",
 
-  featuresDesc: "Turning a feature off never deletes its content; you can turn it back on anytime.",
+  featuresDesc:
+    "Turning a feature off never deletes its content; you can turn it back on anytime.",
   feature_assistant: "Archy smart assistant",
   feature_assistantDesc:
     "Enable or disable Archy, including the robot, greeting, tour and chat; existing conversations and support requests remain saved.",
   feature_recommendations: "Tool recommendations",
-  feature_recommendationsDesc: "When off, the request page stops suggesting tools.",
+  feature_recommendationsDesc:
+    "When off, the request page stops suggesting tools.",
   feature_support: "Support us page",
-  feature_supportDesc: "When off, it leaves the menu and search and shows a short notice.",
+  feature_supportDesc:
+    "When off, it leaves the menu and search and shows a short notice.",
   feature_affiliates: "Affiliates page",
-  feature_affiliatesDesc: "When off, it leaves the menu and search and shows a short notice.",
+  feature_affiliatesDesc:
+    "When off, it leaves the menu and search and shows a short notice.",
   feature_roadmap: "Technology roadmap",
-  feature_roadmapDesc: "When off, it leaves the menu and search and shows a short notice.",
+  feature_roadmapDesc:
+    "When off, it leaves the menu and search and shows a short notice.",
   feature_blog: "About us page",
-  feature_blogDesc: "When off, it leaves the menu and search and shows a short notice.",
+  feature_blogDesc:
+    "When off, it leaves the menu and search and shows a short notice.",
   feature_enterprise: "Enterprise services",
   feature_enterpriseDesc:
     "When off, the services page and its request form leave the menu and search.",
   feature_testimonials: "Client testimonials",
-  feature_testimonialsDesc: "When off, it leaves the menu and search and shows a short notice.",
+  feature_testimonialsDesc:
+    "When off, it leaves the menu and search and shows a short notice.",
   feature_terms: "Terms of service",
   feature_termsDesc:
     "When off, it leaves the menu and the form footer links and shows a short notice.",
   feature_contact: "Contact us page",
-  feature_contactDesc: "When off, it leaves the menu and search and shows a short notice.",
+  feature_contactDesc:
+    "When off, it leaves the menu and search and shows a short notice.",
   feature_arabic: "Arabic for visitors",
   feature_arabicDesc:
     "When off, the site shows English only and the language switcher is hidden; the admin console keeps both languages.",
   feature_discover: "Start with your need",
-  feature_discoverDesc: "When off, the guided questions page and its links leave the menu, search and home page.",
+  feature_discoverDesc:
+    "When off, the guided questions page and its links leave the menu, search and home page.",
   feature_compare: "Tool comparison",
-  feature_compareDesc: "When off, the Compare buttons and tray disappear and the comparison page shows a short notice.",
+  feature_compareDesc:
+    "When off, the Compare buttons and tray disappear and the comparison page shows a short notice.",
   feature_myTools: "Saved tools",
-  feature_myToolsDesc: "When off, the save button and the My tools page disappear; what visitors saved stays in their browser.",
+  feature_myToolsDesc:
+    "When off, the save button and the My tools page disappear; what visitors saved stays in their browser.",
   feature_trials: "Planning exercises",
-  feature_trialsDesc: "When off, the Try link leaves the tool pages and the exercise page shows a short notice.",
+  feature_trialsDesc:
+    "When off, the Try link leaves the tool pages and the exercise page shows a short notice.",
   feature_waitlist: "Coming-soon waitlist",
-  feature_waitlistDesc: "When off, the notify-me form leaves coming-soon tools and the server refuses new sign-ups; the saved list is kept.",
+  feature_waitlistDesc:
+    "When off, the notify-me form leaves coming-soon tools and the server refuses new sign-ups; the saved list is kept.",
   feature_newsletter: "Newsletter sign-up",
-  feature_newsletterDesc: "When off, the sign-up page and its footer link disappear and the server refuses new sign-ups; current subscribers and sending are unaffected.",
+  feature_newsletterDesc:
+    "When off, the sign-up page and its footer link disappear and the server refuses new sign-ups; current subscribers and sending are unaffected.",
   feature_search: "Site search",
   feature_searchDesc: "When off, the search button leaves the header.",
 
@@ -2113,32 +2239,45 @@ const en: Record<AdminCopyKey, string> = {
   fsNoPage: "Not tied to one page",
   fsManage: "Change",
   fsManageLabel: "Change {name} in the Features tab",
-  fsSavedNote: "This page shows the saved settings; changes are made in the Features tab.",
+  fsSavedNote:
+    "This page shows the saved settings; changes are made in the Features tab.",
   featureAbout_assistant:
     "Archy in the corner of every page: a spoken greeting, a site tour and a chat that suggests suitable tools and hands the visitor to a team member when needed.",
   featureAbout_recommendations:
     "Suggests library tools to visitors based on what they write in the request form.",
-  featureAbout_support: "The Support us page showing ways to support the platform.",
-  featureAbout_affiliates: "The Affiliates page with DT Guide consultation and course links.",
-  featureAbout_roadmap: "The technology roadmap showing proposed adoption phases for the tools.",
+  featureAbout_support:
+    "The Support us page showing ways to support the platform.",
+  featureAbout_affiliates:
+    "The Affiliates page with DT Guide consultation and course links.",
+  featureAbout_roadmap:
+    "The technology roadmap showing proposed adoption phases for the tools.",
   featureAbout_blog:
     "The About us page with the intro video and a description of the platform and its tools.",
-  featureAbout_enterprise: "The enterprise services page and its service request form.",
+  featureAbout_enterprise:
+    "The enterprise services page and its service request form.",
   featureAbout_testimonials: "The page of published client testimonials.",
   featureAbout_terms: "The terms of service page and its link under the forms.",
   featureAbout_contact: "The Contact us page with the public contact details.",
   featureAbout_arabic:
     "Lets visitors view the site in Arabic and choose the language from the header language button.",
-  featureAbout_discover: "Short questions about the visitor's need that suggest matching tools.",
-  featureAbout_compare: "Side-by-side comparison of two or three tools from the tool cards.",
-  featureAbout_myTools: "Saving tools and exercises in the visitor's browser, shown on the My tools page.",
-  featureAbout_trials: "An interactive planning exercise for each available tool, to try before using it.",
-  featureAbout_waitlist: "The notify-me-at-launch form on coming-soon tool pages.",
-  featureAbout_newsletter: "The monthly newsletter sign-up page and its footer link.",
-  featureAbout_search: "The header search button for quick access to tools and pages.",
+  featureAbout_discover:
+    "Short questions about the visitor's need that suggest matching tools.",
+  featureAbout_compare:
+    "Side-by-side comparison of two or three tools from the tool cards.",
+  featureAbout_myTools:
+    "Saving tools and exercises in the visitor's browser, shown on the My tools page.",
+  featureAbout_trials:
+    "An interactive planning exercise for each available tool, to try before using it.",
+  featureAbout_waitlist:
+    "The notify-me-at-launch form on coming-soon tool pages.",
+  featureAbout_newsletter:
+    "The monthly newsletter sign-up page and its footer link.",
+  featureAbout_search:
+    "The header search button for quick access to tools and pages.",
 
   publicContact: "Public contact details",
-  publicContactDesc: "Shown on the Contact us page. Leave a field empty to hide it.",
+  publicContactDesc:
+    "Shown on the Contact us page. Leave a field empty to hide it.",
   phone: "Phone",
   website: "Website",
   address: "Address",
@@ -2161,13 +2300,15 @@ const en: Record<AdminCopyKey, string> = {
   aiImportModelsHint:
     "Fetches the latest models available to the saved OpenAI key; pick one and save.",
   aiImported: "Imported models:",
-  errAiOpenAiKey: "OpenAI rejected the new key (401). Enter a valid project key and save again.",
+  errAiOpenAiKey:
+    "OpenAI rejected the new key (401). Enter a valid project key and save again.",
   errAiKeyCheck: "Could not verify this key right now. Try again.",
   errAiImport: "Could not fetch models from OpenAI.",
   errAiImportNeedsKey: "Save the ChatGPT provider with an OpenAI key first.",
   aiPaid: "Paid",
   aiBaseUrl: "Service URL",
-  aiBaseUrlHint: "Public https services only; the server key is only ever sent to api.groq.com.",
+  aiBaseUrlHint:
+    "Public https services only; the server key is only ever sent to api.groq.com.",
   aiModel: "Model",
   aiSpeed: "Response style",
   aiSpeed_fast: "Fast and brief",
@@ -2210,7 +2351,8 @@ const en: Record<AdminCopyKey, string> = {
   strength_fair: "Fair",
   strength_strong: "Strong",
   adminsDesc: "Accounts with admin access (read-only).",
-  adminsNote: "The owner grants admin access in the backend; it can't be granted or removed here.",
+  adminsNote:
+    "The owner grants admin access in the backend; it can't be granted or removed here.",
   colCreated: "Created",
   colLastSignIn: "Last sign-in",
   noAdmins: "No admins.",
@@ -2265,8 +2407,10 @@ const en: Record<AdminCopyKey, string> = {
   testimonialsOpenPage: "Open page",
   addTestimonial: "Add testimonial",
   testimonialsCount: "Testimonials shown to visitors: {count}.",
-  testimonialsMenuNote: "The page's menu link stays hidden until you switch it on in Navigation.",
-  noTestimonials: 'No testimonials yet. Add the first real one with "Add testimonial".',
+  testimonialsMenuNote:
+    "The page's menu link stays hidden until you switch it on in Navigation.",
+  noTestimonials:
+    'No testimonials yet. Add the first real one with "Add testimonial".',
   newTestimonial: "New testimonial",
   testimonialShown: "Shown to visitors",
   testimonialHidden: "Hidden from visitors",
@@ -2275,7 +2419,8 @@ const en: Record<AdminCopyKey, string> = {
   testimonialRole: "Role",
   testimonialOrganization: "Organization",
   funnelTitle: "Customer journey",
-  funnelHint: "How many reached each step: site visit, then a product page, then a chat, then a request.",
+  funnelHint:
+    "How many reached each step: site visit, then a product page, then a chat, then a request.",
   funnelRange: "Period",
   funnelDays: "Last {days} days",
   funnel_visitors: "Site visitors",
@@ -2284,10 +2429,12 @@ const en: Record<AdminCopyKey, string> = {
   funnel_requests: "Sent a request",
   funnelOfPrevious: "{pct}% of the previous step",
   funnelWaitlist: "{count} of them came from coming-soon waitlist answers.",
-  funnelNote: "Visitors are counted by a random browser id with no identity. Chats and requests are totals for the same period, not the same people tracked through.",
+  funnelNote:
+    "Visitors are counted by a random browser id with no identity. Chats and requests are totals for the same period, not the same people tracked through.",
   funnelError: "Couldn't load the customer journey.",
   weeklyTitle: "Weekly report: product pages and waitlists",
-  weeklyHint: "Last four weeks on Riyadh time. Each week is seven days ending today.",
+  weeklyHint:
+    "Last four weeks on Riyadh time. Each week is seven days ending today.",
   weeklyWeek: "Week",
   weeklyViewers: "Opened a product page",
   weeklyAnswers: "Waitlist answers",
@@ -2298,12 +2445,15 @@ const en: Record<AdminCopyKey, string> = {
   weeklyWaitlists: "Waitlist size now",
   weeklyMembers: "{count} members",
   weeklyNoWaitlists: "No coming-soon products right now.",
-  weeklyNote: "Product page views are counted site-wide, not per product, so the rate is approximate.",
+  weeklyNote:
+    "Product page views are counted site-wide, not per product, so the rate is approximate.",
   weeklyError: "Couldn't load the weekly report.",
   testimonialQuote: "Testimonial text",
-  testimonialQuoteHint: "Name the tool in the text (e.g. Tech Radar) and the testimonial also appears next to the main button on that tool's page.",
+  testimonialQuoteHint:
+    "Name the tool in the text (e.g. Tech Radar) and the testimonial also appears next to the main button on that tool's page.",
   testimonialPhoto: "Photo",
-  testimonialPhotoHint: "Optional. Without one, the first letter of the name is shown.",
+  testimonialPhotoHint:
+    "Optional. Without one, the first letter of the name is shown.",
   testimonialPublished: "Show this testimonial to visitors",
   testimonialNameRequired: "Enter the person's name.",
   testimonialQuoteRequired: "Enter the testimonial in Arabic or English.",
@@ -2320,7 +2470,8 @@ const en: Record<AdminCopyKey, string> = {
   consultantsWhatsapp: "Team WhatsApp number",
   consultantsWhatsappHint:
     "International number without + or leading zeros, e.g. 9665XXXXXXXX. Leave empty to hide the WhatsApp button.",
-  consultantsWhatsappInvalid: "Enter the full international number (8 to 15 digits).",
+  consultantsWhatsappInvalid:
+    "Enter the full international number (8 to 15 digits).",
   consultantsOpenPage: "Open the Enterprise Services page in this design",
   termsTitle: "Terms of service",
   termsHint:
@@ -2348,10 +2499,12 @@ const en: Record<AdminCopyKey, string> = {
   errSaveArchy: "Could not save Archy's greeting.",
   errSaveTerms: "Could not save the terms of service.",
   navEnterprise: "Enterprise requests",
-  navEnterpriseDesc: "Implementation, rollout, training and support requests with every detail.",
+  navEnterpriseDesc:
+    "Implementation, rollout, training and support requests with every detail.",
   filterService: "Filter by service",
   allServices: "All services",
-  consultantsInvalid: "Fix the services team email or WhatsApp number before saving.",
+  consultantsInvalid:
+    "Fix the services team email or WhatsApp number before saving.",
   navFeedback: "Ratings & common questions",
   navCustomers: "Customer workspace",
   navCustomersDesc: "Support, conversations, ratings and visitor records.",
@@ -2386,7 +2539,8 @@ const en: Record<AdminCopyKey, string> = {
   vsRequested: "Sent a request",
   vsChat: "chat",
   vsRequest: "request",
-  vsNote: "Each browser counts once a day on Riyadh time; no IP address or identity is stored.",
+  vsNote:
+    "Each browser counts once a day on Riyadh time; no IP address or identity is stored.",
   searchDb: "Search all requests: name, email, company or message",
   clearSearch: "Clear search",
   repliesNone: "No replies yet",
@@ -2484,8 +2638,10 @@ const en: Record<AdminCopyKey, string> = {
   errForbidden: "This page is for administrators.",
   errSaveProduct: "Couldn't save the product. Try a different ID.",
   errDeleteProduct: "Couldn't delete the product.",
-  errRequestStatus: "Couldn't update the request status; the change wasn't confirmed.",
-  errOfferStatus: "Couldn't update the offer status; the change wasn't confirmed.",
+  errRequestStatus:
+    "Couldn't update the request status; the change wasn't confirmed.",
+  errOfferStatus:
+    "Couldn't update the offer status; the change wasn't confirmed.",
   errImageType: "Choose a PNG, JPG or WebP image under 4 MB.",
   errImageInvalid: "The file isn't a valid image.",
   errImageUpload: "Couldn't upload the image.",
@@ -2509,10 +2665,14 @@ const en: Record<AdminCopyKey, string> = {
   errPasswordEmail: "Don't use your email as the password.",
   errPasswordSame: "Choose a password different from the current one.",
   errPasswordCurrent: "The current password is incorrect.",
-  errPasswordUpdate: "Couldn't change the password. Choose a stronger one and try again.",
+  errPasswordUpdate:
+    "Couldn't change the password. Choose a stronger one and try again.",
 };
 
-export const adminDictionaries: Record<Language, Record<AdminCopyKey, string>> = { ar, en };
+export const adminDictionaries: Record<
+  Language,
+  Record<AdminCopyKey, string>
+> = { ar, en };
 
 export function isAdminCopyKey(value: unknown): value is AdminCopyKey {
   return typeof value === "string" && value in ar;

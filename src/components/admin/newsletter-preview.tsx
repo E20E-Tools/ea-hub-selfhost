@@ -18,8 +18,8 @@ export function NewsletterPreview({ ar }: { ar: boolean }) {
     [draft, setDraft] = useState<{
       ar: string;
       en: string;
-      source:{ar:string;en:string};
-      locked:boolean;
+      source: { ar: string; en: string };
+      locked: boolean;
       ready: boolean;
     } | null>(null),
     [busy, setBusy] = useState(false),
@@ -54,7 +54,9 @@ export function NewsletterPreview({ ar }: { ar: boolean }) {
             try {
               setDraft(await getNewsletterPreview({ data: month }));
             } catch {
-              setNote(adminDictionaries[ar ? "ar" : "en"].consolePreviewUnavailable);
+              setNote(
+                adminDictionaries[ar ? "ar" : "en"].consolePreviewUnavailable,
+              );
             } finally {
               setBusy(false);
             }
@@ -70,11 +72,23 @@ export function NewsletterPreview({ ar }: { ar: boolean }) {
                 value={lang}
                 onChange={(e) => setLang(e.target.value === "en" ? "en" : "ar")}
               >
-                <option value="ar">{adminDictionaries.ar.arabicLanguageName}</option>
+                <option value="ar">
+                  {adminDictionaries.ar.arabicLanguageName}
+                </option>
                 <option value="en">English</option>
               </select>
             </label>
-            {body && !draft.locked && <IssueEditor key={month+lang+body} ar={ar} lang={lang} month={month} body={body} source={draft.source[lang]} onSaved={v=>setDraft({...draft,[lang]:v})}/>}
+            {body && !draft.locked && (
+              <IssueEditor
+                key={month + lang + body}
+                ar={ar}
+                lang={lang}
+                month={month}
+                body={body}
+                source={draft.source[lang]}
+                onSaved={(v) => setDraft({ ...draft, [lang]: v })}
+              />
+            )}
             <article
               className="rounded border p-3"
               dir={lang === "ar" ? "rtl" : "ltr"}
@@ -101,18 +115,29 @@ export function NewsletterPreview({ ar }: { ar: boolean }) {
                 ))
               ) : (
                 <p>
-                  {adminDictionaries[ar ? "ar" : "en"].consoleNoUpdatesForThisMonth}
+                  {
+                    adminDictionaries[ar ? "ar" : "en"]
+                      .consoleNoUpdatesForThisMonth
+                  }
                 </p>
               )}
               {body && (
-                <p>
-                  {adminDictionaries[lang].consolePreferencesUnsubscribe}
-                </p>
+                <p>{adminDictionaries[lang].consolePreferencesUnsubscribe}</p>
               )}
             </article>
-            <label>{adminDictionaries[ar ? "ar" : "en"].nlPreviewRecipient}{" "}
-              <select value={recipient} onChange={e => setRecipient(e.target.value === "editorial" ? "editorial" : "admin")}>
-                <option value="admin">{adminDictionaries[ar ? "ar" : "en"].nlMyAdminEmail}</option>
+            <label>
+              {adminDictionaries[ar ? "ar" : "en"].nlPreviewRecipient}{" "}
+              <select
+                value={recipient}
+                onChange={(e) =>
+                  setRecipient(
+                    e.target.value === "editorial" ? "editorial" : "admin",
+                  )
+                }
+              >
+                <option value="admin">
+                  {adminDictionaries[ar ? "ar" : "en"].nlMyAdminEmail}
+                </option>
                 <option value="editorial">EA@E20E.Tools</option>
               </select>
             </label>
@@ -121,22 +146,37 @@ export function NewsletterPreview({ ar }: { ar: boolean }) {
               onClick={async () => {
                 setBusy(true);
                 try {
-                  await emailNewsletterPreview({ data: { month, lang, recipient } });
+                  await emailNewsletterPreview({
+                    data: { month, lang, recipient },
+                  });
                   setNote(
-                    recipient === "editorial" ? adminDictionaries[ar ? "ar" : "en"].nlProviderAcceptedFor + "EA@E20E.Tools" : adminDictionaries[ar ? "ar" : "en"].consoleTheProviderAcceptedTheTestEmailFor,
+                    recipient === "editorial"
+                      ? adminDictionaries[ar ? "ar" : "en"]
+                          .nlProviderAcceptedFor + "EA@E20E.Tools"
+                      : adminDictionaries[ar ? "ar" : "en"]
+                          .consoleTheProviderAcceptedTheTestEmailFor,
                   );
                 } catch {
-                  setNote(adminDictionaries[ar ? "ar" : "en"].consoleTestDeliveryFailed);
+                  setNote(
+                    adminDictionaries[ar ? "ar" : "en"]
+                      .consoleTestDeliveryFailed,
+                  );
                 } finally {
                   setBusy(false);
                 }
               }}
             >
-              {recipient === "admin" ? adminDictionaries[ar ? "ar" : "en"].consoleEmailACopyToMe : adminDictionaries[ar ? "ar" : "en"].nlSendPreviewTo + "EA@E20E.Tools"}
+              {recipient === "admin"
+                ? adminDictionaries[ar ? "ar" : "en"].consoleEmailACopyToMe
+                : adminDictionaries[ar ? "ar" : "en"].nlSendPreviewTo +
+                  "EA@E20E.Tools"}
             </Button>
             {!draft.ready && (
               <small>
-                {adminDictionaries[ar ? "ar" : "en"].consoleTestDeliveryRequiresEmailProviderSetup}
+                {
+                  adminDictionaries[ar ? "ar" : "en"]
+                    .consoleTestDeliveryRequiresEmailProviderSetup
+                }
               </small>
             )}
           </>

@@ -6,17 +6,26 @@ describe("Footer website links", () => {
       linkedFooterParts("By E20E.Tools & DT.Guide", [
         { name: "DT.Guide", url: "https://www.dt.guide/" },
       ]),
-    ).toEqual([{ text: "By E20E.Tools & " }, { text: "DT.Guide", url: "https://www.dt.guide/" }]);
+    ).toEqual([
+      { text: "By E20E.Tools & " },
+      { text: "DT.Guide", url: "https://www.dt.guide/" },
+    ]);
   });
   it("rejects script links and credentials", () => {
     expect(
-      footerLinksSchema.safeParse([{ name: "Site", url: "javascript:alert(1)" }]).success,
+      footerLinksSchema.safeParse([
+        { name: "Site", url: "javascript:alert(1)" },
+      ]).success,
     ).toBe(false);
     expect(
-      footerLinksSchema.safeParse([{ name: "Site", url: "https://user:pass@example.com" }]).success,
+      footerLinksSchema.safeParse([
+        { name: "Site", url: "https://user:pass@example.com" },
+      ]).success,
     ).toBe(false);
   });
   it("preserves plain text when no links are configured", () => {
-    expect(linkedFooterParts("By E20E.Tools", [])).toEqual([{ text: "By E20E.Tools" }]);
+    expect(linkedFooterParts("By E20E.Tools", [])).toEqual([
+      { text: "By E20E.Tools" },
+    ]);
   });
 });

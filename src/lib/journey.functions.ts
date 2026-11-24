@@ -20,13 +20,28 @@ export const recordJourneyEvent = createServerFn({ method: "POST" })
     if (privacySignalInHeaders(request.headers)) return { ok: false };
     const { checkLimits, clientIp } = await import("./rate-limit.server");
     const outcome = await checkLimits([
-      { bucket: "journey:ip", subject: clientIp(request), limit: 120, windowSeconds: 600 },
-      { bucket: "journey:global-day", subject: "all", limit: 5000, windowSeconds: 86400 },
+      {
+        bucket: "journey:ip",
+        subject: clientIp(request),
+        limit: 120,
+        windowSeconds: 600,
+      },
+      {
+        bucket: "journey:global-day",
+        subject: "all",
+        limit: 5000,
+        windowSeconds: 86400,
+      },
     ]);
     if (outcome !== "ok") return { ok: false };
     const { recordJourney } = await import("./journey.server");
     return {
-      ok: await recordJourney(data.event, data.language, data.eventKey, data.rating ?? undefined),
+      ok: await recordJourney(
+        data.event,
+        data.language,
+        data.eventKey,
+        data.rating ?? undefined,
+      ),
     };
   });
 
@@ -34,7 +49,9 @@ export const getJourneyOverview = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     await (await import("./admin-guard.server")).requireAdmin(context);
-    const since = new Date(Date.now() - 29 * 86400000).toISOString().slice(0, 10);
+    const since = new Date(Date.now() - 29 * 86400000)
+      .toISOString()
+      .slice(0, 10);
     const { data, error } = await context.supabase
       .from("journey_aggregates")
       .select("day,event,language,count,rating_sum")

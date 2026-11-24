@@ -5,7 +5,13 @@ describe("visitor customer records", () => {
   it("joins email case variants and counts support requests and chats separately", () => {
     const result = summarizeVisitors(
       [{ email: "Visitor@example.com", created_at: "2026-11-01" }],
-      [{ email: "visitor@example.com", name: "Visitor", created_at: "2026-11-02" }],
+      [
+        {
+          email: "visitor@example.com",
+          name: "Visitor",
+          created_at: "2026-11-02",
+        },
+      ],
       [
         {
           email: "VISITOR@example.com",
@@ -20,7 +26,13 @@ describe("visitor customer records", () => {
           created_at: "2026-11-04",
         },
       ],
-      [{ visitor_email: "visitor@example.com", visitor_name: "Visitor", created_at: "2026-11-05" }],
+      [
+        {
+          visitor_email: "visitor@example.com",
+          visitor_name: "Visitor",
+          created_at: "2026-11-05",
+        },
+      ],
     );
     expect(result).toEqual([
       {

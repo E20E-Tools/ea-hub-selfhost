@@ -49,10 +49,23 @@
     z-index: -1;
     pointer-events: none;
     background:
-      radial-gradient(28% 34% at 15% 20%, oklch(0.62 0.2 265 / 0.12), transparent 70%),
-      radial-gradient(30% 30% at 85% 30%, oklch(0.8 0.14 215 / 0.14), transparent 70%),
-      radial-gradient(34% 30% at 55% 85%, oklch(0.62 0.2 295 / 0.1), transparent 70%),
-      radial-gradient(oklch(0.55 0.1 260 / 0.09) 1px, transparent 1.5px) 0 0 / 22px 22px;
+      radial-gradient(
+        28% 34% at 15% 20%,
+        oklch(0.62 0.2 265 / 0.12),
+        transparent 70%
+      ),
+      radial-gradient(
+        30% 30% at 85% 30%,
+        oklch(0.8 0.14 215 / 0.14),
+        transparent 70%
+      ),
+      radial-gradient(
+        34% 30% at 55% 85%,
+        oklch(0.62 0.2 295 / 0.1),
+        transparent 70%
+      ),
+      radial-gradient(oklch(0.55 0.1 260 / 0.09) 1px, transparent 1.5px) 0 0 /
+        22px 22px;
     animation: tb-blobs 30s ease-in-out infinite alternate;
   }
 
@@ -82,8 +95,13 @@
     block-size: 8px;
     pointer-events: none;
     background:
-      radial-gradient(circle, #2f6bff 2px, oklch(1 0 0) 2.6px, transparent 3.4px) 6px 50% / 24px 8px
-        repeat-x,
+      radial-gradient(
+          circle,
+          #2f6bff 2px,
+          oklch(1 0 0) 2.6px,
+          transparent 3.4px
+        )
+        6px 50% / 24px 8px repeat-x,
       linear-gradient(
           90deg,
           oklch(0.62 0.2 265 / 0.25),
@@ -171,10 +189,10 @@
     border-radius: 20px;
     border: 1.5px solid transparent;
     background:
-      repeating-linear-gradient(90deg, #7d8bb8 0 6px, transparent 6px 14px) left 24px top 0 /
-        calc(100% - 48px) 4px no-repeat padding-box,
-      repeating-linear-gradient(90deg, #7d8bb8 0 6px, transparent 6px 14px) left 24px bottom 0 /
-        calc(100% - 48px) 4px no-repeat padding-box,
+      repeating-linear-gradient(90deg, #7d8bb8 0 6px, transparent 6px 14px) left
+        24px top 0 / calc(100% - 48px) 4px no-repeat padding-box,
+      repeating-linear-gradient(90deg, #7d8bb8 0 6px, transparent 6px 14px) left
+        24px bottom 0 / calc(100% - 48px) 4px no-repeat padding-box,
       linear-gradient(var(--card), var(--card)) padding-box,
       var(--tb-grad) border-box;
     transition:
@@ -213,7 +231,12 @@
   }
 
   & :is(.product-launch, .detail-cta, .request-form button[type="submit"]) {
-    background: linear-gradient(110deg, #2456e0, #0b7fb0 50%, #6d3fd8) !important;
+    background: linear-gradient(
+      110deg,
+      #2456e0,
+      #0b7fb0 50%,
+      #6d3fd8
+    ) !important;
     color: #fff !important;
     border: 0 !important;
     border-radius: 999px !important;
@@ -231,7 +254,14 @@
   & :is(input, textarea, select) {
     border-radius: 14px;
   }
-  & :is(.home-action, .detail-hero, .detail-visual, .request-form, .request-success) {
+  &
+    :is(
+      .home-action,
+      .detail-hero,
+      .detail-visual,
+      .request-form,
+      .request-success
+    ) {
     border-radius: 24px;
     border: 1.5px solid transparent;
     background:
@@ -249,10 +279,10 @@
   & .about-card {
     border-radius: 20px;
     background:
-      repeating-linear-gradient(90deg, #7d8bb8 0 6px, transparent 6px 14px) left 24px top 0 /
-        calc(100% - 48px) 4px no-repeat padding-box,
-      repeating-linear-gradient(90deg, #7d8bb8 0 6px, transparent 6px 14px) left 24px bottom 0 /
-        calc(100% - 48px) 4px no-repeat padding-box,
+      repeating-linear-gradient(90deg, #7d8bb8 0 6px, transparent 6px 14px) left
+        24px top 0 / calc(100% - 48px) 4px no-repeat padding-box,
+      repeating-linear-gradient(90deg, #7d8bb8 0 6px, transparent 6px 14px) left
+        24px bottom 0 / calc(100% - 48px) 4px no-repeat padding-box,
       linear-gradient(var(--card), var(--card)) padding-box,
       var(--tb-grad) border-box;
   }
@@ -385,16 +415,29 @@
   position: absolute;
   inset: 0;
   background:
-    repeating-linear-gradient(0deg, oklch(0 0 0 / 0.045) 0 2px, transparent 2px 4px),
+    repeating-linear-gradient(
+      0deg,
+      oklch(0 0 0 / 0.045) 0 2px,
+      transparent 2px 4px
+    ),
     linear-gradient(180deg, var(--tb-beige), #b5ae9e);
 }
 .tb-digital-bg {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(38% 50% at 22% 25%, oklch(0.62 0.2 265 / 0.13), transparent 70%),
-    radial-gradient(38% 50% at 80% 78%, oklch(0.62 0.2 295 / 0.12), transparent 70%),
-    radial-gradient(oklch(0.55 0.12 260 / 0.2) 1px, transparent 1.6px) 0 0 / 20px 20px,
+    radial-gradient(
+      38% 50% at 22% 25%,
+      oklch(0.62 0.2 265 / 0.13),
+      transparent 70%
+    ),
+    radial-gradient(
+      38% 50% at 80% 78%,
+      oklch(0.62 0.2 295 / 0.12),
+      transparent 70%
+    ),
+    radial-gradient(oklch(0.55 0.12 260 / 0.2) 1px, transparent 1.6px) 0 0 /
+      20px 20px,
     var(--tb-white);
 }
 .tb-seam {
@@ -402,10 +445,18 @@
   pointer-events: none;
 }
 .tb-seam-legacy {
-  background: linear-gradient(var(--seam-dir), transparent, oklch(0.95 0.006 250 / 0.6));
+  background: linear-gradient(
+    var(--seam-dir),
+    transparent,
+    oklch(0.95 0.006 250 / 0.6)
+  );
 }
 .tb-seam-digital {
-  background: linear-gradient(var(--seam-dir), transparent, oklch(0.86 0.02 85 / 0.5));
+  background: linear-gradient(
+    var(--seam-dir),
+    transparent,
+    oklch(0.86 0.02 85 / 0.5)
+  );
 }
 
 /* World labels live in the top band, clear of every chip. */
@@ -517,7 +568,11 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: repeating-linear-gradient(0deg, oklch(0 0 0 / 0.35) 0 1px, transparent 1px 3px);
+  background: repeating-linear-gradient(
+    0deg,
+    oklch(0 0 0 / 0.35) 0 1px,
+    transparent 1px 3px
+  );
   animation: tb-flicker 0.15s steps(2) infinite;
 }
 .tb-crt-screen pre {
@@ -737,8 +792,8 @@
     box-shadow 0.22s ease;
 }
 .tb-chip {
-  transform: perspective(700px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg))
-    translateY(var(--lift, 0px));
+  transform: perspective(700px) rotateX(var(--rx, 0deg))
+    rotateY(var(--ry, 0deg)) translateY(var(--lift, 0px));
 }
 .tb-chip:hover,
 .tb-chip:focus-visible {
@@ -774,7 +829,8 @@
 .tb-chip:focus-visible .tb-sheen {
   opacity: 0.5;
 }
-.tb-stage[data-focus] .tb-chip:not(:hover):not(:focus-visible):not([data-selected]) {
+.tb-stage[data-focus]
+  .tb-chip:not(:hover):not(:focus-visible):not([data-selected]) {
   opacity: calc(var(--m) * 0.5);
 }
 .tb-led {
@@ -839,7 +895,13 @@
   inset-block: 0;
   left: -2px;
   inline-size: 4px;
-  background: linear-gradient(180deg, #4a4536, #141414 40%, var(--tb-blue) 65%, var(--tb-violet));
+  background: linear-gradient(
+    180deg,
+    #4a4536,
+    #141414 40%,
+    var(--tb-blue) 65%,
+    var(--tb-violet)
+  );
   box-shadow: 0 0 18px oklch(0.6 0.2 260 / 0.55);
 }
 .tb-grip {
@@ -894,7 +956,13 @@
   left: 0;
   block-size: 4px;
   inline-size: auto;
-  background: linear-gradient(90deg, #4a4536, #141414 40%, var(--tb-blue) 65%, var(--tb-violet));
+  background: linear-gradient(
+    90deg,
+    #4a4536,
+    #141414 40%,
+    var(--tb-blue) 65%,
+    var(--tb-violet)
+  );
 }
 .tb-stage[data-mobile] .tb-grip {
   left: calc(50% - 22px);
@@ -1173,7 +1241,8 @@
   stroke-width: 4.4;
   stroke-linecap: round;
   stroke-dasharray: 1.6 98.4;
-  filter: drop-shadow(0 0 5px var(--tb-cyan)) drop-shadow(0 0 14px var(--tb-blue));
+  filter: drop-shadow(0 0 5px var(--tb-cyan))
+    drop-shadow(0 0 14px var(--tb-blue));
   animation: tb-flow-in calc(2.8s / var(--tb-speed, 1)) linear infinite;
 }
 /* Paths run chip → core, so a shrinking offset carries the packet from the chip into the hub. */
@@ -1218,7 +1287,8 @@
   }
 }
 .tb-stage[data-boot] .tb-chip {
-  animation: tb-power calc(0.55s / var(--tb-speed, 1)) cubic-bezier(0.2, 0.9, 0.2, 1) backwards;
+  animation: tb-power calc(0.55s / var(--tb-speed, 1))
+    cubic-bezier(0.2, 0.9, 0.2, 1) backwards;
   animation-delay: calc(0.8s + var(--i, 0) * 0.13s / var(--tb-speed, 1));
 }
 @keyframes tb-power {
@@ -1229,7 +1299,8 @@
   }
 }
 .tb-stage[data-boot] .tb-core {
-  animation: tb-assemble calc(1s / var(--tb-speed, 1)) cubic-bezier(0.2, 0.9, 0.2, 1) backwards;
+  animation: tb-assemble calc(1s / var(--tb-speed, 1))
+    cubic-bezier(0.2, 0.9, 0.2, 1) backwards;
   animation-delay: calc(0.5s / var(--tb-speed, 1));
 }
 @keyframes tb-assemble {
@@ -1361,7 +1432,8 @@
 .tb-stage[data-static] :is(.tb-packet, .tb-trail, .tb-core-ring) {
   opacity: 0;
 }
-:root[data-design-theme="transformation-board"][data-motion="off"] [data-surface="site"]::before,
+:root[data-design-theme="transformation-board"][data-motion="off"]
+  [data-surface="site"]::before,
 :root[data-design-theme="transformation-board"][data-motion="off"]
   [data-surface="site"]
   .product-soon::before {
@@ -1374,7 +1446,9 @@
     animation: none !important;
   }
   :root[data-design-theme="transformation-board"] [data-surface="site"]::before,
-  :root[data-design-theme="transformation-board"] [data-surface="site"] .product-soon::before {
+  :root[data-design-theme="transformation-board"]
+    [data-surface="site"]
+    .product-soon::before {
     animation: none !important;
   }
 }
@@ -1551,7 +1625,8 @@
 
 /* Chips powering on when a stop or Play turns them digital. */
 .tb-chip[data-power] {
-  animation: tb-power calc(0.55s / var(--tb-speed, 1)) cubic-bezier(0.2, 0.9, 0.2, 1) backwards;
+  animation: tb-power calc(0.55s / var(--tb-speed, 1))
+    cubic-bezier(0.2, 0.9, 0.2, 1) backwards;
 }
 
 /* Owner request: product boxes stay fixed; the whole board is a drag surface. */

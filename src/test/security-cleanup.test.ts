@@ -6,7 +6,10 @@ import {
   keyMoveProblem,
   safeAiError,
 } from "@/lib/ai-settings.shared";
-import { CHAT_GLOBAL_DAY_LIMIT, RECOMMEND_GLOBAL_DAY_LIMIT } from "@/lib/ai-budget.shared";
+import {
+  CHAT_GLOBAL_DAY_LIMIT,
+  RECOMMEND_GLOBAL_DAY_LIMIT,
+} from "@/lib/ai-budget.shared";
 import { limitRequestBody } from "@/lib/body-limit";
 import {
   clearLegacy,
@@ -25,7 +28,9 @@ it("provider error logging excludes echoed credentials, prompts, bodies and nest
     cause: new Error("fixture credential in cause"),
   });
   expect(safeAiError(error)).toBe("provider failure status=401");
-  expect(safeAiError({ statusCode: "fixture credential" })).toBe("provider failure");
+  expect(safeAiError({ statusCode: "fixture credential" })).toBe(
+    "provider failure",
+  );
 });
 
 it("keeps the paid AI daily budgets at 500 chat and 500 recommendations", () => {
@@ -81,16 +86,24 @@ it("AI fetch refuses redirects, other origins, and carries an abort signal", asy
 
 it("AI fetch refuses a redirect response", async () => {
   const base = vi.fn(
-    async () => new Response(null, { status: 302, headers: { location: "http://10.0.0.1" } }),
+    async () =>
+      new Response(null, {
+        status: 302,
+        headers: { location: "http://10.0.0.1" },
+      }),
   );
   const f = boundedAiFetch("https://api.openai.com/v1", 1000, base as never);
-  await expect(f("https://api.openai.com/v1/x")).rejects.toThrow("redirect refused");
+  await expect(f("https://api.openai.com/v1/x")).rejects.toThrow(
+    "redirect refused",
+  );
 });
 
 it("AI fetch aborts after the timeout", async () => {
   const base = (_: unknown, init?: RequestInit) =>
     new Promise<Response>((_, reject) =>
-      init?.signal?.addEventListener("abort", () => reject(new Error("aborted"))),
+      init?.signal?.addEventListener("abort", () =>
+        reject(new Error("aborted")),
+      ),
     );
   const f = boundedAiFetch("https://api.openai.com", 20, base as never);
   await expect(f("https://api.openai.com/x")).rejects.toThrow("aborted");
@@ -127,7 +140,10 @@ it("errors a streamed body without content-length once it passes the limit", asy
 it("passes a valid multipart body through intact", async () => {
   const form = new FormData();
   form.set("name", "Khaled");
-  form.set("images", new File([new Uint8Array(10)], "a.png", { type: "image/png" }));
+  form.set(
+    "images",
+    new File([new Uint8Array(10)], "a.png", { type: "image/png" }),
+  );
   const req = new Request("https://x.test/a", { method: "POST", body: form });
   const out = limitRequestBody(req);
   if (!("request" in out)) throw new Error("expected request");
@@ -148,12 +164,21 @@ function memoryStore(seed: Record<string, string> = {}) {
 
 it("never hands unowned legacy chat history to a new account", () => {
   const store = memoryStore({
-    "e20e-assistant-chat": JSON.stringify([{ role: "user", content: "old secret" }]),
-    "e20e-assistant-access": JSON.stringify({ token: "t", name: "n", exp: Date.now() + 1e6 }),
+    "e20e-assistant-chat": JSON.stringify([
+      { role: "user", content: "old secret" },
+    ]),
+    "e20e-assistant-access": JSON.stringify({
+      token: "t",
+      name: "n",
+      exp: Date.now() + 1e6,
+    }),
   });
   clearLegacy(store);
   expect(store.data.size).toBe(0);
-  expect(loadAccountState(store, "user-b")).toEqual({ session: null, history: [] });
+  expect(loadAccountState(store, "user-b")).toEqual({
+    session: null,
+    history: [],
+  });
 });
 
 it("scopes chat state per account and drops expired sessions", () => {
@@ -170,7 +195,9 @@ it("scopes chat state per account and drops expired sessions", () => {
 
 it("discards malformed stored messages", () => {
   expect(
-    parseHistory(JSON.stringify([{ role: "system", content: "x" }, 5, { role: "user" }])),
+    parseHistory(
+      JSON.stringify([{ role: "system", content: "x" }, 5, { role: "user" }]),
+    ),
   ).toEqual([]);
   expect(parseHistory("not json")).toEqual([]);
 });
@@ -186,12 +213,16 @@ it("AI fetch aborts when an existing Request's own signal aborts", async () => {
   const base = vi.fn(
     (_: unknown, init?: RequestInit) =>
       new Promise<Response>((_, reject) =>
-        init?.signal?.addEventListener("abort", () => reject(new Error("aborted"))),
+        init?.signal?.addEventListener("abort", () =>
+          reject(new Error("aborted")),
+        ),
       ),
   );
   const f = boundedAiFetch("https://api.openai.com", 60_000, base as never);
   const caller = new AbortController();
-  const request = new Request("https://api.openai.com/x", { signal: caller.signal });
+  const request = new Request("https://api.openai.com/x", {
+    signal: caller.signal,
+  });
   const pending = f(request);
   caller.abort();
   await expect(pending).rejects.toThrow("aborted");
@@ -206,9 +237,12 @@ it("AI fetch honours both Request.signal and init.signal", async () => {
   const f = boundedAiFetch("https://api.openai.com", 60_000, base as never);
   const fromRequest = new AbortController();
   const fromInit = new AbortController();
-  await f(new Request("https://api.openai.com/x", { signal: fromRequest.signal }), {
-    signal: fromInit.signal,
-  });
+  await f(
+    new Request("https://api.openai.com/x", { signal: fromRequest.signal }),
+    {
+      signal: fromInit.signal,
+    },
+  );
   expect(seen?.aborted).toBe(false);
   fromInit.abort();
   expect(seen?.aborted).toBe(true);
@@ -230,7 +264,9 @@ it("AI fetch aborts a stream that stalls after headers arrive", async () => {
         );
       },
     });
-    return new Response(body, { headers: { "content-type": "text/event-stream" } });
+    return new Response(body, {
+      headers: { "content-type": "text/event-stream" },
+    });
   };
   const f = boundedAiFetch("https://api.openai.com", 30, base as never);
   const response = await f("https://api.openai.com/stream");

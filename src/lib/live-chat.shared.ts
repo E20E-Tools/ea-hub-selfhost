@@ -1,5 +1,10 @@
 /** Browser-safe live chat rules shared by the visitor widget, admin screen and tests. */
-export const LIVE_CHAT_STATUSES = ["ai", "waiting", "active", "closed"] as const;
+export const LIVE_CHAT_STATUSES = [
+  "ai",
+  "waiting",
+  "active",
+  "closed",
+] as const;
 export type LiveChatStatus = (typeof LIVE_CHAT_STATUSES)[number];
 export type LiveChatSender = "visitor" | "ai" | "admin" | "system";
 /** System messages are stored as codes and shown in the reader's language. */
@@ -19,7 +24,9 @@ export function isWithPerson(status: string | null | undefined): boolean {
 }
 
 export function cleanMessage(value: unknown): string {
-  return typeof value === "string" ? value.trim().slice(0, LIVE_MESSAGE_MAX) : "";
+  return typeof value === "string"
+    ? value.trim().slice(0, LIVE_MESSAGE_MAX)
+    : "";
 }
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;

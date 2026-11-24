@@ -1,0 +1,783 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <meta charset="utf-8" /><meta
+    name="viewport"
+    content="width=device-width, initial-scale=1"
+  /><title>EA-Hub | استوديو التصميم</title>
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body {
+      margin: 0;
+      background: #112026;
+      color: #f5f3e9;
+      font:
+        16px/1.7 "Segoe UI",
+        Tahoma,
+        sans-serif;
+    }
+    main {
+      max-width: 1300px;
+      margin: auto;
+      padding: clamp(20px, 5vw, 70px);
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #54645f;
+      padding-bottom: 22px;
+    }
+    header b {
+      font: 700 26px Arial;
+      letter-spacing: -2px;
+    }
+    header b span {
+      color: #ff8452;
+    }
+    h1 {
+      font-size: clamp(32px, 5vw, 62px);
+      line-height: 1.22;
+      margin: 38px 0 8px;
+    }
+    p {
+      margin: 8px 0 22px;
+      color: #c6d4ce;
+    }
+    section {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 270px), 1fr));
+      gap: 18px;
+    }
+    article {
+      background: #edeee7;
+      color: #192c29;
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    article > div:last-child {
+      padding: 16px 22px;
+    }
+    article p {
+      color: #4a6059;
+      margin: 4px 0 14px;
+    }
+    h2 {
+      font-size: 22px;
+      margin: 0;
+    }
+    button {
+      cursor: pointer;
+      color: inherit;
+      background: transparent;
+      border: 1px solid currentColor;
+      padding: 5px 14px;
+      border-radius: 4px;
+      font: inherit;
+    }
+    .scene {
+      height: 215px;
+      background: radial-gradient(circle at center, #2c4945, #14252a);
+      position: relative;
+      overflow: hidden;
+      display: grid;
+      place-items: center;
+      isolation: isolate;
+    }
+    .scene > * {
+      position: absolute;
+    }
+    .radar {
+      height: 155px;
+      aspect-ratio: 1;
+      border-radius: 50%;
+      background:
+        repeating-radial-gradient(
+          circle,
+          transparent 0 17px,
+          #88b1a65c 18px 19px
+        ),
+        conic-gradient(from 0deg, transparent 65%, #65d2b380 99%, transparent);
+      border: 1px solid #91b3a4;
+      animation: sweep 5s linear infinite;
+    }
+    .dots {
+      width: 5px;
+      height: 5px;
+      background: #ff8751;
+      border-radius: 100%;
+      box-shadow:
+        -48px -27px #ff8751,
+        27px -45px #dbe6d5,
+        35px 38px #ff8751;
+    }
+    .layers {
+      width: 90px;
+      height: 90px;
+      border: 1px solid #ff9862;
+      background: linear-gradient(135deg, #dc874151, #4f8a7f9c);
+      transform: translateY(var(--y)) rotateX(57deg) rotateZ(43deg);
+      animation: lift 4s ease-in-out infinite alternate;
+    }
+    .layers:nth-child(1) {
+      --y: 35px;
+    }
+    .layers:nth-child(2) {
+      --y: 2px;
+    }
+    .layers:nth-child(3) {
+      --y: -31px;
+    }
+    .tracks {
+      inset: 0;
+      background:
+        repeating-linear-gradient(90deg, transparent 0 31px, #68847730 32px),
+        repeating-linear-gradient(0deg, transparent 0 31px, #68847730 32px);
+    }
+    .line {
+      width: 75%;
+      height: 3px;
+      background: #79978b;
+      transform: rotate(-12deg);
+    }
+    .line:before {
+      content: "";
+      position: absolute;
+      inset: -5px 0;
+      background: radial-gradient(circle closest-side, #ff9e6e 92%, transparent)
+        left/33.333% 100% repeat-x;
+    }
+    .trace {
+      width: 15px;
+      height: 15px;
+      border: 2px solid #fff;
+      border-radius: 50%;
+      position: absolute;
+      top: -6px;
+      animation: travel 4s ease-in-out infinite alternate;
+    }
+    .paused *,
+    .paused :before {
+      animation-play-state: paused !important;
+    }
+    @keyframes sweep {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+    @keyframes lift {
+      to {
+        transform: translateY(calc(var(--y) * 1.8)) rotateX(51deg)
+          rotateZ(60deg);
+      }
+    }
+    @keyframes travel {
+      from {
+        left: 4%;
+      }
+      to {
+        left: 91%;
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .scene:not(.playing) * {
+        animation-play-state: paused;
+      }
+    }
+  </style>
+  <main>
+    <header>
+      <b dir="ltr">EA<span>/</span>HUB</b><span>دراسة تصميم محلية</span>
+    </header>
+    <section class="concept-studio" aria-labelledby="concept-title">
+      <h1 id="concept-title">أيّ بيئة تناسب طريقة عمل فريقك؟</h1>
+      <p>
+        اختر شاشة ثم قارن طرق تنظيمها. يمكنك تجربة الاتجاه في التطبيق على هذا
+        المتصفح.
+      </p>
+      <div class="lab-controls">
+        <label
+          >الشاشة
+          <select id="surface"></select></label
+        ><label
+          >الاتجاه
+          <select id="direction"></select
+        ></label>
+      </div>
+      <div class="lab-layout">
+        <div id="looks"></div>
+        <div class="lab-inspect" id="look-inspect">
+          <h2 id="sample-title"></h2>
+          <figure class="lab-wire">
+            <figcaption>معاينة تخطيطية</figcaption>
+            <div id="wire-rows"></div>
+          </figure>
+          <p id="sample-body"></p>
+          <button type="button" id="try-look">
+            طبّق على هذا المتصفح وافتح الشاشة ↗
+          </button>
+          <p id="applied" role="status"></p>
+        </div>
+      </div>
+      <h2 class="idea-heading">ميزات مقترحة للتطوير</h2>
+      <div class="idea-list">
+        <details open>
+          <summary>سجل قرار اختيار الأداة</summary>
+          <p>
+            للجنة البنية المؤسسية. تحفظ اللجنة الأدوات التي قارنتها ومعايير
+            الاختيار وسبب الاستبعاد وتاريخ المراجعة. البداية المقترحة هي إضافة
+            سجل خاص بالمؤسسة مرتبط بنتيجة المقارنة ويتطلب صلاحية كاتب أو مراجع.
+          </p>
+        </details>
+        <details>
+          <summary>تحليل أثر إيقاف تقنية</summary>
+          <p>
+            لمدير محفظة التطبيقات. يختار تقنية مرشحة للإيقاف فيرى التطبيقات
+            المتأثرة ومالكيها قبل اتخاذ القرار. يتطلب بيانات علاقات موثوقة بين
+            التطبيقات والتقنيات، مع إظهار تاريخ آخر تحديث لكل علاقة.
+          </p>
+        </details>
+        <details>
+          <summary>مراجعة تغييرات الإعدادات قبل النشر</summary>
+          <p>
+            لمسؤول المنصة. يرى الفروق بين المسودة والإصدار المنشور، ويشارك
+            معاينة مؤقتة مع المراجع. الخطوة التالية هي تخزين مسودات ذات إصدارات
+            وتطبيق التغييرات المعتمدة في عملية واحدة.
+          </p>
+        </details>
+        <details>
+          <summary>خطة تبنٍّ مشتقة من نتيجة الاكتشاف</summary>
+          <p>
+            لفريق التحول. يحوّل المستخدم الأداة المختارة إلى تجربة محدودة ويحدد
+            المسؤول ومعيار النجاح وموعد المراجعة. يحتاج هذا المسار إلى مساحة
+            مؤسسة وصلاحيات متابعة مشتركة.
+          </p>
+        </details>
+      </div>
+    </section>
+    <style>
+      .concept-studio {
+        display: block;
+      }
+      .concept-studio > p {
+        max-width: 72ch;
+      }
+      .lab-controls,
+      .lab-layout {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+      }
+      .lab-controls label {
+        display: grid;
+        gap: 5px;
+        color: #c7d9d1;
+        font-weight: 600;
+      }
+      .lab-controls select {
+        width: 100%;
+        padding: 9px;
+        background: #19342f;
+        color: white;
+        border: 1px solid #64877b;
+        border-radius: 4px;
+        font: inherit;
+      }
+      .lab-layout {
+        margin: 18px 0 40px;
+        align-items: stretch;
+      }
+      .lab-layout #looks {
+        display: grid;
+        gap: 8px;
+      }
+      .lab-option {
+        display: block;
+        width: 100%;
+        text-align: start;
+        border: 1px solid #5d746d;
+        border-radius: 5px;
+        padding: 14px 18px;
+        background: #172e2e;
+      }
+      .lab-option strong,
+      .lab-option small {
+        display: block;
+      }
+      .lab-option small {
+        color: #bdd0c8;
+        font-size: 14px;
+      }
+      .lab-option[aria-pressed="true"] {
+        border-inline-start: 5px solid #b3f4d0;
+        background: #22453a;
+      }
+      .lab-inspect {
+        padding: 20px;
+        background: #e5eee6;
+        color: #112e26;
+        border-radius: 6px;
+      }
+      .lab-inspect p {
+        color: inherit;
+        line-height: 1.65;
+      }
+      .lab-inspect button {
+        background: #183e32;
+        color: white;
+      }
+      .lab-inspect[data-look="signal"] {
+        background: #11303c;
+        color: #cef4ed;
+      }
+      .lab-inspect[data-look="journal"] {
+        background: #f7ebd6;
+        color: #523524;
+      }
+      .lab-inspect #applied {
+        margin: 0;
+      }
+      .idea-heading {
+        margin-top: 25px;
+      }
+      .idea-list details {
+        padding: 12px 0;
+        border-bottom: 1px solid #587168;
+      }
+      .idea-list summary {
+        font-weight: 650;
+        cursor: pointer;
+      }
+      .idea-list details p {
+        max-width: 85ch;
+        margin: 10px 0;
+      }
+      .concept-studio + .motion-title {
+        margin-top: 48px;
+      }
+      .motion-title {
+        font-size: 30px;
+      }
+      @media (max-width: 650px) {
+        .lab-layout,
+        .lab-controls {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+    <style>
+      .lab-wire {
+        margin: 14px 0;
+        border: 1px solid currentColor;
+        border-radius: 5px;
+        padding: 12px;
+      }
+      .lab-wire figcaption {
+        font-size: 12px;
+        font-weight: 650;
+        margin-bottom: 8px;
+      }
+      #wire-rows {
+        display: grid;
+        gap: 5px;
+        min-height: 110px;
+      }
+      #wire-rows > div {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        padding: 6px 9px;
+        border: 1px solid color-mix(in srgb, currentColor 36%, transparent);
+        border-inline-start: 4px solid currentColor;
+        min-width: 0;
+      }
+      #wire-rows b {
+        font-size: 14px;
+      }
+      #wire-rows small {
+        font-size: 12px;
+      }
+      #wire-rows[data-shape="cards"] {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+      #wire-rows[data-shape="cards"] > div {
+        align-items: flex-start;
+        justify-content: center;
+        flex-direction: column;
+        border-inline-start-width: 1px;
+        border-top: 4px solid currentColor;
+      }
+      #wire-rows[data-shape="timeline"] > div {
+        margin-inline-start: 12px;
+        border: 0;
+        border-inline-start: 2px dotted;
+        position: relative;
+      }
+      #wire-rows[data-shape="timeline"] > div::before {
+        content: "";
+        position: absolute;
+        inset-inline-start: -5px;
+        width: 8px;
+        height: 8px;
+        background: currentColor;
+        border-radius: 100%;
+      }
+      #wire-rows[data-shape="ledger"] {
+        gap: 0;
+      }
+      #wire-rows[data-shape="ledger"] > div {
+        border: 0;
+        border-bottom: 1px solid currentColor;
+      }
+      #wire-rows[data-shape="dossier"] {
+        grid-template-columns: 1.4fr 1fr;
+      }
+      #wire-rows[data-shape="dossier"] > div {
+        display: grid;
+        align-content: center;
+      }
+      #wire-rows[data-shape="dossier"] > div:first-child {
+        grid-row: span 2;
+        background: color-mix(in srgb, currentColor 10%, transparent);
+      }
+      @media (max-width: 380px) {
+        #wire-rows[data-shape="cards"] {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+    <script>
+      (function () {
+        const profiles = {
+          atlas: ["الأطلس الهندسي", "بطاقات مصوّرة بألوان الأطلس تتيح فتح كل أداة ومقارنتها."],
+          signal: [
+            "مرصد الإشارات",
+            "مساحة داكنة تجمع الحالة والمقارنة السريعة.",
+          ],
+          journal: ["دفتر القرار", "قراءة تحريرية مخصصة للمراجعة والتوثيق."],
+        };
+        const surfaces = {
+          home: [
+            "الرئيسية ومكتبة الأدوات",
+            "/#catalog",
+            "ست بطاقات مصوّرة في صفّين، تعرض المجال والوصف وإجراءات كل أداة.",
+            "شبكة من ست بطاقات بحدود بارزة وألوان مرصد الإشارات.",
+            "ست بطاقات بعناوين تحريرية وألوان دافئة مع إمكانية تنزيل موجز كل أداة.",
+          ],
+          discovery: [
+            "الاكتشاف والمقارنة",
+            "/discover",
+            "تنقّل بين الاحتياج والاختيار والنتيجة ضمن خطوات واضحة.",
+            "اقتراح تطوري: اعرض المعايير المتفقة والمختلفة كإشارات في مصفوفة.",
+            "اقتراح تطوري: دوّن سبب ملاءمة كل أداة في موجز قرار.",
+          ],
+          services: [
+            "خدمات المؤسسات والطلبات",
+            "/enterprise-services",
+            "حدد الخدمة والأداة ثم تابع إلى طلب مُعبّأ بهذا الاختيار.",
+            "اقتراح تطوري: مسار تشغيل يعرض حالة كل مرحلة وصاحبها.",
+            "اقتراح تطوري: ملف تكليف واحد يضم الهدف والمخرجات ومعيار القبول.",
+          ],
+          roadmap: [
+            "خارطة التقنيات",
+            "/technology-roadmap",
+            "مصفوفة زمنية تربط الأدوات بمراحل التبنّي.",
+            "اقتراح تطوري: لوحة تركّز على التقنيات التي تغيّرت مرحلتها.",
+            "اقتراح تطوري: سجل زمني لأسباب تقديم مرحلة تبنّي أو تأخيرها.",
+          ],
+          assistant: [
+            "المساعد والتتبّع",
+            "/my-requests",
+            "استعرض المحادثات والطلبات وتابع تفاصيل السجل.",
+            "اقتراح تطوري: صندوق متابعة يميّز الحالات التي تحتاج ردًّا.",
+            "اقتراح تطوري: ملف حالة يجمع المحادثة والأداة والإيصال.",
+          ],
+          admin: [
+            "الإدارة والتشغيل",
+            "/admin",
+            "مؤشرات العمل ومجموعات تنقّل حسب المهمّة.",
+            "اقتراح تطوري: طابور للحالات العاجلة مع أسباب ترتيبها.",
+            "اقتراح تطوري: ملخص تشغيلي يومي مع سجل الإجراءات.",
+          ],
+          settings: [
+            "مركز الإعدادات",
+            "/admin?section=settings",
+            "ابحث عن الحقل أو انتقل من مجموعة عمل إلى محرّر متخصص.",
+            "اقتراح تطوري: فحص الاعتماديات والإعدادات التي تمنع تشغيل خدمة.",
+            "اقتراح تطوري: مراجعة تغييرات كل قسم ومقارنتها قبل الاعتماد.",
+          ],
+        };
+        const by = (id) => document.getElementById(id);
+        const select = by("surface"),
+          profile = by("direction");
+        for (const [k, v] of Object.entries(surfaces))
+          select.add(new Option(v[0], k));
+        for (const [k, v] of Object.entries(profiles))
+          profile.add(new Option(v[0], k));
+        try {
+          const saved = localStorage.getItem("ea-studio-direction");
+          if (Object.hasOwn(profiles, saved)) profile.value = saved;
+        } catch {}
+        function draw() {
+          const entry = surfaces[select.value],
+            ids = Object.keys(profiles),
+            id = profile.value;
+          const list = by("looks");
+          list.replaceChildren();
+          ids.forEach((k, i) => {
+            const b = document.createElement("button");
+            b.className = "lab-option";
+            b.type = "button";
+            b.setAttribute("aria-pressed", String(k === id));
+            const title = document.createElement("strong"),
+              body = document.createElement("small");
+            title.textContent = profiles[k][0];
+            body.textContent = entry[2 + i];
+            b.append(title, body);
+            b.onclick = () => {
+              profile.value = k;
+              renderConcept();
+              list.children[i].focus();
+            };
+            list.append(b);
+          });
+          by("look-inspect").dataset.look = id;
+          by("sample-title").textContent = profiles[id][0];
+          by("sample-body").textContent =
+            profiles[id][1] + " " + entry[2 + ids.indexOf(id)];
+          by("applied").textContent = "";
+        }
+        const homeCards = [
+          "cards", "ArchONE|البنية المؤسسية", "APM & App Landscape|خريطة التقنيات",
+          "Tech Radar|تقييم التقنيات", "EA Tool|منصة البنية", "ITFM|الإدارة المالية",
+          "Innovation|الابتكار",
+        ];
+        const examples = {
+          home: [homeCards, homeCards, homeCards],
+          discovery: [
+            [
+              "timeline",
+              "الاحتياج|جرد التطبيقات",
+              "المعيار|الاعتماديات",
+              "الترشيح|APM",
+            ],
+            [
+              "cards",
+              "التكلفة|معيار مشترك",
+              "الاعتماديات|نقطة اختلاف",
+              "التغطية|نقطة اختلاف",
+            ],
+            [
+              "dossier",
+              "موجز القرار|مقارنة أدوات",
+              "المرشّح|APM",
+              "سبب الاختيار|ربط التطبيقات",
+            ],
+          ],
+          services: [
+            [
+              "timeline",
+              "الخدمة|التدريب",
+              "الأداة|Tech Radar",
+              "الطلب|مراجعة النطاق",
+            ],
+            [
+              "cards",
+              "تحديد النطاق|مدير المشروع",
+              "تجهيز البيئة|فريق التقنية",
+              "التسليم|مالك الخدمة",
+            ],
+            [
+              "dossier",
+              "تكليف التدريب|تمكين فريق التقنية",
+              "المخرج|ورشة عمل",
+              "القبول|إنجاز التمرين",
+            ],
+          ],
+          roadmap: [
+            [
+              "timeline",
+              "الاستكشاف|الربع الأول",
+              "التجربة|الربع الثاني",
+              "التبنّي|الربع الثالث",
+            ],
+            [
+              "cards",
+              "مستجد|مرشح للتقييم",
+              "تغيّر|دخل التجربة",
+              "مستقر|قيد التبنّي",
+            ],
+            [
+              "ledger",
+              "التجربة|اكتمل التقييم",
+              "التوسّع|تحقّق معيار القبول",
+              "المراجعة|موعد التقييم المقبل",
+            ],
+          ],
+          assistant: [
+            [
+              "dossier",
+              "ملف الطلب|طلب تدريب",
+              "المحادثة|رسالة العميل",
+              "الحالة|قيد المراجعة",
+            ],
+            [
+              "cards",
+              "ينتظر ردًّا|من الفريق",
+              "جارٍ العمل|مع المختص",
+              "مكتمل|أُغلق الطلب",
+            ],
+            [
+              "timeline",
+              "فتح الحالة|طلب العميل",
+              "التشخيص|ملاحظة المختص",
+              "المتابعة|موعد المراجعة",
+            ],
+          ],
+          admin: [
+            [
+              "cards",
+              "الطلبات|الوارد",
+              "المحادثات|المتابعة",
+              "المحتوى|الأدوات",
+            ],
+            [
+              "ledger",
+              "عاجل|دعم تقني",
+              "ينتظر ردًّا|طلب مؤسسة",
+              "للمراجعة|عرض جديد",
+            ],
+            [
+              "timeline",
+              "بداية اليوم|مراجعة الوارد",
+              "آخر إجراء|تحديث طلب",
+              "التالي|متابعة العميل",
+            ],
+          ],
+          settings: [
+            [
+              "dossier",
+              "هوية الموقع|محرّر الحقول",
+              "العنوان|عربي وإنجليزي",
+              "التذييل|بيانات التواصل",
+            ],
+            [
+              "cards",
+              "القناة|خدمة البريد",
+              "الاعتمادية|مفتاح الإرسال",
+              "النتيجة|جاهزية الخدمة",
+            ],
+            [
+              "ledger",
+              "القيمة الحالية|اسم الموقع",
+              "القيمة المقترحة|عنوان محدّث",
+              "المراجعة|بانتظار الاعتماد",
+            ],
+          ],
+        };
+        function drawWire() {
+          const [shape, ...items] =
+            examples[select.value][profile.selectedIndex];
+          const rows = by("wire-rows");
+          rows.dataset.shape = shape;
+          rows.replaceChildren(
+            ...items.map((item) => {
+              const [label, value] = item.split("|");
+              const row = document.createElement("div"),
+                name = document.createElement("b"),
+                detail = document.createElement("small");
+              name.dir = detail.dir = "auto";
+              name.textContent = label;
+              detail.textContent = value;
+              row.append(name, detail);
+              return row;
+            }),
+          );
+        }
+        function renderConcept() {
+          draw();
+          drawWire();
+        }
+
+        select.onchange = profile.onchange = renderConcept;
+        by("try-look").onclick = () => {
+          try {
+            localStorage.setItem("ea-studio-direction", profile.value);
+          } catch {
+            by("applied").textContent = "تعذّر حفظ المظهر في هذا المتصفح.";
+            return;
+          }
+          location.assign(surfaces[select.value][1]);
+        };
+        renderConcept();
+      })();
+    </script>
+
+    <h2 class="motion-title">استوديو الحركة</h2>
+    <p>ثلاث معاينات لاختيار الاتجاه البصري القادم لخدمات المنصة.</p>
+    <section>
+      <article>
+        <div class="scene" aria-hidden="true">
+          <i class="radar"></i><i class="dots"></i>
+        </div>
+        <div>
+          <h2>رادار التقنيات</h2>
+          <p>
+            يمرّ شعاع قصير فوق التقنيات التي تطابق المرشّح المحدد. يصلح لمكتبة
+            الأدوات وخارطة التبنّي.
+          </p>
+          <button></button>
+        </div>
+      </article>
+      <article>
+        <div class="scene" aria-hidden="true">
+          <i class="layers"></i><i class="layers"></i><i class="layers"></i>
+        </div>
+        <div>
+          <h2>طبقات المؤسسة</h2>
+          <p>
+            تتباعد طبقات الأعمال والتطبيقات والبنية التحتية عند اختيار أداة،
+            لتوضيح موضعها في المؤسسة.
+          </p>
+          <button></button>
+        </div>
+      </article>
+      <article>
+        <div class="scene" aria-hidden="true">
+          <i class="tracks"></i><i class="line"><i class="trace"></i></i>
+        </div>
+        <div>
+          <h2>مسار الطلب</h2>
+          <p>
+            تنتقل نبضة بين محطات الطلب. عند تطبيقها في الموقع ترتبط الحركة
+            بتغيّر الحالة الفعلي.
+          </p>
+          <button></button>
+        </div>
+      </article>
+    </section>
+  </main>
+  <script>
+    for (const card of document.querySelectorAll("article:has(.scene)")) {
+      const scene = card.querySelector(".scene"),
+        button = card.querySelector("button");
+      let paused = matchMedia("(prefers-reduced-motion:reduce)").matches;
+      function paint() {
+        scene.classList.toggle("paused", paused);
+        scene.classList.toggle("playing", !paused);
+        button.textContent = paused ? "تشغيل المعاينة" : "إيقاف المعاينة";
+        button.setAttribute(
+          "aria-label",
+          button.textContent + " — " + card.querySelector("h2").textContent,
+        );
+      }
+      button.onclick = () => {
+        paused = !paused;
+        paint();
+      };
+      paint();
+    }
+  </script>
+</html>

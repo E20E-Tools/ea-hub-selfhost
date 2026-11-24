@@ -2,7 +2,10 @@ import { useMemo, useRef, useState } from "react";
 import { useNavigate } from "@tanstack/react-router";
 import { useLanguage } from "@/lib/language";
 import { fill } from "@/lib/copy";
-import { openAssistantWindow, openToolRequestInChat } from "@/lib/assistant-events";
+import {
+  openAssistantWindow,
+  openToolRequestInChat,
+} from "@/lib/assistant-events";
 import type { StageProps } from "../registry";
 import { useStageMotion } from "../use-stage-motion";
 import { useFrameLoop, useStageInspector } from "../stage-kit";
@@ -26,7 +29,12 @@ export function ArchyPointer() {
       <rect x="12" y="17" width="28" height="14" rx="7" fill="#0F1730" />
       <rect x="18" y="22" width="4" height="4" fill="#00D4FF" />
       <rect x="30" y="22" width="4" height="4" fill="#00D4FF" />
-      <path d="M46 28 L60 22" stroke="#2F6BFF" strokeWidth="3" strokeLinecap="round" />
+      <path
+        d="M46 28 L60 22"
+        stroke="#2F6BFF"
+        strokeWidth="3"
+        strokeLinecap="round"
+      />
     </svg>
   );
 }
@@ -39,7 +47,10 @@ export default function ProblemToToolStage({ products, settings }: StageProps) {
   const navigate = useNavigate();
   const list = useMemo(() => products.slice(0, 12), [products]);
   const inspector = useStageInspector(list, "pt-inspector");
-  const problems = useMemo(() => list.map((p) => problemFor(p, language)), [list, language]);
+  const problems = useMemo(
+    () => list.map((p) => problemFor(p, language)),
+    [list, language],
+  );
   const [index, setIndex] = useState(0);
   const [phase, setPhase] = useState<"typing" | "match" | "clear">("match");
   const [query, setQuery] = useState("");
@@ -68,12 +79,21 @@ export default function ProblemToToolStage({ products, settings }: StageProps) {
     [index, problems, motion.animate, list.length],
   );
 
-  const matchId = userActive ? bestMatch(query, list, language) : list[index]?.id;
-  const showCard = userActive ? Boolean(matchId) : !motion.animate || phase !== "typing";
+  const matchId = userActive
+    ? bestMatch(query, list, language)
+    : list[index]?.id;
+  const showCard = userActive
+    ? Boolean(matchId)
+    : !motion.animate || phase !== "typing";
   const product = list.find((p) => p.id === matchId);
 
   return (
-    <div ref={root} className="pt-stage" dir={dir} data-phase={userActive ? "match" : phase}>
+    <div
+      ref={root}
+      className="pt-stage"
+      dir={dir}
+      data-phase={userActive ? "match" : phase}
+    >
       <h2 className="pt-title">{settings.displayTitle}</h2>
       <form
         className="pt-search"
@@ -122,8 +142,13 @@ export default function ProblemToToolStage({ products, settings }: StageProps) {
                   {product.name}
                 </strong>
                 <span className="pt-desc">{product.description}</span>
-                <span className="pt-status" data-soon={product.comingSoon ? "" : undefined}>
-                  {product.comingSoon ? t("comingSoonBadge") : t("inspectorAvailable")}
+                <span
+                  className="pt-status"
+                  data-soon={product.comingSoon ? "" : undefined}
+                >
+                  {product.comingSoon
+                    ? t("comingSoonBadge")
+                    : t("inspectorAvailable")}
                 </span>
               </button>
               {product.comingSoon ? null : (

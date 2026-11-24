@@ -1,4 +1,10 @@
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import {
+  cleanup,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 const h = vi.hoisted(() => ({ sent: 0, forms: [] as FormData[] }));
@@ -55,7 +61,9 @@ describe("tool request window", () => {
   it("keeps an incomplete request from being sent", async () => {
     open();
     fireEvent.click(screen.getByRole("button", { name: "إرسال الطلب" }));
-    await waitFor(() => expect(screen.getAllByRole("alert").length).toBeGreaterThan(0));
+    await waitFor(() =>
+      expect(screen.getAllByRole("alert").length).toBeGreaterThan(0),
+    );
     expect(screen.getAllByText("اكتب اسمك الكامل.").length).toBeGreaterThan(0);
     expect(h.sent).toBe(0);
   });
@@ -70,7 +78,9 @@ describe("tool request window", () => {
 
   it("carries the typed problem and the selected tool into the saved request", async () => {
     open();
-    fireEvent.change(screen.getByLabelText("الاسم الكامل"), { target: { value: "Khaled QA" } });
+    fireEvent.change(screen.getByLabelText("الاسم الكامل"), {
+      target: { value: "Khaled QA" },
+    });
     fireEvent.change(document.querySelector('input[type="email"]')!, {
       target: { value: "khaled.qa@example.com" },
     });
@@ -81,6 +91,8 @@ describe("tool request window", () => {
     expect(form.get("type")).toBe("new");
     expect(form.get("need")).toBe("لا نرى خريطة تطبيقاتنا");
     await waitFor(() => expect(screen.getByText("وصلنا طلبك")).toBeTruthy());
-    expect(screen.getByText("11111111-2222-3333-4444-555555555555")).toBeTruthy();
+    expect(
+      screen.getByText("11111111-2222-3333-4444-555555555555"),
+    ).toBeTruthy();
   });
 });

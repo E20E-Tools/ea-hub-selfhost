@@ -54,11 +54,23 @@
   background:
     radial-gradient(1px 1px at 12% 18%, oklch(1 0 0 / 0.8), transparent 2px),
     radial-gradient(1px 1px at 72% 8%, oklch(1 0 0 / 0.7), transparent 2px),
-    radial-gradient(1.5px 1.5px at 38% 62%, oklch(1 0 0 / 0.6), transparent 2px),
+    radial-gradient(
+      1.5px 1.5px at 38% 62%,
+      oklch(1 0 0 / 0.6),
+      transparent 2px
+    ),
     radial-gradient(1px 1px at 88% 44%, oklch(1 0 0 / 0.7), transparent 2px),
     radial-gradient(1px 1px at 56% 88%, oklch(1 0 0 / 0.6), transparent 2px),
-    radial-gradient(60% 50% at 10% 0%, oklch(0.33 0.12 300 / 0.45), transparent 70%),
-    radial-gradient(50% 50% at 95% 100%, oklch(0.38 0.06 215 / 0.45), transparent 70%),
+    radial-gradient(
+      60% 50% at 10% 0%,
+      oklch(0.33 0.12 300 / 0.45),
+      transparent 70%
+    ),
+    radial-gradient(
+      50% 50% at 95% 100%,
+      oklch(0.38 0.06 215 / 0.45),
+      transparent 70%
+    ),
     var(--gx-void);
   background-size:
     420px 420px,
@@ -117,7 +129,14 @@
   }
   & .site-nav-link {
     border-radius: 0 !important;
-    clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px);
+    clip-path: polygon(
+      8px 0,
+      100% 0,
+      100% calc(100% - 8px),
+      calc(100% - 8px) 100%,
+      0 100%,
+      0 8px
+    );
   }
 
   /* Product cards = HUD frames. */
@@ -137,14 +156,22 @@
     opacity: 1;
     border-radius: 0;
     background:
-      linear-gradient(var(--gx-cyan), var(--gx-cyan)) top left / 18px 2px no-repeat,
-      linear-gradient(var(--gx-cyan), var(--gx-cyan)) top left / 2px 18px no-repeat,
-      linear-gradient(var(--gx-cyan), var(--gx-cyan)) top right / 18px 2px no-repeat,
-      linear-gradient(var(--gx-cyan), var(--gx-cyan)) top right / 2px 18px no-repeat,
-      linear-gradient(var(--gx-cyan), var(--gx-cyan)) bottom left / 18px 2px no-repeat,
-      linear-gradient(var(--gx-cyan), var(--gx-cyan)) bottom left / 2px 18px no-repeat,
-      linear-gradient(var(--gx-cyan), var(--gx-cyan)) bottom right / 18px 2px no-repeat,
-      linear-gradient(var(--gx-cyan), var(--gx-cyan)) bottom right / 2px 18px no-repeat;
+      linear-gradient(var(--gx-cyan), var(--gx-cyan)) top left / 18px 2px
+        no-repeat,
+      linear-gradient(var(--gx-cyan), var(--gx-cyan)) top left / 2px 18px
+        no-repeat,
+      linear-gradient(var(--gx-cyan), var(--gx-cyan)) top right / 18px 2px
+        no-repeat,
+      linear-gradient(var(--gx-cyan), var(--gx-cyan)) top right / 2px 18px
+        no-repeat,
+      linear-gradient(var(--gx-cyan), var(--gx-cyan)) bottom left / 18px 2px
+        no-repeat,
+      linear-gradient(var(--gx-cyan), var(--gx-cyan)) bottom left / 2px 18px
+        no-repeat,
+      linear-gradient(var(--gx-cyan), var(--gx-cyan)) bottom right / 18px 2px
+        no-repeat,
+      linear-gradient(var(--gx-cyan), var(--gx-cyan)) bottom right / 2px 18px
+        no-repeat;
     pointer-events: none;
     z-index: 3;
   }
@@ -174,7 +201,11 @@
     content: "";
     position: absolute;
     inset: 0;
-    background: repeating-linear-gradient(0deg, oklch(0 0 0 / 0.18) 0 1px, transparent 1px 3px);
+    background: repeating-linear-gradient(
+      0deg,
+      oklch(0 0 0 / 0.18) 0 1px,
+      transparent 1px 3px
+    );
     pointer-events: none;
   }
   & .product-number {
@@ -260,9 +291,21 @@
   inset: 0;
   z-index: 0;
   background:
-    radial-gradient(45% 55% at 18% 28%, oklch(0.33 0.12 300 / 0.7), transparent 70%),
-    radial-gradient(40% 50% at 84% 72%, oklch(0.38 0.06 215 / 0.75), transparent 70%),
-    radial-gradient(30% 35% at 60% 12%, oklch(0.3 0.1 285 / 0.5), transparent 70%),
+    radial-gradient(
+      45% 55% at 18% 28%,
+      oklch(0.33 0.12 300 / 0.7),
+      transparent 70%
+    ),
+    radial-gradient(
+      40% 50% at 84% 72%,
+      oklch(0.38 0.06 215 / 0.75),
+      transparent 70%
+    ),
+    radial-gradient(
+      30% 35% at 60% 12%,
+      oklch(0.3 0.1 285 / 0.5),
+      transparent 70%
+    ),
     radial-gradient(80% 80% at 50% 55%, oklch(0.24 0.06 280), var(--gx-void));
 }
 .gx-stars {
@@ -325,10 +368,23 @@
   inset: -38%;
   border-radius: 50%;
   background:
-    repeating-conic-gradient(from 0deg, oklch(0.9 0.12 85 / 0.55) 0 4deg, transparent 4deg 13deg),
-    repeating-conic-gradient(from 7deg, oklch(0.8 0.14 70 / 0.35) 0 2deg, transparent 2deg 9deg);
+    repeating-conic-gradient(
+      from 0deg,
+      oklch(0.9 0.12 85 / 0.55) 0 4deg,
+      transparent 4deg 13deg
+    ),
+    repeating-conic-gradient(
+      from 7deg,
+      oklch(0.8 0.14 70 / 0.35) 0 2deg,
+      transparent 2deg 9deg
+    );
   mask: radial-gradient(circle, transparent 46%, black 52%, transparent 72%);
-  -webkit-mask: radial-gradient(circle, transparent 46%, black 52%, transparent 72%);
+  -webkit-mask: radial-gradient(
+    circle,
+    transparent 46%,
+    black 52%,
+    transparent 72%
+  );
   animation: gx-spin 60s linear infinite;
   filter: blur(1.5px);
 }
@@ -355,10 +411,26 @@
   position: absolute;
   inset: -20%;
   background:
-    radial-gradient(circle at 30% 40%, oklch(1 0.03 95 / 0.55) 0 8%, transparent 14%),
-    radial-gradient(circle at 65% 30%, oklch(0.7 0.15 60 / 0.4) 0 7%, transparent 13%),
-    radial-gradient(circle at 55% 70%, oklch(1 0.03 95 / 0.45) 0 9%, transparent 15%),
-    radial-gradient(circle at 25% 75%, oklch(0.7 0.15 60 / 0.35) 0 6%, transparent 12%);
+    radial-gradient(
+      circle at 30% 40%,
+      oklch(1 0.03 95 / 0.55) 0 8%,
+      transparent 14%
+    ),
+    radial-gradient(
+      circle at 65% 30%,
+      oklch(0.7 0.15 60 / 0.4) 0 7%,
+      transparent 13%
+    ),
+    radial-gradient(
+      circle at 55% 70%,
+      oklch(1 0.03 95 / 0.45) 0 9%,
+      transparent 15%
+    ),
+    radial-gradient(
+      circle at 25% 75%,
+      oklch(0.7 0.15 60 / 0.35) 0 6%,
+      transparent 12%
+    );
   mix-blend-mode: soft-light;
   animation: gx-boil 14s ease-in-out infinite alternate;
 }
@@ -479,8 +551,19 @@
       oklch(0.85 0.12 75 / 0.9) 0 1.2deg,
       transparent 1.2deg 11deg
     ),
-    radial-gradient(closest-side, transparent 48%, oklch(0.76 0.13 73 / 0.35) 58%, transparent 100%);
-  mask: radial-gradient(closest-side, transparent 45%, black 55%, black 80%, transparent 100%);
+    radial-gradient(
+      closest-side,
+      transparent 48%,
+      oklch(0.76 0.13 73 / 0.35) 58%,
+      transparent 100%
+    );
+  mask: radial-gradient(
+    closest-side,
+    transparent 45%,
+    black 55%,
+    black 80%,
+    transparent 100%
+  );
   -webkit-mask: radial-gradient(
     closest-side,
     transparent 45%,
@@ -523,17 +606,23 @@
   left: 41%;
   top: 41%;
   border-radius: 50%;
-  background: radial-gradient(circle at 35% 35%, oklch(0.95 0.01 260), oklch(0.55 0.02 260));
+  background: radial-gradient(
+    circle at 35% 35%,
+    oklch(0.95 0.01 260),
+    oklch(0.55 0.02 260)
+  );
   animation: gx-moon 7s linear infinite;
   pointer-events: none;
 }
 @keyframes gx-moon {
   0% {
-    transform: rotate(0deg) translateX(105%) translateX(var(--moon, 2.2em)) rotate(0deg);
+    transform: rotate(0deg) translateX(105%) translateX(var(--moon, 2.2em))
+      rotate(0deg);
     z-index: 2;
   }
   100% {
-    transform: rotate(360deg) translateX(105%) translateX(var(--moon, 2.2em)) rotate(-360deg);
+    transform: rotate(360deg) translateX(105%) translateX(var(--moon, 2.2em))
+      rotate(-360deg);
   }
 }
 .gx-reticle {
@@ -700,9 +789,15 @@
   border: 1px solid var(--gx-cyan);
   border-radius: 0;
   background:
-    repeating-linear-gradient(0deg, oklch(0.84 0.11 197 / 0.05) 0 1px, transparent 1px 3px),
-    linear-gradient(oklch(0.84 0.11 197 / 0.07) 1px, transparent 1px) 0 0 / 24px 24px,
-    linear-gradient(90deg, oklch(0.84 0.11 197 / 0.07) 1px, transparent 1px) 0 0 / 24px 24px,
+    repeating-linear-gradient(
+      0deg,
+      oklch(0.84 0.11 197 / 0.05) 0 1px,
+      transparent 1px 3px
+    ),
+    linear-gradient(oklch(0.84 0.11 197 / 0.07) 1px, transparent 1px) 0 0 / 24px
+      24px,
+    linear-gradient(90deg, oklch(0.84 0.11 197 / 0.07) 1px, transparent 1px) 0
+      0 / 24px 24px,
     oklch(0.15 0.05 272 / 0.9);
   backdrop-filter: blur(10px);
   clip-path: polygon(
@@ -839,7 +934,14 @@
 }
 
 .gx-stage[data-paused]
-  :is(.gx-corona, .gx-boil::after, .gx-surface, .gx-disk, .gx-moon, .gx-sun::before) {
+  :is(
+    .gx-corona,
+    .gx-boil::after,
+    .gx-surface,
+    .gx-disk,
+    .gx-moon,
+    .gx-sun::before
+  ) {
   animation-play-state: paused;
 }
 :root[data-motion="off"]
@@ -892,7 +994,14 @@
     transform: none;
     inline-size: auto;
     max-block-size: 72vh;
-    clip-path: polygon(18px 0, calc(100% - 18px) 0, 100% 18px, 100% 100%, 0 100%, 0 18px);
+    clip-path: polygon(
+      18px 0,
+      calc(100% - 18px) 0,
+      100% 18px,
+      100% 100%,
+      0 100%,
+      0 18px
+    );
     animation: gx-sheet 0.35s ease-out;
   }
   @keyframes gx-sheet {

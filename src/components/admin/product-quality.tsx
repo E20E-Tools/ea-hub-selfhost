@@ -57,7 +57,10 @@ export function ProductQuality({
                   className="text-start underline"
                   onClick={() => edit(p, "p-description-ar")}
                 >
-                  {adminDictionaries[ar ? "ar" : "en"].consoleMissingArabicDescriptionEdit}
+                  {
+                    adminDictionaries[ar ? "ar" : "en"]
+                      .consoleMissingArabicDescriptionEdit
+                  }
                 </button>
               )}
               {!p.comingSoon && !valid && (
@@ -65,7 +68,10 @@ export function ProductQuality({
                   className="text-start underline"
                   onClick={() => edit(p, "p-url")}
                 >
-                  {adminDictionaries[ar ? "ar" : "en"].consoleMissingOrMalformedLaunchURLEdit}
+                  {
+                    adminDictionaries[ar ? "ar" : "en"]
+                      .consoleMissingOrMalformedLaunchURLEdit
+                  }
                 </button>
               )}
               {valid && !p.comingSoon && (
@@ -75,13 +81,18 @@ export function ProductQuality({
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  {adminDictionaries[ar ? "ar" : "en"].consoleOpenLaunchURLToVerify}
+                  {
+                    adminDictionaries[ar ? "ar" : "en"]
+                      .consoleOpenLaunchURLToVerify
+                  }
                 </a>
               )}
               {reviews.data && (
                 <label>
                   {adminDictionaries[ar ? "ar" : "en"].consoleLastReviewed} ·{" "}
-                  {reviewed ?? (adminDictionaries[ar ? "ar" : "en"].consoleNoDateRecorded)}{" "}
+                  {reviewed ??
+                    adminDictionaries[ar ? "ar" : "en"]
+                      .consoleNoDateRecorded}{" "}
                   <input
                     type="date"
                     max={today}
@@ -110,7 +121,8 @@ export function ProductQuality({
                     await reviews.refetch();
                   } catch {
                     toast.error(
-                      adminDictionaries[ar ? "ar" : "en"].consoleCouldNotSaveReview,
+                      adminDictionaries[ar ? "ar" : "en"]
+                        .consoleCouldNotSaveReview,
                     );
                   } finally {
                     setSaving("");

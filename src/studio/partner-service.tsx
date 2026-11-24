@@ -1,6 +1,7 @@
 import { BookOpen, BriefcaseBusiness, ArrowUpRight } from "lucide-react";
 import { useLanguage } from "@/lib/language";
 import { JourneyHeading } from "./journey-heading";
+import { dictionaries } from "@/lib/copy";
 
 const courses = [
   [
@@ -24,21 +25,13 @@ export function PartnerService({ learning }: { learning: boolean }) {
         icon={learning ? BookOpen : BriefcaseBusiness}
         title={
           learning
-            ? ar
-              ? "الدورات التدريبية"
-              : "Courses"
-            : ar
-              ? "الاستشارات"
-              : "Consultations"
+            ? dictionaries[ar ? "ar" : "en"].partnerServiceCourses
+            : dictionaries[ar ? "ar" : "en"].affiliatesConsultations
         }
         description={
           learning
-            ? ar
-              ? "اختر مجال التعلّم واطّلع على منهج الدورة لدى DT.Guide."
-              : "Choose a subject and explore the syllabus at DT.Guide."
-            : ar
-              ? "جهّز سؤال فريقك ثم انتقل إلى خدمة الاستشارات لدى DT.Guide."
-              : "Frame the decision your team needs to make, then visit the DT.Guide consultation service."
+            ? dictionaries[ar ? "ar" : "en"].partnerServiceChooseASubjectAnd
+            : dictionaries[ar ? "ar" : "en"].partnerServiceFrameTheDecisionYour
         }
       />
       {learning ? (
@@ -53,7 +46,12 @@ export function PartnerService({ learning }: { learning: boolean }) {
         </div>
       ) : (
         <section className="bx-panel">
-          <h2>{ar ? "قبل طلب الاستشارة" : "Prepare for the discussion"}</h2>
+          <h2>
+            {
+              dictionaries[ar ? "ar" : "en"]
+                .partnerServicePrepareForTheDiscussion
+            }
+          </h2>
           <ol className="ea-prep">
             {(ar
               ? [
@@ -81,12 +79,9 @@ export function PartnerService({ learning }: { learning: boolean }) {
         }
       >
         {learning
-          ? ar
-            ? "كل الدورات على DT.Guide"
-            : "All courses on DT.Guide"
-          : ar
-            ? "انتقل إلى استشارات DT.Guide"
-            : "Visit DT.Guide consultations"}
+          ? dictionaries[ar ? "ar" : "en"].partnerServiceAllCoursesOnDt
+          : dictionaries[ar ? "ar" : "en"]
+              .partnerServiceVisitDtGuideConsultations}
         <ArrowUpRight size={18} />
       </a>
     </main>

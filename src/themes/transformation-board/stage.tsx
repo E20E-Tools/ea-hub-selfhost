@@ -13,7 +13,10 @@ import { useLanguage } from "@/lib/language";
 import { fill } from "@/lib/copy";
 import type { StageProps } from "../registry";
 import { useStageMotion } from "../use-stage-motion";
-import { archyBoardTourEligible, useArchyBoardTour } from "./use-archy-board-tour";
+import {
+  archyBoardTourEligible,
+  useArchyBoardTour,
+} from "./use-archy-board-tour";
 import { themedLogo } from "../theme-art";
 import {
   InspectorActions,
@@ -42,10 +45,15 @@ const DEMO_KEY = "e20e-tb-demo";
 /** The board builds itself once per session, then sweeps on its own if nothing is touched. */
 const BOOT_KEY = "e20e-tb-boot";
 const IDLE_MS = 6000;
-const easeInOut = (x: number) => (x < 0.5 ? 4 * x * x * x : 1 - (-2 * x + 2) ** 3 / 2);
-const useIsoLayout = typeof window === "undefined" ? useEffect : useLayoutEffect;
+const easeInOut = (x: number) =>
+  x < 0.5 ? 4 * x * x * x : 1 - (-2 * x + 2) ** 3 / 2;
+const useIsoLayout =
+  typeof window === "undefined" ? useEffect : useLayoutEffect;
 /** Band heights (px) above and below the board plane: world labels on top, grip below. */
-const BANDS = { desktop: { top: 44, bottom: 78 }, mobile: { top: 40, bottom: 48 } };
+const BANDS = {
+  desktop: { top: 44, bottom: 78 },
+  mobile: { top: 40, bottom: 48 },
+};
 
 function useMobile(): boolean {
   const [mobile, setMobile] = useState(false);
@@ -85,10 +93,20 @@ function FileIcon({ kind }: { kind: ReturnType<typeof legacyKind> }) {
   return (
     <svg viewBox="0 0 24 28" className="tb-file-icon" aria-hidden="true">
       {kind === "folder" ? (
-        <path d="M1 7h8l2 3h12v16H1z" fill="#d8c67a" stroke="#4a4536" strokeWidth="1.5" />
+        <path
+          d="M1 7h8l2 3h12v16H1z"
+          fill="#d8c67a"
+          stroke="#4a4536"
+          strokeWidth="1.5"
+        />
       ) : (
         <>
-          <path d="M2 1h14l6 6v20H2z" fill="#f2efe6" stroke="#4a4536" strokeWidth="1.5" />
+          <path
+            d="M2 1h14l6 6v20H2z"
+            fill="#f2efe6"
+            stroke="#4a4536"
+            strokeWidth="1.5"
+          />
           <path d="M16 1v6h6" fill="none" stroke="#4a4536" strokeWidth="1.5" />
           <rect x="5" y="14" width="14" height="8" fill={color} />
         </>
@@ -106,7 +124,10 @@ function CardBody({ product }: { product: Product }) {
         {product.name}
       </strong>
       <span className="tb-card-cat">{product.label}</span>
-      <p className="tb-card-status" data-soon={facts.available ? undefined : ""}>
+      <p
+        className="tb-card-status"
+        data-soon={facts.available ? undefined : ""}
+      >
         <i aria-hidden="true" />
         <span>
           {facts.status}
@@ -136,7 +157,10 @@ function CardBody({ product }: { product: Product }) {
   );
 }
 
-export default function TransformationBoardStage({ products, settings }: StageProps) {
+export default function TransformationBoardStage({
+  products,
+  settings,
+}: StageProps) {
   const { t, dir } = useLanguage();
   const rtl = dir === "rtl";
   const root = useRef<HTMLDivElement>(null);
@@ -146,14 +170,20 @@ export default function TransformationBoardStage({ products, settings }: StagePr
   const vertical = mobile;
   const band = mobile ? BANDS.mobile : BANDS.desktop;
   const list = useMemo(() => products.slice(0, 12), [products]);
-  const board = useMemo(() => tbBoard(list.length, mobile), [list.length, mobile]);
+  const board = useMemo(
+    () => tbBoard(list.length, mobile),
+    [list.length, mobile],
+  );
   const inspector = useProductInspector();
   const [size, setSize] = useState({ w: 1000, h: 740 });
   // null = resting position (computed from the layout so no product is caught mid-morph).
   const [p, setP] = useState<number | null>(null);
   const [out, setOut] = useState(0);
   const [hot, setHot] = useState<string | null>(null);
-  const [converting, setConverting] = useState<{ from: string; to: string } | null>(null);
+  const [converting, setConverting] = useState<{
+    from: string;
+    to: string;
+  } | null>(null);
   const demo = useRef<number | null>(null);
   const dragging = useRef(false);
   // Once the visitor moves the handle, scrolling never drifts it again.
@@ -225,7 +255,10 @@ export default function TransformationBoardStage({ products, settings }: StagePr
     const step = (now: number) => {
       const e = Math.max(0, Math.min(1, (now - t0) / dur));
       if (bootLine.current)
-        bootLine.current.textContent = full.slice(0, Math.round(full.length * e));
+        bootLine.current.textContent = full.slice(
+          0,
+          Math.round(full.length * e),
+        );
       if (e >= 1) {
         setBooting(false);
         try {
@@ -242,7 +275,6 @@ export default function TransformationBoardStage({ products, settings }: StagePr
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [motion.animate, motion.scale]);
 
-
   useEffect(
     () => () => {
       if (settle.current) cancelAnimationFrame(settle.current);
@@ -254,7 +286,9 @@ export default function TransformationBoardStage({ products, settings }: StagePr
   useEffect(() => {
     const el = boardEl.current;
     if (!el) return;
-    const ro = new ResizeObserver(() => setSize({ w: el.offsetWidth, h: el.offsetHeight }));
+    const ro = new ResizeObserver(() =>
+      setSize({ w: el.offsetWidth, h: el.offsetHeight }),
+    );
     ro.observe(el);
     return () => ro.disconnect();
   }, []);
@@ -286,12 +320,14 @@ export default function TransformationBoardStage({ products, settings }: StagePr
     const sweep = () => {
       idle.current = null;
       const t0 = performance.now() + 450;
-      const ease = (x: number) => (x < 0.5 ? 4 * x * x * x : 1 - (-2 * x + 2) ** 3 / 2);
+      const ease = (x: number) =>
+        x < 0.5 ? 4 * x * x * x : 1 - (-2 * x + 2) ** 3 / 2;
       const step = (now: number) => {
         const e = now - t0;
         if (e < 0) setP(0.94);
         else if (e < 1800) setP(0.94 - ease(e / 1800) * 0.88);
-        else if (e < 2700) setP(0.06 + ease((e - 1800) / 900) * (restRef.current - 0.06));
+        else if (e < 2700)
+          setP(0.06 + ease((e - 1800) / 900) * (restRef.current - 0.06));
         else {
           demo.current = null;
           markSeen();
@@ -338,7 +374,12 @@ export default function TransformationBoardStage({ products, settings }: StagePr
         if (userMoved.current || tourPending) return;
         const r = root.current?.getBoundingClientRect();
         if (!r) return;
-        setOut(Math.max(0, Math.min(1, (-r.top - r.height * 0.25) / (r.height * 0.55))));
+        setOut(
+          Math.max(
+            0,
+            Math.min(1, (-r.top - r.height * 0.25) / (r.height * 0.55)),
+          ),
+        );
       });
     };
     on();
@@ -357,7 +398,8 @@ export default function TransformationBoardStage({ products, settings }: StagePr
     height: size.h,
     top: band.top,
   });
-  const uOf = (box: Box) => (box === board.core ? us[0]! : us[1 + board.chips.indexOf(box)]!);
+  const uOf = (box: Box) =>
+    box === board.core ? us[0]! : us[1 + board.chips.indexOf(box)]!;
   const BAND = 0.04; // morph band half-width around the handle
   const rest = restPosition(us, TB_REST, BAND + 0.012);
   restRef.current = rest;
@@ -370,7 +412,15 @@ export default function TransformationBoardStage({ products, settings }: StagePr
     const cable = board.cables[i]!;
     const m = morphAt(uOf(box), h, BAND);
     const pts = cableAt(cable, m);
-    return { product, box, cable, m, pts, d: cubicPath(pts), name: legacyFileName(product) };
+    return {
+      product,
+      box,
+      cable,
+      m,
+      pts,
+      d: cubicPath(pts),
+      name: legacyFileName(product),
+    };
   });
 
   const stopTravel = () => {
@@ -445,7 +495,9 @@ export default function TransformationBoardStage({ products, settings }: StagePr
   const setFromPointer = (e: RPointerEvent) => {
     const r = boardEl.current?.getBoundingClientRect();
     if (!r) return;
-    const raw = vertical ? (e.clientY - r.top) / r.height : (e.clientX - r.left) / r.width;
+    const raw = vertical
+      ? (e.clientY - r.top) / r.height
+      : (e.clientX - r.left) / r.width;
     userMoved.current = true;
     if (settle.current) {
       cancelAnimationFrame(settle.current);
@@ -462,7 +514,7 @@ export default function TransformationBoardStage({ products, settings }: StagePr
     // The handle stays exactly where the visitor lets go.
   };
 
-  const moveHandle=(next:number)=>{
+  const moveHandle = (next: number) => {
     stopDemo();
     stopTravel();
     userMoved.current = true;
@@ -477,7 +529,12 @@ export default function TransformationBoardStage({ products, settings }: StagePr
   };
 
   const [dock, setDock] = useState<"left" | "right">("right");
-  const openFrom = (product: Product, el: HTMLElement, box: Box, legacy: boolean) => {
+  const openFrom = (
+    product: Product,
+    el: HTMLElement,
+    box: Box,
+    legacy: boolean,
+  ) => {
     if (inspector.openId === product.id) return inspector.close();
     // Dock the card on the half of the board away from the clicked chip.
     setDock(box.x + box.w / 2 < board.w / 2 ? "right" : "left");
@@ -502,7 +559,9 @@ export default function TransformationBoardStage({ products, settings }: StagePr
       ? `inset(0 ${pct(h)} 0 0)`
       : `inset(0 0 0 ${pct(h)})`;
   const physX = rtl ? 1 - h : h; // handle position from the physical left
-  const handlePos: CSSProperties = vertical ? { top: pct(h) } : { left: pct(physX) };
+  const handlePos: CSSProperties = vertical
+    ? { top: pct(h) }
+    : { left: pct(physX) };
   // Soft colour seam on each side of the handle so the board shifts from beige to white gradually.
   const legacyBefore = vertical || !rtl; // legacy lies physically before the handle (left / top)
   const seam = (legacy: boolean): CSSProperties => {
@@ -535,7 +594,8 @@ export default function TransformationBoardStage({ products, settings }: StagePr
   const legacySide = rtl ? "right" : "left";
   const digitalSide = rtl ? "left" : "right";
   const openItem = items.find((x) => x.product.id === inspector.openId) ?? null;
-  const pulses = motion.intensity === "low" ? 1 : motion.intensity === "high" ? 3 : 2;
+  const pulses =
+    motion.intensity === "low" ? 1 : motion.intensity === "high" ? 3 : 2;
   // Keep the grip fully inside the board at the extremes (the divider line still reaches the edge).
   const edgeShift = (at: number, total: number, r: number) =>
     Math.max(r + 4 - at, 0) - Math.max(at - (total - r - 4), 0);
@@ -560,7 +620,8 @@ export default function TransformationBoardStage({ products, settings }: StagePr
         aria-label={t("stageProductsLabel")}
         data-dragging={draggingNow ? "" : undefined}
         onPointerDown={(e) => {
-          if (e.button !== 0 || (e.target as HTMLElement).closest(".tb-grip")) return;
+          if (e.button !== 0 || (e.target as HTMLElement).closest(".tb-grip"))
+            return;
           stopDemo();
           stopTravel();
           dragging.current = true;
@@ -576,7 +637,10 @@ export default function TransformationBoardStage({ products, settings }: StagePr
           ["--tb-bottom" as string]: `${band.bottom}px`,
         }}
       >
-        <div className="tb-spacer" style={{ aspectRatio: `${board.w} / ${board.h}` }} />
+        <div
+          className="tb-spacer"
+          style={{ aspectRatio: `${board.w} / ${board.h}` }}
+        />
 
         {/* Legacy board */}
         <div className="tb-layer tb-legacy" style={{ clipPath: clipLegacy }}>
@@ -590,7 +654,11 @@ export default function TransformationBoardStage({ products, settings }: StagePr
             {t("ldLegacy")}
           </p>
           <div className="tb-plane">
-            <svg viewBox={`0 0 ${board.w} ${board.h}`} className="tb-svg" aria-hidden="true">
+            <svg
+              viewBox={`0 0 ${board.w} ${board.h}`}
+              className="tb-svg"
+              aria-hidden="true"
+            >
               {items.map((it) => {
                 const end = it.pts[it.pts.length - 1]!;
                 return (
@@ -634,7 +702,11 @@ export default function TransformationBoardStage({ products, settings }: StagePr
             {t("tbDigital")}
           </p>
           <div className="tb-plane">
-            <svg viewBox={`0 0 ${board.w} ${board.h}`} className="tb-svg" aria-hidden="true">
+            <svg
+              viewBox={`0 0 ${board.w} ${board.h}`}
+              className="tb-svg"
+              aria-hidden="true"
+            >
               <defs>
                 <linearGradient
                   id="tb-grad"
@@ -651,7 +723,11 @@ export default function TransformationBoardStage({ products, settings }: StagePr
               </defs>
               {board.bus ? <path d={board.bus} className="tb-bus" /> : null}
               {items.map((it, i) => {
-                const state = hot ? (hot === it.product.id ? "hot" : "dim") : "on";
+                const state = hot
+                  ? hot === it.product.id
+                    ? "hot"
+                    : "dim"
+                  : "on";
                 const viaOpacity = Math.max(0, (it.m - 0.8) / 0.2);
                 return (
                   <g
@@ -692,13 +768,17 @@ export default function TransformationBoardStage({ products, settings }: StagePr
                           d={it.d}
                           pathLength={100}
                           className="tb-trail"
-                          style={{ animationDelay: `${(i * 0.55) / motion.scale}s` }}
+                          style={{
+                            animationDelay: `${(i * 0.55) / motion.scale}s`,
+                          }}
                         />
                         <path
                           d={it.d}
                           pathLength={100}
                           className="tb-packet"
-                          style={{ animationDelay: `${(0.6 + i * 0.47) / motion.scale}s` }}
+                          style={{
+                            animationDelay: `${(0.6 + i * 0.47) / motion.scale}s`,
+                          }}
                         />
                       </>
                     ) : null}
@@ -738,7 +818,9 @@ export default function TransformationBoardStage({ products, settings }: StagePr
               tabIndex={it.m > 0.5 ? -1 : 0}
               aria-label={`${it.name} → ${it.product.name}`}
               onPointerDown={(e) => e.stopPropagation()}
-              onClick={(e) => openFrom(it.product, e.currentTarget, it.box, true)}
+              onClick={(e) =>
+                openFrom(it.product, e.currentTarget, it.box, true)
+              }
             >
               <FileIcon kind={legacyKind(it.name)} />
               <span dir="ltr">
@@ -760,7 +842,9 @@ export default function TransformationBoardStage({ products, settings }: StagePr
               />
             ) : null}
             <strong>{settings.displayTitle.toUpperCase()}</strong>
-            {settings.tagline ? <small dir={dir}>{settings.tagline}</small> : null}
+            {settings.tagline ? (
+              <small dir={dir}>{settings.tagline}</small>
+            ) : null}
           </div>
           {items.map((it, i) => {
             const id = it.product.id;
@@ -773,7 +857,11 @@ export default function TransformationBoardStage({ products, settings }: StagePr
                 data-selected={inspector.openId === id ? "" : undefined}
                 data-off={it.m > 0.5 ? undefined : ""}
                 data-power={powering.includes(id) ? "" : undefined}
-                style={{ ...boxStyle(it.box), ["--m" as string]: it.m, ["--i" as string]: i }}
+                style={{
+                  ...boxStyle(it.box),
+                  ["--m" as string]: it.m,
+                  ["--i" as string]: i,
+                }}
                 tabIndex={it.m > 0.5 ? 0 : -1}
                 aria-label={`${it.product.name} — ${it.product.label} — ${it.product.comingSoon ? t("comingSoonBadge") : t("inspectorAvailable")}`}
                 aria-expanded={inspector.openId === id}
@@ -787,7 +875,9 @@ export default function TransformationBoardStage({ products, settings }: StagePr
                 onFocus={() => setHot(id)}
                 onBlur={() => setHot(null)}
                 onPointerDown={(e) => e.stopPropagation()}
-                onClick={(e) => openFrom(it.product, e.currentTarget, it.box, false)}
+                onClick={(e) =>
+                  openFrom(it.product, e.currentTarget, it.box, false)
+                }
               >
                 <span className="tb-sheen" aria-hidden="true" />
                 <span className="tb-led" aria-hidden="true" />
@@ -809,7 +899,9 @@ export default function TransformationBoardStage({ products, settings }: StagePr
           <div
             className="tb-grip"
             style={{
-              transform: vertical ? `translateY(${gripShift}px)` : `translateX(${gripShift}px)`,
+              transform: vertical
+                ? `translateY(${gripShift}px)`
+                : `translateX(${gripShift}px)`,
             }}
             role="slider"
             tabIndex={0}
@@ -879,7 +971,9 @@ export default function TransformationBoardStage({ products, settings }: StagePr
             product={openItem.product}
             className="tb-card"
             onClose={inspector.close}
-            title={<span dir="ltr">{`chip.inspect("${openItem.product.id}")`}</span>}
+            title={
+              <span dir="ltr">{`chip.inspect("${openItem.product.id}")`}</span>
+            }
           >
             <CardBody product={openItem.product} />
           </InspectorPanel>

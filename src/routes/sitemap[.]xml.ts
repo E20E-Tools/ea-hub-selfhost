@@ -15,7 +15,10 @@ export const Route = createFileRoute("/sitemap.xml")({
           const { publishableClient } = await import("@/lib/catalog.functions");
           const client = publishableClient();
           const [products, settings, testimonials] = await Promise.all([
-            client.from("products").select("id,coming_soon,publication_date").order("sort_order"),
+            client
+              .from("products")
+              .select("id,coming_soon,publication_date")
+              .order("sort_order"),
             client
               .from("site_settings")
               .select("feature_flags,navigation_items")
@@ -26,7 +29,8 @@ export const Route = createFileRoute("/sitemap.xml")({
               .select("id", { count: "exact", head: true })
               .eq("published", true),
           ]);
-          if (products.error || settings.error || testimonials.error) throw new Error("read");
+          if (products.error || settings.error || testimonials.error)
+            throw new Error("read");
           paths = sitemapPaths({
             featureFlags: settings.data?.feature_flags,
             navigationItems: settings.data?.navigation_items,

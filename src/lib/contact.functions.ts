@@ -6,14 +6,17 @@ export const DEFAULT_CONTACT_EMAIL = "ea@e20e.tools";
 export const getPublicContactEmail = createServerFn({ method: "GET" }).handler(
   async (): Promise<string> => {
     try {
-      const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+      const { supabaseAdmin } =
+        await import("@/integrations/supabase/client.server");
       const { data } = await supabaseAdmin
         .from("site_settings")
         .select("contact_info")
         .eq("id", true)
         .maybeSingle();
       const email = (data?.contact_info as { email?: unknown } | null)?.email;
-      return typeof email === "string" && email.trim() ? email.trim() : DEFAULT_CONTACT_EMAIL;
+      return typeof email === "string" && email.trim()
+        ? email.trim()
+        : DEFAULT_CONTACT_EMAIL;
     } catch {
       return DEFAULT_CONTACT_EMAIL;
     }

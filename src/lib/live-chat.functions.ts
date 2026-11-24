@@ -11,10 +11,14 @@ async function visitorLimitKey(email: string): Promise<string> {
 }
 
 export type LiveResult =
-  { ok: true; chatId: string } | { ok: false; code: "gate" | "failed" | "limit" | "closed" };
+  | { ok: true; chatId: string }
+  | { ok: false; code: "gate" | "failed" | "limit" | "closed" };
 
 function visitorInput(value: unknown) {
-  const source = value && typeof value === "object" ? (value as Record<string, unknown>) : {};
+  const source =
+    value && typeof value === "object"
+      ? (value as Record<string, unknown>)
+      : {};
   return {
     access: typeof source["access"] === "string" ? source["access"] : "",
     language: source["language"] === "en" ? "en" : "ar",
@@ -41,7 +45,10 @@ export const requestHumanChat = createServerFn({ method: "POST" })
   .handler(async ({ data }): Promise<LiveResult> => {
     if (!(await sameOrigin())) return { ok: false, code: "failed" };
     const live = await import("./live-chat.server");
-    const visitor = await live.verifyVisitor({ supabase: null, userId: "" }, data.access);
+    const visitor = await live.verifyVisitor(
+      { supabase: null, userId: "" },
+      data.access,
+    );
     if (!visitor) return { ok: false, code: "gate" };
     const { consumeLimits } = await import("./rate-limit.server");
     if (
@@ -57,17 +64,28 @@ export const requestHumanChat = createServerFn({ method: "POST" })
       return { ok: false, code: "limit" };
     try {
       const db = await live.adminClient();
-      const chat = await live.openChatFor(db, { ...visitor, language: data.language });
+      const chat = await live.openChatFor(db, {
+        ...visitor,
+        language: data.language,
+      });
       if (!isWithPerson(chat.status)) {
-        await live.appendMessages(db, chat.id, [{ sender: "system", body: "requested" }], {
-          status: "waiting",
-          requested_at: new Date().toISOString(),
-          visitor_name: visitor.name,
-        });
+        await live.appendMessages(
+          db,
+          chat.id,
+          [{ sender: "system", body: "requested" }],
+          {
+            status: "waiting",
+            requested_at: new Date().toISOString(),
+            visitor_name: visitor.name,
+          },
+        );
       }
       return { ok: true, chatId: chat.id };
     } catch (error) {
-      console.error("live chat request failed", error instanceof Error ? error.message : "unknown");
+      console.error(
+        "live chat request failed",
+        error instanceof Error ? error.message : "unknown",
+      );
       return { ok: false, code: "failed" };
     }
   });
@@ -76,17 +94,27 @@ export const requestHumanChat = createServerFn({ method: "POST" })
 export const sendVisitorLiveMessage = createServerFn({ method: "POST" })
   .inputValidator(visitorInput)
   .handler(async ({ data }): Promise<LiveResult> => {
-    if (!(await sameOrigin()) || !data.chatId || !data.body) return { ok: false, code: "failed" };
+    if (!(await sameOrigin()) || !data.chatId || !data.body)
+      return { ok: false, code: "failed" };
     const live = await import("./live-chat.server");
-    const visitor = await live.verifyVisitor({ supabase: null, userId: "" }, data.access);
+    const visitor = await live.verifyVisitor(
+      { supabase: null, userId: "" },
+      data.access,
+    );
     if (!visitor) return { ok: false, code: "gate" };
     const { checkLimits } = await import("./rate-limit.server");
     const key = await visitorLimitKey(visitor.email);
     const pace = await checkLimits([
       { bucket: "live:msg-min", subject: key, limit: 15, windowSeconds: 60 },
-      { bucket: "live:msg-day", subject: key, limit: 300, windowSeconds: 86_400 },
+      {
+        bucket: "live:msg-day",
+        subject: key,
+        limit: 300,
+        windowSeconds: 86_400,
+      },
     ]);
-    if (pace !== "ok") return { ok: false, code: pace === "limited" ? "limit" : "failed" };
+    if (pace !== "ok")
+      return { ok: false, code: pace === "limited" ? "limit" : "failed" };
     const db = await live.adminClient();
     const { data: chat } = await db
       .from("live_chats")
@@ -94,9 +122,12 @@ export const sendVisitorLiveMessage = createServerFn({ method: "POST" })
       .eq("id", data.chatId)
       .eq("visitor_id", visitor.id)
       .maybeSingle();
-    if (!chat || !isWithPerson(chat.status)) return { ok: false, code: "closed" };
+    if (!chat || !isWithPerson(chat.status))
+      return { ok: false, code: "closed" };
     try {
-      await live.appendMessages(db, chat.id, [{ sender: "visitor", body: data.body }]);
+      await live.appendMessages(db, chat.id, [
+        { sender: "visitor", body: data.body },
+      ]);
       return { ok: true, chatId: chat.id };
     } catch {
       return { ok: false, code: "failed" };
@@ -107,9 +138,13 @@ export const sendVisitorLiveMessage = createServerFn({ method: "POST" })
 export const endVisitorLiveChat = createServerFn({ method: "POST" })
   .inputValidator(visitorInput)
   .handler(async ({ data }): Promise<LiveResult> => {
-    if (!(await sameOrigin()) || !data.chatId) return { ok: false, code: "failed" };
+    if (!(await sameOrigin()) || !data.chatId)
+      return { ok: false, code: "failed" };
     const live = await import("./live-chat.server");
-    const visitor = await live.verifyVisitor({ supabase: null, userId: "" }, data.access);
+    const visitor = await live.verifyVisitor(
+      { supabase: null, userId: "" },
+      data.access,
+    );
     if (!visitor) return { ok: false, code: "gate" };
     const db = await live.adminClient();
     const { data: chat } = await db
@@ -119,14 +154,22 @@ export const endVisitorLiveChat = createServerFn({ method: "POST" })
       .eq("visitor_id", visitor.id)
       .maybeSingle();
     if (!chat) return { ok: false, code: "failed" };
-    await live.appendMessages(db, chat.id, [{ sender: "system", body: "closed" }], {
-      status: "closed",
-    });
+    await live.appendMessages(
+      db,
+      chat.id,
+      [{ sender: "system", body: "closed" }],
+      {
+        status: "closed",
+      },
+    );
     return { ok: true, chatId: chat.id };
   });
 
 function adminInput(value: unknown) {
-  const source = value && typeof value === "object" ? (value as Record<string, unknown>) : {};
+  const source =
+    value && typeof value === "object"
+      ? (value as Record<string, unknown>)
+      : {};
   if (!isUuid(source["chatId"])) throw new Error("bad chat");
   return { chatId: source["chatId"], body: cleanMessage(source["body"]) };
 }
@@ -155,7 +198,9 @@ export const adminSendLiveMessage = createServerFn({ method: "POST" })
         ...(joining ? [{ sender: "system" as const, body: "joined" }] : []),
         { sender: "admin", body: data.body },
       ],
-      joining ? { status: "active", admin_email: actorEmail(context.claims) } : {},
+      joining
+        ? { status: "active", admin_email: actorEmail(context.claims) }
+        : {},
     );
     // Expired chats are purged by the daily cleanup job, never during a reply.
     return { ok: true };
@@ -169,9 +214,14 @@ export const adminCloseLiveChat = createServerFn({ method: "POST" })
     await requireAdmin(context as never);
     const live = await import("./live-chat.server");
     const db = await live.adminClient();
-    await live.appendMessages(db, data.chatId, [{ sender: "system", body: "closed" }], {
-      status: "closed",
-    });
+    await live.appendMessages(
+      db,
+      data.chatId,
+      [{ sender: "system", body: "closed" }],
+      {
+        status: "closed",
+      },
+    );
     return { ok: true };
   });
 
@@ -180,7 +230,9 @@ export const adminTakeOverChat = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator((value: unknown) => {
     const id =
-      value && typeof value === "object" ? (value as Record<string, unknown>)["chatId"] : null;
+      value && typeof value === "object"
+        ? (value as Record<string, unknown>)["chatId"]
+        : null;
     if (!isUuid(id)) throw new Error("bad chat");
     return { chatId: id };
   })
@@ -197,28 +249,41 @@ export const adminTakeOverChat = createServerFn({ method: "POST" })
     if (error || !chat) throw new Error("not found");
     if (chat.status === "closed") throw new Error("closed");
     if (chat.status !== "active")
-      await live.appendMessages(db, chat.id, [{ sender: "system", body: "joined" }], {
-        status: "active",
-        admin_email: actorEmail(context.claims),
-      });
+      await live.appendMessages(
+        db,
+        chat.id,
+        [{ sender: "system", body: "joined" }],
+        {
+          status: "active",
+          admin_email: actorEmail(context.claims),
+        },
+      );
     return { ok: true };
   });
 
-export type VisitorSupportRow = { id: string; kind: string; status: string; created_at: string };
+export type VisitorSupportRow = {
+  id: string;
+  kind: string;
+  status: string;
+  created_at: string;
+};
 
 /** Only requests explicitly linked to this conversation, never inferred from typed email. */
 export const adminChatVisitorSupport = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .inputValidator((value: unknown) => {
     const chatId =
-      value && typeof value === "object" ? (value as Record<string, unknown>)["chatId"] : "";
+      value && typeof value === "object"
+        ? (value as Record<string, unknown>)["chatId"]
+        : "";
     if (!isUuid(chatId)) throw new Error("bad chat");
     return { chatId };
   })
   .handler(async ({ data, context }): Promise<VisitorSupportRow[]> => {
     const { requireAdmin } = await import("./admin-guard.server");
     await requireAdmin(context as never);
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { supabaseAdmin } =
+      await import("@/integrations/supabase/client.server");
     const r = await supabaseAdmin
       .from("suggestion_requests")
       .select("id, request_type, status, created_at")
@@ -241,7 +306,12 @@ export const readVisitorChats = createServerFn({ method: "POST" })
   .inputValidator(visitorInput)
   .handler(async ({ data }) => {
     const empty = {
-      chats: [] as { id: string; status: string; created_at: string; last_message_at: string }[],
+      chats: [] as {
+        id: string;
+        status: string;
+        created_at: string;
+        last_message_at: string;
+      }[],
       messages: [] as {
         id: string;
         chat_id: string;
@@ -253,7 +323,10 @@ export const readVisitorChats = createServerFn({ method: "POST" })
     };
     if (!(await sameOrigin())) return empty;
     const live = await import("./live-chat.server");
-    const visitor = await live.verifyVisitor({ supabase: null, userId: "" }, data.access);
+    const visitor = await live.verifyVisitor(
+      { supabase: null, userId: "" },
+      data.access,
+    );
     if (!visitor) return empty;
     const db = await live.adminClient();
     let query = db

@@ -15,18 +15,29 @@ describe("site search", () => {
   it("no longer offers the removed events and bookings pages", () => {
     expect(
       SEARCH_PAGES.some(
-        (p) => (p.to as string) === "/events" || (p.to as string) === "/my-bookings",
+        (p) =>
+          (p.to as string) === "/events" || (p.to as string) === "/my-bookings",
       ),
     ).toBe(false);
   });
   it("leaves '/' to text fields", () => {
-    expect(isTypingTarget({ tagName: "INPUT" } as unknown as EventTarget)).toBe(true);
-    expect(isTypingTarget({ tagName: "TEXTAREA" } as unknown as EventTarget)).toBe(true);
+    expect(isTypingTarget({ tagName: "INPUT" } as unknown as EventTarget)).toBe(
+      true,
+    );
     expect(
-      isTypingTarget({ tagName: "DIV", isContentEditable: true } as unknown as EventTarget),
+      isTypingTarget({ tagName: "TEXTAREA" } as unknown as EventTarget),
     ).toBe(true);
     expect(
-      isTypingTarget({ tagName: "BUTTON", isContentEditable: false } as unknown as EventTarget),
+      isTypingTarget({
+        tagName: "DIV",
+        isContentEditable: true,
+      } as unknown as EventTarget),
+    ).toBe(true);
+    expect(
+      isTypingTarget({
+        tagName: "BUTTON",
+        isContentEditable: false,
+      } as unknown as EventTarget),
     ).toBe(false);
   });
 });

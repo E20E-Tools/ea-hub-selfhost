@@ -3,7 +3,7 @@ import { FeatureGate, FeatureOnly } from "@/components/feature-gate";
 import { AskRecords } from "@/components/work-cards";
 import { TeamTrials } from "@/components/team-trials";
 import { SavedExercises } from "@/components/saved-exercises";
-import {SavedDecisions} from "@/components/comparison-decision";
+import { SavedDecisions } from "@/components/comparison-decision";
 import { JourneyHeading } from "@/studio/journey-heading";
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { Bookmark, Heart } from "lucide-react";
@@ -18,18 +18,21 @@ import { useThemeArt } from "@/themes/use-theme-art";
 import { pageUrl } from "@/lib/seo";
 
 export const Route = createFileRoute("/my-tools")({
-  loader: ({ context }) => context.queryClient.ensureQueryData(catalogQueryOptions),
+  loader: ({ context }) =>
+    context.queryClient.ensureQueryData(catalogQueryOptions),
   head: () => ({
     meta: [
       { title: "My tools — E20E Tools | أدواتي" },
       {
         name: "description",
-        content: "Browser-local tool favorites and comparisons using only public product IDs.",
+        content:
+          "Browser-local tool favorites and comparisons using only public product IDs.",
       },
       { property: "og:title", content: "My tools — E20E Tools" },
       {
         property: "og:description",
-        content: "Review local favorites, compare tools and securely track your requests.",
+        content:
+          "Review local favorites, compare tools and securely track your requests.",
       },
       { property: "og:url", content: pageUrl("/my-tools") },
       { property: "og:type", content: "website" },
@@ -59,7 +62,11 @@ function MyToolsPage() {
         description={t("bxMyToolsLead")}
         view="my-tools"
       />
-      <a className="ea-guide-step" href={`/guide/${language}.html#s3`}>{language === "ar" ? "أين أجد أدواتي المحفوظة؟" : "How do I find my saved tools?"}</a>
+      <a className="ea-guide-step" href={`/guide/${language}.html#s3`}>
+        {language === "ar"
+          ? "أين أجد أدواتي المحفوظة؟"
+          : "How do I find my saved tools?"}
+      </a>
       <p className="bx-local-note">{t("bxLocalOnly")}</p>
       {tools.status !== "ok" && (
         <p className="bx-local-note" role="status">
@@ -76,31 +83,41 @@ function MyToolsPage() {
         <Button asChild variant="outline">
           <Link to="/my-requests">{t("bxTrackRequests")}</Link>
         </Button>
-
       </div>
       <section className="mt-8" aria-labelledby="favorite-tools">
         <div className="ea-favorites-heading">
-        <h2 id="favorite-tools" className="ea-shelf-heading">
-          <Bookmark size={20} />
-          {t("bxFavorites")} <span>{favorites.length}</span>
-        </h2>
-        {favorites.length > 0 && (
-        <Button
-          type="button"
-          variant="ghost"
-          onClick={() => setRemoved(tools.clearFavorites())}
-        >
-          {t("bxClearFavorites")}
-        </Button>
-        )}
+          <h2 id="favorite-tools" className="ea-shelf-heading">
+            <Bookmark size={20} />
+            {t("bxFavorites")} <span>{favorites.length}</span>
+          </h2>
+          {favorites.length > 0 && (
+            <Button
+              type="button"
+              variant="ghost"
+              onClick={() => setRemoved(tools.clearFavorites())}
+            >
+              {t("bxClearFavorites")}
+            </Button>
+          )}
         </div>
         {removed.length > 0 && (
           <div className="bx-actions">
-            <span role="status">{language === "ar" ? "أُزيلت من المفضلة" : "Removed from favorites"} ({removed.length})</span>
-            <Button type="button" variant="outline" onClick={() => {
-              tools.restoreFavorites(removed);
-              setRemoved([]);
-            }}>{language === "ar" ? "تراجع" : "Undo"}</Button>
+            <span role="status">
+              {language === "ar"
+                ? "أُزيلت من المفضلة"
+                : "Removed from favorites"}{" "}
+              ({removed.length})
+            </span>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                tools.restoreFavorites(removed);
+                setRemoved([]);
+              }}
+            >
+              {language === "ar" ? "تراجع" : "Undo"}
+            </Button>
           </div>
         )}
         {!tools.hydrated ? (
@@ -109,7 +126,9 @@ function MyToolsPage() {
           <div className="bx-empty">
             <p>{t("bxNoFavorites")}</p>
             <Button asChild variant="outline">
-              <Link to="/" hash="catalog">{t("backToLibrary")}</Link>
+              <Link to="/" hash="catalog">
+                {t("backToLibrary")}
+              </Link>
             </Button>
           </div>
         ) : (
@@ -123,21 +142,29 @@ function MyToolsPage() {
                   className="ea-shelf-art"
                 >
                   <img src={art.image(product)} alt="" loading="lazy" />
-                  <span>{product.comingSoon ? t("comingSoonBadge") : product.label}</span>
+                  <span>
+                    {product.comingSoon ? t("comingSoonBadge") : product.label}
+                  </span>
                 </Link>
                 <h3 dir="ltr">{product.name}</h3>
                 <p>{product.description}</p>
                 <ProductToolsActions product={product} />
                 <div className="bx-actions">
                   <Button asChild variant="outline">
-                    <Link to="/product/$productId" params={{ productId: product.id }}>
+                    <Link
+                      to="/product/$productId"
+                      params={{ productId: product.id }}
+                    >
                       {t("bxOpenDetails")}
                     </Link>
                   </Button>
                   {!product.comingSoon && (
                     <FeatureOnly feature="trials">
                       <Button asChild variant="ghost">
-                        <Link to="/try/$productId" params={{ productId: product.id }}>
+                        <Link
+                          to="/try/$productId"
+                          params={{ productId: product.id }}
+                        >
                           {t("bxTryDemo")}
                         </Link>
                       </Button>
@@ -149,10 +176,10 @@ function MyToolsPage() {
           </div>
         )}
       </section>
-<AskRecords ar={language === "ar"}/>
-<TeamTrials ar={language === "ar"}/>
-<SavedExercises ar={language === "ar"}/>
-<SavedDecisions/>
+      <AskRecords ar={language === "ar"} />
+      <TeamTrials ar={language === "ar"} />
+      <SavedExercises ar={language === "ar"} />
+      <SavedDecisions />
     </main>
   );
 }

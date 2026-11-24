@@ -1,10 +1,22 @@
 /** Static mini isometric city for the admin picker. */
 export function MetropolisThumb() {
-  const box = (x: number, y: number, w: number, h: number, c: [string, string, string]) => (
+  const box = (
+    x: number,
+    y: number,
+    w: number,
+    h: number,
+    c: [string, string, string],
+  ) => (
     <g>
       <path d={`M${x} ${y}l${w} ${w / 2}v${-h}l${-w} ${-w / 2}z`} fill={c[1]} />
-      <path d={`M${x + w} ${y + w / 2}l${w} ${-w / 2}v${-h}l${-w} ${w / 2}z`} fill={c[2]} />
-      <path d={`M${x} ${y - h}l${w} ${w / 2}l${w} ${-w / 2}l${-w} ${-w / 2}z`} fill={c[0]} />
+      <path
+        d={`M${x + w} ${y + w / 2}l${w} ${-w / 2}v${-h}l${-w} ${w / 2}z`}
+        fill={c[2]}
+      />
+      <path
+        d={`M${x} ${y - h}l${w} ${w / 2}l${w} ${-w / 2}l${-w} ${-w / 2}z`}
+        fill={c[0]}
+      />
       {Array.from({ length: Math.floor(h / 9) }, (_, i) => (
         <path
           key={i}
@@ -36,7 +48,11 @@ export function MetropolisThumb() {
         strokeOpacity="0.6"
       />
       <path d="M160 140l-100 -36l100 -36l100 36z" fill="#3b4a66" />
-      <path d="M110 122l100 -36M210 122l-100 -36" stroke="#1f2a3d" strokeWidth="6" />
+      <path
+        d="M110 122l100 -36M210 122l-100 -36"
+        stroke="#1f2a3d"
+        strokeWidth="6"
+      />
       {box(84, 108, 18, 34, ["#c9d4ee", "#7f8fb8", "#4d5b85"])}
       {box(194, 104, 16, 44, ["#bfe3e0", "#5ea9a4", "#33716e"])}
       {box(142, 112, 18, 82, ["#ffe2a8", "#c69b54", "#8a6a33"])}
@@ -51,7 +67,12 @@ export function MetropolisThumb() {
         fill="none"
       />
       <rect x="257" y="88" width="10" height="7" fill="#F4B860" />
-      <path d="M224 132l16 8 16 -8" stroke="#F4B860" strokeDasharray="3 2" fill="none" />
+      <path
+        d="M224 132l16 8 16 -8"
+        stroke="#F4B860"
+        strokeDasharray="3 2"
+        fill="none"
+      />
     </svg>
   );
 }

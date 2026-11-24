@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { rateArchyReply } from "@/lib/archy-quality.functions";
+import { dictionaries } from "@/lib/copy";
 export function ReplyRating({
   id,
   access,
@@ -31,9 +32,11 @@ export function ReplyRating({
     >
       {state === "done" ? (
         <>
-          <span>{ar ? "شكرًا لتقييمك" : "Thanks for your feedback"}</span>
+          <span>
+            {dictionaries[ar ? "ar" : "en"].replyRatingThanksForYourFeedback}
+          </span>
           <button onClick={() => setState("idle")}>
-            {ar ? "تعديل" : "Edit"}
+            {dictionaries[ar ? "ar" : "en"].bxEdit}
           </button>
         </>
       ) : state === "saving" ? (
@@ -44,7 +47,7 @@ export function ReplyRating({
         )
       ) : state === "negative" ? (
         <>
-          <span>{ar ? "ما السبب؟" : "What went wrong?"}</span>
+          <span>{dictionaries[ar ? "ar" : "en"].replyRatingWhatWentWrong}</span>
           {(["fit", "incomplete", "other"] as const).map((v, i) => (
             <button key={v} onClick={() => void rate(false, v)}>
               {
@@ -55,22 +58,24 @@ export function ReplyRating({
             </button>
           ))}
           <button onClick={() => void rate(false, null)}>
-            {ar ? "تخطي السبب" : "Skip reason"}
+            {dictionaries[ar ? "ar" : "en"].replyRatingSkipReason}
           </button>
         </>
       ) : (
         <>
           {state === "error" && (
             <span role="alert">
-              {ar ? "تعذّر الحفظ. أعد المحاولة." : "Could not save. Try again."}
+              {dictionaries[ar ? "ar" : "en"].replyRatingCouldNotSaveTry}
             </span>
           )}
-          <span>{ar ? "هل ساعدك الرد؟" : "Was this helpful?"}</span>
+          <span>
+            {dictionaries[ar ? "ar" : "en"].replyRatingWasThisHelpful}
+          </span>
           <button onClick={() => void rate(true, null)}>
-            {ar ? "نعم" : "Yes"}
+            {dictionaries[ar ? "ar" : "en"].replyRatingYes}
           </button>
           <button onClick={() => setState("negative")}>
-            {ar ? "لا" : "No"}
+            {dictionaries[ar ? "ar" : "en"].replyRatingNo}
           </button>
         </>
       )}

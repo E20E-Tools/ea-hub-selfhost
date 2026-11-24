@@ -7,7 +7,11 @@ import { Input } from "@/components/ui/input";
 import { normalizeQuestion } from "@/lib/chat-feedback.shared";
 import { EmptyBlock, ErrorBlock, LoadingBlock, useAdminCopy } from "./ui";
 
-export function FaqReplies({ onChoose }: { onChoose: (answer: string) => void }) {
+export function FaqReplies({
+  onChoose,
+}: {
+  onChoose: (answer: string) => void;
+}) {
   const { t } = useAdminCopy();
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
@@ -27,7 +31,9 @@ export function FaqReplies({ onChoose }: { onChoose: (answer: string) => void })
   const rows = useMemo(
     () =>
       (query.data ?? []).filter((r) =>
-        normalizeQuestion(`${r.question} ${r.answer}`).includes(normalizeQuestion(search)),
+        normalizeQuestion(`${r.question} ${r.answer}`).includes(
+          normalizeQuestion(search),
+        ),
       ),
     [query.data, search],
   );

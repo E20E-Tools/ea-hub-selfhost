@@ -6,7 +6,12 @@ export const IMAGE_TYPES = ["image/jpeg", "image/png", "image/webp"];
 export const suggestionSchema = z.object({
   requestId: z.string().uuid(),
   name: z.string().trim().min(2, "اكتب اسمك الكامل.").max(100),
-  email: z.string().trim().email("اكتب بريدًا إلكترونيًا صحيحًا.").max(255).toLowerCase(),
+  email: z
+    .string()
+    .trim()
+    .email("اكتب بريدًا إلكترونيًا صحيحًا.")
+    .max(255)
+    .toLowerCase(),
   company: z.string().trim().max(150).default(""),
   phone: z
     .string()
@@ -14,12 +19,18 @@ export const suggestionSchema = z.object({
     .min(7, "اكتب رقم هاتف صحيحًا.")
     .max(20)
     .regex(/^[+\d][\d\s()-]*$/, "اكتب رقم هاتف صحيحًا."),
-  need: z.string().trim().min(20, "صف احتياجك بتفصيل أكبر (20 حرفًا على الأقل).").max(2000),
+  need: z
+    .string()
+    .trim()
+    .min(20, "صف احتياجك بتفصيل أكبر (20 حرفًا على الأقل).")
+    .max(2000),
   recommendation: z.unknown().optional(),
   website: z.string().max(200).default(""),
 });
 
-export function validateAttachments(files: { size: number; type: string }[]): string {
+export function validateAttachments(
+  files: { size: number; type: string }[],
+): string {
   if (files.length > MAX_ATTACHMENTS) return "يمكن إرفاق 3 صور كحد أقصى.";
   if (files.some((file) => !IMAGE_TYPES.includes(file.type)))
     return "اختر صور JPG أو PNG أو WebP فقط.";
@@ -28,10 +39,16 @@ export function validateAttachments(files: { size: number; type: string }[]): st
   return "";
 }
 
-export function matchesImageSignature(bytes: Uint8Array, type: string): boolean {
-  if (type === "image/jpeg") return bytes[0] === 255 && bytes[1] === 216 && bytes[2] === 255;
+export function matchesImageSignature(
+  bytes: Uint8Array,
+  type: string,
+): boolean {
+  if (type === "image/jpeg")
+    return bytes[0] === 255 && bytes[1] === 216 && bytes[2] === 255;
   if (type === "image/png")
-    return [137, 80, 78, 71, 13, 10, 26, 10].every((value, i) => bytes[i] === value);
+    return [137, 80, 78, 71, 13, 10, 26, 10].every(
+      (value, i) => bytes[i] === value,
+    );
   if (type === "image/webp")
     return (
       new TextDecoder().decode(bytes.slice(0, 4)) === "RIFF" &&
@@ -50,13 +67,22 @@ export function imageDimensions(
 ): { width: number; height: number } | null {
   const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
   try {
-    if (type === "image/png") return { width: view.getUint32(16), height: view.getUint32(20) };
+    if (type === "image/png")
+      return { width: view.getUint32(16), height: view.getUint32(20) };
     if (type === "image/webp") {
       const chunk = new TextDecoder().decode(bytes.slice(12, 16));
       if (chunk === "VP8X")
         return {
-          width: 1 + ((bytes[24] ?? 0) | ((bytes[25] ?? 0) << 8) | ((bytes[26] ?? 0) << 16)),
-          height: 1 + ((bytes[27] ?? 0) | ((bytes[28] ?? 0) << 8) | ((bytes[29] ?? 0) << 16)),
+          width:
+            1 +
+            ((bytes[24] ?? 0) |
+              ((bytes[25] ?? 0) << 8) |
+              ((bytes[26] ?? 0) << 16)),
+          height:
+            1 +
+            ((bytes[27] ?? 0) |
+              ((bytes[28] ?? 0) << 8) |
+              ((bytes[29] ?? 0) << 16)),
         };
       if (chunk === "VP8 ")
         return {
@@ -75,8 +101,15 @@ export function imageDimensions(
         if (bytes[i] !== 0xff) return null;
         const marker = bytes[i + 1] ?? 0;
         const length = view.getUint16(i + 2);
-        if (marker >= 0xc0 && marker <= 0xcf && ![0xc4, 0xc8, 0xcc].includes(marker)) {
-          return { height: view.getUint16(i + 5), width: view.getUint16(i + 7) };
+        if (
+          marker >= 0xc0 &&
+          marker <= 0xcf &&
+          ![0xc4, 0xc8, 0xcc].includes(marker)
+        ) {
+          return {
+            height: view.getUint16(i + 5),
+            width: view.getUint16(i + 7),
+          };
         }
         i += 2 + length;
       }
@@ -97,7 +130,8 @@ export function stripJpegMetadata(bytes: Uint8Array): Uint8Array {
     if (marker === 0xda) break; // start of image data: keep the rest untouched
     const end = i + 2 + view.getUint16(i + 2);
     if (end > bytes.length) return bytes;
-    if (!((marker >= 0xe1 && marker <= 0xef) || marker === 0xfe)) parts.push(bytes.slice(i, end));
+    if (!((marker >= 0xe1 && marker <= 0xef) || marker === 0xfe))
+      parts.push(bytes.slice(i, end));
     i = end;
   }
   parts.push(bytes.slice(i));
@@ -116,11 +150,13 @@ export function stripJpegMetadata(bytes: Uint8Array): Uint8Array {
  * Malformed chunk lengths are rejected rather than storing unprocessed metadata.
  */
 export function stripWebpMetadata(bytes: Uint8Array): Uint8Array {
-  const ascii = (start: number, end: number) => new TextDecoder().decode(bytes.slice(start, end));
+  const ascii = (start: number, end: number) =>
+    new TextDecoder().decode(bytes.slice(start, end));
   if (bytes.length < 20 || ascii(0, 4) !== "RIFF" || ascii(8, 12) !== "WEBP")
     throw new Error("invalid webp");
   const view = new DataView(bytes.buffer, bytes.byteOffset, bytes.byteLength);
-  if (view.getUint32(4, true) + 8 !== bytes.length) throw new Error("invalid webp");
+  if (view.getUint32(4, true) + 8 !== bytes.length)
+    throw new Error("invalid webp");
 
   const chunks: Uint8Array[] = [];
   let offset = 12;
@@ -140,7 +176,9 @@ export function stripWebpMetadata(bytes: Uint8Array): Uint8Array {
     offset = end;
   }
 
-  const out = new Uint8Array(12 + chunks.reduce((total, chunk) => total + chunk.length, 0));
+  const out = new Uint8Array(
+    12 + chunks.reduce((total, chunk) => total + chunk.length, 0),
+  );
   out.set(bytes.slice(0, 12), 0);
   new DataView(out.buffer).setUint32(4, out.length - 8, true);
   let target = 12;

@@ -23,11 +23,17 @@ export const FEATURE_KEYS = [
 export type FeatureKey = (typeof FEATURE_KEYS)[number];
 
 /** Switches that existed before the 2026-11 additions; settings saved earlier always carry these. */
-export const LEGACY_FEATURE_KEYS: readonly FeatureKey[] = FEATURE_KEYS.slice(0, 11);
+export const LEGACY_FEATURE_KEYS: readonly FeatureKey[] = FEATURE_KEYS.slice(
+  0,
+  11,
+);
 
 export const FEATURE_LABELS: Record<FeatureKey, { ar: string; en: string }> = {
   assistant: { ar: "المساعد الذكي أرشي", en: "Archy smart assistant" },
-  recommendations: { ar: "اقتراحات الأدوات في الطلبات", en: "Tool recommendations" },
+  recommendations: {
+    ar: "اقتراحات الأدوات في الطلبات",
+    en: "Tool recommendations",
+  },
   support: { ar: "صفحة ادعمنا", en: "Support us page" },
   affiliates: { ar: "صفحة التوابع", en: "Affiliates page" },
   roadmap: { ar: "خارطة التقنيات", en: "Technology roadmap" },
@@ -98,12 +104,18 @@ export function normalizeFeatureFlags(value: unknown): FeatureFlags {
   return out;
 }
 
-export function featureEnabled(flags: FeatureFlags | undefined, key: FeatureKey): boolean {
+export function featureEnabled(
+  flags: FeatureFlags | undefined,
+  key: FeatureKey,
+): boolean {
   return flags ? flags[key] !== false : true;
 }
 
 /** A missing/malformed authoritative settings value is unknown, never an enabled fallback. */
-export function authoritativeFeatureState(value: unknown, key: FeatureKey): boolean | null {
+export function authoritativeFeatureState(
+  value: unknown,
+  key: FeatureKey,
+): boolean | null {
   if (!value || typeof value !== "object" || Array.isArray(value)) return null;
   return normalizeFeatureFlags(value)[key];
 }
@@ -111,12 +123,18 @@ export function authoritativeFeatureState(value: unknown, key: FeatureKey): bool
 const LEGACY_ABOUT_PATH = "/blog";
 
 /** True when a menu link points into a feature the admin switched off. */
-export function isDisabledFeaturePath(flags: FeatureFlags | undefined, url: string): boolean {
+export function isDisabledFeaturePath(
+  flags: FeatureFlags | undefined,
+  url: string,
+): boolean {
   if (!url.startsWith("/")) return false;
   const raw = url.split("?")[0] || "/";
   // The former About address still belongs to the About page switch.
   const path = raw === LEGACY_ABOUT_PATH ? "/about" : raw;
-  for (const [key, featurePath] of Object.entries(FEATURE_PATHS) as [FeatureKey, string][]) {
+  for (const [key, featurePath] of Object.entries(FEATURE_PATHS) as [
+    FeatureKey,
+    string,
+  ][]) {
     if (path === featurePath || path.startsWith(`${featurePath}/`))
       return !featureEnabled(flags, key);
   }

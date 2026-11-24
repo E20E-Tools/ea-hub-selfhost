@@ -8,13 +8,25 @@ export function TransformationBoardThumb() {
           <stop offset="0.5" stopColor="#00D4FF" />
           <stop offset="1" stopColor="#8B5CF6" />
         </linearGradient>
-        <pattern id="tb-thumb-dots" width="10" height="10" patternUnits="userSpaceOnUse">
+        <pattern
+          id="tb-thumb-dots"
+          width="10"
+          height="10"
+          patternUnits="userSpaceOnUse"
+        >
           <circle cx="1" cy="1" r="0.9" fill="#9fb0dc" />
         </pattern>
       </defs>
       <rect width="160" height="180" fill="#C9C3B5" />
       {[0, 1, 2, 3, 4, 5, 6, 7, 8].map((k) => (
-        <rect key={k} y={k * 20} width="160" height="1.5" fill="#000" opacity="0.05" />
+        <rect
+          key={k}
+          y={k * 20}
+          width="160"
+          height="1.5"
+          fill="#000"
+          opacity="0.05"
+        />
       ))}
       <rect x="160" width="160" height="180" fill="#F8FAFC" />
       <rect x="160" width="160" height="180" fill="url(#tb-thumb-dots)" />
@@ -33,7 +45,12 @@ export function TransformationBoardThumb() {
       />
       <circle cx="70" cy="80" r="3.5" fill="#241f19" />
       <circle cx="100" cy="150" r="3.5" fill="#241f19" />
-      <path d="M22 24h18l6 6v24H22z" fill="#f2efe6" stroke="#4a4536" strokeWidth="1.5" />
+      <path
+        d="M22 24h18l6 6v24H22z"
+        fill="#f2efe6"
+        stroke="#4a4536"
+        strokeWidth="1.5"
+      />
       <rect x="26" y="38" width="16" height="8" fill="#3c7a3c" />
       <rect
         x="18"
@@ -61,7 +78,14 @@ export function TransformationBoardThumb() {
         stroke="url(#tb-thumb-g)"
         strokeWidth="2"
       />
-      <rect x="216" y="86" width="36" height="7" rx="2" fill="url(#tb-thumb-g)" />
+      <rect
+        x="216"
+        y="86"
+        width="36"
+        height="7"
+        rx="2"
+        fill="url(#tb-thumb-g)"
+      />
       {[
         [256, 22],
         [256, 142],
@@ -81,10 +105,24 @@ export function TransformationBoardThumb() {
           <circle cx={x! + 38} cy={y! + 5} r="2" fill="#10b981" />
         </g>
       ))}
-      <circle cx="236" cy="50" r="2.6" fill="#ffffff" stroke="#2F6BFF" strokeWidth="1.4" />
+      <circle
+        cx="236"
+        cy="50"
+        r="2.6"
+        fill="#ffffff"
+        stroke="#2F6BFF"
+        strokeWidth="1.4"
+      />
       {/* Handle */}
       <rect x="158" width="4" height="180" fill="#141414" />
-      <circle cx="160" cy="150" r="13" fill="#ffffff" stroke="#141414" strokeWidth="3" />
+      <circle
+        cx="160"
+        cy="150"
+        r="13"
+        fill="#ffffff"
+        stroke="#141414"
+        strokeWidth="3"
+      />
       <path
         d="M152 150h16M152 150l4-4M152 150l4 4M168 150l-4-4M168 150l-4 4"
         stroke="#141414"

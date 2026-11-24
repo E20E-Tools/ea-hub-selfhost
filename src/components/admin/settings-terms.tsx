@@ -21,7 +21,10 @@ export function TermsSettings({
   const { t } = useAdminCopy();
   const queryClient = useQueryClient();
   const save = useServerFn(saveTerms);
-  const saved = { ar: catalog.settings.terms.ar, en: catalog.settings.terms.en };
+  const saved = {
+    ar: catalog.settings.terms.ar,
+    en: catalog.settings.terms.en,
+  };
   const form = useDraft(saved);
   const value = form.value ?? saved;
   const [busy, setBusy] = useState(false);
@@ -30,7 +33,8 @@ export function TermsSettings({
     setBusy(true);
     try {
       const result = await save({ data: value });
-      if (!result.ok) return void toast.error(t(result.message as AdminCopyKey));
+      if (!result.ok)
+        return void toast.error(t(result.message as AdminCopyKey));
       form.reset(value);
       toast.success(t("saved"));
       await queryClient.invalidateQueries({ queryKey: ["catalog"] });
@@ -62,7 +66,9 @@ export function TermsSettings({
               type="button"
               variant="outline"
               size="sm"
-              onClick={() => form.setValue({ ar: DEFAULT_TERMS_AR, en: DEFAULT_TERMS_EN })}
+              onClick={() =>
+                form.setValue({ ar: DEFAULT_TERMS_AR, en: DEFAULT_TERMS_EN })
+              }
             >
               <FileText className="size-4" aria-hidden="true" />
               {t("termsUseDraft")}

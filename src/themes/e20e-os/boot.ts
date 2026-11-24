@@ -3,7 +3,10 @@ export const BOOT_STORAGE_KEY = "e20e-os-booted";
 
 export type BootStore = Pick<Storage, "getItem" | "setItem">;
 
-export function shouldBoot(opts: { animate: boolean; store: BootStore | null }): boolean {
+export function shouldBoot(opts: {
+  animate: boolean;
+  store: BootStore | null;
+}): boolean {
   if (!opts.animate) return false;
   try {
     return opts.store?.getItem(BOOT_STORAGE_KEY) !== "1";

@@ -67,8 +67,11 @@ export function SiteSearch({ pages }: { pages: SearchPage[] }) {
   }, []);
 
   const q = query.trim().toLowerCase();
-  const pageLabel = (page: SearchPage) => page.label ?? (page.key ? t(page.key) : "");
-  const pageHits = pages.filter((page) => !q || pageLabel(page).toLowerCase().includes(q));
+  const pageLabel = (page: SearchPage) =>
+    page.label ?? (page.key ? t(page.key) : "");
+  const pageHits = pages.filter(
+    (page) => !q || pageLabel(page).toLowerCase().includes(q),
+  );
   const productHits = useMemo(
     () =>
       filterCatalog(catalog.products, query, ALL_CATEGORIES).map((p) =>
@@ -136,9 +139,13 @@ export function SiteSearch({ pages }: { pages: SearchPage[] }) {
                       value={`page:${page.to}`}
                       onSelect={() =>
                         go(() => {
-                          if (page.label !== undefined) window.location.assign(page.to);
+                          if (page.label !== undefined)
+                            window.location.assign(page.to);
                           else
-                            void navigate({ to: page.to as never, search: page.search as never });
+                            void navigate({
+                              to: page.to as never,
+                              search: page.search as never,
+                            });
                         })
                       }
                     >
@@ -167,7 +174,9 @@ export function SiteSearch({ pages }: { pages: SearchPage[] }) {
                       <Package aria-hidden="true" />
                       <bdi>{product.name}</bdi>
                       <span className="site-search-meta">
-                        {product.comingSoon ? t("comingSoonBadge") : product.label}
+                        {product.comingSoon
+                          ? t("comingSoonBadge")
+                          : product.label}
                       </span>
                     </CommandItem>
                   ))}

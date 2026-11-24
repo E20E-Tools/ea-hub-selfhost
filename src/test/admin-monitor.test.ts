@@ -21,7 +21,9 @@ describe("Admin activity filtering and export", () => {
   it("filters assistant operations without including other operations", () =>
     expect(filterActivity(rows, "ai", "", "", "")).toEqual([rows[0]]));
   it("combines actor search with inclusive UTC date bounds", () =>
-    expect(filterActivity(rows, "all", "OWNER", "2026-10-20", "2026-10-20")).toEqual([rows[0]]));
+    expect(
+      filterActivity(rows, "all", "OWNER", "2026-10-20", "2026-10-20"),
+    ).toEqual([rows[0]]));
   it("excludes dates outside the requested period", () =>
     expect(filterActivity(rows, "all", "", "2026-10-21", "")).toEqual([]));
   it("neutralizes spreadsheet formulas and escapes quoted values", () => {

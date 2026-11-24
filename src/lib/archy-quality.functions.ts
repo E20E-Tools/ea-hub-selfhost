@@ -86,19 +86,24 @@ export const saveArchyCase = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator(
     z.object({
-      expected:z.string().trim().max(800).optional(),
+      expected: z.string().trim().max(800).optional(),
       question: z.string().trim().min(1).max(1200),
       language: z.enum(["ar", "en"]),
     }),
   )
   .handler(async ({ data, context }) => {
     const db = await admin(context);
-    const r = await db
-      .from("archy_cases")
-      .upsert({question:data.question,language:data.language,...(data.expected===undefined?{}:{expected:data.expected})}, {
+    const r = await db.from("archy_cases").upsert(
+      {
+        question: data.question,
+        language: data.language,
+        ...(data.expected === undefined ? {} : { expected: data.expected }),
+      },
+      {
         onConflict: "language,question",
-        defaultToNull:false,
-      });
+        defaultToNull: false,
+      },
+    );
     if (r.error) throw new Error("Save failed");
     return true;
   });
@@ -137,12 +142,32 @@ export const setProductReview = createServerFn({ method: "POST" })
     return true;
   });
 
-export const archyHealth=createServerFn({method:"GET"}).middleware([requireSupabaseAuth]).handler(async({context})=>{
- const db=await admin(context);
- const [visitor,tests,events]=await Promise.all([
- db.from("live_chat_messages").select("reply_source,reply_model,reply_ms,created_at").not("reply_source","is",null).order("created_at",{ascending:false}).limit(1),
- db.from("archy_probe").select("*").order("checked_at",{ascending:false}),
- db.from("archy_setting_events").select("actor,changes,created_at").order("created_at",{ascending:false}).limit(30)]);
- if(visitor.error||tests.error||events.error)throw Error("Health unavailable");
- return {visitor:visitor.data[0]??null,tests:tests.data,events:events.data};
-});
+export const archyHealth = createServerFn({ method: "GET" })
+  .middleware([requireSupabaseAuth])
+  .handler(async ({ context }) => {
+    const db = await admin(context);
+    const [visitor, tests, events] = await Promise.all([
+      db
+        .from("live_chat_messages")
+        .select("reply_source,reply_model,reply_ms,created_at")
+        .not("reply_source", "is", null)
+        .order("created_at", { ascending: false })
+        .limit(1),
+      db
+        .from("archy_probe")
+        .select("*")
+        .order("checked_at", { ascending: false }),
+      db
+        .from("archy_setting_events")
+        .select("actor,changes,created_at")
+        .order("created_at", { ascending: false })
+        .limit(30),
+    ]);
+    if (visitor.error || tests.error || events.error)
+      throw Error("Health unavailable");
+    return {
+      visitor: visitor.data[0] ?? null,
+      tests: tests.data,
+      events: events.data,
+    };
+  });

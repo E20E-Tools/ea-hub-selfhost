@@ -1,5 +1,10 @@
 import { useState } from "react";
-import { ChevronDown, CircleCheck, CircleMinus, ExternalLink } from "lucide-react";
+import {
+  ChevronDown,
+  CircleCheck,
+  CircleMinus,
+  ExternalLink,
+} from "lucide-react";
 import type { FeatureKey } from "@/lib/site-features";
 import type { Catalog } from "@/lib/catalog";
 import { featureStatusRows } from "@/lib/feature-status";
@@ -17,12 +22,23 @@ export function FeatureStatus({
   const rows = featureStatusRows(catalog.settings.featureFlags);
   const enabled = rows.filter((row) => row.enabled).length;
   const counts = { all: rows.length, enabled, disabled: rows.length - enabled };
-  const visible = rows.filter((row) => filter === "all" || row.enabled === (filter === "enabled"));
+  const visible = rows.filter(
+    (row) => filter === "all" || row.enabled === (filter === "enabled"),
+  );
   return (
     <Card description={t("fsSavedNote")}>
-      <div className="settings-state-filters" role="group" aria-label={t("tabFeatureStatus")}>
+      <div
+        className="settings-state-filters"
+        role="group"
+        aria-label={t("tabFeatureStatus")}
+      >
         {(["all", "enabled", "disabled"] as const).map((id) => (
-          <button type="button" key={id} aria-pressed={filter === id} onClick={() => setFilter(id)}>
+          <button
+            type="button"
+            key={id}
+            aria-pressed={filter === id}
+            onClick={() => setFilter(id)}
+          >
             {t(id)} <span>{number(counts[id])}</span>
           </button>
         ))}
@@ -55,7 +71,8 @@ export function FeatureStatus({
                   </summary>
                   <p>{t(`featureAbout_${row.key}`)}</p>
                   <p>
-                    <strong>{t("fsWhenOff")}</strong> {t(`feature_${row.key}Desc`)}
+                    <strong>{t("fsWhenOff")}</strong>{" "}
+                    {t(`feature_${row.key}Desc`)}
                   </p>
                   {row.path && (
                     <a href={row.path} target="_blank" rel="noreferrer">

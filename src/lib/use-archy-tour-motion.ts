@@ -28,7 +28,9 @@ export function useArchyTourMotion(ref: RefObject<HTMLDivElement | null>) {
       dock.style.removeProperty("transform");
       dock.style.removeProperty("transform-origin");
       dock.style.removeProperty("will-change");
-      dock.querySelector<HTMLElement>(".archy-bubble")?.style.removeProperty("translate");
+      dock
+        .querySelector<HTMLElement>(".archy-bubble")
+        ?.style.removeProperty("translate");
       home = null;
       current = { x: 0, y: 0 };
       currentScale = 1;
@@ -56,15 +58,19 @@ export function useArchyTourMotion(ref: RefObject<HTMLDivElement | null>) {
       if (grip && state.phase === "fly") {
         // Direction comes from the real legacy grip position, not language assumptions.
         const board = state.grip?.closest(".tb-board")?.getBoundingClientRect();
-        if (board) direction = grip.left + grip.width / 2 > board.left + board.width / 2 ? -1 : 1;
+        if (board)
+          direction =
+            grip.left + grip.width / 2 > board.left + board.width / 2 ? -1 : 1;
       }
       const tilt = direction * 8;
       const scale = ARCHY_TOUR_SCALE;
       const hand = direction < 0 ? ARCHY_TOUR_HAND.right : ARCHY_TOUR_HAND.left;
       const radians = (tilt * Math.PI) / 180;
       // Top-left transform origin makes the hand equation invariant to toolbar/bubble height.
-      const hx = scale * (hand.x * Math.cos(radians) - hand.y * Math.sin(radians));
-      const hy = scale * (hand.x * Math.sin(radians) + hand.y * Math.cos(radians));
+      const hx =
+        scale * (hand.x * Math.cos(radians) - hand.y * Math.sin(radians));
+      const hy =
+        scale * (hand.x * Math.sin(radians) + hand.y * Math.cos(radians));
       const target = grip
         ? {
             x: grip.left + grip.width / 2 - home.left - hx,
@@ -72,7 +78,9 @@ export function useArchyTourMotion(ref: RefObject<HTMLDivElement | null>) {
           }
         : current;
       if (state.phase === "fly" || state.phase === "return") {
-        const e = tourEase((now - state.phaseStarted) / tourDuration(state.phase, state.scale));
+        const e = tourEase(
+          (now - state.phaseStarted) / tourDuration(state.phase, state.scale),
+        );
         const end = state.phase === "return" ? { x: 0, y: 0 } : target;
         current = quadraticArc(
           start,
@@ -80,8 +88,11 @@ export function useArchyTourMotion(ref: RefObject<HTMLDivElement | null>) {
           end,
           e,
         );
-        currentScale = startScale + ((state.phase === "return" ? 1 : scale) - startScale) * e;
-        currentTilt = startTilt + ((state.phase === "return" ? 0 : tilt) - startTilt) * e;
+        currentScale =
+          startScale +
+          ((state.phase === "return" ? 1 : scale) - startScale) * e;
+        currentTilt =
+          startTilt + ((state.phase === "return" ? 0 : tilt) - startTilt) * e;
       } else {
         current = target;
         currentScale = scale;

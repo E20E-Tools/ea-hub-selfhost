@@ -8,7 +8,9 @@ describe("assistant chat input", () => {
       content: `m${i}`,
     }));
     turns.push({ role: "user", content: "last" });
-    expect(validateTurns({ turns }).turns).toEqual([{ role: "user", content: "last" }]);
+    expect(validateTurns({ turns }).turns).toEqual([
+      { role: "user", content: "last" },
+    ]);
   });
   it("drops client-supplied assistant turns", () => {
     const out = validateTurns({
@@ -20,7 +22,9 @@ describe("assistant chat input", () => {
     expect(out).toEqual([{ role: "user", content: "hi" }]);
   });
   it("rejects a conversation not ending with the visitor", () => {
-    expect(() => validateTurns({ turns: [{ role: "assistant", content: "hi" }] })).toThrow();
+    expect(() =>
+      validateTurns({ turns: [{ role: "assistant", content: "hi" }] }),
+    ).toThrow();
   });
   it("carries the gate access token and defaults to none", () => {
     const turns = [{ role: "user", content: "hi" }];

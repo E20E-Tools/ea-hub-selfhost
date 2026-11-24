@@ -14,27 +14,41 @@ import {
 
 describe("legacy filenames", () => {
   it("uses the owner table", () => {
-    expect(legacyFileName({ id: "archone", name: "ArchONE" })).toBe("EA_diagrams_2017.vsd");
-    expect(legacyFileName({ id: "itfm", name: "ITFM" })).toBe("IT_budget_2019_copy(2).xls");
+    expect(legacyFileName({ id: "archone", name: "ArchONE" })).toBe(
+      "EA_diagrams_2017.vsd",
+    );
+    expect(legacyFileName({ id: "itfm", name: "ITFM" })).toBe(
+      "IT_budget_2019_copy(2).xls",
+    );
     expect(legacyFileName({ id: "platform", name: "EA Tool" })).toBe(
       "\\\\shared-drive\\EA\\misc\\",
     );
   });
   it("falls back to <Name>_FINAL_v2.xlsx", () => {
-    expect(legacyFileName({ id: "new-one", name: "Data Hub" })).toBe("Data_Hub_FINAL_v2.xlsx");
-    expect(legacyFileName({ id: "x", name: "  " })).toBe("Untitled_FINAL_v2.xlsx");
+    expect(legacyFileName({ id: "new-one", name: "Data Hub" })).toBe(
+      "Data_Hub_FINAL_v2.xlsx",
+    );
+    expect(legacyFileName({ id: "x", name: "  " })).toBe(
+      "Untitled_FINAL_v2.xlsx",
+    );
   });
 });
 
 describe("transformation slider keys", () => {
   it("LTR: left reveals more digital, right less; Home/End bounds", () => {
-    expect(sliderKey(60, "ArrowLeft", { rtl: false, vertical: false })).toBe(65);
-    expect(sliderKey(60, "ArrowRight", { rtl: false, vertical: false })).toBe(55);
+    expect(sliderKey(60, "ArrowLeft", { rtl: false, vertical: false })).toBe(
+      65,
+    );
+    expect(sliderKey(60, "ArrowRight", { rtl: false, vertical: false })).toBe(
+      55,
+    );
     expect(sliderKey(60, "Home", { rtl: false, vertical: false })).toBe(0);
     expect(sliderKey(60, "End", { rtl: false, vertical: false })).toBe(100);
   });
   it("RTL mirrors the arrows", () => {
-    expect(sliderKey(60, "ArrowRight", { rtl: true, vertical: false })).toBe(65);
+    expect(sliderKey(60, "ArrowRight", { rtl: true, vertical: false })).toBe(
+      65,
+    );
     expect(sliderKey(60, "ArrowLeft", { rtl: true, vertical: false })).toBe(55);
   });
   it("vertical: up reveals more digital; clamps; ignores other keys", () => {
@@ -95,7 +109,8 @@ describe("legacy desktop icons", () => {
   it("lists five unique joke filenames, each with a file extension", () => {
     expect(LEGACY_DESKTOP_FILES).toHaveLength(5);
     expect(new Set(LEGACY_DESKTOP_FILES).size).toBe(5);
-    for (const name of LEGACY_DESKTOP_FILES) expect(name).toMatch(/\.[a-z]{3,4}$/);
+    for (const name of LEGACY_DESKTOP_FILES)
+      expect(name).toMatch(/\.[a-z]{3,4}$/);
   });
   it("gives presentation and image files a diagram icon", () => {
     expect(legacyKind("Copy of Strategy (3).ppt")).toBe("diagram");

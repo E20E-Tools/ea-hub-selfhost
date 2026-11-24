@@ -23,13 +23,17 @@ vi.mock("@tanstack/react-start", () => ({
         validate = validator;
         return builder;
       },
-      handler: (handler: (args: unknown) => unknown) => async (args?: { data?: unknown }) =>
-        handler({ data: validate(args?.data) }),
+      handler:
+        (handler: (args: unknown) => unknown) =>
+        async (args?: { data?: unknown }) =>
+          handler({ data: validate(args?.data) }),
     };
     return builder;
   },
 }));
-vi.mock("@tanstack/react-start/server", () => ({ getRequest: () => ({ headers: mocks.headers }) }));
+vi.mock("@tanstack/react-start/server", () => ({
+  getRequest: () => ({ headers: mocks.headers }),
+}));
 vi.mock("@/lib/rate-limit.server", () => ({
   clientIp: () => "203.0.113.1",
   consumeLimits: (rules: unknown) => {
@@ -38,14 +42,20 @@ vi.mock("@/lib/rate-limit.server", () => ({
   },
   noteBudgetUsage: async () => undefined,
 }));
-vi.mock("@/lib/recommend.server", () => ({ liveCatalog: async () => [{ id: "itfm" }] }));
-vi.mock("@/lib/contact-notify.server", () => ({ notifyContactSubmission: mocks.notify }));
+vi.mock("@/lib/recommend.server", () => ({
+  liveCatalog: async () => [{ id: "itfm" }],
+}));
+vi.mock("@/lib/contact-notify.server", () => ({
+  notifyContactSubmission: mocks.notify,
+}));
 vi.mock("@/lib/live-chat.server", () => ({
   verifyVisitor: mocks.verifyVisitor,
   openChatFor: mocks.openChatFor,
 }));
 vi.mock("@/lib/journey.server", () => ({ recordJourney: mocks.journey }));
-vi.mock("@/lib/archy-tour-visits.server", () => ({ recordTourSupport: mocks.tourSupport }));
+vi.mock("@/lib/archy-tour-visits.server", () => ({
+  recordTourSupport: mocks.tourSupport,
+}));
 vi.mock("@/integrations/supabase/client.server", () => {
   const table = (name: string) => {
     const chain = {
@@ -55,7 +65,10 @@ vi.mock("@/integrations/supabase/client.server", () => {
       maybeSingle: () => Promise.resolve({ data: null, error: null }),
       single: () =>
         Promise.resolve({
-          data: { id: "725e1a8f-01cb-4cdd-a274-72a373480b31", created_at: "2026-11-03T00:00:00Z" },
+          data: {
+            id: "725e1a8f-01cb-4cdd-a274-72a373480b31",
+            created_at: "2026-11-03T00:00:00Z",
+          },
           error: null,
         }),
       insert: (row: Record<string, unknown>) => {
@@ -70,8 +83,16 @@ vi.mock("@/integrations/supabase/client.server", () => {
       from: table,
       storage: {
         from: () => ({
-          upload: async (path: string, bytes: Uint8Array, options: { contentType: string }) => {
-            mocks.uploads.push({ path, bytes, contentType: options.contentType });
+          upload: async (
+            path: string,
+            bytes: Uint8Array,
+            options: { contentType: string },
+          ) => {
+            mocks.uploads.push({
+              path,
+              bytes,
+              contentType: options.contentType,
+            });
             return { error: null };
           },
           remove: async () => ({}),
@@ -86,7 +107,8 @@ import { submitSupportOffer } from "@/lib/support.functions";
 import { requestSchema, supportSchema } from "@/lib/requests.shared";
 
 const id = "725e1a8f-01cb-4cdd-a274-72a373480b31";
-const longText = "We need a way to map current technologies across the organisation.";
+const longText =
+  "We need a way to map current technologies across the organisation.";
 function form(values: Record<string, string>) {
   const data = new FormData();
   Object.entries({
@@ -110,51 +132,86 @@ beforeEach(() => {
   mocks.tourSupport.mockReset();
   mocks.journey.mockReset().mockResolvedValue(true);
   mocks.uploads = [];
-  mocks.verifyVisitor
-    .mockReset()
-    .mockResolvedValue({ id: "guest-current", name: "Khaled", email: "ea@example.com" });
-  mocks.openChatFor
-    .mockReset()
-    .mockResolvedValue({ id: "f8bcd11c-a841-40d4-a501-13b8f28d74ca", status: "ai" });
+  mocks.verifyVisitor.mockReset().mockResolvedValue({
+    id: "guest-current",
+    name: "Khaled",
+    email: "ea@example.com",
+  });
+  mocks.openChatFor.mockReset().mockResolvedValue({
+    id: "f8bcd11c-a841-40d4-a501-13b8f28d74ca",
+    status: "ai",
+  });
 });
 
 describe("unified request validation", () => {
-  const noPhone = { requestId: id, name: "Khaled", email: "ea@example.com", need: longText };
+  const noPhone = {
+    requestId: id,
+    name: "Khaled",
+    email: "ea@example.com",
+    need: longText,
+  };
   const base = { ...noPhone, phone: "+966500000000" };
   it("requires phone for support but keeps it optional for shorter new, feature and general forms", () => {
     for (const type of ["new", "feature", "general"]) {
-      expect(requestSchema.safeParse({ ...noPhone, type, productId: "itfm" }).success).toBe(true);
+      expect(
+        requestSchema.safeParse({ ...noPhone, type, productId: "itfm" })
+          .success,
+      ).toBe(true);
     }
     expect(
-      requestSchema.safeParse({ ...noPhone, type: "support", productId: "itfm", urgency: "urgent" })
-        .success,
+      requestSchema.safeParse({
+        ...noPhone,
+        type: "support",
+        productId: "itfm",
+        urgency: "urgent",
+      }).success,
     ).toBe(false);
   });
   it("accepts a general inquiry without product", () => {
-    expect(requestSchema.safeParse({ ...base, type: "general" }).success).toBe(true);
-  });
-  it("requires a product for feature and support requests", () => {
-    expect(requestSchema.safeParse({ ...base, type: "feature" }).success).toBe(false);
-    expect(requestSchema.safeParse({ ...base, type: "feature", productId: "itfm" }).success).toBe(
+    expect(requestSchema.safeParse({ ...base, type: "general" }).success).toBe(
       true,
     );
   });
+  it("requires a product for feature and support requests", () => {
+    expect(requestSchema.safeParse({ ...base, type: "feature" }).success).toBe(
+      false,
+    );
+    expect(
+      requestSchema.safeParse({ ...base, type: "feature", productId: "itfm" })
+        .success,
+    ).toBe(true);
+  });
   it("requires phone and urgency only for support", () => {
     const support = { ...noPhone, type: "support", productId: "itfm" };
-    expect(requestSchema.safeParse({ ...support, urgency: "urgent" }).success).toBe(false);
-    expect(requestSchema.safeParse({ ...support, phone: "+966500000000" }).success).toBe(false);
     expect(
-      requestSchema.safeParse({ ...support, phone: "+966500000000", urgency: "urgent" }).success,
+      requestSchema.safeParse({ ...support, urgency: "urgent" }).success,
+    ).toBe(false);
+    expect(
+      requestSchema.safeParse({ ...support, phone: "+966500000000" }).success,
+    ).toBe(false);
+    expect(
+      requestSchema.safeParse({
+        ...support,
+        phone: "+966500000000",
+        urgency: "urgent",
+      }).success,
     ).toBe(true);
     expect(
-      requestSchema.safeParse({ ...support, phone: "+966500000000", urgency: "asap" }).success,
+      requestSchema.safeParse({
+        ...support,
+        phone: "+966500000000",
+        urgency: "asap",
+      }).success,
     ).toBe(false);
   });
   it("rejects short messages and unknown types", () => {
-    expect(requestSchema.safeParse({ ...base, type: "general", need: "short" }).success).toBe(
+    expect(
+      requestSchema.safeParse({ ...base, type: "general", need: "short" })
+        .success,
+    ).toBe(false);
+    expect(requestSchema.safeParse({ ...base, type: "other" }).success).toBe(
       false,
     );
-    expect(requestSchema.safeParse({ ...base, type: "other" }).success).toBe(false);
   });
 });
 
@@ -169,7 +226,11 @@ describe("submitRequest", () => {
       }),
     });
     expect(result.ok).toBe(true);
-    expect(mocks.tourSupport).toHaveBeenCalledWith(expect.anything(), "signed-tour", id);
+    expect(mocks.tourSupport).toHaveBeenCalledWith(
+      expect.anything(),
+      "signed-tour",
+      id,
+    );
     expect(mocks.inserts[0]?.table).toBe("suggestion_requests");
   });
   it("does not record a rejected support request as a post-tour conversion", async () => {
@@ -217,7 +278,12 @@ describe("submitRequest", () => {
     mocks.verifyVisitor.mockResolvedValue(null);
     expect(
       await submitRequest({
-        data: form({ type: "support", productId: "itfm", urgency: "urgent", fromChat: "1" }),
+        data: form({
+          type: "support",
+          productId: "itfm",
+          urgency: "urgent",
+          fromChat: "1",
+        }),
       }),
     ).toEqual({ ok: false, message: "rqErrRejected" });
     expect(mocks.inserts).toHaveLength(0);
@@ -253,10 +319,14 @@ describe("submitRequest", () => {
       }),
     });
     expect(result).toMatchObject({ ok: true, tracking: "none" });
-    expect(mocks.inserts.find((i) => i.table === "suggestion_requests")?.row["email"]).toBe(
-      "work@company.example",
+    expect(
+      mocks.inserts.find((i) => i.table === "suggestion_requests")?.row[
+        "email"
+      ],
+    ).toBe("work@company.example");
+    expect(mocks.inserts.some((i) => i.table === "request_identities")).toBe(
+      false,
     );
-    expect(mocks.inserts.some((i) => i.table === "request_identities")).toBe(false);
   });
   it("tells chat-opened requests to use the chat email instead of a generic rejection", async () => {
     const result = await submitRequest({
@@ -282,7 +352,12 @@ describe("submitRequest", () => {
         impact: "dropped",
       }),
     });
-    expect(result).toEqual({ ok: true, id, createdAt: "2026-11-03T00:00:00Z", tracking: "none" });
+    expect(result).toEqual({
+      ok: true,
+      id,
+      createdAt: "2026-11-03T00:00:00Z",
+      tracking: "none",
+    });
     const row = mocks.inserts[0]?.row;
     expect(mocks.inserts[0]?.table).toBe("suggestion_requests");
     expect(row).toMatchObject({
@@ -326,7 +401,9 @@ describe("submitRequest", () => {
       chunk("XMP ", new TextEncoder().encode("<xmp>Riyadh</xmp>")),
       chunk("VP8 ", new Uint8Array([1, 2, 3, 4])),
     ];
-    const bytes = new Uint8Array(12 + chunks.reduce((sum, item) => sum + item.length, 0));
+    const bytes = new Uint8Array(
+      12 + chunks.reduce((sum, item) => sum + item.length, 0),
+    );
     bytes.set(new TextEncoder().encode("RIFF"), 0);
     bytes.set(new TextEncoder().encode("WEBP"), 8);
     new DataView(bytes.buffer).setUint32(4, bytes.length - 8, true);
@@ -336,7 +413,10 @@ describe("submitRequest", () => {
       offset += item.length;
     }
     const data = form({ type: "new" });
-    data.set("images", new File([bytes], "location.webp", { type: "image/webp" }));
+    data.set(
+      "images",
+      new File([bytes], "location.webp", { type: "image/webp" }),
+    );
 
     const result = await submitRequest({ data });
     expect(result.ok).toBe(true);
@@ -352,16 +432,22 @@ describe("submitRequest", () => {
     expect(uploaded.bytes[20]).toBe(0);
   });
   it("drops the honeypot submission without storing", async () => {
-    const result = await submitRequest({ data: form({ type: "general", website: "spam" }) });
+    const result = await submitRequest({
+      data: form({ type: "general", website: "spam" }),
+    });
     expect(result.ok).toBe(false);
     expect(mocks.inserts).toHaveLength(0);
     expect(mocks.consume).not.toHaveBeenCalled();
   });
   it("rejects cross-site posts but allows a missing Sec-Fetch-Site header", async () => {
     mocks.headers = new Headers({ "sec-fetch-site": "cross-site" });
-    expect((await submitRequest({ data: form({ type: "general" }) })).ok).toBe(false);
+    expect((await submitRequest({ data: form({ type: "general" }) })).ok).toBe(
+      false,
+    );
     mocks.headers = new Headers();
-    expect((await submitRequest({ data: form({ type: "general" }) })).ok).toBe(true);
+    expect((await submitRequest({ data: form({ type: "general" }) })).ok).toBe(
+      true,
+    );
   });
   it("stops when the durable rate limit is exhausted", async () => {
     mocks.allowed = false;
@@ -372,15 +458,19 @@ describe("submitRequest", () => {
     expect(mocks.inserts).toHaveLength(0);
   });
   it("refuses a product that is not in the live catalog", async () => {
-    expect(await submitRequest({ data: form({ type: "feature", productId: "made-up" }) })).toEqual({
+    expect(
+      await submitRequest({
+        data: form({ type: "feature", productId: "made-up" }),
+      }),
+    ).toEqual({
       ok: false,
       message: "rqErrProduct",
     });
   });
   it("refuses a feature request without a product before any database work", async () => {
-    await expect(submitRequest({ data: form({ type: "feature" }) })).rejects.toThrow(
-      "rqErrProduct",
-    );
+    await expect(
+      submitRequest({ data: form({ type: "feature" }) }),
+    ).rejects.toThrow("rqErrProduct");
     expect(mocks.consume).not.toHaveBeenCalled();
   });
 });
@@ -398,11 +488,17 @@ describe("enterprise service requests", () => {
   };
   it("requires the organisation name", () => {
     expect(requestSchema.safeParse(service).success).toBe(true);
-    expect(requestSchema.safeParse({ ...service, company: "" }).success).toBe(false);
+    expect(requestSchema.safeParse({ ...service, company: "" }).success).toBe(
+      false,
+    );
   });
   it("requires at least one service", () => {
-    expect(requestSchema.safeParse({ ...service, services: [] }).success).toBe(false);
-    expect(requestSchema.safeParse({ ...service, services: ["consulting"] }).success).toBe(false);
+    expect(requestSchema.safeParse({ ...service, services: [] }).success).toBe(
+      false,
+    );
+    expect(
+      requestSchema.safeParse({ ...service, services: ["consulting"] }).success,
+    ).toBe(false);
   });
   it("stores the chosen services, tools, team size and start as a service request", async () => {
     const result = await submitRequest({
@@ -456,8 +552,12 @@ describe("support offers", () => {
   };
   it("requires organisation fields for partnerships", () => {
     expect(supportSchema.safeParse(partnership).success).toBe(true);
-    expect(supportSchema.safeParse({ ...partnership, organization: "" }).success).toBe(false);
-    expect(supportSchema.safeParse({ ...partnership, orgType: "club" }).success).toBe(false);
+    expect(
+      supportSchema.safeParse({ ...partnership, organization: "" }).success,
+    ).toBe(false);
+    expect(
+      supportSchema.safeParse({ ...partnership, orgType: "club" }).success,
+    ).toBe(false);
   });
   it("requires at least one skill and https-only links for contributions", () => {
     const contribution = {
@@ -470,12 +570,20 @@ describe("support offers", () => {
       links: ["https://github.com/ali"],
     };
     expect(supportSchema.safeParse(contribution).success).toBe(true);
-    expect(supportSchema.safeParse({ ...contribution, skills: [] }).success).toBe(false);
     expect(
-      supportSchema.safeParse({ ...contribution, links: ["http://github.com/ali"] }).success,
+      supportSchema.safeParse({ ...contribution, skills: [] }).success,
     ).toBe(false);
     expect(
-      supportSchema.safeParse({ ...contribution, links: ["javascript:alert(1)"] }).success,
+      supportSchema.safeParse({
+        ...contribution,
+        links: ["http://github.com/ali"],
+      }).success,
+    ).toBe(false);
+    expect(
+      supportSchema.safeParse({
+        ...contribution,
+        links: ["javascript:alert(1)"],
+      }).success,
     ).toBe(false);
   });
   it("financial offers carry no payment fields and need a support type", () => {
@@ -487,10 +595,14 @@ describe("support offers", () => {
       kind: "once",
     };
     expect(supportSchema.safeParse(financial).success).toBe(true);
-    expect(supportSchema.safeParse({ ...financial, kind: "" }).success).toBe(false);
+    expect(supportSchema.safeParse({ ...financial, kind: "" }).success).toBe(
+      false,
+    );
   });
   it("stores an offer in support_offers with typed details and returns the receipt", async () => {
-    const result = await submitSupportOffer({ data: { ...partnership, website: "" } });
+    const result = await submitSupportOffer({
+      data: { ...partnership, website: "" },
+    });
     expect(result.ok).toBe(true);
     expect(mocks.inserts[0]?.table).toBe("support_offers");
     expect(mocks.inserts[0]?.row).toMatchObject({
@@ -500,7 +612,10 @@ describe("support offers", () => {
     });
   });
   it("drops honeypot and rate-limited offers without storing", async () => {
-    expect((await submitSupportOffer({ data: { ...partnership, website: "bot" } })).ok).toBe(false);
+    expect(
+      (await submitSupportOffer({ data: { ...partnership, website: "bot" } }))
+        .ok,
+    ).toBe(false);
     mocks.allowed = false;
     expect(await submitSupportOffer({ data: partnership })).toEqual({
       ok: false,
@@ -515,7 +630,8 @@ describe("request limits tied to an unverified email", () => {
     const result = await submitRequest({ data: form({ type: "general" }) });
     expect(result.ok).toBe(true);
     const rules = mocks.consume.mock.calls.flatMap(
-      ([batch]) => batch as { bucket: string; subject: string; limit: number }[],
+      ([batch]) =>
+        batch as { bucket: string; subject: string; limit: number }[],
     );
     expect(rules.find((r) => r.bucket === "request:email-day")?.subject).toBe(
       "203.0.113.1|ea@example.com",

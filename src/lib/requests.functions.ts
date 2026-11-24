@@ -13,7 +13,12 @@ import { normaliseRequest, requestSchema } from "./requests.shared";
 
 /** `message` is a copy key the page translates. */
 export type RequestResult =
-  | { ok: true; id: string; createdAt: string; tracking: "account" | "guest" | "none" }
+  | {
+      ok: true;
+      id: string;
+      createdAt: string;
+      tracking: "account" | "guest" | "none";
+    }
   | { ok: false; message: string };
 
 export const submitRequest = createServerFn({ method: "POST" })
@@ -43,10 +48,13 @@ export const submitRequest = createServerFn({ method: "POST" })
       services: list("services"),
       tools: list("tools"),
     });
-    if (!parsed.success) throw new Error(parsed.error.issues[0]?.message ?? "rqErrInvalid");
+    if (!parsed.success)
+      throw new Error(parsed.error.issues[0]?.message ?? "rqErrInvalid");
     const entry = normaliseRequest(parsed.data);
     const files = entry.allowImages
-      ? value.getAll("images").filter((item): item is File => item instanceof File)
+      ? value
+          .getAll("images")
+          .filter((item): item is File => item instanceof File)
       : [];
     if (validateAttachments(files)) throw new Error("rqErrImages");
     const chatAccess = value.get("chatAccess");
@@ -54,11 +62,14 @@ export const submitRequest = createServerFn({ method: "POST" })
     const tourToken = value.get("tourToken");
     return {
       ...entry,
-      contactForm: value.get("source")==="contact" && entry.type==="general",
+      contactForm:
+        value.get("source") === "contact" && entry.type === "general",
       files,
       fromChat: value.get("fromChat") === "1",
-      chatAccess: typeof chatAccess === "string" ? chatAccess.slice(0, 4096) : "",
-      visitorAccess: typeof visitorAccess === "string" ? visitorAccess.slice(0, 4096) : "",
+      chatAccess:
+        typeof chatAccess === "string" ? chatAccess.slice(0, 4096) : "",
+      visitorAccess:
+        typeof visitorAccess === "string" ? visitorAccess.slice(0, 4096) : "",
       language: raw["language"] === "ar" ? ("ar" as const) : ("en" as const),
       metricsOptOut: value.get("metrics") === "off",
       tourToken: typeof tourToken === "string" ? tourToken.slice(0, 4096) : "",
@@ -75,7 +86,8 @@ export const submitRequest = createServerFn({ method: "POST" })
     const site = request.headers.get("sec-fetch-site");
     if (site && site !== "same-origin" && site !== "none")
       return { ok: false, message: "rqErrCrossSite" };
-    const { consumeLimits, clientIp, noteBudgetUsage } = await import("./rate-limit.server");
+    const { consumeLimits, clientIp, noteBudgetUsage } =
+      await import("./rate-limit.server");
     const { REQUEST_GLOBAL_BUCKET, REQUEST_GLOBAL_DAY_LIMIT, ipEmailSubject } =
       await import("./ai-budget.shared");
     const ip = clientIp(request);
@@ -110,9 +122,12 @@ export const submitRequest = createServerFn({ method: "POST" })
       // An expired or unverifiable guest pass (e.g. after a signing-secret change) must not
       // block an ordinary request: retry without it so it is saved untracked. Chat-linked
       // requests still require a valid pass, and an invalid account session still rejects.
-      if (data.fromChat || !data.visitorAccess) return { ok: false, message: "rqErrRejected" };
+      if (data.fromChat || !data.visitorAccess)
+        return { ok: false, message: "rqErrRejected" };
       try {
-        identity = await (await import("./request-identity.server")).resolveRequestIdentity("");
+        identity = await (
+          await import("./request-identity.server")
+        ).resolveRequestIdentity("");
       } catch {
         return { ok: false, message: "rqErrRejected" };
       }
@@ -123,8 +138,10 @@ export const submitRequest = createServerFn({ method: "POST" })
       if (data.fromChat) return { ok: false, message: "rqErrChatEmail" };
       identity = null;
     }
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
-    if (!identity && data.contactForm && !data.visitorAccess) identity=(await import("./contact-owner.server")).contactOwner(true);
+    const { supabaseAdmin } =
+      await import("@/integrations/supabase/client.server");
+    if (!identity && data.contactForm && !data.visitorAccess)
+      identity = (await import("./contact-owner.server")).contactOwner(true);
     // Idempotent retry: a resend with the same request UUID returns the stored receipt only
     // to its proven owner (verified account or signed guest linked to that request). The
     // UUID and typed email are never authority, and every refusal looks the same.
@@ -144,12 +161,18 @@ export const submitRequest = createServerFn({ method: "POST" })
     let linkedChatId: string | undefined;
     if (data.fromChat) {
       const { verifyVisitor, openChatFor } = await import("./live-chat.server");
-      const visitor = await verifyVisitor({ supabase: null, userId: "" }, data.chatAccess);
+      const visitor = await verifyVisitor(
+        { supabase: null, userId: "" },
+        data.chatAccess,
+      );
       if (!visitor) return { ok: false, message: "rqErrRejected" };
       if (visitor.email.trim().toLowerCase() !== data.email)
         return { ok: false, message: "rqErrChatEmail" };
       try {
-        const chat = await openChatFor(supabaseAdmin, { ...visitor, language: "en" });
+        const chat = await openChatFor(supabaseAdmin, {
+          ...visitor,
+          language: "en",
+        });
         linkedChatId = chat.id;
       } catch {
         return { ok: false, message: "rqErrSave" };
@@ -168,18 +191,37 @@ export const submitRequest = createServerFn({ method: "POST" })
       if (countError) throw countError;
       if ((count ?? 0) > 0) return { ok: false, message: "rqErrRecent" };
       // Lookup failure throws into the catch below, so unknown ids are never accepted.
-      const tools: string[] = "tools" in data.details && Array.isArray(data.details.tools) ? data.details.tools : [];
+      const tools: string[] =
+        "tools" in data.details && Array.isArray(data.details.tools)
+          ? data.details.tools
+          : [];
       const needsCatalog = Boolean(
-        data.productId || tools.length || (data.allowAnalysis && data.recommendation),
+        data.productId ||
+        tools.length ||
+        (data.allowAnalysis && data.recommendation),
       );
       const catalog = needsCatalog ? await liveCatalog() : [];
-      if (data.productId && !catalog.some((product) => product.id === data.productId))
+      if (
+        data.productId &&
+        !catalog.some((product) => product.id === data.productId)
+      )
         return { ok: false, message: "rqErrProduct" };
-      if (tools.some((tool) => !catalog.some((product) => product.id === tool && !product.comingSoon && product.servicesEnabled !== false)))
+      if (
+        tools.some(
+          (tool) =>
+            !catalog.some(
+              (product) =>
+                product.id === tool &&
+                !product.comingSoon &&
+                product.servicesEnabled !== false,
+            ),
+        )
+      )
         return { ok: false, message: "rqErrProduct" };
       for (const file of data.files) {
         const original = new Uint8Array(await file.arrayBuffer());
-        if (!matchesImageSignature(original, file.type)) throw new Error("invalid image");
+        if (!matchesImageSignature(original, file.type))
+          throw new Error("invalid image");
         const size = imageDimensions(original, file.type);
         if (
           !size ||
@@ -196,7 +238,11 @@ export const submitRequest = createServerFn({ method: "POST" })
               ? stripWebpMetadata(original)
               : original;
         const extension =
-          file.type === "image/jpeg" ? "jpg" : file.type === "image/png" ? "png" : "webp";
+          file.type === "image/jpeg"
+            ? "jpg"
+            : file.type === "image/png"
+              ? "png"
+              : "webp";
         const path = `${data.requestId}/${crypto.randomUUID()}.${extension}`;
         const { error } = await supabaseAdmin.storage
           .from("request-attachments")
@@ -238,17 +284,21 @@ export const submitRequest = createServerFn({ method: "POST" })
           .select("id, created_at")
           .eq("id", data.requestId)
           .maybeSingle();
-        const replay = winner ? await ownedReplay(supabaseAdmin, winner, identity) : null;
+        const replay = winner
+          ? await ownedReplay(supabaseAdmin, winner, identity)
+          : null;
         return replay ?? { ok: false, message: "rqErrReceipt" };
       }
       if (error) throw error;
       saved = true;
       if (identity) {
-        const ownership = await supabaseAdmin.from("request_identities").insert({
-          request_id: data.requestId,
-          visitor_id: identity.kind === "guest" ? identity.id : null,
-          account_id: identity.kind === "account" ? identity.id : null,
-        });
+        const ownership = await supabaseAdmin
+          .from("request_identities")
+          .insert({
+            request_id: data.requestId,
+            visitor_id: identity.kind === "guest" ? identity.id : null,
+            account_id: identity.kind === "account" ? identity.id : null,
+          });
         // A receipt remains truthful even if the optional tracking link cannot be stored.
         if (!ownership.error) tracking = identity.kind;
       }
@@ -273,12 +323,14 @@ export const submitRequest = createServerFn({ method: "POST" })
       };
       if (data.type === "support" && data.tourToken) {
         await optional(async () => {
-          const { recordTourSupport } = await import("./archy-tour-visits.server");
+          const { recordTourSupport } =
+            await import("./archy-tour-visits.server");
           await recordTourSupport(supabaseAdmin, data.tourToken, receipt.id);
         });
       }
       await optional(async () => {
-        const { notifyContactSubmission } = await import("./contact-notify.server");
+        const { notifyContactSubmission } =
+          await import("./contact-notify.server");
         await notifyContactSubmission(receipt.id, `request.${data.type}`);
       });
       // Count only a real database-read receipt; the request UUID makes retries idempotent.
@@ -290,8 +342,15 @@ export const submitRequest = createServerFn({ method: "POST" })
           await recordJourney("request_completed", data.language, receipt.id);
         }
       });
-      await optional(() => recordTelemetry("request", "success", telemetryStart));
-      return { ok: true, id: receipt.id, createdAt: receipt.created_at, tracking };
+      await optional(() =>
+        recordTelemetry("request", "success", telemetryStart),
+      );
+      return {
+        ok: true,
+        id: receipt.id,
+        createdAt: receipt.created_at,
+        tracking,
+      };
     } catch {
       await recordTelemetry("request", "failure", telemetryStart, "storage");
       return { ok: false, message: "rqErrSave" };
@@ -317,5 +376,10 @@ async function ownedReplay(
   if (error || !link) return null;
   const owner = identity.kind === "account" ? link.account_id : link.visitor_id;
   if (owner !== identity.id) return null;
-  return { ok: true, id: existing.id, createdAt: existing.created_at, tracking: identity.kind };
+  return {
+    ok: true,
+    id: existing.id,
+    createdAt: existing.created_at,
+    tracking: identity.kind,
+  };
 }

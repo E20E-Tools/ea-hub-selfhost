@@ -10,12 +10,20 @@ export const METRO_PALETTE = [
   "oklch(0.6 0.25 355)", // pink #E5007D
 ] as const;
 
-export type MetroLineInfo = { category: string; color: string; badge: string; index: number };
+export type MetroLineInfo = {
+  category: string;
+  color: string;
+  badge: string;
+  index: number;
+};
 
 /** Lines in order of first appearance; badge = first letter of the category id, or the line number on clashes. */
-export function metroLines(products: Array<{ category: string }>): MetroLineInfo[] {
+export function metroLines(
+  products: Array<{ category: string }>,
+): MetroLineInfo[] {
   const seen: string[] = [];
-  for (const p of products) if (!seen.includes(p.category)) seen.push(p.category);
+  for (const p of products)
+    if (!seen.includes(p.category)) seen.push(p.category);
   const used = new Set<string>();
   return seen.slice(0, 8).map((category, index) => {
     const letter = (category.match(/[a-z]/i)?.[0] ?? "").toUpperCase();

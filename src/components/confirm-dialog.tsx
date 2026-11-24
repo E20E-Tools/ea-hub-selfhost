@@ -20,7 +20,10 @@ type Request = {
 };
 
 /** Promise-based replacement for window.confirm, rendered as an accessible dialog. */
-export function useConfirm(): [(request: Request) => Promise<boolean>, ReactNode] {
+export function useConfirm(): [
+  (request: Request) => Promise<boolean>,
+  ReactNode,
+] {
   const [request, setRequest] = useState<Request | null>(null);
   const resolver = useRef<((ok: boolean) => void) | null>(null);
 
@@ -52,7 +55,9 @@ export function useConfirm(): [(request: Request) => Promise<boolean>, ReactNode
           {request?.body ? (
             <AlertDialogDescription>{request.body}</AlertDialogDescription>
           ) : (
-            <AlertDialogDescription className="sr-only">{request?.title}</AlertDialogDescription>
+            <AlertDialogDescription className="sr-only">
+              {request?.title}
+            </AlertDialogDescription>
           )}
         </AlertDialogHeader>
         <AlertDialogFooter>

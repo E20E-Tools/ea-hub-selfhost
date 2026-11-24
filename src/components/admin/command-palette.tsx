@@ -7,7 +7,11 @@ import {
   CommandList,
 } from "@/components/ui/command";
 import { adminDictionaries } from "@/lib/admin-copy";
-import { ADMIN_NAV, ADMIN_SECTION_TABS, TAB_LABELS } from "@/lib/admin-sections";
+import {
+  ADMIN_NAV,
+  ADMIN_SECTION_TABS,
+  TAB_LABELS,
+} from "@/lib/admin-sections";
 import type { Go } from "./shell";
 import { useAdminCopy } from "./ui";
 
@@ -25,7 +29,12 @@ export function CommandPalette({
   const both = (key: keyof (typeof adminDictionaries)["en"]) =>
     `${adminDictionaries.ar[key]} ${adminDictionaries.en[key]}`;
   return (
-    <CommandDialog open={open} onOpenChange={onOpenChange} title={t("commandOpen")} dir={dir}>
+    <CommandDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      title={t("commandOpen")}
+      dir={dir}
+    >
       <CommandInput placeholder={t("commandPlaceholder")} />
       <CommandList>
         <CommandEmpty>{t("commandEmpty")}</CommandEmpty>

@@ -1,12 +1,28 @@
-import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { Canvas, useThree } from "@react-three/fiber";
-import { Environment, Lightformer, useAnimations, useGLTF } from "@react-three/drei";
+import {
+  Environment,
+  Lightformer,
+  useAnimations,
+  useGLTF,
+} from "@react-three/drei";
 import type { AnimationAction, Group } from "three";
 import { archyGestureClips } from "./archy-gestures";
 import { useDirection } from "@/studio/directions";
 import { createArchyRig } from "./archy-rig";
 import archyModel from "@/assets/models/archy-rigged.glb.asset.json";
-import { playArchyClip, finishArchyClip, type ArchyActions } from "./archy-animation";
+import {
+  playArchyClip,
+  finishArchyClip,
+  type ArchyActions,
+} from "./archy-animation";
 import type { ArchyAnimation } from "@/lib/archy-mascot";
 
 type SceneProps = {
@@ -47,11 +63,16 @@ function ArchyRig({
   const invalidate = useThree((state) => state.invalidate);
   const direction = useDirection();
   const rig = useMemo(() => createArchyRig(scene), [scene]);
-  const clips = useMemo(() => [...animations, ...archyGestureClips(scene)], [scene, animations]);
-  useEffect(() => { rig.recolor(direction); invalidate(); }, [rig, direction, invalidate]);
+  const clips = useMemo(
+    () => [...animations, ...archyGestureClips(scene)],
+    [scene, animations],
+  );
+  useEffect(() => {
+    rig.recolor(direction);
+    invalidate();
+  }, [rig, direction, invalidate]);
   useEffect(() => () => rig.dispose(), [rig]);
   const { actions, mixer } = useAnimations(clips, group);
-
 
   // Keep the supplied poster visible until the real rig has loaded, not merely the canvas.
   useEffect(() => onReady(), [onReady]);
@@ -109,7 +130,11 @@ export default function ArchyScene({
     onReady();
   }, [onReady]);
   // No continuous loop while only the poster is visible (loading) or when paused.
-  const frameloop = hidden ? "never" : reducedMotion || !loaded ? "demand" : "always";
+  const frameloop = hidden
+    ? "never"
+    : reducedMotion || !loaded
+      ? "demand"
+      : "always";
   return (
     <Canvas
       aria-hidden="true"
@@ -122,7 +147,11 @@ export default function ArchyScene({
       <ContextLossListener onFailure={onFailure} />
       <hemisphereLight args={["#edf8ff", "#8096af", 1.65]} />
       <directionalLight position={[3, 5, 5]} intensity={2.35} color="#fff7e9" />
-      <directionalLight position={[-4, 2, 3]} intensity={1.22} color="#bdeaff" />
+      <directionalLight
+        position={[-4, 2, 3]}
+        intensity={1.22}
+        color="#bdeaff"
+      />
       <directionalLight position={[2, 3, -3]} intensity={1.1} color="#b4ebff" />
       <Environment>
         <Lightformer intensity={1.5} position={[0, 4, 3]} scale={[5, 5, 1]} />

@@ -15,7 +15,11 @@ describe("Assistant recommendations", () => {
       ],
     });
     expect(result.summary).toBe("ابدأ بخريطة التقنيات.");
-    expect(result.picks.map((pick) => pick.id)).toEqual(["radar", "landscape", "archone"]);
+    expect(result.picks.map((pick) => pick.id)).toEqual([
+      "radar",
+      "landscape",
+      "archone",
+    ]);
   });
 
   it("gives the chat guide each tool's direct page instead of a general site address", () => {
@@ -38,7 +42,10 @@ describe("Assistant recommendations", () => {
     expect(catalogLines()).not.toContain("id=platform");
     expect(catalogLines()).toContain("id=archone");
     expect(
-      sanitizeRecommendation({ summary: "", picks: [{ id: "platform", reason: "منصة" }] }).picks,
+      sanitizeRecommendation({
+        summary: "",
+        picks: [{ id: "platform", reason: "منصة" }],
+      }).picks,
     ).toEqual([]);
   });
 

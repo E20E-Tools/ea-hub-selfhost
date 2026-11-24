@@ -32,7 +32,9 @@ export function filterActivity(
       (!from || day >= from) &&
       (!to || day <= to) &&
       (!needle ||
-        `${row.actor_email} ${row.action} ${row.target}`.toLocaleLowerCase().includes(needle))
+        `${row.actor_email} ${row.action} ${row.target}`
+          .toLocaleLowerCase()
+          .includes(needle))
     );
   });
 }
@@ -40,7 +42,12 @@ export function filterActivity(
 export function activityCsv(rows: AdminActivityRow[]) {
   return toCsv(
     ["time", "actor", "action", "target"],
-    rows.map((row) => [row.created_at, row.actor_email, row.action, row.target]),
+    rows.map((row) => [
+      row.created_at,
+      row.actor_email,
+      row.action,
+      row.target,
+    ]),
   );
 }
 

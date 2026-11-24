@@ -41,7 +41,11 @@ export default defineConfig(({ command }) => ({
                   formats: ["image/webp"],
                   minimumCacheTTL: 86400,
                   remotePatterns: [
-                    { protocol: "https", hostname: "**.supabase.co", pathname: "/storage/v1/object/**" },
+                    {
+                      protocol: "https",
+                      hostname: "**.supabase.co",
+                      pathname: "/storage/v1/object/**",
+                    },
                   ],
                 },
               },

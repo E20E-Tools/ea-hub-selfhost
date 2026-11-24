@@ -11,6 +11,7 @@ export const getLanguageCookie = createServerFn({ method: "GET" }).handler(
 
 /** Server: the request cookie. Browser: document.cookie, with no network call. */
 export async function savedLanguage(): Promise<Language | null> {
-  if (typeof document !== "undefined") return languageFromCookie(document.cookie);
+  if (typeof document !== "undefined")
+    return languageFromCookie(document.cookie);
   return getLanguageCookie();
 }

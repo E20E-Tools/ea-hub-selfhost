@@ -1,5 +1,9 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { ADMIN_SECTION_TABS, TAB_LABELS, type AdminTab } from "@/lib/admin-sections";
+import {
+  ADMIN_SECTION_TABS,
+  TAB_LABELS,
+  type AdminTab,
+} from "@/lib/admin-sections";
 import type { Catalog } from "@/lib/catalog";
 import { AffiliatesTab } from "./content-affiliates";
 import { CategoriesTab } from "./content-categories";
@@ -21,7 +25,11 @@ export function ContentSection({
   return (
     <div>
       <PageHeader title={t("navContent")} description={t("navContentDesc")} />
-      <Tabs value={current} onValueChange={(v) => onTab(v as AdminTab)} dir={dir}>
+      <Tabs
+        value={current}
+        onValueChange={(v) => onTab(v as AdminTab)}
+        dir={dir}
+      >
         <TabsList>
           {ADMIN_SECTION_TABS.content.map((id) => (
             <TabsTrigger key={id} value={id}>

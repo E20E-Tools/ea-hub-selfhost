@@ -16,17 +16,22 @@ vi.mock("@tanstack/react-start", () => ({
         validate = fn;
         return builder;
       },
-      handler: (fn: (args: unknown) => unknown) => async (args?: { data: unknown }) =>
-        fn({
-          data: validate(args?.data),
-          context: { userId: "admin", supabase: { from: state.query } },
-        }),
+      handler:
+        (fn: (args: unknown) => unknown) => async (args?: { data: unknown }) =>
+          fn({
+            data: validate(args?.data),
+            context: { userId: "admin", supabase: { from: state.query } },
+          }),
     };
     return builder;
   },
 }));
-vi.mock("@tanstack/react-start/server", () => ({ getRequest: () => ({ headers: state.headers }) }));
-vi.mock("@/integrations/supabase/auth-middleware", () => ({ requireSupabaseAuth: {} }));
+vi.mock("@tanstack/react-start/server", () => ({
+  getRequest: () => ({ headers: state.headers }),
+}));
+vi.mock("@/integrations/supabase/auth-middleware", () => ({
+  requireSupabaseAuth: {},
+}));
 vi.mock("@/lib/admin-guard.server", () => ({
   requireAdmin: async () => {
     if (!state.admin) throw new Error("Forbidden");
@@ -37,7 +42,10 @@ vi.mock("@/lib/rate-limit.server", () => ({
   checkLimits: async () => state.limit,
 }));
 vi.mock("@/lib/journey.server", () => ({ recordJourney: state.record }));
-import { getJourneyOverview, recordJourneyEvent } from "@/lib/journey.functions";
+import {
+  getJourneyOverview,
+  recordJourneyEvent,
+} from "@/lib/journey.functions";
 const input = {
   event: "chooser_completed",
   language: "en",
@@ -52,8 +60,15 @@ beforeEach(() => {
   state.query.mockReset();
 });
 it("records only allowlisted bounded visitor actions", async () => {
-  await expect(recordJourneyEvent({ data: input })).resolves.toEqual({ ok: true });
-  expect(state.record).toHaveBeenCalledWith("chooser_completed", "en", input.eventKey, undefined);
+  await expect(recordJourneyEvent({ data: input })).resolves.toEqual({
+    ok: true,
+  });
+  expect(state.record).toHaveBeenCalledWith(
+    "chooser_completed",
+    "en",
+    input.eventKey,
+    undefined,
+  );
   await expect(
     recordJourneyEvent({ data: { ...input, event: "request_completed" } }),
   ).rejects.toThrow();

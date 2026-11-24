@@ -10,6 +10,7 @@ import { catalogQueryOptions } from "@/lib/catalog.functions";
 import { localizedProduct } from "@/lib/catalog";
 import { featureEnabled } from "@/lib/site-features";
 import { pageUrl } from "@/lib/seo";
+import { dictionaries } from "@/lib/copy";
 
 export const Route = createFileRoute("/about")({
   loader: ({ context }) =>
@@ -40,21 +41,43 @@ export const Route = createFileRoute("/about")({
   component: About,
 });
 
-const scenarios: Record<string, { image: string; ar: [string, string]; en: [string, string] }> = {
+const scenarios: Record<
+  string,
+  { image: string; ar: [string, string]; en: [string, string] }
+> = {
   archone: {
-    image: "/__l5e/assets-v1/901c8a9b-5dbd-4f86-8fa5-181674e46db9/archone-transformation-board.jpg",
-    ar: ["ما أثر تغيير هذه العملية؟", "اربط العملية بالقدرات والتطبيقات التي تدعمها لتحديد ما يحتاج إلى مراجعة قبل التغيير."],
-    en: ["What would a process change affect?", "Trace a process to the capabilities and applications that support it before deciding what to change."],
+    image:
+      "/__l5e/assets-v1/901c8a9b-5dbd-4f86-8fa5-181674e46db9/archone-transformation-board.jpg",
+    ar: [
+      "ما أثر تغيير هذه العملية؟",
+      "اربط العملية بالقدرات والتطبيقات التي تدعمها لتحديد ما يحتاج إلى مراجعة قبل التغيير.",
+    ],
+    en: [
+      "What would a process change affect?",
+      "Trace a process to the capabilities and applications that support it before deciding what to change.",
+    ],
   },
   landscape: {
     image: "/images/decisions/application-overlap.webp",
-    ar: ["أين تتكرر التطبيقات؟", "اربط التطبيقات بالقدرات التي تدعمها لتكتشف التداخل قبل الاستثمار في تطبيق جديد."],
-    en: ["Where do applications overlap?", "Map applications to the capabilities they support before investing in another tool."],
+    ar: [
+      "أين تتكرر التطبيقات؟",
+      "اربط التطبيقات بالقدرات التي تدعمها لتكتشف التداخل قبل الاستثمار في تطبيق جديد.",
+    ],
+    en: [
+      "Where do applications overlap?",
+      "Map applications to the capabilities they support before investing in another tool.",
+    ],
   },
   radar: {
     image: "/images/decisions/technology-radar.webp",
-    ar: ["أي تقنية تستحق التجربة؟", "سجّل موقف الفريق من كل تقنية وسبب القرار، ثم راجعه في الاجتماع القادم."],
-    en: ["Which technology should we trial?", "Record the team’s position on each technology and revisit the reasoning at your next review."],
+    ar: [
+      "أي تقنية تستحق التجربة؟",
+      "سجّل موقف الفريق من كل تقنية وسبب القرار، ثم راجعه في الاجتماع القادم.",
+    ],
+    en: [
+      "Which technology should we trial?",
+      "Record the team’s position on each technology and revisit the reasoning at your next review.",
+    ],
   },
 };
 
@@ -85,15 +108,12 @@ function About() {
               {t("aboutEyebrow")}
             </span>
             <h1>
-              {ar
-                ? "أدوات معمارية المؤسسات من واقع عمل المعماريين"
-                : "Enterprise architecture tools built by practising architects"}
+              {
+                dictionaries[ar ? "ar" : "en"]
+                  .aboutEnterpriseArchitectureToolsBuilt
+              }
             </h1>
-            <p>
-              {ar
-                ? "نساعد فرق المعمارية والتقنية على فهم محفظة التطبيقات واتخاذ قرارات تقنية يمكن توضيح أسبابها ومراجعتها."
-                : "We help architecture and technology teams understand their application portfolios and make technology decisions they can explain and revisit."}
-            </p>
+            <p>{dictionaries[ar ? "ar" : "en"].aboutWeHelpArchitectureAnd}</p>
             <div className="about-actions">
               <Button asChild>
                 <a href="/#catalog">{t("requestBrowse")}</a>
@@ -120,9 +140,7 @@ function About() {
         </section>
 
         <section className="about-section">
-          <h2>
-            {ar ? "أي قرار تواجهه اليوم؟" : "What decision are you facing?"}
-          </h2>
+          <h2>{dictionaries[ar ? "ar" : "en"].aboutWhatDecisionAreYou}</h2>
           <div className="about-purpose">
             {products.map((product) => {
               const scenario = scenarios[product.id];
@@ -130,16 +148,35 @@ function About() {
               const copy = scenario[language];
               return (
                 <article className="about-card" key={product.id}>
-                  <img className="ea-decision-image" loading="lazy" decoding="async"
-                    src={scenario.image} alt="" width={900} height={500} />
-                  <small><bdi>{product.name}</bdi></small>
+                  <img
+                    className="ea-decision-image"
+                    loading="lazy"
+                    decoding="async"
+                    src={scenario.image}
+                    alt=""
+                    width={900}
+                    height={500}
+                  />
+                  <small>
+                    <bdi>{product.name}</bdi>
+                  </small>
                   <h3>{copy[0]}</h3>
                   <p>{copy[1]}</p>
                   <div className="about-tool-links">
-                    <a href={"/product/" + encodeURIComponent(product.id)}>{ar ? "استكشف" : "Explore"} {product.name}</a>
-                    {!product.comingSoon && /^https?:\/\//i.test(product.url) && (
-                      <a href={product.url}>{ar ? "افتح الأداة" : "Launch tool"} <span className="sr-only"><bdi>{product.name}</bdi></span> ↗</a>
-                    )}
+                    <a href={"/product/" + encodeURIComponent(product.id)}>
+                      {dictionaries[ar ? "ar" : "en"].aboutExplore}{" "}
+                      {product.name}
+                    </a>
+                    {!product.comingSoon &&
+                      /^https?:\/\//i.test(product.url) && (
+                        <a href={product.url}>
+                          {dictionaries[ar ? "ar" : "en"].aboutLaunchTool}{" "}
+                          <span className="sr-only">
+                            <bdi>{product.name}</bdi>
+                          </span>{" "}
+                          ↗
+                        </a>
+                      )}
                   </div>
                 </article>
               );
@@ -147,19 +184,34 @@ function About() {
           </div>
           <FeatureOnly feature="discover">
             <Link to="/discover">
-              {ar ? "ساعدني في اختيار أداة" : "Help me choose a tool"} →
+              {dictionaries[ar ? "ar" : "en"].aboutHelpMeChooseA} →
             </Link>
           </FeatureOnly>
         </section>
-        <section className="about-section" aria-labelledby="archy-services-report">
-          <h2 id="archy-services-report">{ar ? "كيف يساعدك Archy؟" : "How can Archy help?"}</h2>
-          <p>{ar ? "اطّلع على خدمات المحادثة ومراجعة بطاقات العمل وتلخيص تجارب الفريق، وكيف تتحكم المنصة في مشاركة البيانات." : "Explore tool guidance, work card reviews and team trial summaries, including how data sharing is controlled."}</p>
-          <a className="underline" href="/guide/EA-Hub-AI-Services-AR.pdf">{ar ? "تقرير خدمات الذكاء الاصطناعي (PDF بالعربية)" : "AI services report (PDF in Arabic)"}</a>
+        <section
+          className="about-section"
+          aria-labelledby="archy-services-report"
+        >
+          <h2 id="archy-services-report">
+            {dictionaries[ar ? "ar" : "en"].aboutHowCanArchyHelp}
+          </h2>
+          <p>{dictionaries[ar ? "ar" : "en"].aboutExploreToolGuidanceWork}</p>
+          <a className="underline" href="/guide/EA-Hub-AI-Services-AR.pdf">
+            {dictionaries[ar ? "ar" : "en"].aboutAiServicesReportPdf}
+          </a>
         </section>
         <details className="about-section about-card" id="decision-record">
-          <summary>{ar ? "من سجل المنصة: تحديث حالة إطلاق ArchONE" : "Platform notes: updating the ArchONE launch status"}</summary>
-          <p>{ar?"عند مراجعة الإطلاق، كان رابط ArchONE يفتح لوحة المنتج، بينما ظل الدليل يعرض حالة «قريبًا». تحقّق الفريق من رابط التشغيل ثم حدّث سجل المنتج الذي تستخدمه صفحات الموقع. ويمكن الآن ضبط إتاحة التدريب والتنفيذ بصورة مستقلة عن حالة الإطلاق.":"During the launch review, ArchONE’s public URL opened its dashboard while the directory still showed Coming soon. The team verified the launch URL and updated the product record used by the site. Professional service availability can now be managed independently of the launch status."}</p>
-          <a className="underline" href="/product/archone">{ar?"اطّلع على سجل المنتج الحالي":"View the current product record"} ↗</a> · <a className="underline" href="/archone-coming-soon">{ar?"تحقق من مسار صفحة الإطلاق السابقة":"Check the former launch-page route"} ↗</a>
+          <summary>
+            {dictionaries[ar ? "ar" : "en"].aboutPlatformNotesUpdatingThe}
+          </summary>
+          <p>{dictionaries[ar ? "ar" : "en"].aboutDuringTheLaunchReview}</p>
+          <a className="underline" href="/product/archone">
+            {dictionaries[ar ? "ar" : "en"].aboutViewTheCurrentProduct} ↗
+          </a>{" "}
+          ·{" "}
+          <a className="underline" href="/archone-coming-soon">
+            {dictionaries[ar ? "ar" : "en"].aboutCheckTheFormerLaunch} ↗
+          </a>
         </details>
         <section className="about-cta" aria-labelledby="about-cta">
           <div>

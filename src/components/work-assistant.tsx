@@ -15,6 +15,7 @@ import {
   workCompletion,
   issueCompletion,
 } from "@/lib/work-assistant.functions";
+import { dictionaries } from "@/lib/copy";
 
 export function useWorkPolicy() {
   return useQuery({
@@ -34,11 +35,11 @@ export function WorkControls({ ar }: { ar: boolean }) {
     i = ar ? 0 : 1;
   return (
     <section className="bx-panel grid gap-3">
-      <h2>{ar ? "مساعد المهام والخصوصية" : "Task assistant and privacy"}</h2>
+      <h2>
+        {dictionaries[ar ? "ar" : "en"].workAssistantTaskAssistantAndPrivacy}
+      </h2>
       <p>
-        {ar
-          ? "اختر المهام المتاحة والحقول المسموح بإرسالها إلى OpenAI عند طلب المستخدم. تظل باقي الحقول على الجهاز."
-          : "Choose available tasks and the fields OpenAI may receive when a user asks. Other fields stay on the device."}
+        {dictionaries[ar ? "ar" : "en"].workAssistantChooseAvailableTasksAnd}
       </p>
       {policy ? (
         features.map((f) => (
@@ -59,10 +60,8 @@ export function WorkControls({ ar }: { ar: boolean }) {
                   }}
                 />{" "}
                 {j === 0
-                  ? ar
-                    ? "تفعيل الميزة"
-                    : "Enable feature"
-                  : (ar ? "السماح لـ OpenAI · " : "Allow OpenAI · ") +
+                  ? dictionaries[ar ? "ar" : "en"].workAssistantEnableFeature
+                  : dictionaries[ar ? "ar" : "en"].workAssistantAllowOpenai +
                     sections[f][j === 1 ? 0 : 1][i]}
               </label>
             ))}
@@ -71,9 +70,7 @@ export function WorkControls({ ar }: { ar: boolean }) {
       ) : (
         <p>
           {q.isError
-            ? ar
-              ? "تعذر تحميل الإعدادات"
-              : "Settings unavailable"
+            ? dictionaries[ar ? "ar" : "en"].workAssistantSettingsUnavailable
             : "…"}
         </p>
       )}
@@ -86,15 +83,17 @@ export function WorkControls({ ar }: { ar: boolean }) {
             await saveWorkPolicy({ data: draft });
             cache.setQueryData(["archy-work-policy"], draft);
             set(null);
-            note(ar ? "تم حفظ صلاحيات المهام" : "Task permissions saved");
+            note(
+              dictionaries[ar ? "ar" : "en"].workAssistantTaskPermissionsSaved,
+            );
           } catch {
-            note(ar ? "تعذر الحفظ" : "Save failed");
+            note(dictionaries[ar ? "ar" : "en"].workAssistantSaveFailed);
           } finally {
             wait(false);
           }
         }}
       >
-        {ar ? "حفظ صلاحيات المهام" : "Save task permissions"}
+        {dictionaries[ar ? "ar" : "en"].workAssistantSaveTaskPermissions}
       </Button>
       <p role="status">{status}</p>
     </section>
@@ -129,12 +128,10 @@ export function CloudOption({
   if (!Object.keys(fields).length) return null;
   return (
     <details className="mt-3">
-      <summary>{ar ? "تحسين باستخدام OpenAI" : "Refine with OpenAI"}</summary>
-      <p>
-        {ar
-          ? "النص الذي سيُرسل عند التأكيد"
-          : "Text that will be sent when you confirm"}
-      </p>
+      <summary>
+        {dictionaries[ar ? "ar" : "en"].workAssistantRefineWithOpenai}
+      </summary>
+      <p>{dictionaries[ar ? "ar" : "en"].workAssistantTextThatWillBe}</p>
       <pre className="whitespace-pre-wrap break-words">
         {Object.values(fields).join("\n")}
       </pre>
@@ -157,16 +154,17 @@ export function CloudOption({
             setModel(res.model);
           } catch {
             set(
-              ar
-                ? "تعذر الحصول على رد من OpenAI. النتيجة المحلية متاحة."
-                : "OpenAI is unavailable. The local result is available.",
+              dictionaries[ar ? "ar" : "en"]
+                .workAssistantOpenaiIsUnavailableThe,
             );
           } finally {
             wait(false);
           }
         }}
       >
-        {busy ? "…" : ar ? "تأكيد الإرسال" : "Confirm and send"}
+        {busy
+          ? "…"
+          : dictionaries[ar ? "ar" : "en"].workAssistantConfirmAndSend}
       </Button>
       <div role="status" className="whitespace-pre-wrap">
         {model && (
@@ -179,7 +177,7 @@ export function CloudOption({
       </div>
       {model && onApply && (
         <Button variant="outline" onClick={() => onApply(message)}>
-          {ar ? "استخدام النص في المسودة" : "Use text in draft"}
+          {dictionaries[ar ? "ar" : "en"].workAssistantUseTextInDraft}
         </Button>
       )}
     </details>

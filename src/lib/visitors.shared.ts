@@ -88,7 +88,12 @@ export function summarizeVisitors(
       lastAt.set(row.email, at);
       row.lastPage = page;
     }
-    if (c.id && c.status && c.status !== "closed" && at > (openAt.get(row.email) ?? "")) {
+    if (
+      c.id &&
+      c.status &&
+      c.status !== "closed" &&
+      at > (openAt.get(row.email) ?? "")
+    ) {
       openAt.set(row.email, at);
       row.openChatId = c.id;
       row.openChatStatus = c.status;

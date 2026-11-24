@@ -32,7 +32,11 @@ export const DEFAULT_ARCHY_GREETING: ArchyGreetingSettings = {
   guideDelay: 3,
 };
 
-const clamp = (value: unknown, [min, max]: readonly [number, number], fallback: number) => {
+const clamp = (
+  value: unknown,
+  [min, max]: readonly [number, number],
+  fallback: number,
+) => {
   const n = Number(value);
   return Number.isFinite(n) ? Math.min(max, Math.max(min, n)) : fallback;
 };
@@ -42,7 +46,8 @@ export function normalizeArchyGreeting(value: unknown): ArchyGreetingSettings {
     value && typeof value === "object" && !Array.isArray(value)
       ? (value as Record<string, unknown>)
       : {};
-  const str = (v: unknown) => (typeof v === "string" ? v.trim().slice(0, ARCHY_GREETING_MAX) : "");
+  const str = (v: unknown) =>
+    typeof v === "string" ? v.trim().slice(0, ARCHY_GREETING_MAX) : "";
   return {
     ar: str(row["ar"]),
     en: str(row["en"]),
@@ -51,7 +56,11 @@ export function normalizeArchyGreeting(value: unknown): ArchyGreetingSettings {
     pitch: clamp(row["pitch"], ARCHY_PITCH_RANGE, DEFAULT_ARCHY_GREETING.pitch),
     autoGuide: row["autoGuide"] !== false,
     guideDelay: Math.round(
-      clamp(row["guideDelay"], ARCHY_GUIDE_DELAY_RANGE, DEFAULT_ARCHY_GREETING.guideDelay),
+      clamp(
+        row["guideDelay"],
+        ARCHY_GUIDE_DELAY_RANGE,
+        DEFAULT_ARCHY_GREETING.guideDelay,
+      ),
     ),
   };
 }
@@ -73,7 +82,11 @@ export const archyGreetingSchema = z.object({
   rate: z.number().min(ARCHY_RATE_RANGE[0]).max(ARCHY_RATE_RANGE[1]),
   pitch: z.number().min(ARCHY_PITCH_RANGE[0]).max(ARCHY_PITCH_RANGE[1]),
   autoGuide: z.boolean(),
-  guideDelay: z.number().int().min(ARCHY_GUIDE_DELAY_RANGE[0]).max(ARCHY_GUIDE_DELAY_RANGE[1]),
+  guideDelay: z
+    .number()
+    .int()
+    .min(ARCHY_GUIDE_DELAY_RANGE[0])
+    .max(ARCHY_GUIDE_DELAY_RANGE[1]),
 });
 
 export type ArchyRoute = "tool" | "support" | "request" | "guide";
@@ -82,10 +95,16 @@ export type ArchyRoute = "tool" | "support" | "request" | "guide";
  * Which chat Archy suggests before the visitor picks one. The page wins (a tool page
  * suggests that tool); otherwise an open support request suggests following up with the team.
  */
-export function suggestArchyRoute(pathname: string, openSupport: number): ArchyRoute {
+export function suggestArchyRoute(
+  pathname: string,
+  openSupport: number,
+): ArchyRoute {
   if (/^\/product\/[^/]+/.test(pathname)) return "tool";
   if (pathname.startsWith("/support")) return "support";
-  if (pathname.startsWith("/request") || pathname.startsWith("/enterprise-services"))
+  if (
+    pathname.startsWith("/request") ||
+    pathname.startsWith("/enterprise-services")
+  )
     return "request";
   if (openSupport > 0) return "support";
   return "guide";

@@ -14,7 +14,9 @@ describe("admin dictionary", () => {
   });
 
   it("fills placeholders and translates audit actions", () => {
-    expect(adminText("en", "editProduct", { name: "Radar" })).toBe("Edit Radar");
+    expect(adminText("en", "editProduct", { name: "Radar" })).toBe(
+      "Edit Radar",
+    );
     expect(actionLabel("en", "product.save")).toBe("Saved a product");
     expect(actionLabel("ar", "product.save")).toBe("حفظ منتج");
     expect(actionLabel("en", "unknown.thing")).toBe("Unknown thing");

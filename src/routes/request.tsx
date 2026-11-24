@@ -1,7 +1,13 @@
 import { RequestReceipt } from "@/components/request-receipt";
 import { FormTermsNote } from "@/components/form-terms-note";
 import { createFileRoute, Link, redirect } from "@tanstack/react-router";
-import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type FormEvent,
+} from "react";
 import {
   ArrowLeft,
   ArrowRight,
@@ -21,7 +27,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { submitRequest } from "@/lib/requests.functions";
-import { getPublicContactEmail, DEFAULT_CONTACT_EMAIL } from "@/lib/contact.functions";
+import {
+  getPublicContactEmail,
+  DEFAULT_CONTACT_EMAIL,
+} from "@/lib/contact.functions";
 import {
   isPublicRequestType,
   requestSchema,
@@ -63,9 +72,15 @@ type RequestSearch = {
 export const Route = createFileRoute("/request")({
   validateSearch: (search: Record<string, unknown>): RequestSearch => ({
     type: typeof search["type"] === "string" ? search["type"] : undefined,
-    product: typeof search["product"] === "string" ? search["product"].slice(0, 80) : undefined,
+    product:
+      typeof search["product"] === "string"
+        ? search["product"].slice(0, 80)
+        : undefined,
     from: search["from"] === "chat" ? "chat" : undefined,
-    need: typeof search["need"] === "string" ? search["need"].slice(0, 500) : undefined,
+    need:
+      typeof search["need"] === "string"
+        ? search["need"].slice(0, 500)
+        : undefined,
   }),
   // Enterprise service requests have their own page.
   beforeLoad: ({ search }) => {
@@ -75,7 +90,9 @@ export const Route = createFileRoute("/request")({
   loader: ({ context }) =>
     Promise.all([
       context.queryClient.ensureQueryData(catalogQueryOptions),
-      context.queryClient.ensureQueryData(contactEmailQuery).catch(() => DEFAULT_CONTACT_EMAIL),
+      context.queryClient
+        .ensureQueryData(contactEmailQuery)
+        .catch(() => DEFAULT_CONTACT_EMAIL),
     ]),
   head: () => ({
     meta: [
@@ -100,7 +117,10 @@ export const Route = createFileRoute("/request")({
   component: RequestPage,
 });
 
-const TYPE_KEYS: Record<PublicRequestType, { title: keyof Copy; hint: keyof Copy }> = {
+const TYPE_KEYS: Record<
+  PublicRequestType,
+  { title: keyof Copy; hint: keyof Copy }
+> = {
   new: { title: "rqType_new", hint: "rqType_new_hint" },
   feature: { title: "rqType_feature", hint: "rqType_feature_hint" },
   support: { title: "rqType_support", hint: "rqType_support_hint" },
@@ -122,7 +142,8 @@ function RequestPage() {
   const { data: contactEmail } = useSuspenseQuery(contactEmailQuery);
   const search = Route.useSearch();
   const { language, dir, t } = useLanguage();
-  const tr = (key: string) => (key in dictionaries.ar ? t(key as keyof Copy) : key);
+  const tr = (key: string) =>
+    key in dictionaries.ar ? t(key as keyof Copy) : key;
   const products = catalog.products.map((p) => localizedProduct(p, language));
   const initialProduct = products.some((p) => p.id === search.product)
     ? (search.product ?? "")
@@ -154,10 +175,21 @@ function RequestPage() {
   const [rec, setRec] = useState<Recommendation | null>(null);
   const [recBusy, setRecBusy] = useState(false);
   const [recError, setRecError] = useState("");
-  const draftValue = { type, productId, urgency, name, email, company, phone, need, impact };
+  const draftValue = {
+    type,
+    productId,
+    urgency,
+    name,
+    email,
+    company,
+    phone,
+    need,
+    impact,
+  };
   const restoreDraft = useCallback((values: Record<string, unknown>) => {
     if (isPublicRequestType(values["type"])) setType(values["type"]);
-    if (typeof values["productId"] === "string") setProductId(values["productId"]);
+    if (typeof values["productId"] === "string")
+      setProductId(values["productId"]);
     if (typeof values["urgency"] === "string") setUrgency(values["urgency"]);
     if (typeof values["name"] === "string") setName(values["name"]);
     if (typeof values["email"] === "string") setEmail(values["email"]);
@@ -201,7 +233,12 @@ function RequestPage() {
     setBusy(false);
     setRecBusy(false);
   };
-  const draft = useRequestDraft("request", draftValue, restoreDraft, resetForIdentity);
+  const draft = useRequestDraft(
+    "request",
+    draftValue,
+    restoreDraft,
+    resetForIdentity,
+  );
   const clearDraft = () => {
     draft.clear();
     resetFields();
@@ -222,21 +259,30 @@ function RequestPage() {
     try {
       const key = "ea-step-help:" + match[1];
       const message = sessionStorage.getItem(key);
-      if (message) { setNeed(message); sessionStorage.removeItem(key); }
-    } catch { /* Other request fields are still usable. */ }
+      if (message) {
+        setNeed(message);
+        sessionStorage.removeItem(key);
+      }
+    } catch {
+      /* Other request fields are still usable. */
+    }
   }, [search.type]);
 
   // Opened from the chat: reuse the visitor's chat details once.
   useEffect(() => {
     if (search.from !== "chat") return;
     try {
-      const saved = JSON.parse(sessionStorage.getItem("e20e-request-prefill") ?? "null") as {
+      const saved = JSON.parse(
+        sessionStorage.getItem("e20e-request-prefill") ?? "null",
+      ) as {
         name?: unknown;
         email?: unknown;
         access?: unknown;
       } | null;
-      if (typeof saved?.name === "string") setName((v) => v || (saved.name as string));
-      if (typeof saved?.email === "string") setEmail((v) => v || (saved.email as string));
+      if (typeof saved?.name === "string")
+        setName((v) => v || (saved.name as string));
+      if (typeof saved?.email === "string")
+        setEmail((v) => v || (saved.email as string));
       if (typeof saved?.access === "string") chatAccess.current = saved.access;
     } catch {
       /* ignore unreadable prefill */
@@ -292,7 +338,9 @@ function RequestPage() {
       setError(tr(validation.error.issues[0]?.message ?? "rqErrInvalid"));
       requestAnimationFrame(() =>
         document
-          .getElementById(`request-${String(validation.error.issues[0]?.path[0] ?? "name")}`)
+          .getElementById(
+            `request-${String(validation.error.issues[0]?.path[0] ?? "name")}`,
+          )
           ?.focus(),
       );
       return;
@@ -310,14 +358,18 @@ function RequestPage() {
       const form = new FormData();
       form.set("language", language);
       form.set("metrics", metricsAllowed() ? "on" : "off");
-      const visitorAccess = chatAccess.current || (await currentVisitorAccess());
+      const visitorAccess =
+        chatAccess.current || (await currentVisitorAccess());
       if (epoch !== identityEpoch.current) return;
       if (visitorAccess) form.set("visitorAccess", visitorAccess);
       Object.entries(validation.data).forEach(([key, value]) => {
         if (typeof value === "string") form.set(key, value);
       });
-      if (rec && type === "new") form.set("recommendation", JSON.stringify(rec));
-      const trap = document.getElementById("request-website") as HTMLInputElement | null;
+      if (rec && type === "new")
+        form.set("recommendation", JSON.stringify(rec));
+      const trap = document.getElementById(
+        "request-website",
+      ) as HTMLInputElement | null;
       form.set("website", trap?.value ?? "");
       const tourToken = type === "support" ? currentTourVisit() : "";
       if (tourToken) form.set("tourToken", tourToken);
@@ -336,7 +388,11 @@ function RequestPage() {
         if (type === "support" && tourToken)
           trackProductEvent("project.archy_post_tour_support_submitted");
         draft.clear();
-        setReceipt({ id: result.id, createdAt: result.createdAt, tracking: result.tracking });
+        setReceipt({
+          id: result.id,
+          createdAt: result.createdAt,
+          tracking: result.tracking,
+        });
         window.scrollTo({ top: 0, behavior: "instant" });
       } else {
         setError(tr(result.message));
@@ -380,7 +436,10 @@ function RequestPage() {
           : t("contactMessagePlaceholder");
 
   return (
-    <main className="library-page request-page ea-workspace ea-request" dir={dir}>
+    <main
+      className="library-page request-page ea-workspace ea-request"
+      dir={dir}
+    >
       <div className="request-shell request-shell-wide">
         {receipt ? (
           <div className="request-success" role="status">
@@ -392,7 +451,16 @@ function RequestPage() {
                 ? fill(t("requestSavedImages"), String(images.length))
                 : t("requestSavedPlain")}
             </p>
-            <RequestReceipt receipt={receipt} subject={[t(TYPE_KEYS[type].title), products.find(p => p.id === productId)?.name].filter(Boolean).join(" · ")} summary={need} />
+            <RequestReceipt
+              receipt={receipt}
+              subject={[
+                t(TYPE_KEYS[type].title),
+                products.find((p) => p.id === productId)?.name,
+              ]
+                .filter(Boolean)
+                .join(" · ")}
+              summary={need}
+            />
             <div className="flex flex-wrap justify-center gap-2">
               <Button asChild variant="outline">
                 <Link to="/">{t("requestBrowse")}</Link>
@@ -402,9 +470,16 @@ function RequestPage() {
           </div>
         ) : (
           <div className="request-layout">
-            <form className="request-form" onSubmit={submit} aria-busy={busy} noValidate>
+            <form
+              className="request-form"
+              onSubmit={submit}
+              aria-busy={busy}
+              noValidate
+            >
               {search.from === "chat" && (
-                <p className="text-sm text-muted-foreground">{t("rqFromChat")}</p>
+                <p className="text-sm text-muted-foreground">
+                  {t("rqFromChat")}
+                </p>
               )}
               <input
                 id="request-website"
@@ -420,14 +495,21 @@ function RequestPage() {
                 <p>{t("rqLead")}</p>
                 <ol
                   className="ea-request-steps"
-                  aria-label={language === "ar" ? "تقدّم الطلب" : "Request progress"}
+                  aria-label={
+                    language === "ar" ? "تقدّم الطلب" : "Request progress"
+                  }
                 >
                   {[
                     language === "ar" ? "تفاصيل الطلب" : "Request details",
                     t("bxReview"),
                     language === "ar" ? "إيصال الطلب" : "Receipt",
                   ].map((label, i) => (
-                    <li key={label} aria-current={i === Number(reviewing) ? "step" : undefined}>
+                    <li
+                      key={label}
+                      aria-current={
+                        i === Number(reviewing) ? "step" : undefined
+                      }
+                    >
                       {label}
                     </li>
                   ))}
@@ -436,18 +518,24 @@ function RequestPage() {
               {reviewing && (
                 <RequestReview
                   items={[
-                    { label: t("rqTypeLegend"), value: t(TYPE_KEYS[type].title) },
+                    {
+                      label: t("rqTypeLegend"),
+                      value: t(TYPE_KEYS[type].title),
+                    },
                     { label: t("requestNameLabel"), value: name },
                     { label: t("requestEmailLabel"), value: email },
                     { label: t("requestCompanyLabel"), value: company },
                     { label: t("rqPhoneSupport"), value: phone },
                     {
                       label: t("rqProductLabel"),
-                      value: products.find((p) => p.id === productId)?.name ?? "",
+                      value:
+                        products.find((p) => p.id === productId)?.name ?? "",
                     },
                     {
                       label: t("rqUrgencyLabel"),
-                      value: urgency ? t(`rqUrgency_${urgency}` as keyof Copy) : "",
+                      value: urgency
+                        ? t(`rqUrgency_${urgency}` as keyof Copy)
+                        : "",
                     },
                     { label: messageLabel, value: need },
                     { label: t("rqImpactLabel"), value: impact },
@@ -462,7 +550,11 @@ function RequestPage() {
                 <fieldset className="choice-cards" disabled={busy}>
                   <legend className="sr-only">{t("rqTypeLegend")}</legend>
                   {PUBLIC_REQUEST_TYPES.map((option) => (
-                    <label key={option} className="choice-card" data-selected={type === option}>
+                    <label
+                      key={option}
+                      className="choice-card"
+                      data-selected={type === option}
+                    >
                       <input
                         type="radio"
                         name="request-type"
@@ -496,13 +588,18 @@ function RequestPage() {
                         autoComplete="name"
                         value={name}
                         aria-invalid={Boolean(fieldErrors["name"])}
-                        aria-describedby={fieldErrors["name"] ? "request-name-error" : undefined}
+                        aria-describedby={
+                          fieldErrors["name"] ? "request-name-error" : undefined
+                        }
                         onChange={(e) => setName(e.target.value)}
                         placeholder={t("requestNamePlaceholder")}
                         maxLength={100}
                         required
                       />
-                      <FieldError id="request-name-error" message={fieldErrors["name"]} />
+                      <FieldError
+                        id="request-name-error"
+                        message={fieldErrors["name"]}
+                      />
                     </label>
                     <label className="request-field">
                       <span>{t("requestEmailLabel")}</span>
@@ -513,13 +610,20 @@ function RequestPage() {
                         dir="ltr"
                         value={email}
                         aria-invalid={Boolean(fieldErrors["email"])}
-                        aria-describedby={fieldErrors["email"] ? "request-email-error" : undefined}
+                        aria-describedby={
+                          fieldErrors["email"]
+                            ? "request-email-error"
+                            : undefined
+                        }
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="name@company.com"
                         maxLength={255}
                         required
                       />
-                      <FieldError id="request-email-error" message={fieldErrors["email"]} />
+                      <FieldError
+                        id="request-email-error"
+                        message={fieldErrors["email"]}
+                      />
                     </label>
                     {type === "support" ? (
                       <label className="request-field">
@@ -532,7 +636,9 @@ function RequestPage() {
                           value={phone}
                           aria-invalid={Boolean(fieldErrors["phone"])}
                           aria-describedby={
-                            fieldErrors["phone"] ? "request-phone-error" : undefined
+                            fieldErrors["phone"]
+                              ? "request-phone-error"
+                              : undefined
                           }
                           onChange={(e) => setPhone(e.target.value)}
                           placeholder="+966 5X XXX XXXX"
@@ -540,7 +646,10 @@ function RequestPage() {
                           required
                           minLength={7}
                         />
-                        <FieldError id="request-phone-error" message={fieldErrors["phone"]} />
+                        <FieldError
+                          id="request-phone-error"
+                          message={fieldErrors["phone"]}
+                        />
                       </label>
                     ) : null}
                     <label className="request-field">
@@ -570,7 +679,9 @@ function RequestPage() {
                           value={productId}
                           aria-invalid={Boolean(fieldErrors["productId"])}
                           aria-describedby={
-                            fieldErrors["productId"] ? "request-product-error" : undefined
+                            fieldErrors["productId"]
+                              ? "request-product-error"
+                              : undefined
                           }
                           onChange={(e) => setProductId(e.target.value)}
                           required
@@ -582,7 +693,10 @@ function RequestPage() {
                             </option>
                           ))}
                         </select>
-                        <FieldError id="request-product-error" message={fieldErrors["productId"]} />
+                        <FieldError
+                          id="request-product-error"
+                          message={fieldErrors["productId"]}
+                        />
                       </label>
                     ) : null}
                     {type === "support" ? (
@@ -594,7 +708,9 @@ function RequestPage() {
                           value={urgency}
                           aria-invalid={Boolean(fieldErrors["urgency"])}
                           aria-describedby={
-                            fieldErrors["urgency"] ? "request-urgency-error" : undefined
+                            fieldErrors["urgency"]
+                              ? "request-urgency-error"
+                              : undefined
                           }
                           onChange={(e) => setUrgency(e.target.value)}
                           required
@@ -606,7 +722,10 @@ function RequestPage() {
                             </option>
                           ))}
                         </select>
-                        <FieldError id="request-urgency-error" message={fieldErrors["urgency"]} />
+                        <FieldError
+                          id="request-urgency-error"
+                          message={fieldErrors["urgency"]}
+                        />
                       </label>
                     ) : null}
                     <label className="request-field request-field-wide">
@@ -615,7 +734,9 @@ function RequestPage() {
                         id="request-need"
                         value={need}
                         aria-invalid={Boolean(fieldErrors["need"])}
-                        aria-describedby={fieldErrors["need"] ? "request-need-error" : undefined}
+                        aria-describedby={
+                          fieldErrors["need"] ? "request-need-error" : undefined
+                        }
                         onChange={(e) => {
                           setNeed(e.target.value);
                           setRec(null);
@@ -625,7 +746,10 @@ function RequestPage() {
                         maxLength={2000}
                         required
                       />
-                      <FieldError id="request-need-error" message={fieldErrors["need"]} />
+                      <FieldError
+                        id="request-need-error"
+                        message={fieldErrors["need"]}
+                      />
                     </label>
                     {type === "feature" ? (
                       <label className="request-field request-field-wide">
@@ -646,19 +770,33 @@ function RequestPage() {
                   <section className="request-section">
                     <h2 className="request-section-title">
                       <span>03</span>{" "}
-                      {type === "support" ? t("rqScreenshots") : t("requestImagesSection")}{" "}
+                      {type === "support"
+                        ? t("rqScreenshots")
+                        : t("requestImagesSection")}{" "}
                       <small>{t("requestOptional")}</small>
                     </h2>
-                    <RequestImages files={images} onChange={setImages} disabled={busy} />
+                    <RequestImages
+                      files={images}
+                      onChange={setImages}
+                      disabled={busy}
+                    />
                   </section>
                 ) : null}
 
                 {type === "new" &&
-                featureEnabled(catalog.settings.featureFlags, "recommendations") ? (
-                  <section className="need-map" aria-label={t("requestAssistantLabel")}>
+                featureEnabled(
+                  catalog.settings.featureFlags,
+                  "recommendations",
+                ) ? (
+                  <section
+                    className="need-map"
+                    aria-label={t("requestAssistantLabel")}
+                  >
                     <div className="need-map-head">
                       <div>
-                        <span className="request-eyebrow">{t("requestAssistantEyebrow")}</span>
+                        <span className="request-eyebrow">
+                          {t("requestAssistantEyebrow")}
+                        </span>
                         <h2>{t("requestAssistantTitle")}</h2>
                       </div>
                       <Button
@@ -668,7 +806,11 @@ function RequestPage() {
                         disabled={busy || recBusy || need.trim().length < 8}
                       >
                         {recBusy ? (
-                          <Loader2 size={16} className="animate-spin" aria-hidden="true" />
+                          <Loader2
+                            size={16}
+                            className="animate-spin"
+                            aria-hidden="true"
+                          />
                         ) : (
                           <Wand2 size={16} aria-hidden="true" />
                         )}
@@ -692,10 +834,16 @@ function RequestPage() {
                           <span>{t("requestAssistantYourNeed")}</span>
                           <p>{rec.summary || need.slice(0, 140)}</p>
                         </div>
-                        <NeedArrow className="need-arrow" size={20} aria-hidden="true" />
+                        <NeedArrow
+                          className="need-arrow"
+                          size={20}
+                          aria-hidden="true"
+                        />
                         <ol className="need-picks">
                           {rec.picks.map((pick, i) => {
-                            const stored = catalog.products.find((item) => item.id === pick.id);
+                            const stored = catalog.products.find(
+                              (item) => item.id === pick.id,
+                            );
                             if (!stored) return null;
                             const product = localizedProduct(stored, language);
                             return (
@@ -723,7 +871,9 @@ function RequestPage() {
                         </ol>
                       </div>
                     ) : (
-                      <p className="need-map-empty">{t("requestAssistantEmpty")}</p>
+                      <p className="need-map-empty">
+                        {t("requestAssistantEmpty")}
+                      </p>
                     )}
                   </section>
                 ) : null}
@@ -743,14 +893,26 @@ function RequestPage() {
                       ? `${t("requestMissingLead")} ${missing.join(" · ")}`
                       : ""}
                 </span>
-                <Button type="submit" className="request-submit" disabled={busy || recBusy}>
+                <Button
+                  type="submit"
+                  className="request-submit"
+                  disabled={busy || recBusy}
+                >
                   {busy ? (
-                    <Loader2 size={16} className="animate-spin" aria-hidden="true" />
+                    <Loader2
+                      size={16}
+                      className="animate-spin"
+                      aria-hidden="true"
+                    />
                   ) : (
                     <Send size={16} aria-hidden="true" />
                   )}
                   <span>
-                    {busy ? t("requestSaving") : reviewing ? t("bxConfirmSend") : t("bxReview")}
+                    {busy
+                      ? t("requestSaving")
+                      : reviewing
+                        ? t("bxConfirmSend")
+                        : t("bxReview")}
                   </span>
                 </Button>
                 {reviewing && (
@@ -799,7 +961,8 @@ function RequestPage() {
               </section>
               <section>
                 <h2>
-                  <HandHeart size={16} aria-hidden="true" /> {t("rqSideSupport")}
+                  <HandHeart size={16} aria-hidden="true" />{" "}
+                  {t("rqSideSupport")}
                 </h2>
                 <p>{t("rqSideSupportBody")}</p>
                 <Button asChild variant="outline" size="sm">

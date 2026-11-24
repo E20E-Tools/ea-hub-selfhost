@@ -1,7 +1,14 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
-import { RefreshCw, Users, Inbox, MessagesSquare, Star, Bot } from "lucide-react";
+import {
+  RefreshCw,
+  Users,
+  Inbox,
+  MessagesSquare,
+  Star,
+  Bot,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -68,7 +75,12 @@ export function CustomersSection({
   );
   const selected = visitors.data?.find((v) => v.email === email);
   const tiles = [
-    { label: "cwVisitors", value: visitors.data?.length, icon: Users, tab: "visitors" },
+    {
+      label: "cwVisitors",
+      value: visitors.data?.length,
+      icon: Users,
+      tab: "visitors",
+    },
     {
       label: "cwSupport",
       value: visitors.data?.reduce((n, v) => n + v.supportRequests, 0),
@@ -91,7 +103,9 @@ export function CustomersSection({
             variant="outline"
             size="icon"
             aria-label={t("cwRefresh")}
-            onClick={() => void client.invalidateQueries({ queryKey: ["admin"] })}
+            onClick={() =>
+              void client.invalidateQueries({ queryKey: ["admin"] })
+            }
           >
             <RefreshCw className="size-4" />
           </Button>
@@ -107,13 +121,17 @@ export function CustomersSection({
           >
             <Icon className="size-5 shrink-0 text-muted-foreground" />
             <span className="text-start">
-              <span className="block text-xl font-semibold">{value ?? "—"}</span>
+              <span className="block text-xl font-semibold">
+                {value ?? "—"}
+              </span>
               {t(label)}
             </span>
           </Button>
         ))}
       </div>
-      <p className="-mt-3 mb-5 text-xs text-muted-foreground">{t("cwTilesScope")}</p>
+      <p className="-mt-3 mb-5 text-xs text-muted-foreground">
+        {t("cwTilesScope")}
+      </p>
       <section
         aria-label={t("vsTitle")}
         className="mb-5 rounded-lg border border-border bg-card p-4"
@@ -130,7 +148,9 @@ export function CustomersSection({
           ).map(([label, value]) => (
             <div key={label}>
               <dt className="text-xs text-muted-foreground">{t(label)}</dt>
-              <dd className="text-xl font-semibold">{stats.isError ? "!" : (value ?? "—")}</dd>
+              <dd className="text-xl font-semibold">
+                {stats.isError ? "!" : (value ?? "—")}
+              </dd>
             </div>
           ))}
         </dl>
@@ -147,7 +167,9 @@ export function CustomersSection({
                   }}
                 >
                   {c.name || c.email} ·{" "}
-                  {[c.chat && t("vsChat"), c.request && t("vsRequest")].filter(Boolean).join(" + ")}
+                  {[c.chat && t("vsChat"), c.request && t("vsRequest")]
+                    .filter(Boolean)
+                    .join(" + ")}
                 </button>
               </li>
             ))}
@@ -166,7 +188,11 @@ export function CustomersSection({
           </Button>
         </div>
       ) : null}
-      <Tabs value={tab ?? "requests"} onValueChange={(v) => onTab(v as AdminTab)} dir={dir}>
+      <Tabs
+        value={tab ?? "requests"}
+        onValueChange={(v) => onTab(v as AdminTab)}
+        dir={dir}
+      >
         <TabsList className="mb-4 h-auto w-full flex-wrap justify-start gap-1">
           <TabsTrigger value="requests">
             <Inbox className="size-4" />
@@ -208,9 +234,14 @@ export function CustomersSection({
         <TabsContent value="visitors">
           <section className="mb-6 min-w-0" aria-label={t("tourVisits")}>
             <h2 className="mb-3 text-base font-semibold">{t("tourVisits")}</h2>
-            <section className="mb-5 border-y border-border py-4" aria-label={t("tourEngagement")}>
+            <section
+              className="mb-5 border-y border-border py-4"
+              aria-label={t("tourEngagement")}
+            >
               <h3 className="font-semibold">{t("tourEngagement")}</h3>
-              <p className="mt-1 text-xs text-muted-foreground">{t("tourEngagementScope")}</p>
+              <p className="mt-1 text-xs text-muted-foreground">
+                {t("tourEngagementScope")}
+              </p>
               <dl className="mt-4 grid grid-cols-2 gap-5 lg:grid-cols-4">
                 {[
                   ["tourUniqueStarted", engagement?.started],
@@ -219,15 +250,21 @@ export function CustomersSection({
                   ["tourUniqueSupport", engagement?.supported],
                 ].map(([key, value]) => (
                   <div key={key}>
-                    <dt className="text-xs text-muted-foreground">{t(String(key))}</dt>
-                    <dd className="mt-1 text-2xl font-semibold tabular-nums">{value ?? "—"}</dd>
+                    <dt className="text-xs text-muted-foreground">
+                      {t(String(key))}
+                    </dt>
+                    <dd className="mt-1 text-2xl font-semibold tabular-nums">
+                      {value ?? "—"}
+                    </dd>
                   </div>
                 ))}
               </dl>
               <div className="mt-5 flex flex-wrap items-center gap-3 text-sm">
                 <span>{t("tourCompletionRate")}</span>
                 <strong dir="ltr">
-                  {engagement?.completionRate != null ? `${engagement.completionRate}%` : "—"}
+                  {engagement?.completionRate != null
+                    ? `${engagement.completionRate}%`
+                    : "—"}
                 </strong>
                 <progress
                   className="h-2 w-40 accent-primary"
@@ -237,7 +274,11 @@ export function CustomersSection({
                 />
               </div>
             </section>
-            <QueryState query={tours} empty={t("noMatches")} isEmpty={!tours.data?.length}>
+            <QueryState
+              query={tours}
+              empty={t("noMatches")}
+              isEmpty={!tours.data?.length}
+            >
               <div className="overflow-x-auto">
                 <table className="w-full text-start text-sm">
                   <thead>
@@ -249,7 +290,10 @@ export function CustomersSection({
                         "tourChat",
                         "tourSupport",
                       ].map((key) => (
-                        <th key={key} className="px-3 py-3 text-start font-medium">
+                        <th
+                          key={key}
+                          className="px-3 py-3 text-start font-medium"
+                        >
                           {t(key)}
                         </th>
                       ))}
@@ -259,8 +303,13 @@ export function CustomersSection({
                     {tours.data?.map((v) => (
                       <tr key={v.id} className="border-b border-border">
                         <td className="px-3 py-3">
-                          <strong className="block">{v.visitor_name || t("tourAnonymous")}</strong>
-                          <span dir="ltr" className="text-xs text-muted-foreground">
+                          <strong className="block">
+                            {v.visitor_name || t("tourAnonymous")}
+                          </strong>
+                          <span
+                            dir="ltr"
+                            className="text-xs text-muted-foreground"
+                          >
                             {v.visitor_email || v.visitor_key.slice(0, 8)}
                           </span>
                         </td>
@@ -271,9 +320,17 @@ export function CustomersSection({
                           v.support_submitted_at,
                         ].map((at, i) => (
                           <td key={i} className="whitespace-nowrap px-3 py-3">
-                            {at ? date(at, { dateStyle: "short", timeStyle: "short" }) : "—"}
+                            {at
+                              ? date(at, {
+                                  dateStyle: "short",
+                                  timeStyle: "short",
+                                })
+                              : "—"}
                             {i === 3 && v.support_request_id ? (
-                              <span className="block text-xs text-muted-foreground" dir="ltr">
+                              <span
+                                className="block text-xs text-muted-foreground"
+                                dir="ltr"
+                              >
                                 {v.support_request_id}
                               </span>
                             ) : null}
@@ -293,7 +350,11 @@ export function CustomersSection({
             aria-label={t("cwSearch")}
             placeholder={t("cwSearch")}
           />
-          <QueryState query={visitors} empty={t("noMatches")} isEmpty={rows.length === 0}>
+          <QueryState
+            query={visitors}
+            empty={t("noMatches")}
+            isEmpty={rows.length === 0}
+          >
             <div className="overflow-x-auto">
               <table className="w-full text-start text-sm">
                 <thead>
@@ -308,7 +369,10 @@ export function CustomersSection({
                       "navLiveChat",
                       "openDetails",
                     ].map((key) => (
-                      <th key={key} className="whitespace-nowrap px-3 py-3 text-start font-medium">
+                      <th
+                        key={key}
+                        className="whitespace-nowrap px-3 py-3 text-start font-medium"
+                      >
                         {t(key)}
                       </th>
                     ))}
@@ -365,7 +429,8 @@ export function CustomersSection({
                             size="sm"
                             disabled={busy === v.openChatId}
                             onClick={() => {
-                              if (v.openChatId) void route(v.email, v.openChatId);
+                              if (v.openChatId)
+                                void route(v.email, v.openChatId);
                             }}
                           >
                             {t("cwTakeOver")}

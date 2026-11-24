@@ -1,7 +1,15 @@
-import { gateSecrets, issueAccessToken, verifyAccessToken } from "./assistant-gate.server";
-import { deriveSigningSecret, deriveSigningSecrets } from "./server-keys.server";
+import {
+  gateSecrets,
+  issueAccessToken,
+  verifyAccessToken,
+} from "./assistant-gate.server";
+import {
+  deriveSigningSecret,
+  deriveSigningSecrets,
+} from "./server-keys.server";
 
-type Db = (typeof import("@/integrations/supabase/client.server"))["supabaseAdmin"];
+type Db =
+  (typeof import("@/integrations/supabase/client.server"))["supabaseAdmin"];
 const secret = () => deriveSigningSecret("archy-tour-visit-v1");
 
 export async function issueTourVisitToken(id: string) {
@@ -9,12 +17,19 @@ export async function issueTourVisitToken(id: string) {
 }
 export async function verifyTourVisitToken(token: string) {
   // Current and previous roots, so tour links survive the APP_ENCRYPTION_KEY switch-over.
-  const payload = await verifyAccessToken(await deriveSigningSecrets("archy-tour-visit-v1"), token);
+  const payload = await verifyAccessToken(
+    await deriveSigningSecrets("archy-tour-visit-v1"),
+    token,
+  );
   return payload?.visitorId ?? null;
 }
 
 /** Called only after a real support receipt has been saved and read back. */
-export async function recordTourSupport(db: Db, token: string, requestId: string) {
+export async function recordTourSupport(
+  db: Db,
+  token: string,
+  requestId: string,
+) {
   try {
     const id = await verifyTourVisitToken(token);
     if (!id) return;

@@ -10,7 +10,9 @@ const base = {
 
 describe("contactSettingsSchema", () => {
   it("accepts the default recipient ea@e20e.tools", () => {
-    expect(contactSettingsSchema.parse(base).recipientEmail).toBe("ea@e20e.tools");
+    expect(contactSettingsSchema.parse(base).recipientEmail).toBe(
+      "ea@e20e.tools",
+    );
   });
 
   it("rejects an invalid recipient email", () => {
@@ -21,7 +23,8 @@ describe("contactSettingsSchema", () => {
 
   it("lowercases the recipient email", () => {
     expect(
-      contactSettingsSchema.parse({ ...base, recipientEmail: "EA@E20E.Tools" }).recipientEmail,
+      contactSettingsSchema.parse({ ...base, recipientEmail: "EA@E20E.Tools" })
+        .recipientEmail,
     ).toBe("ea@e20e.tools");
   });
 });

@@ -225,7 +225,10 @@ export function NavigationSettings({ catalog }: { catalog: Catalog }) {
                 />
               </Field>
               <label className="grid gap-2 text-sm">
-                {adminDictionaries[dir === "rtl" ? "ar" : "en"].consoleMenuGroup}
+                {
+                  adminDictionaries[dir === "rtl" ? "ar" : "en"]
+                    .consoleMenuGroup
+                }
                 <select
                   className="rounded-md border bg-background p-2"
                   value={item.group ?? "platform"}
@@ -236,19 +239,34 @@ export function NavigationSettings({ catalog }: { catalog: Catalog }) {
                   }
                 >
                   <option value="platform">
-                    {adminDictionaries[dir === "rtl" ? "ar" : "en"].consolePlatformServices}
+                    {
+                      adminDictionaries[dir === "rtl" ? "ar" : "en"]
+                        .consolePlatformServices
+                    }
                   </option>
                   <option value="workspace">
-                    {adminDictionaries[dir === "rtl" ? "ar" : "en"].consoleWorkspace}
+                    {
+                      adminDictionaries[dir === "rtl" ? "ar" : "en"]
+                        .consoleWorkspace
+                    }
                   </option>
                   <option value="company">
-                    {adminDictionaries[dir === "rtl" ? "ar" : "en"].consoleCompanyContact}
+                    {
+                      adminDictionaries[dir === "rtl" ? "ar" : "en"]
+                        .consoleCompanyContact
+                    }
                   </option>
                   <option value="appearance">
-                    {adminDictionaries[dir === "rtl" ? "ar" : "en"].consoleAppearance}
+                    {
+                      adminDictionaries[dir === "rtl" ? "ar" : "en"]
+                        .consoleAppearance
+                    }
                   </option>
                   <option value="none">
-                    {adminDictionaries[dir === "rtl" ? "ar" : "en"].consoleNoMenuGroup}
+                    {
+                      adminDictionaries[dir === "rtl" ? "ar" : "en"]
+                        .consoleNoMenuGroup
+                    }
                   </option>
                 </select>
               </label>
@@ -258,7 +276,10 @@ export function NavigationSettings({ catalog }: { catalog: Catalog }) {
                     checked={!!item.topBar}
                     onCheckedChange={(v) => update(item.id, { topBar: v })}
                   />
-                  {adminDictionaries[dir === "rtl" ? "ar" : "en"].consoleShowInTopBar}
+                  {
+                    adminDictionaries[dir === "rtl" ? "ar" : "en"]
+                      .consoleShowInTopBar
+                  }
                 </label>
                 <label className="flex items-center gap-2 text-sm">
                   <Switch

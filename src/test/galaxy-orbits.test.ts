@@ -28,7 +28,8 @@ describe("galaxy orbit layout", () => {
   });
   it("inner orbits are faster (T ∝ a^1.5) and the outer ring is 1", () => {
     const o = orbitLayout(5);
-    for (let i = 1; i < o.length; i++) expect(o[i]!.period).toBeGreaterThan(o[i - 1]!.period);
+    for (let i = 1; i < o.length; i++)
+      expect(o[i]!.period).toBeGreaterThan(o[i - 1]!.period);
     expect(o[4]!.a).toBe(1);
     expect(o[4]!.period / o[0]!.period).toBeCloseTo((1 / o[0]!.a) ** 1.5, 5);
   });
@@ -52,13 +53,16 @@ describe("depth ordering", () => {
   });
   it("depth index increases monotonically with z", () => {
     const zs = [-1, -0.5, -0.01, 0, 0.5, 1].map(depthIndex);
-    for (let i = 1; i < zs.length; i++) expect(zs[i]!).toBeGreaterThanOrEqual(zs[i - 1]!);
+    for (let i = 1; i < zs.length; i++)
+      expect(zs[i]!).toBeGreaterThanOrEqual(zs[i - 1]!);
   });
 });
 
 describe("T-minus", () => {
   it("formats days and clock", () => {
-    expect(formatTMinus(((11 * 24 + 4) * 3600 + 22 * 60 + 17) * 1000)).toBe("T-11d 04:22:17");
+    expect(formatTMinus(((11 * 24 + 4) * 3600 + 22 * 60 + 17) * 1000)).toBe(
+      "T-11d 04:22:17",
+    );
     expect(formatTMinus(999)).toBe("T-0d 00:00:00");
     expect(formatTMinus(0)).toBeNull();
     expect(formatTMinus(-5)).toBeNull();
@@ -71,15 +75,27 @@ describe("T-minus", () => {
 
 describe("planet label placement", () => {
   it("keeps the label right of the planet in English when it fits", () => {
-    expect(placeLabel(400, 30, 200, 1368, false)).toEqual({ x: 430, side: "right" });
+    expect(placeLabel(400, 30, 200, 1368, false)).toEqual({
+      x: 430,
+      side: "right",
+    });
   });
   it("flips a label near the right edge to the inner (left) side", () => {
     // ITFM near the right edge of a 1368px stage.
-    expect(placeLabel(1180, 30, 220, 1368, false)).toEqual({ x: 930, side: "left" });
+    expect(placeLabel(1180, 30, 220, 1368, false)).toEqual({
+      x: 930,
+      side: "left",
+    });
   });
   it("mirrors in Arabic: left by default, flips right near the left edge", () => {
-    expect(placeLabel(800, 30, 200, 1368, true)).toEqual({ x: 570, side: "left" });
-    expect(placeLabel(150, 30, 200, 1368, true)).toEqual({ x: 180, side: "right" });
+    expect(placeLabel(800, 30, 200, 1368, true)).toEqual({
+      x: 570,
+      side: "left",
+    });
+    expect(placeLabel(150, 30, 200, 1368, true)).toEqual({
+      x: 180,
+      side: "right",
+    });
   });
   it("clamps inside the stage when neither side fits", () => {
     const { x } = placeLabel(195, 30, 360, 390, false);

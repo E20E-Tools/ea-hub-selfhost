@@ -7,9 +7,14 @@ import { ArrowUpRight, Boxes, Compass, Map } from "lucide-react";
 
 import { useLanguage } from "@/lib/language";
 import { catalogQueryOptions } from "@/lib/catalog.functions";
-import { filterCatalog, localizedProduct, localizedSettings } from "@/lib/catalog";
+import {
+  filterCatalog,
+  localizedProduct,
+  localizedSettings,
+} from "@/lib/catalog";
 import { archyTour } from "@/lib/archy-tour";
 import { featureEnabled } from "@/lib/site-features";
+import { dictionaries } from "@/lib/copy";
 
 // Read the home route through its id so this module never imports the route file (which imports it).
 const Route = getRouteApi("/");
@@ -26,9 +31,13 @@ export function StudioHome() {
   const navigate = Route.useNavigate();
 
   // Earlier shared searches still land on their matching tool in the full library.
-  const linkedTool = q || cat !== "all" ? filterCatalog(products, q, cat)[0]?.id : undefined;
+  const linkedTool =
+    q || cat !== "all" ? filterCatalog(products, q, cat)[0]?.id : undefined;
   useEffect(() => {
-    if ((!q && cat === "all") || (window.location.hash && window.location.hash !== "#catalog"))
+    if (
+      (!q && cat === "all") ||
+      (window.location.hash && window.location.hash !== "#catalog")
+    )
       return;
     const target = linkedTool ? "catalog-" + linkedTool : "catalog";
     document.getElementById(target)?.scrollIntoView({ block: "start" });
@@ -48,8 +57,8 @@ export function StudioHome() {
           {
             href: "/discover",
             Icon: Compass,
-            title: ar ? "اكتشف الأداة المناسبة" : "Find the right tool",
-            body: ar ? "ابدأ بالتحدّي الذي يواجه فريقك." : "Start with the challenge facing your team.",
+            title: dictionaries[ar ? "ar" : "en"].homeFindTheRightTool,
+            body: dictionaries[ar ? "ar" : "en"].homeStartWithTheChallenge,
           },
         ]
       : []),
@@ -58,10 +67,9 @@ export function StudioHome() {
           {
             href: "/enterprise-services",
             Icon: Boxes,
-            title: ar ? "خدمات المؤسسات" : "Enterprise services",
-            body: ar
-              ? "التنفيذ والإطلاق والتدريب والدعم الفني."
-              : "Implementation, rollout, training and technical support.",
+            title: dictionaries[ar ? "ar" : "en"].homeEnterpriseServices,
+            body: dictionaries[ar ? "ar" : "en"]
+              .homeImplementationRolloutTrainingAnd,
           },
         ]
       : []),
@@ -70,10 +78,8 @@ export function StudioHome() {
           {
             href: "/technology-roadmap",
             Icon: Map,
-            title: ar ? "خارطة التقنيات" : "Technology roadmap",
-            body: ar
-              ? "تعرّف على مراحل تبنّي الأدوات داخل المؤسسة."
-              : "Explore adoption phases for your organisation.",
+            title: dictionaries[ar ? "ar" : "en"].roadmapTitle,
+            body: dictionaries[ar ? "ar" : "en"].homeExploreAdoptionPhasesFor,
           },
         ]
       : []),
@@ -84,7 +90,9 @@ export function StudioHome() {
       <CatalogWorkbench products={products} />
       <section className="s-service-band">
         <div className="s-section">
-          <h2>{ar ? "من الاستكشاف إلى التطبيق" : "From discovery to implementation"}</h2>
+          <h2>
+            {dictionaries[ar ? "ar" : "en"].homeFromDiscoveryToImplementation}
+          </h2>
           <div className="s-service-grid">
             {services.map(({ href, Icon, title, body }) => (
               <a key={href} href={href}>

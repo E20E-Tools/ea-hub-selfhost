@@ -31,46 +31,59 @@ export const getApplicationHealth = createServerFn({ method: "GET" })
         .eq("bucket", bucket)
         .eq("subject", allSubject)
         .gte("created_at", daySince);
-    const [ai, mail, flags, telemetry, requestUsage, chatUsage] = await Promise.all([
-      db
-        .from("ai_assistant_settings")
-        .select("base_url,model,api_key,updated_at,chat_engine")
-        .eq("id", true)
-        .maybeSingle(),
-      db
-        .from("contact_settings")
-        .select("notify_enabled,auto_reply_enabled,recipient_email")
-        .eq("id", true)
-        .maybeSingle(),
-      db.from("site_settings").select("feature_flags").eq("id", true).maybeSingle(),
-      db
-        .from("application_telemetry")
-        .select("operation,outcome,duration_ms,created_at")
-        .gte("created_at", new Date(Date.now() - 86400000).toISOString())
-        .order("created_at", { ascending: false })
-        .limit(500),
-      usageCount(budget.REQUEST_GLOBAL_BUCKET),
-      usageCount(budget.CHAT_GLOBAL_BUCKET),
-    ]);
-    const { aiBaseUrlProblem, isOfficialGroq } = await import("./ai-settings.shared");
+    const [ai, mail, flags, telemetry, requestUsage, chatUsage] =
+      await Promise.all([
+        db
+          .from("ai_assistant_settings")
+          .select("base_url,model,api_key,updated_at,chat_engine")
+          .eq("id", true)
+          .maybeSingle(),
+        db
+          .from("contact_settings")
+          .select("notify_enabled,auto_reply_enabled,recipient_email")
+          .eq("id", true)
+          .maybeSingle(),
+        db
+          .from("site_settings")
+          .select("feature_flags")
+          .eq("id", true)
+          .maybeSingle(),
+        db
+          .from("application_telemetry")
+          .select("operation,outcome,duration_ms,created_at")
+          .gte("created_at", new Date(Date.now() - 86400000).toISOString())
+          .order("created_at", { ascending: false })
+          .limit(500),
+        usageCount(budget.REQUEST_GLOBAL_BUCKET),
+        usageCount(budget.CHAT_GLOBAL_BUCKET),
+      ]);
+    const { aiBaseUrlProblem, isOfficialGroq } =
+      await import("./ai-settings.shared");
     const base = ai.data?.base_url;
     const endpoint = base ?? "https://api.groq.com/openai/v1";
-    const validEndpoint = typeof endpoint === "string" && !aiBaseUrlProblem(endpoint);
+    const validEndpoint =
+      typeof endpoint === "string" && !aiBaseUrlProblem(endpoint);
     const hasCloudKey = Boolean(
       ai.data?.api_key ||
-      (validEndpoint && isOfficialGroq(endpoint) && process.env["GROQ_API_KEY"]),
+      (validEndpoint &&
+        isOfficialGroq(endpoint) &&
+        process.env["GROQ_API_KEY"]),
     );
     const localSemantic =
       !ai.error &&
-      (ai.data?.chat_engine === "local" || (!ai.data?.chat_engine && validEndpoint && !hasCloudKey)) &&
+      (ai.data?.chat_engine === "local" ||
+        (!ai.data?.chat_engine && validEndpoint && !hasCloudKey)) &&
       Boolean(process.env["EA_LOCAL_SEMANTIC"]?.startsWith("file:"));
     const configuredAt = ai.data?.updated_at;
     const latestAssistant =
-      telemetry.error || ai.error || (!ai.data && !localSemantic && !hasCloudKey)
+      telemetry.error ||
+      ai.error ||
+      (!ai.data && !localSemantic && !hasCloudKey)
         ? undefined
         : telemetry.data?.find(
             (row) =>
-              row.operation === "assistant" && (!configuredAt || row.created_at >= configuredAt),
+              row.operation === "assistant" &&
+              (!configuredAt || row.created_at >= configuredAt),
           );
     return {
       checkedAt: new Date().toISOString(),
@@ -86,7 +99,9 @@ export const getApplicationHealth = createServerFn({ method: "GET" })
             ? hasCloudKey
               ? "configured"
               : "needsSetup"
-            : typeof base !== "string" || typeof ai.data.model !== "string" || !ai.data.model.trim()
+            : typeof base !== "string" ||
+                typeof ai.data.model !== "string" ||
+                !ai.data.model.trim()
               ? "unknown"
               : aiBaseUrlProblem(base)
                 ? "blocked"
@@ -125,7 +140,9 @@ export const getApplicationHealth = createServerFn({ method: "GET" })
           ? null
           : mail.data.notify_enabled,
       deliveryVerified: null,
-      measurements: telemetry.error ? null : summarizeTelemetry(telemetry.data ?? []),
+      measurements: telemetry.error
+        ? null
+        : summarizeTelemetry(telemetry.data ?? []),
       // null = unknown (telemetry unreadable), never "no problem".
       aiAlert: telemetry.error ? null : aiFailureAlert(telemetry.data ?? []),
       // Last hour of conversation answers: successes, reply times and a degradation alert.
@@ -173,7 +190,11 @@ export const previewSettingsRestore = createServerFn({ method: "POST" })
   .inputValidator((v: unknown) => z.object({ id: z.string().uuid() }).parse(v))
   .handler(async ({ data, context }) => {
     const db = await admin(context);
-    const h = await db.from("settings_versions").select("*").eq("id", data.id).single();
+    const h = await db
+      .from("settings_versions")
+      .select("*")
+      .eq("id", data.id)
+      .single();
     if (h.error || !h.data) throw new Error("historyLoadFailed");
     const version = h.data;
     const source = version.source;
@@ -215,7 +236,11 @@ export const restoreSettingsVersion = createServerFn({ method: "POST" })
   )
   .handler(async ({ data, context }) => {
     const db = await admin(context);
-    const h = await db.from("settings_versions").select("*").eq("id", data.id).single();
+    const h = await db
+      .from("settings_versions")
+      .select("*")
+      .eq("id", data.id)
+      .single();
     if (h.error || !h.data) throw new Error("historyLoadFailed");
     const value = await (
       await import("./settings-restore.server")
@@ -229,7 +254,8 @@ export const restoreSettingsVersion = createServerFn({ method: "POST" })
       const { aiOrigin, isOfficialGroq } = await import("./ai-settings.shared");
       if (
         ai.error ||
-        (ai.data.api_key && aiOrigin(ai.data.base_url) !== aiOrigin(String(value["base_url"]))) ||
+        (ai.data.api_key &&
+          aiOrigin(ai.data.base_url) !== aiOrigin(String(value["base_url"]))) ||
         (!ai.data.api_key && !isOfficialGroq(String(value["base_url"])))
       )
         throw new Error("errAiKeyOrigin");
@@ -296,7 +322,9 @@ export const saveRetentionPolicy = createServerFn({ method: "POST" })
   });
 export const previewRetention = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((v: unknown) => z.object({ type: retentionTypeSchema }).parse(v))
+  .inputValidator((v: unknown) =>
+    z.object({ type: retentionTypeSchema }).parse(v),
+  )
   .handler(async ({ data, context }) => {
     const db = await admin(context);
     const p = await db
@@ -318,7 +346,9 @@ export const previewRetention = createServerFn({ method: "POST" })
         : data.type === "visits"
           ? "site_visits"
           : "application_telemetry";
-    const count = await db.from(table).select("*", { count: "exact", head: true });
+    const count = await db
+      .from(table)
+      .select("*", { count: "exact", head: true });
     if (count.error) throw new Error("retentionLoadFailed");
     const candidates = (r.data ?? []).slice(0, 100);
     const proof = await (
@@ -361,7 +391,13 @@ export const cleanupRetention = createServerFn({ method: "POST" })
     if (
       !(await (
         await import("./retention-preview.server")
-      ).verifyRetentionPreview(data.proof, context.userId, data.type, data.revision, data.ids))
+      ).verifyRetentionPreview(
+        data.proof,
+        context.userId,
+        data.type,
+        data.revision,
+        data.ids,
+      ))
     )
       throw new Error("retentionConflict");
     const r = await db.rpc("cleanup_retention_batch", {

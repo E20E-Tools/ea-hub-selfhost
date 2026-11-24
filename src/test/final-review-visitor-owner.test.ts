@@ -21,7 +21,10 @@ vi.mock("@/lib/assistant-storage", () => ({
   loadAccountState: h.load,
 }));
 
-import { currentViewer, currentVisitorAccess } from "@/lib/current-visitor-access";
+import {
+  currentViewer,
+  currentVisitorAccess,
+} from "@/lib/current-visitor-access";
 
 const noSession = { data: { session: null }, error: null };
 const someSession = { data: { session: { access_token: "jwt" } }, error: null };
@@ -36,21 +39,33 @@ beforeEach(() => {
 describe("which Archy pass the request pages may read", () => {
   it("a true guest (no local session) reads only the guest pass", async () => {
     h.getSession.mockResolvedValue(noSession);
-    expect(await currentViewer()).toEqual({ token: "guest-pass", accountId: "" });
+    expect(await currentViewer()).toEqual({
+      token: "guest-pass",
+      accountId: "",
+    });
     expect(h.getUser).not.toHaveBeenCalled();
     expect(h.load.mock.calls.map((c) => c[1])).toEqual(["guest-v2"]);
   });
 
   it("a validated account reads only its own pass", async () => {
     h.getSession.mockResolvedValue(someSession);
-    h.getUser.mockResolvedValue({ data: { user: { id: "acct-1" } }, error: null });
-    expect(await currentViewer()).toEqual({ token: "pass-acct-1", accountId: "acct-1" });
+    h.getUser.mockResolvedValue({
+      data: { user: { id: "acct-1" } },
+      error: null,
+    });
+    expect(await currentViewer()).toEqual({
+      token: "pass-acct-1",
+      accountId: "acct-1",
+    });
     expect(h.load.mock.calls.map((c) => c[1])).toEqual(["acct-1"]);
   });
 
   it("a present session rejected as missing (revoked session_not_found) is unknown, not guest", async () => {
     h.getSession.mockResolvedValue(someSession);
-    h.getUser.mockResolvedValue({ data: { user: null }, error: new AuthSessionMissingError() });
+    h.getUser.mockResolvedValue({
+      data: { user: null },
+      error: new AuthSessionMissingError(),
+    });
     expect(await currentViewer()).toEqual(unknown);
     expect(h.load).not.toHaveBeenCalled();
   });
@@ -78,14 +93,18 @@ describe("which Archy pass the request pages may read", () => {
       error: new AuthRetryableFetchError("refresh failed", 0),
     });
     expect(await currentViewer()).toEqual(unknown);
-    h.getSession.mockImplementation(() => Promise.reject(new Error("storage blocked")));
+    h.getSession.mockImplementation(() =>
+      Promise.reject(new Error("storage blocked")),
+    );
     expect(await currentVisitorAccess()).toBe("");
     expect(h.load).not.toHaveBeenCalled();
   });
 
   it("a thrown getUser network failure is unknown", async () => {
     h.getSession.mockResolvedValue(someSession);
-    h.getUser.mockImplementation(() => Promise.reject(new TypeError("Failed to fetch")));
+    h.getUser.mockImplementation(() =>
+      Promise.reject(new TypeError("Failed to fetch")),
+    );
     expect(await currentVisitorAccess()).toBe("");
     expect(h.load).not.toHaveBeenCalled();
   });

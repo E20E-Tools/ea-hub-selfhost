@@ -8,7 +8,8 @@
   --os-glass: oklch(0.2 0.035 262 / 0.62);
   --os-glass-strong: oklch(0.17 0.035 265 / 0.86);
   --os-edge: oklch(1 0 0 / 0.16);
-  --os-shadow: 0 30px 70px -24px oklch(0 0 0 / 0.75), 0 0 0 0.5px oklch(1 0 0 / 0.12);
+  --os-shadow:
+    0 30px 70px -24px oklch(0 0 0 / 0.75), 0 0 0 0.5px oklch(1 0 0 / 0.12);
   --os-display: "Sora", "IBM Plex Sans Arabic", sans-serif;
   --os-mono: "JetBrains Mono", ui-monospace, monospace;
 
@@ -57,9 +58,22 @@
   --font-display: var(--os-display);
   font-family: var(--font-sans);
   background:
-    radial-gradient(60% 50% at 12% 18%, oklch(0.536 0.089 205 / 0.5), transparent 70%),
-    radial-gradient(45% 40% at 88% 78%, oklch(0.712 0.131 83.7 / 0.28), transparent 70%),
-    radial-gradient(50% 60% at 70% 10%, oklch(0.42 0.1 250 / 0.45), transparent 70%), var(--os-navy);
+    radial-gradient(
+      60% 50% at 12% 18%,
+      oklch(0.536 0.089 205 / 0.5),
+      transparent 70%
+    ),
+    radial-gradient(
+      45% 40% at 88% 78%,
+      oklch(0.712 0.131 83.7 / 0.28),
+      transparent 70%
+    ),
+    radial-gradient(
+      50% 60% at 70% 10%,
+      oklch(0.42 0.1 250 / 0.45),
+      transparent 70%
+    ),
+    var(--os-navy);
   background-attachment: fixed;
 
   & :is(h1, h2, h3, .home-section-title) {
@@ -100,12 +114,12 @@
     height: 34px;
     opacity: 1;
     background:
-      radial-gradient(circle, oklch(0.68 0.2 25) 5.5px, transparent 6px) 14px 50% / 12px 12px
-        no-repeat,
-      radial-gradient(circle, oklch(0.82 0.16 85) 5.5px, transparent 6px) 32px 50% / 12px 12px
-        no-repeat,
-      radial-gradient(circle, oklch(0.76 0.17 145) 5.5px, transparent 6px) 50px 50% / 12px 12px
-        no-repeat,
+      radial-gradient(circle, oklch(0.68 0.2 25) 5.5px, transparent 6px) 14px
+        50% / 12px 12px no-repeat,
+      radial-gradient(circle, oklch(0.82 0.16 85) 5.5px, transparent 6px) 32px
+        50% / 12px 12px no-repeat,
+      radial-gradient(circle, oklch(0.76 0.17 145) 5.5px, transparent 6px) 50px
+        50% / 12px 12px no-repeat,
       oklch(0.27 0.035 262 / 0.95);
     border-bottom: 1px solid var(--os-edge);
   }
@@ -138,7 +152,14 @@
   }
 
   /* Glass pills and glass fields. */
-  & :is(.product-open, .product-launch, .detail-cta, .library-empty a, .library-empty button) {
+  &
+    :is(
+      .product-open,
+      .product-launch,
+      .detail-cta,
+      .library-empty a,
+      .library-empty button
+    ) {
     border-radius: 999px !important;
     background: oklch(1 0 0 / 0.1);
     border: 1px solid var(--os-edge);
@@ -204,7 +225,11 @@
   inset: -40px;
   z-index: 0;
   background:
-    radial-gradient(120% 90% at 50% 120%, oklch(0.3 0.08 220 / 0.6), transparent 60%),
+    radial-gradient(
+      120% 90% at 50% 120%,
+      oklch(0.3 0.08 220 / 0.6),
+      transparent 60%
+    ),
     var(--os-navy);
   transform: translate3d(calc(var(--px) * -10px), calc(var(--py) * -8px), 0);
   transition: transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
@@ -221,7 +246,8 @@
   left: -8%;
   top: -12%;
   background: oklch(0.536 0.089 205 / 0.85);
-  animation: os-drift-a calc(26s / var(--cc-speed, 1)) ease-in-out infinite alternate;
+  animation: os-drift-a calc(26s / var(--cc-speed, 1)) ease-in-out infinite
+    alternate;
 }
 .os-blob-b {
   width: 42%;
@@ -712,7 +738,11 @@
   filter: saturate(0.3) brightness(0.85);
 }
 .os-dock-term {
-  background: linear-gradient(160deg, oklch(0.32 0.02 265), oklch(0.16 0.02 265));
+  background: linear-gradient(
+    160deg,
+    oklch(0.32 0.02 265),
+    oklch(0.16 0.02 265)
+  );
 }
 .os-dock-item:focus-visible .os-dock-tile {
   outline: 2px solid var(--os-gold);

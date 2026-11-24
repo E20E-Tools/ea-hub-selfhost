@@ -4,15 +4,12 @@ import type { Product } from "@/lib/catalog";
 import { CompareTray, ProductToolsActions } from "@/components/product-tools";
 import { useThemeArt } from "@/themes/use-theme-art";
 import { useDirection } from "./directions";
+import { dictionaries } from "@/lib/copy";
 
 function downloadCard(p: Product, ar: boolean) {
   const availability = p.comingSoon
-    ? ar
-      ? "قيد التطوير"
-      : "In development"
-    : ar
-      ? "متاحة"
-      : "Available";
+    ? dictionaries[ar ? "ar" : "en"].catalogWorkbenchInDevelopment
+    : dictionaries[ar ? "ar" : "en"].aboutAvailable;
   const lines = [
     p.name,
     p.label + " · " + availability,
@@ -40,15 +37,24 @@ export function CatalogWorkbench({ products }: { products: Product[] }) {
   const art = useThemeArt();
   const design = useDirection();
   return (
-    <section className="nx-catalog" id="catalog" aria-label={ar ? "مكتبة الأدوات" : "Tool library"}>
+    <section
+      className="nx-catalog"
+      id="catalog"
+      aria-label={dictionaries[ar ? "ar" : "en"].aboutOfferLibrary}
+    >
       <CompareTray />
       {products.length ? (
         <div className="nx-card-grid" data-layout={design}>
           {products.map((product) => {
             const url = "/product/" + encodeURIComponent(product.id);
-            const fileLabel = (ar ? "تنزيل بطاقة " : "Download brief for ") + product.name;
+            const fileLabel =
+              dictionaries[ar ? "ar" : "en"].catalogWorkbenchDownloadBriefFor +
+              product.name;
             const full = art.image(product);
-            const image = full === product.image && product.imageThumb ? product.imageThumb : full;
+            const image =
+              full === product.image && product.imageThumb
+                ? product.imageThumb
+                : full;
             return (
               <article
                 className="nx-product-card"
@@ -58,15 +64,27 @@ export function CatalogWorkbench({ products }: { products: Product[] }) {
               >
                 <div className="nx-card-visual">
                   {image && (
-                    <img src={image} alt={product.imageAlt} width={1280} height={832} loading="lazy" decoding="async" />
+                    <img
+                      src={image}
+                      alt={product.imageAlt}
+                      width={1280}
+                      height={832}
+                      loading="lazy"
+                      decoding="async"
+                    />
                   )}
-                  <span className="nx-card-state" data-available={!product.comingSoon}>
+                  <span
+                    className="nx-card-state"
+                    data-available={!product.comingSoon}
+                  >
                     {product.comingSoon ? (
                       <Clock3 size={13} aria-hidden="true" />
                     ) : (
                       <Check size={13} aria-hidden="true" />
                     )}
-                    {product.comingSoon ? t("comingSoonBadge") : ar ? "متاحة الآن" : "Available now"}
+                    {product.comingSoon
+                      ? t("comingSoonBadge")
+                      : dictionaries[ar ? "ar" : "en"].roadmapStatAvailable}
                   </span>
                 </div>
                 <div className="nx-card-copy">

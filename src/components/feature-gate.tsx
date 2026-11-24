@@ -18,7 +18,8 @@ export function FeatureGate({
 }) {
   const { data: catalog } = useSuspenseQuery(catalogQueryOptions);
   const { dir, t } = useLanguage();
-  if (featureEnabled(catalog.settings?.featureFlags, featureKey)) return <>{children}</>;
+  if (featureEnabled(catalog.settings?.featureFlags, featureKey))
+    return <>{children}</>;
   return (
     <main className="library-page" dir={dir}>
       <section className="mx-auto w-full max-w-3xl px-4 py-20 text-center">
@@ -30,6 +31,12 @@ export function FeatureGate({
 }
 
 /** Renders a link or control only while its feature is switched on. */
-export function FeatureOnly({ feature, children }: { feature: FeatureKey; children: ReactNode }) {
+export function FeatureOnly({
+  feature,
+  children,
+}: {
+  feature: FeatureKey;
+  children: ReactNode;
+}) {
   return useFeature(feature) ? <>{children}</> : null;
 }

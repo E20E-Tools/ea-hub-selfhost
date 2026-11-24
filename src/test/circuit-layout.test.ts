@@ -1,9 +1,15 @@
 import { describe, expect, it } from "vitest";
-import { CHIP_CODE_MAX, chipCode, circuitLayout } from "@/themes/circuit-core/layout";
+import {
+  CHIP_CODE_MAX,
+  chipCode,
+  circuitLayout,
+} from "@/themes/circuit-core/layout";
 import { countdownParts } from "@/themes/launch";
 
-const overlap = (a: { x: number; y: number; w: number; h: number }, b: typeof a) =>
-  a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h;
+const overlap = (
+  a: { x: number; y: number; w: number; h: number },
+  b: typeof a,
+) => a.x < b.x + b.w && b.x < a.x + a.w && a.y < b.y + b.h && b.y < a.y + a.h;
 
 describe("circuit core layout", () => {
   for (const mobile of [false, true]) {
@@ -40,7 +46,14 @@ describe("chip codes", () => {
     { id: "itfm", name: "ITFM" },
   ];
   it("derives short clean codes for the six live products", () => {
-    expect(live.map(chipCode)).toEqual(["ARCHONE", "APM", "RADAR", "EA-TOOL", "INNOV", "ITFM"]);
+    expect(live.map(chipCode)).toEqual([
+      "ARCHONE",
+      "APM",
+      "RADAR",
+      "EA-TOOL",
+      "INNOV",
+      "ITFM",
+    ]);
   });
   it("never exceeds the chip code length, even for long new products", () => {
     const extra = [

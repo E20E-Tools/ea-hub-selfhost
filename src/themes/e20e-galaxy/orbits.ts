@@ -25,19 +25,32 @@ export function orbitLayout(count: number): Orbit[] {
     const second = n > 6 && i >= rings;
     const a = rings === 1 ? 1 : inner + ((1 - inner) * ring) / (rings - 1);
     const phase =
-      (((ring * GOLDEN + (second ? Math.PI : 0)) % (2 * Math.PI)) + 2 * Math.PI) % (2 * Math.PI);
+      (((ring * GOLDEN + (second ? Math.PI : 0)) % (2 * Math.PI)) +
+        2 * Math.PI) %
+      (2 * Math.PI);
     out.push({ ring, a, phase, period: BASE_PERIOD * a ** 1.5 });
   }
   return out;
 }
 
-export type Projected = { x: number; y: number; z: number; scale: number; angle: number };
+export type Projected = {
+  x: number;
+  y: number;
+  z: number;
+  scale: number;
+  angle: number;
+};
 
 /**
  * Projects an orbit onto the tilted plane at time t (seconds). `tilt` is the ry/rx ratio.
  * z is +1 at the nearest point (in front of the sun) and -1 at the farthest.
  */
-export function project(orbit: Orbit, t: number, tilt: number, extraPhase = 0): Projected {
+export function project(
+  orbit: Orbit,
+  t: number,
+  tilt: number,
+  extraPhase = 0,
+): Projected {
   const angle = orbit.phase + extraPhase + (2 * Math.PI * t) / orbit.period;
   const z = Math.sin(angle);
   return {
@@ -50,7 +63,10 @@ export function project(orbit: Orbit, t: number, tilt: number, extraPhase = 0): 
 }
 
 /** True when the planet is on the far side and its centre falls inside the sun's disc. */
-export function behindSun(p: Pick<Projected, "x" | "y" | "z">, sunRadius: number): boolean {
+export function behindSun(
+  p: Pick<Projected, "x" | "y" | "z">,
+  sunRadius: number,
+): boolean {
   return p.z < 0 && Math.hypot(p.x, p.y) < sunRadius;
 }
 
@@ -99,6 +115,9 @@ export function placeLabel(
   const fitsAfter = after + width <= stageWidth - pad;
   const fitsBefore = before >= pad;
   const right = rtl ? !fitsBefore && fitsAfter : fitsAfter || !fitsBefore;
-  const lx = Math.max(pad, Math.min(stageWidth - pad - width, right ? after : before));
+  const lx = Math.max(
+    pad,
+    Math.min(stageWidth - pad - width, right ? after : before),
+  );
   return { x: lx, side: right ? "right" : "left" };
 }

@@ -12,7 +12,10 @@ export function useActiveTheme(initial: DesignThemeId): DesignThemeId {
     };
     read();
     const mo = new MutationObserver(read);
-    mo.observe(el, { attributes: true, attributeFilter: ["data-design-theme"] });
+    mo.observe(el, {
+      attributes: true,
+      attributeFilter: ["data-design-theme"],
+    });
     return () => mo.disconnect();
   }, []);
   return theme;

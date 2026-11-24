@@ -29,7 +29,14 @@ export function FlipDeckThumb() {
                 rx="4"
                 fill={["#2F6BFF", "#00D4FF", "#8B5CF6"][i]}
               />
-              <rect x="-18" y="-6" width="36" height="7" rx="3" fill="#0F1730" />
+              <rect
+                x="-18"
+                y="-6"
+                width="36"
+                height="7"
+                rx="3"
+                fill="#0F1730"
+              />
               <rect x="-18" y="6" width="30" height="4" rx="2" fill="#9aa3b8" />
             </>
           ) : (

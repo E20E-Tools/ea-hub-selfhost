@@ -5,14 +5,24 @@ export const FORMATIONS = ["grid", "clusters", "title"] as const;
 export type Formation = (typeof FORMATIONS)[number];
 
 export function particleCount(mobile: boolean, scale: number): number {
-  return Math.round((mobile ? 180 : 400) * Math.min(1.25, Math.max(0.5, scale)));
+  return Math.round(
+    (mobile ? 180 : 400) * Math.min(1.25, Math.max(0.5, scale)),
+  );
 }
 
 /** Which formation is shown and how far into it (k 0–1) at time `ms`. */
-export function formationAt(ms: number): { formation: Formation; index: number; k: number } {
+export function formationAt(ms: number): {
+  formation: Formation;
+  index: number;
+  k: number;
+} {
   const step = Math.floor(ms / FORMATION_MS);
   const index = ((step % 3) + 3) % 3;
-  return { formation: FORMATIONS[index]!, index, k: (ms % FORMATION_MS) / FORMATION_MS };
+  return {
+    formation: FORMATIONS[index]!,
+    index,
+    k: (ms % FORMATION_MS) / FORMATION_MS,
+  };
 }
 
 /** Old spreadsheet grid targets. */
@@ -48,7 +58,9 @@ export function clusterTargets(n: number, centres: Pt[], radius: number): Pt[] {
   return Array.from({ length: n }, (_, i) => {
     const c = centres[i % centres.length]!;
     const j = Math.floor(i / centres.length);
-    const r = radius * Math.sqrt((j + 0.5) / Math.max(1, Math.ceil(n / centres.length)));
+    const r =
+      radius *
+      Math.sqrt((j + 0.5) / Math.max(1, Math.ceil(n / centres.length)));
     const a = j * 2.39996;
     return { x: c.x + Math.cos(a) * r, y: c.y + Math.sin(a) * r };
   });
@@ -67,11 +79,19 @@ export function sampleText(
     for (let x = 0; x < width; x += step)
       if ((data[(y * width + x) * 4 + 3] ?? 0) > 128) hits.push({ x, y });
   if (!hits.length) return [];
-  return Array.from({ length: n }, (_, i) => hits[Math.floor((i * hits.length) / n)]!);
+  return Array.from(
+    { length: n },
+    (_, i) => hits[Math.floor((i * hits.length) / n)]!,
+  );
 }
 
 /** Pointer push: displacement away from the pointer within `radius`. */
-export function repel(p: Pt, pointer: Pt | null, radius: number, strength: number): Pt {
+export function repel(
+  p: Pt,
+  pointer: Pt | null,
+  radius: number,
+  strength: number,
+): Pt {
   if (!pointer) return { x: 0, y: 0 };
   const dx = p.x - pointer.x;
   const dy = p.y - pointer.y;

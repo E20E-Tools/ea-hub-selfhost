@@ -12,7 +12,11 @@ import {
   launchMonthGrid,
 } from "@/lib/archone-launch";
 import { mapProduct, type ProductRow } from "@/lib/catalog";
-import { verifyTurnstile, turnstileConfig, TURNSTILE_VERIFY_URL } from "@/lib/turnstile.server";
+import {
+  verifyTurnstile,
+  turnstileConfig,
+  TURNSTILE_VERIFY_URL,
+} from "@/lib/turnstile.server";
 import {
   budgetAlertThreshold,
   ipEmailSubject,
@@ -25,8 +29,15 @@ import {
   openSecret,
   rootSecrets,
 } from "@/lib/server-keys.server";
-import { issueAccessToken, verifyAccessToken } from "@/lib/assistant-gate.server";
-import { DESIGN_THEME_IDS, THEME_FONT_FAMILIES, themeFontsHref } from "@/lib/design-themes";
+import {
+  issueAccessToken,
+  verifyAccessToken,
+} from "@/lib/assistant-gate.server";
+import {
+  DESIGN_THEME_IDS,
+  THEME_FONT_FAMILIES,
+  themeFontsHref,
+} from "@/lib/design-themes";
 import {
   CATALOG_TTL_MS,
   SIGNED_URL_REUSE_MS,
@@ -38,9 +49,17 @@ import {
   rememberSignedUrl,
 } from "@/lib/catalog-cache.server";
 import { sitemapPaths } from "@/lib/sitemap.shared";
-import { LANGUAGE_COOKIE, languageCookie, languageFromCookie } from "@/lib/language-core";
+import {
+  LANGUAGE_COOKIE,
+  languageCookie,
+  languageFromCookie,
+} from "@/lib/language-core";
 import { DEFAULT_NAVIGATION, readNavigation } from "@/lib/navigation.shared";
-import { FEATURE_PATHS, isDisabledFeaturePath, normalizeFeatureFlags } from "@/lib/site-features";
+import {
+  FEATURE_PATHS,
+  isDisabledFeaturePath,
+  normalizeFeatureFlags,
+} from "@/lib/site-features";
 import { aiFailureAlert, budgetAlerts } from "@/lib/operations.shared";
 
 afterEach(() => vi.unstubAllEnvs());
@@ -63,9 +82,9 @@ describe("1) ArchONE launch comes from products.publication_date", () => {
     const at = launchInstantFor("archone", "2026-12-05")!;
     expect(launchIcs(at)).toContain("DTSTART:20261205T060000Z");
     expect(launchIcs(at)).toContain("DTEND:20261205T070000Z");
-    expect(new URL(launchGoogleCalendarHref(at, false)).searchParams.get("dates")).toBe(
-      "20261205T060000Z/20261205T070000Z",
-    );
+    expect(
+      new URL(launchGoogleCalendarHref(at, false)).searchParams.get("dates"),
+    ).toBe("20261205T060000Z/20261205T070000Z");
     // November 2026 starts on a Sunday and has 30 days.
     const grid = launchMonthGrid(launchInstantFor("archone", "2026-11-22")!);
     expect(grid.day).toBe(22);
@@ -74,10 +93,16 @@ describe("1) ArchONE launch comes from products.publication_date", () => {
     expect(archoneLaunchLabel(false, "2026-12-05")).toBe("Launches 5 Dec 2026");
   });
   it("redirects to the product page once the launch moment has passed", () => {
-    const archone = { id: "archone", comingSoon: true, publicationDate: "2026-11-22" };
+    const archone = {
+      id: "archone",
+      comingSoon: true,
+      publicationDate: "2026-11-22",
+    };
     expect(archoneSoonTarget(archone, BEFORE)).toBeNull();
     expect(archoneSoonTarget(archone, AFTER)).toBe("product");
-    expect(archoneSoonTarget({ ...archone, comingSoon: false }, BEFORE)).toBe("product");
+    expect(archoneSoonTarget({ ...archone, comingSoon: false }, BEFORE)).toBe(
+      "product",
+    );
     expect(archoneSoonTarget(undefined, BEFORE)).toBe("home");
   });
   it("shows a coming-soon product as available after its date without changing the stored flag", () => {
@@ -116,23 +141,35 @@ describe("2) Cloudflare Turnstile replaces the sum only when both keys are set",
     expect(turnstileConfig()).toEqual({ siteKey: "site", secretKey: "secret" });
   });
   it("verifies the token on the server through siteverify", async () => {
-    const fetcher = vi.fn(async (_url: string | URL | Request, init?: RequestInit) => {
-      const body = init?.body as URLSearchParams;
-      expect(body.get("secret")).toBe("secret");
-      expect(body.get("response")).toBe("tok");
-      expect(body.get("remoteip")).toBe("192.0.2.1");
-      return Response.json({ success: true });
-    });
+    const fetcher = vi.fn(
+      async (_url: string | URL | Request, init?: RequestInit) => {
+        const body = init?.body as URLSearchParams;
+        expect(body.get("secret")).toBe("secret");
+        expect(body.get("response")).toBe("tok");
+        expect(body.get("remoteip")).toBe("192.0.2.1");
+        return Response.json({ success: true });
+      },
+    );
     const config = { siteKey: "site", secretKey: "secret" };
-    expect(await verifyTurnstile(config, "tok", "192.0.2.1", fetcher as typeof fetch)).toBe(true);
+    expect(
+      await verifyTurnstile(
+        config,
+        "tok",
+        "192.0.2.1",
+        fetcher as typeof fetch,
+      ),
+    ).toBe(true);
     expect(fetcher.mock.calls[0]?.[0]).toBe(TURNSTILE_VERIFY_URL);
-    const deny = (async () => Response.json({ success: false })) as unknown as typeof fetch;
+    const deny = (async () =>
+      Response.json({ success: false })) as unknown as typeof fetch;
     expect(await verifyTurnstile(config, "tok", "192.0.2.1", deny)).toBe(false);
     const down = (async () => {
       throw new Error("offline");
     }) as unknown as typeof fetch;
     expect(await verifyTurnstile(config, "tok", "192.0.2.1", down)).toBe(false);
-    expect(await verifyTurnstile(config, "", "192.0.2.1", fetcher as typeof fetch)).toBe(false);
+    expect(
+      await verifyTurnstile(config, "", "192.0.2.1", fetcher as typeof fetch),
+    ).toBe(false);
   });
 });
 
@@ -171,18 +208,38 @@ describe("4) dedicated APP_ENCRYPTION_KEY with the old key as fallback", () => {
     vi.stubEnv("SUPABASE_SERVICE_ROLE_KEY", "old-root");
     vi.stubEnv("APP_ENCRYPTION_KEY", "new-root");
     const oldValue = await encryptSecret("api-key-1", "old-root");
-    expect(await openSecret(oldValue)).toEqual({ plain: "api-key-1", rewrap: true });
+    expect(await openSecret(oldValue)).toEqual({
+      plain: "api-key-1",
+      rewrap: true,
+    });
     const newValue = await encryptSecret("api-key-1");
-    expect(await openSecret(newValue)).toEqual({ plain: "api-key-1", rewrap: false });
-    expect(await openSecret(newValue, ["old-root"])).toEqual({ plain: "", rewrap: false });
+    expect(await openSecret(newValue)).toEqual({
+      plain: "api-key-1",
+      rewrap: false,
+    });
+    expect(await openSecret(newValue, ["old-root"])).toEqual({
+      plain: "",
+      rewrap: false,
+    });
   });
   it("accepts visitor tokens signed with either key during the switch-over", async () => {
     vi.stubEnv("SUPABASE_SERVICE_ROLE_KEY", "old-root");
-    const oldSecret = await deriveSigningSecret("assistant-gate-v1", "old-root");
-    const { token } = await issueAccessToken(oldSecret, "V", "v@example.com", Date.now(), "id-1");
+    const oldSecret = await deriveSigningSecret(
+      "assistant-gate-v1",
+      "old-root",
+    );
+    const { token } = await issueAccessToken(
+      oldSecret,
+      "V",
+      "v@example.com",
+      Date.now(),
+      "id-1",
+    );
     vi.stubEnv("APP_ENCRYPTION_KEY", "new-root");
     const secrets = await deriveSigningSecrets("assistant-gate-v1");
-    expect(secrets[0]).toBe(await deriveSigningSecret("assistant-gate-v1", "new-root"));
+    expect(secrets[0]).toBe(
+      await deriveSigningSecret("assistant-gate-v1", "new-root"),
+    );
     expect((await verifyAccessToken(secrets, token))?.visitorId).toBe("id-1");
     expect(await verifyAccessToken([secrets[0]!], token)).toBeNull();
   });
@@ -218,10 +275,12 @@ describe("6) server memory cache for signed links and the catalog", () => {
   it("reuses a signed link for an hour, well inside its 6-hour validity", () => {
     expect(SIGNED_URL_REUSE_MS).toBe(3_600_000);
     rememberSignedUrl("products/a.png", "https://signed/a", 1_000);
-    expect(cachedSignedUrl("products/a.png", 1_000 + SIGNED_URL_REUSE_MS - 1)).toBe(
-      "https://signed/a",
-    );
-    expect(cachedSignedUrl("products/a.png", 1_000 + SIGNED_URL_REUSE_MS)).toBeNull();
+    expect(
+      cachedSignedUrl("products/a.png", 1_000 + SIGNED_URL_REUSE_MS - 1),
+    ).toBe("https://signed/a");
+    expect(
+      cachedSignedUrl("products/a.png", 1_000 + SIGNED_URL_REUSE_MS),
+    ).toBeNull();
   });
   it("keeps the catalog 30-60 seconds and drops it on any admin save", () => {
     expect(CATALOG_TTL_MS).toBeGreaterThanOrEqual(30_000);
@@ -253,28 +312,36 @@ describe("6) server memory cache for signed links and the catalog", () => {
 
 describe("7) daily scheduled cleanup", () => {
   it("runs from an authenticated cron route, and chat creation and admin replies no longer purge", () => {
-    const route = readFileSync("src/routes/api/public/jobs/daily-cleanup.ts", "utf8");
+    const route = readFileSync(
+      "src/routes/api/public/jobs/daily-cleanup.ts",
+      "utf8",
+    );
     expect(route.indexOf("authenticateCronRequest(request)")).toBeLessThan(
       route.indexOf("run_daily_maintenance"),
     );
     expect(readFileSync("src/lib/live-chat.server.ts", "utf8")).not.toContain(
       "purge_expired_chats_bounded",
     );
-    expect(readFileSync("src/lib/live-chat.functions.ts", "utf8")).not.toContain(
-      "purgeExpiredChats(",
-    );
+    expect(
+      readFileSync("src/lib/live-chat.functions.ts", "utf8"),
+    ).not.toContain("purgeExpiredChats(");
   });
 });
 
 describe("8) assistant_replies is retired", () => {
   it("admin reads AI replies from live_chat_messages", async () => {
-    const { toAssistantReplyRow } = await import("@/lib/admin-monitor.functions");
+    const { toAssistantReplyRow } =
+      await import("@/lib/admin-monitor.functions");
     expect(
       toAssistantReplyRow({
         id: "m1",
         body: "answer",
         created_at: "2026-11-16T10:00:00Z",
-        live_chats: { visitor_email: "v@example.com", visitor_name: "V", language: "en" },
+        live_chats: {
+          visitor_email: "v@example.com",
+          visitor_name: "V",
+          language: "en",
+        },
       }),
     ).toEqual({
       id: "m1",
@@ -284,9 +351,13 @@ describe("8) assistant_replies is retired", () => {
       language: "en",
       created_at: "2026-11-16T10:00:00Z",
     });
-    const files = readdirSync("src/lib").filter((f) => f.endsWith(".ts") || f.endsWith(".tsx"));
+    const files = readdirSync("src/lib").filter(
+      (f) => f.endsWith(".ts") || f.endsWith(".tsx"),
+    );
     for (const f of files) {
-      expect(readFileSync(`src/lib/${f}`, "utf8"), f).not.toMatch(/from\("assistant_replies"\)/);
+      expect(readFileSync(`src/lib/${f}`, "utf8"), f).not.toMatch(
+        /from\("assistant_replies"\)/,
+      );
     }
   });
 });
@@ -304,7 +375,9 @@ describe("9) sitemap leaves out switched-off, hidden and empty pages", () => {
   };
   it("drops /testimonials while nothing is published", () => {
     expect(sitemapPaths(base)).toContain("/testimonials");
-    expect(sitemapPaths({ ...base, hasTestimonials: false })).not.toContain("/testimonials");
+    expect(sitemapPaths({ ...base, hasTestimonials: false })).not.toContain(
+      "/testimonials",
+    );
   });
   it("drops pages whose feature is switched off", () => {
     const paths = sitemapPaths({ ...base, featureFlags: { blog: false } });
@@ -315,7 +388,9 @@ describe("9) sitemap leaves out switched-off, hidden and empty pages", () => {
     const items = readNavigation(DEFAULT_NAVIGATION).map((i) =>
       i.url === "/affiliates" ? { ...i, hidden: true } : i,
     );
-    expect(sitemapPaths({ ...base, navigationItems: items })).not.toContain("/affiliates");
+    expect(sitemapPaths({ ...base, navigationItems: items })).not.toContain(
+      "/affiliates",
+    );
   });
   it("lists the try page only for available or launched tools", () => {
     expect(sitemapPaths(base)).toContain("/try/radar");
@@ -347,7 +422,13 @@ describe("10) language cookie for the first server response", () => {
 describe("11) /about replaces /blog", () => {
   it("maps saved /blog menu links to /about and keeps the feature switch working", () => {
     const saved = [
-      { id: "about", labelAr: "من نحن", labelEn: "About us", url: "/blog", hidden: false },
+      {
+        id: "about",
+        labelAr: "من نحن",
+        labelEn: "About us",
+        url: "/blog",
+        hidden: false,
+      },
     ];
     expect(readNavigation(saved)[0]?.url).toBe("/about");
     expect(FEATURE_PATHS.blog).toBe("/about");
@@ -364,7 +445,11 @@ describe("11) /about replaces /blog", () => {
 
 describe("12) AI failure alert", () => {
   const now = Date.parse("2026-11-16T12:00:00Z");
-  const row = (minutesAgo: number, outcome: "success" | "failure", operation = "assistant") => ({
+  const row = (
+    minutesAgo: number,
+    outcome: "success" | "failure",
+    operation = "assistant",
+  ) => ({
     operation,
     outcome,
     created_at: new Date(now - minutesAgo * 60_000).toISOString(),
@@ -372,12 +457,20 @@ describe("12) AI failure alert", () => {
   it("alerts after 3 failures in a row", () => {
     expect(
       aiFailureAlert(
-        [row(1, "failure"), row(2, "failure"), row(3, "failure"), row(4, "success")],
+        [
+          row(1, "failure"),
+          row(2, "failure"),
+          row(3, "failure"),
+          row(4, "success"),
+        ],
         now,
       )?.reason,
     ).toBe("streak");
     expect(
-      aiFailureAlert([row(1, "failure"), row(2, "failure"), row(3, "success")], now),
+      aiFailureAlert(
+        [row(1, "failure"), row(2, "failure"), row(3, "success")],
+        now,
+      ),
     ).toBeNull();
   });
   it("alerts when more than 30% of the last hour's answers failed", () => {

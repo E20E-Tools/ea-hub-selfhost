@@ -51,9 +51,12 @@ export function GeneralSettings({ catalog }: { catalog: Catalog }) {
   });
   const draft = form.value;
   if (!draft) throw new Error("Missing general settings draft");
-  const set = (patch: Partial<General>) => form.setValue((current) => ({ ...current, ...patch }));
+  const set = (patch: Partial<General>) =>
+    form.setValue((current) => ({ ...current, ...patch }));
   const [busy, setBusy] = useState(false);
-  const [errors, setErrors] = useState<Partial<Record<keyof General, string>>>({});
+  const [errors, setErrors] = useState<Partial<Record<keyof General, string>>>(
+    {},
+  );
   const logoInput = useRef<HTMLInputElement>(null);
   const logo = useAssetUrl(draft.logoUrl);
   const upload = useImageUpload();
@@ -61,7 +64,8 @@ export function GeneralSettings({ catalog }: { catalog: Catalog }) {
 
   const save = async () => {
     const found: typeof errors = {};
-    if (draft.displayTitle.trim().length < 2) found.displayTitle = t("tooShort");
+    if (draft.displayTitle.trim().length < 2)
+      found.displayTitle = t("tooShort");
     if (draft.description.trim().length < 10) found.description = t("tooShort");
     if (!footerLinksSchema.safeParse(draft.footerLinks).success)
       found.footerLinks = t("invalidUrl");
@@ -70,7 +74,10 @@ export function GeneralSettings({ catalog }: { catalog: Catalog }) {
     setBusy(true);
     try {
       const trimmed = Object.fromEntries(
-        Object.entries(draft).map(([k, v]) => [k, typeof v === "string" ? v.trim() : v]),
+        Object.entries(draft).map(([k, v]) => [
+          k,
+          typeof v === "string" ? v.trim() : v,
+        ]),
       ) as General;
       const result = await saveGeneralSettings({ data: trimmed });
       if (!result.ok) return void toast.error(t(result.message));
@@ -97,15 +104,24 @@ export function GeneralSettings({ catalog }: { catalog: Catalog }) {
 
   return (
     <div className="grid gap-5">
-      <aside className="settings-identity-preview" aria-label={t("settingsPreview")}>
+      <aside
+        className="settings-identity-preview"
+        aria-label={t("settingsPreview")}
+      >
         <small>{t("settingsPreview")}</small>
         <div>
           {logo && <img src={logo} alt="" />}
           <div>
             <strong dir="auto">
-              {language === "ar" ? draft.displayTitle : draft.displayTitleEn || draft.displayTitle}
+              {language === "ar"
+                ? draft.displayTitle
+                : draft.displayTitleEn || draft.displayTitle}
             </strong>
-            <p dir="auto">{language === "ar" ? draft.tagline : draft.taglineEn || draft.tagline}</p>
+            <p dir="auto">
+              {language === "ar"
+                ? draft.tagline
+                : draft.taglineEn || draft.tagline}
+            </p>
           </div>
         </div>
       </aside>
@@ -153,11 +169,19 @@ export function GeneralSettings({ catalog }: { catalog: Catalog }) {
         </div>
       </Card>
       <Card title={t("footerLinks")}>
-        <p className="mb-4 text-sm text-muted-foreground">{t("footerLinksHint")}</p>
+        <p className="mb-4 text-sm text-muted-foreground">
+          {t("footerLinksHint")}
+        </p>
         <div className="grid gap-4">
           {draft.footerLinks.map((link, index) => (
-            <div key={index} className="grid items-end gap-3 sm:grid-cols-[1fr_2fr_auto]">
-              <Field label={t("footerLinkName")} htmlFor={`footer-name-${index}`}>
+            <div
+              key={index}
+              className="grid items-end gap-3 sm:grid-cols-[1fr_2fr_auto]"
+            >
+              <Field
+                label={t("footerLinkName")}
+                htmlFor={`footer-name-${index}`}
+              >
                 <Input
                   id={`footer-name-${index}`}
                   value={link.name}
@@ -193,7 +217,9 @@ export function GeneralSettings({ catalog }: { catalog: Catalog }) {
                 aria-label={t("delete")}
                 onClick={() =>
                   set({
-                    footerLinks: draft.footerLinks.filter((_, i) => i !== index),
+                    footerLinks: draft.footerLinks.filter(
+                      (_, i) => i !== index,
+                    ),
                   })
                 }
               >
@@ -220,7 +246,11 @@ export function GeneralSettings({ catalog }: { catalog: Catalog }) {
         </div>
       </Card>
       <Card>
-        <SettingRow label={t("logo")} hint={t("logoHint")} htmlFor="settings-logo">
+        <SettingRow
+          label={t("logo")}
+          hint={t("logoHint")}
+          htmlFor="settings-logo"
+        >
           <div className="flex flex-wrap items-center gap-4">
             <div className="flex h-20 w-32 items-center justify-center overflow-hidden rounded-lg border border-border bg-muted">
               {logo ? (
@@ -230,7 +260,9 @@ export function GeneralSettings({ catalog }: { catalog: Catalog }) {
                   className="max-h-full max-w-full object-contain"
                 />
               ) : (
-                <span className="text-xs text-muted-foreground">{t("noLogo")}</span>
+                <span className="text-xs text-muted-foreground">
+                  {t("noLogo")}
+                </span>
               )}
             </div>
             <div className="flex flex-wrap gap-2">
@@ -274,7 +306,11 @@ export function GeneralSettings({ catalog }: { catalog: Catalog }) {
             </div>
           </div>
         </SettingRow>
-        <SettingRow label={t("arabicTitle")} hint={t("arabicTitleHint")} htmlFor="arabic-title">
+        <SettingRow
+          label={t("arabicTitle")}
+          hint={t("arabicTitleHint")}
+          htmlFor="arabic-title"
+        >
           <Input
             id="arabic-title"
             dir="rtl"
@@ -285,7 +321,12 @@ export function GeneralSettings({ catalog }: { catalog: Catalog }) {
           />
         </SettingRow>
       </Card>
-      <SaveBar dirty={form.dirty} busy={busy} onSave={() => void save()} onDiscard={form.discard} />
+      <SaveBar
+        dirty={form.dirty}
+        busy={busy}
+        onSave={() => void save()}
+        onDiscard={form.discard}
+      />
     </div>
   );
 }

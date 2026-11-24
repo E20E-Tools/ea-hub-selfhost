@@ -82,7 +82,10 @@ type EvidenceCandidate = {
   searchText: string;
 };
 
-function evidenceCandidates(product: Product, language: Language): EvidenceCandidate[] {
+function evidenceCandidates(
+  product: Product,
+  language: Language,
+): EvidenceCandidate[] {
   const fields: EvidenceCandidate[] = [
     { field: "name", text: product.name, searchText: product.name },
     {
@@ -101,7 +104,10 @@ function evidenceCandidates(product: Product, language: Language): EvidenceCandi
       searchText: `${product.overview} ${product.overviewEn ?? ""}`,
     },
   ];
-  const featureCount = Math.max(product.features.length, product.featuresEn?.length ?? 0);
+  const featureCount = Math.max(
+    product.features.length,
+    product.featuresEn?.length ?? 0,
+  );
   for (let index = 0; index < featureCount; index += 1) {
     const ar = product.features[index] ?? "";
     const en = product.featuresEn?.[index] ?? "";
@@ -120,11 +126,13 @@ export function discoveryCriteria(products: Product[]) {
   return {
     organizationSize: available.some(
       (product) =>
-        normalizeBeneficiaryDetails(product.beneficiaryDetails).organizationSizes.length > 0,
+        normalizeBeneficiaryDetails(product.beneficiaryDetails)
+          .organizationSizes.length > 0,
     ),
     maturity: available.some(
       (product) =>
-        normalizeBeneficiaryDetails(product.beneficiaryDetails).maturityLevels.length > 0,
+        normalizeBeneficiaryDetails(product.beneficiaryDetails).maturityLevels
+          .length > 0,
     ),
   };
 }
@@ -161,14 +169,17 @@ export function discoverProducts(
       ? [{ field: "metadata", text: "", matchedTerm: goal }]
       : [];
     for (const candidate of evidenceCandidates(product, language)) {
-      const matchedTerm = terms.find((term) => containsTerm(candidate.searchText, term));
+      const matchedTerm = terms.find((term) =>
+        containsTerm(candidate.searchText, term),
+      );
       if (matchedTerm) evidence.push({ ...candidate, matchedTerm });
     }
     const uniqueEvidence = evidence
       .filter(
         (item, index, all) =>
-          all.findIndex((other) => other.field === item.field && other.text === item.text) ===
-          index,
+          all.findIndex(
+            (other) => other.field === item.field && other.text === item.text,
+          ) === index,
       )
       .slice(0, 4);
     if (!uniqueEvidence.length) return [];
@@ -176,7 +187,9 @@ export function discoverProducts(
       {
         product,
         evidence: uniqueEvidence,
-        matchedTerms: [...new Set(uniqueEvidence.map((item) => item.matchedTerm))],
+        matchedTerms: [
+          ...new Set(uniqueEvidence.map((item) => item.matchedTerm)),
+        ],
         organizationFit,
         maturityFit,
       },
@@ -185,10 +198,13 @@ export function discoverProducts(
   return matches.sort((a, b) => {
     if (Boolean(a.product.comingSoon) !== Boolean(b.product.comingSoon))
       return a.product.comingSoon ? 1 : -1;
-    const aKnownFits = Number(a.organizationFit === true) + Number(a.maturityFit === true);
-    const bKnownFits = Number(b.organizationFit === true) + Number(b.maturityFit === true);
+    const aKnownFits =
+      Number(a.organizationFit === true) + Number(a.maturityFit === true);
+    const bKnownFits =
+      Number(b.organizationFit === true) + Number(b.maturityFit === true);
     if (aKnownFits !== bKnownFits) return bKnownFits - aKnownFits;
-    if (a.evidence.length !== b.evidence.length) return b.evidence.length - a.evidence.length;
+    if (a.evidence.length !== b.evidence.length)
+      return b.evidence.length - a.evidence.length;
     return (a.product.sortOrder ?? 0) - (b.product.sortOrder ?? 0);
   });
 }
@@ -207,5 +223,9 @@ export function planningPhases(
   );
   const discovery = Math.max(1, Math.round(safeWeeks * (0.2 + complexity)));
   const review = Math.max(1, Math.round(safeWeeks * 0.2));
-  return { discovery, pilot: Math.max(1, safeWeeks - discovery - review), review };
+  return {
+    discovery,
+    pilot: Math.max(1, safeWeeks - discovery - review),
+    review,
+  };
 }

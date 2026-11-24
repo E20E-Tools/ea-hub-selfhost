@@ -1,5 +1,8 @@
 import { describe, expect, it } from "vitest";
-import { summarizeTourVisits, type TourVisit } from "@/lib/archy-tour-visits.shared";
+import {
+  summarizeTourVisits,
+  type TourVisit,
+} from "@/lib/archy-tour-visits.shared";
 
 function row(key: string, values: Partial<TourVisit> = {}): TourVisit {
   return {
@@ -22,7 +25,12 @@ describe("Archy engagement", () => {
       row("a", { completed_at: "2026-11-13T23:01:00Z" }),
       row("b"),
     ]);
-    expect(result).toMatchObject({ tours: 3, started: 2, completed: 1, completionRate: 50 });
+    expect(result).toMatchObject({
+      tours: 3,
+      started: 2,
+      completed: 1,
+      completionRate: 50,
+    });
   });
   it("counts chat and saved support only after completion, once per browser", () => {
     const done = {
@@ -41,6 +49,9 @@ describe("Archy engagement", () => {
     ).toMatchObject({ started: 3, completed: 2, chatted: 2, supported: 1 });
   });
   it("does not invent a completion percentage without starts", () => {
-    expect(summarizeTourVisits([])).toMatchObject({ started: 0, completionRate: null });
+    expect(summarizeTourVisits([])).toMatchObject({
+      started: 0,
+      completionRate: null,
+    });
   });
 });

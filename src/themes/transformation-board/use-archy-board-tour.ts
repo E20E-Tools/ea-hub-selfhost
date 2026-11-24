@@ -1,5 +1,11 @@
 import { trackProductEvent } from "@/lib/metrics-consent";
-import { useEffect, useLayoutEffect, useRef, useSyncExternalStore, type RefObject } from "react";
+import {
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useSyncExternalStore,
+  type RefObject,
+} from "react";
 import { featureEnabled } from "@/lib/site-features";
 import {
   archyTour,
@@ -14,9 +20,15 @@ import {
 } from "@/lib/archy-tour";
 import type { StageMotion } from "../use-stage-motion";
 import type { SiteSettings } from "@/lib/catalog";
-import { startBrowserTourVisit, updateBrowserTourVisit } from "@/lib/archy-tour-visit-client";
+import {
+  startBrowserTourVisit,
+  updateBrowserTourVisit,
+} from "@/lib/archy-tour-visit-client";
 
-export function archyBoardTourEligible(settings: SiteSettings, animate: boolean) {
+export function archyBoardTourEligible(
+  settings: SiteSettings,
+  animate: boolean,
+) {
   return (
     animate &&
     !window.matchMedia("(prefers-reduced-motion: reduce)").matches &&
@@ -174,10 +186,22 @@ export function useArchyBoardTour(options: Options) {
     const isReady = () => {
       const robot = archyTour.getSnapshot();
       const box = boardNode.getBoundingClientRect();
-      const visibleW = Math.max(0, Math.min(box.right, window.innerWidth) - Math.max(0, box.left));
-      const visibleH = Math.max(0, Math.min(box.bottom, window.innerHeight) - Math.max(0, box.top));
-      const fraction = (visibleW * visibleH) / Math.max(1, box.width * box.height);
-      return robot.robotReady && !latest.current.booting && !document.hidden && fraction >= 0.7;
+      const visibleW = Math.max(
+        0,
+        Math.min(box.right, window.innerWidth) - Math.max(0, box.left),
+      );
+      const visibleH = Math.max(
+        0,
+        Math.min(box.bottom, window.innerHeight) - Math.max(0, box.top),
+      );
+      const fraction =
+        (visibleW * visibleH) / Math.max(1, box.width * box.height);
+      return (
+        robot.robotReady &&
+        !latest.current.booting &&
+        !document.hidden &&
+        fraction >= 0.7
+      );
     };
     const check = (now: number) => {
       if (!pending || stopped) return;

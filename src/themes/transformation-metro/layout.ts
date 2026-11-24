@@ -38,13 +38,15 @@ export const LABEL_FONT = 13;
 /** Approximate rendered width of a bold 13px label. */
 export function labelWidth(text: string): number {
   let w = 0;
-  for (const ch of text) w += /[A-Z0-9&]/.test(ch) ? 9.2 : /\s/.test(ch) ? 4 : 8;
+  for (const ch of text)
+    w += /[A-Z0-9&]/.test(ch) ? 9.2 : /\s/.test(ch) ? 4 : 8;
   return Math.ceil(w);
 }
 export function fitLabel(text: string, max: number): string {
   if (labelWidth(text) <= max) return text;
   const chars = Array.from(text);
-  while (chars.length > 1 && labelWidth(`${chars.join("")}…`) > max) chars.pop();
+  while (chars.length > 1 && labelWidth(`${chars.join("")}…`) > max)
+    chars.pop();
   return `${chars.join("").trimEnd()}…`;
 }
 
@@ -58,7 +60,10 @@ function polyLength(points: Pt[]): number {
   return l;
 }
 
-export function pointAt(points: Pt[], dist: number): { x: number; y: number; angle: number } {
+export function pointAt(
+  points: Pt[],
+  dist: number,
+): { x: number; y: number; angle: number } {
   let left = Math.max(0, dist);
   for (let i = 1; i < points.length; i++) {
     const a = points[i - 1] as Pt;
@@ -67,7 +72,11 @@ export function pointAt(points: Pt[], dist: number): { x: number; y: number; ang
     const angle = (Math.atan2(b[1] - a[1], b[0] - a[0]) * 180) / Math.PI;
     if (left <= seg || i === points.length - 1) {
       const t = seg ? Math.min(1, left / seg) : 0;
-      return { x: a[0] + (b[0] - a[0]) * t, y: a[1] + (b[1] - a[1]) * t, angle };
+      return {
+        x: a[0] + (b[0] - a[0]) * t,
+        y: a[1] + (b[1] - a[1]) * t,
+        angle,
+      };
     }
     left -= seg;
   }
@@ -166,7 +175,10 @@ function distanceTo(points: Pt[], target: Pt): number {
   return acc;
 }
 
-function buildBranch(dir: Dir, stations: MetroInput[number]["stations"]): LayoutBranch {
+function buildBranch(
+  dir: Dir,
+  stations: MetroInput[number]["stations"],
+): LayoutBranch {
   const g = branchGeometry(dir, stations.length);
   const sx = dir.includes("E") ? 1 : dir.includes("W") ? -1 : 0;
   const out: LayoutStation[] = stations.map((s, k) => {
@@ -174,7 +186,8 @@ function buildBranch(dir: Dir, stations: MetroInput[number]["stations"]): Layout
     let max = g.labelMax;
     if (!g.vertical) {
       max = Math.min(max, 2 * (Math.min(x, W - x) - 12));
-      if (y === CY) max = Math.min(max, 2 * (Math.abs(x - CX) - PILL_W / 2 - 10));
+      if (y === CY)
+        max = Math.min(max, 2 * (Math.abs(x - CX) - PILL_W / 2 - 10));
     }
     const label = fitLabel(s.name, max);
     if (g.vertical) {
@@ -225,7 +238,9 @@ function networkLayout(lines: MetroInput): MetroLayout {
   // Decide which lines split into two opposite branches (more than 3 stations, while directions remain).
   const split = new Set<number>();
   let used = lines.length;
-  const bySize = lines.map((l, i) => ({ i, n: l.stations.length })).sort((a, b) => b.n - a.n);
+  const bySize = lines
+    .map((l, i) => ({ i, n: l.stations.length }))
+    .sort((a, b) => b.n - a.n);
   for (const { i, n } of bySize) {
     if (n > 3 && used < 8 && split.size < PAIRS.length) {
       split.add(i);
@@ -264,7 +279,10 @@ function networkLayout(lines: MetroInput): MetroLayout {
           ],
         };
       }
-      return { category: line.category, branches: [buildBranch(dirs[0] as Dir, line.stations)] };
+      return {
+        category: line.category,
+        branches: [buildBranch(dirs[0] as Dir, line.stations)],
+      };
     }),
   };
 }
@@ -304,11 +322,22 @@ function stripLayout(lines: MetroInput): MetroLayout {
     return {
       category: line.category,
       branches: [
-        { points, stations, length: polyLength(points), serviceLength: lastLive ? lastLive.at : 0 },
+        {
+          points,
+          stations,
+          length: polyLength(points),
+          serviceLength: lastLive ? lastLive.at : 0,
+        },
       ],
     };
   });
-  return { w, h: y, central: { x: 20, y: 18, w: 320, h: 56 }, lines: out, headers };
+  return {
+    w,
+    h: y,
+    central: { x: 20, y: 18, w: 320, h: 56 },
+    lines: out,
+    headers,
+  };
 }
 
 /** Axis-aligned boxes for markers and labels (used by tests to prove no overlaps). */
@@ -320,7 +349,12 @@ export function layoutBoxes(
     for (const b of line.branches) {
       for (const s of b.stations) {
         const lw = labelWidth(s.label);
-        const lx = s.anchor === "middle" ? s.lx - lw / 2 : s.anchor === "end" ? s.lx - lw : s.lx;
+        const lx =
+          s.anchor === "middle"
+            ? s.lx - lw / 2
+            : s.anchor === "end"
+              ? s.lx - lw
+              : s.lx;
         boxes.push({
           x: lx,
           y: s.ly - LABEL_FONT,
@@ -328,7 +362,13 @@ export function layoutBoxes(
           h: LABEL_FONT + 4,
           kind: `label:${s.productId}`,
         });
-        boxes.push({ x: s.x - 9, y: s.y - 9, w: 18, h: 18, kind: `marker:${s.productId}` });
+        boxes.push({
+          x: s.x - 9,
+          y: s.y - 9,
+          w: 18,
+          h: 18,
+          kind: `marker:${s.productId}`,
+        });
       }
     }
   }

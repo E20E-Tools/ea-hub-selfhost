@@ -1,7 +1,11 @@
 /** Pure board geometry for Circuit Core (1–12 chips). Traces run core → chip. */
 export type Box = { x: number; y: number; w: number; h: number };
 /** `pts` are the trace's polyline vertices (core end first), used by themes that morph traces. */
-export type Trace = { d: string; vias: Array<[number, number]>; pts: Array<[number, number]> };
+export type Trace = {
+  d: string;
+  vias: Array<[number, number]>;
+  pts: Array<[number, number]>;
+};
 export type CircuitLayout = {
   w: number;
   h: number;
@@ -105,10 +109,21 @@ function desktopLayout(n: number): CircuitLayout {
   row(top, w, cw).forEach((x, i) => {
     const chip = { x, y: 24, w: cw, h: chh };
     chips.push(chip);
-    traces.push(vTrace(core.x + (core.w * (i + 1)) / (top + 1), core.y, x + cw / 2, chip.y + chh));
+    traces.push(
+      vTrace(
+        core.x + (core.w * (i + 1)) / (top + 1),
+        core.y,
+        x + cw / 2,
+        chip.y + chh,
+      ),
+    );
   });
   const sideYs =
-    perSide === 2 ? [h / 2 - chh - 14, h / 2 + 14] : perSide === 1 ? [h / 2 - chh / 2] : [];
+    perSide === 2
+      ? [h / 2 - chh - 14, h / 2 + 14]
+      : perSide === 1
+        ? [h / 2 - chh / 2]
+        : [];
   for (const side of ["left", "right"] as const) {
     sideYs.forEach((y, j) => {
       const x = side === "left" ? 16 : w - 16 - cw;
@@ -125,7 +140,12 @@ function desktopLayout(n: number): CircuitLayout {
     const chip = { x, y: h - 24 - chh, w: cw, h: chh };
     chips.push(chip);
     traces.push(
-      vTrace(core.x + (core.w * (i + 1)) / (bottom + 1), core.y + core.h, x + cw / 2, chip.y),
+      vTrace(
+        core.x + (core.w * (i + 1)) / (bottom + 1),
+        core.y + core.h,
+        x + cw / 2,
+        chip.y,
+      ),
     );
   });
   return { w, h, core, chips, traces };
@@ -166,7 +186,9 @@ function mobileLayout(n: number): CircuitLayout {
     core,
     chips,
     traces,
-    bus: last ? `M${bus} ${core.y + core.h}V${last.y + last.h / 2 - 14}` : undefined,
+    bus: last
+      ? `M${bus} ${core.y + core.h}V${last.y + last.h / 2 - 14}`
+      : undefined,
   };
 }
 
@@ -184,7 +206,11 @@ export function chipCode(product: { id: string; name?: string }): string {
   const joined = words.join("-").toUpperCase();
   if (words.length && joined.length <= CHIP_CODE_MAX) return joined;
   const acronym = words.find(
-    (w) => w.length >= 2 && w.length <= 5 && /[A-Z]/.test(w) && w === w.toUpperCase(),
+    (w) =>
+      w.length >= 2 &&
+      w.length <= 5 &&
+      /[A-Z]/.test(w) &&
+      w === w.toUpperCase(),
   );
   if (acronym) return acronym;
   if (words.length >= 2) {

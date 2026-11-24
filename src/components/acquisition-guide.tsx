@@ -24,7 +24,11 @@ export function AcquisitionGuidePanel({
   const headingId = `acquire-${variant}-${product.id}`;
   return (
     <section
-      className={variant === "page" ? "bx-panel bx-acquire bx-acquire-page" : "bx-acquire"}
+      className={
+        variant === "page"
+          ? "bx-panel bx-acquire bx-acquire-page"
+          : "bx-acquire"
+      }
       aria-labelledby={headingId}
     >
       <Heading id={headingId} className="bx-acquire-title">
@@ -35,7 +39,8 @@ export function AcquisitionGuidePanel({
       <p className="bx-acquire-launch">
         <CalendarClock aria-hidden="true" size={16} />
         <span>
-          {t("bxLaunchDate")}: <strong>{guide.launch ?? t("bxLaunchUnknown")}</strong>
+          {t("bxLaunchDate")}:{" "}
+          <strong>{guide.launch ?? t("bxLaunchUnknown")}</strong>
         </span>
       </p>
       <div>

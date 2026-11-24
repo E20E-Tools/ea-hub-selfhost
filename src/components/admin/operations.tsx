@@ -35,10 +35,17 @@ export function ApplicationHealth() {
               : "opsUnknown",
     );
   return (
-    <section className="my-6 border-y border-border py-5" aria-label={t("opsHealth")}>
+    <section
+      className="my-6 border-y border-border py-5"
+      aria-label={t("opsHealth")}
+    >
       <header className="flex flex-wrap items-center justify-between gap-3">
         <h2 className="font-semibold">{t("opsHealth")}</h2>
-        <Button variant="outline" onClick={() => void q.refetch()} disabled={q.isFetching}>
+        <Button
+          variant="outline"
+          onClick={() => void q.refetch()}
+          disabled={q.isFetching}
+        >
           <RefreshCw className="size-4" />
           {t("opsRefresh")}
         </Button>
@@ -51,11 +58,16 @@ export function ApplicationHealth() {
                 role="alert"
                 className="mb-4 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm font-medium text-destructive"
               >
-                {t(q.data.aiAlert.reason === "streak" ? "opsAiAlertStreak" : "opsAiAlertRate", {
-                  streak: q.data.aiAlert.streak,
-                  failures: q.data.aiAlert.hourFailures,
-                  samples: q.data.aiAlert.hourSamples,
-                })}
+                {t(
+                  q.data.aiAlert.reason === "streak"
+                    ? "opsAiAlertStreak"
+                    : "opsAiAlertRate",
+                  {
+                    streak: q.data.aiAlert.streak,
+                    failures: q.data.aiAlert.hourFailures,
+                    samples: q.data.aiAlert.hourSamples,
+                  },
+                )}
               </p>
             ) : null}
             {q.data.budgetAlerts?.map((alert) => (
@@ -64,14 +76,22 @@ export function ApplicationHealth() {
                 role="alert"
                 className="mb-4 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm font-medium text-destructive"
               >
-                {t(alert.kind === "request" ? "opsBudgetAlertRequest" : "opsBudgetAlertChat", {
-                  used: alert.used,
-                  limit: alert.limit,
-                })}
+                {t(
+                  alert.kind === "request"
+                    ? "opsBudgetAlertRequest"
+                    : "opsBudgetAlertChat",
+                  {
+                    used: alert.used,
+                    limit: alert.limit,
+                  },
+                )}
               </p>
             ))}
             {q.data.chatHealth ? (
-              <section className="mb-4 border-y border-border py-3" aria-label={t("opsChatHealth")}>
+              <section
+                className="mb-4 border-y border-border py-3"
+                aria-label={t("opsChatHealth")}
+              >
                 <h3 className="font-medium">{t("opsChatHealth")}</h3>
                 {q.data.chatHealth.alert ? (
                   <p
@@ -90,16 +110,22 @@ export function ApplicationHealth() {
                   </p>
                 ) : null}
                 {q.data.chatHealth.hourSamples === 0 ? (
-                  <p className="text-sm text-muted-foreground">{t("opsChatNone")}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {t("opsChatNone")}
+                  </p>
                 ) : (
                   <dl className="grid gap-3 sm:grid-cols-4">
                     <div>
                       <dt>{t("opsChatSuccessHour")}</dt>
-                      <dd className="tabular-nums">{q.data.chatHealth.hourSuccess}</dd>
+                      <dd className="tabular-nums">
+                        {q.data.chatHealth.hourSuccess}
+                      </dd>
                     </div>
                     <div>
                       <dt>{t("opsChatSamplesHour")}</dt>
-                      <dd className="tabular-nums">{q.data.chatHealth.hourSamples}</dd>
+                      <dd className="tabular-nums">
+                        {q.data.chatHealth.hourSamples}
+                      </dd>
                     </div>
                     <div>
                       <dt>{t("opsChatMedian")}</dt>
@@ -109,7 +135,9 @@ export function ApplicationHealth() {
                     </div>
                     <div>
                       <dt>{t("opsChatP95")}</dt>
-                      <dd className="tabular-nums">{q.data.chatHealth.p95Ms ?? t("opsUnknown")}</dd>
+                      <dd className="tabular-nums">
+                        {q.data.chatHealth.p95Ms ?? t("opsUnknown")}
+                      </dd>
                     </div>
                   </dl>
                 )}
@@ -217,9 +245,9 @@ export function SettingsHistory() {
   const cache = useQueryClient();
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
-  const [preview, setPreview] = useState<Awaited<ReturnType<typeof previewSettingsRestore>> | null>(
-    null,
-  );
+  const [preview, setPreview] = useState<Awaited<
+    ReturnType<typeof previewSettingsRestore>
+  > | null>(null);
   const q = useQuery({
     queryKey: ["admin", "settings-history"],
     queryFn: () => listSettingsVersions(),
@@ -258,7 +286,9 @@ export function SettingsHistory() {
   return (
     <section aria-label={t("opsHistory")}>
       <h2 className="font-semibold">{t("opsHistory")}</h2>
-      <p className="my-2 text-sm text-muted-foreground">{t("opsHistoryHint")}</p>
+      <p className="my-2 text-sm text-muted-foreground">
+        {t("opsHistoryHint")}
+      </p>
       <Button variant="outline" onClick={() => void q.refetch()}>
         <RefreshCw className="size-4" />
         {t("opsRefresh")}
@@ -277,7 +307,11 @@ export function SettingsHistory() {
                   {h.section} · {date(h.created_at)} ·{" "}
                   <bdi>{h.actor_label || h.actor_id || t("opsUnknown")}</bdi>
                 </span>
-                <Button variant="outline" disabled={busy} onClick={() => void show(h.id)}>
+                <Button
+                  variant="outline"
+                  disabled={busy}
+                  onClick={() => void show(h.id)}
+                >
                   <History className="size-4" />
                   {t("opsPreview")}
                 </Button>
@@ -290,7 +324,11 @@ export function SettingsHistory() {
                   className="max-h-64 overflow-auto whitespace-pre-wrap break-all text-xs"
                   dir="ltr"
                 >
-                  {JSON.stringify({ previous: h.previous_value, next: h.new_value }, null, 2)}
+                  {JSON.stringify(
+                    { previous: h.previous_value, next: h.new_value },
+                    null,
+                    2,
+                  )}
                 </pre>
               </details>
             </li>
@@ -298,7 +336,10 @@ export function SettingsHistory() {
         </ul>
       </QueryState>
       {preview && (
-        <section className="my-4 border-y border-border py-4" aria-label={t("opsPreview")}>
+        <section
+          className="my-4 border-y border-border py-4"
+          aria-label={t("opsPreview")}
+        >
           <h3 className="font-semibold">{preview.section}</h3>
           <div className="grid gap-4 sm:grid-cols-2">
             {[
@@ -335,7 +376,9 @@ function PolicyRow({ policy }: { policy: Policy }) {
   const cache = useQueryClient();
   const draft = useDraft(policy);
   const value = draft.value ?? policy;
-  const [preview, setPreview] = useState<Awaited<ReturnType<typeof previewRetention>> | null>(null);
+  const [preview, setPreview] = useState<Awaited<
+    ReturnType<typeof previewRetention>
+  > | null>(null);
   const [confirmation, setConfirmation] = useState("");
   const [error, setError] = useState("");
   const [busy, setBusy] = useState(false);
@@ -389,7 +432,11 @@ function PolicyRow({ policy }: { policy: Policy }) {
     }
   };
   const title = t(
-    policy.type === "chats" ? "opsChats" : policy.type === "visits" ? "opsVisits" : "opsTelemetry",
+    policy.type === "chats"
+      ? "opsChats"
+      : policy.type === "visits"
+        ? "opsVisits"
+        : "opsTelemetry",
   );
   return (
     <section className="my-4 border-y border-border py-4" aria-label={title}>
@@ -403,17 +450,25 @@ function PolicyRow({ policy }: { policy: Policy }) {
             max={730}
             disabled={policy.type === "chats"}
             value={value.days}
-            onChange={(e) => draft.setValue({ ...value, days: Number(e.target.value) })}
+            onChange={(e) =>
+              draft.setValue({ ...value, days: Number(e.target.value) })
+            }
           />
         </label>
         <label className="flex items-center gap-2">
           <Switch
             checked={value.manualEnabled}
-            onCheckedChange={(manualEnabled) => draft.setValue({ ...value, manualEnabled })}
+            onCheckedChange={(manualEnabled) =>
+              draft.setValue({ ...value, manualEnabled })
+            }
           />
           {t("opsManual")}
         </label>
-        <Button variant="outline" disabled={busy || draft.dirty} onClick={() => void show()}>
+        <Button
+          variant="outline"
+          disabled={busy || draft.dirty}
+          onClick={() => void show()}
+        >
           {t("opsPreview")}
         </Button>
       </div>
@@ -479,7 +534,9 @@ export function RetentionManagement() {
   return (
     <section>
       <h2 className="font-semibold">{t("opsRetention")}</h2>
-      <p className="my-2 text-sm text-muted-foreground">{t("opsRetentionHint")}</p>
+      <p className="my-2 text-sm text-muted-foreground">
+        {t("opsRetentionHint")}
+      </p>
       <QueryState query={q} empty={t("opsUnknown")} isEmpty={false}>
         {q.data?.map((p) => (
           <PolicyRow key={p.type + ":" + p.revision} policy={p} />

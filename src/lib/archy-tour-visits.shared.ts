@@ -22,7 +22,8 @@ export function summarizeTourVisits(rows: readonly TourVisit[]) {
     if (!row.completed_at) continue;
     completed.add(row.visitor_key);
     if (row.chat_opened_at) chatted.add(row.visitor_key);
-    if (row.support_submitted_at && row.support_request_id) supported.add(row.visitor_key);
+    if (row.support_submitted_at && row.support_request_id)
+      supported.add(row.visitor_key);
   }
   return {
     tours: rows.length,
@@ -30,7 +31,9 @@ export function summarizeTourVisits(rows: readonly TourVisit[]) {
     completed: completed.size,
     chatted: chatted.size,
     supported: supported.size,
-    completionRate: started.size ? Math.round((completed.size / started.size) * 100) : null,
+    completionRate: started.size
+      ? Math.round((completed.size / started.size) * 100)
+      : null,
   };
 }
 
@@ -40,6 +43,7 @@ export function tourVisitPatch(
   action: "completed" | "chat",
   now = new Date().toISOString(),
 ) {
-  if (action === "completed") return row.completed_at ? {} : { completed_at: now };
+  if (action === "completed")
+    return row.completed_at ? {} : { completed_at: now };
   return row.completed_at && !row.chat_opened_at ? { chat_opened_at: now } : {};
 }

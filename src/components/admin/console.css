@@ -27,7 +27,7 @@ body:has(.ea-console, .ea-auth)
   --popover-foreground: var(--foreground);
   --primary: var(--ea-accent, oklch(49.3% 0.094 160));
   --primary-foreground: var(--background);
-  --secondary: var(--ea-wash, oklch(92.9% 0.020 160));
+  --secondary: var(--ea-wash, oklch(92.9% 0.02 160));
   --secondary-foreground: var(--foreground);
   --muted: var(--secondary);
   --muted-foreground: var(--ea-muted, oklch(49.1% 0.027 160));
@@ -135,11 +135,11 @@ body:has(.ea-console, .ea-auth)
     color 0.16s;
 }
 .ea-nav-entry:hover {
-  background: oklch(37.8% 0.040 160);
+  background: oklch(37.8% 0.04 160);
   color: white;
 }
 .ea-nav-entry[aria-current="page"] {
-  color: oklch(28.0% 0.032 160);
+  color: oklch(28% 0.032 160);
   background: var(--console-glow);
   font-weight: 680;
 }
@@ -149,11 +149,11 @@ body:has(.ea-console, .ea-auth)
   outline-offset: 2px;
 }
 .ea-rail-count {
-  background: oklch(47.4% 0.040 160);
+  background: oklch(47.4% 0.04 160);
   color: white;
 }
 .ea-nav-entry[aria-current] .ea-rail-count {
-  background: oklch(33.0% 0.046 160);
+  background: oklch(33% 0.046 160);
 }
 .ea-rail-account {
   margin: 0.5rem 0.65rem 0.85rem;
@@ -210,7 +210,11 @@ body:has(.ea-console, .ea-auth)
   justify-content: space-between;
   padding: clamp(1.45rem, 4vw, 3rem);
   background:
-    radial-gradient(ellipse at 40% 68%, oklch(44.4% 0.058 160) 0, transparent 65%),
+    radial-gradient(
+      ellipse at 40% 68%,
+      oklch(44.4% 0.058 160) 0,
+      transparent 65%
+    ),
     var(--console-rail);
   color: oklch(97.2% 0.017 160);
 }
@@ -406,7 +410,7 @@ body:has(.ea-console, .ea-auth)
   border-radius: 5px;
 }
 .ea-queue-open:hover {
-  background: oklch(40.0% 0.042 160);
+  background: oklch(40% 0.042 160);
 }
 .ea-stats {
   display: grid;

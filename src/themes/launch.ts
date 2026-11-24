@@ -3,12 +3,17 @@ import type { Product } from "@/lib/catalog";
 import type { Language } from "@/lib/language-core";
 
 /** Launch instant for a coming-soon product with a publication date (00:00 Riyadh, ArchONE 09:00). */
-export function launchInstant(product: Pick<Product, "id" | "publicationDate">): Date | null {
+export function launchInstant(
+  product: Pick<Product, "id" | "publicationDate">,
+): Date | null {
   return launchInstantFor(product.id, product.publicationDate);
 }
 
 /** Remaining whole days and hours, or null once the moment has passed. */
-export function countdownParts(target: Date, now: Date): { days: number; hours: number } | null {
+export function countdownParts(
+  target: Date,
+  now: Date,
+): { days: number; hours: number } | null {
   const ms = target.getTime() - now.getTime();
   if (ms <= 0) return null;
   const hoursTotal = Math.floor(ms / 3_600_000);

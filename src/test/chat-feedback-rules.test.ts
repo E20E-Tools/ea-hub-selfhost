@@ -30,6 +30,8 @@ describe("chat ratings and common questions", () => {
   });
   it("gives the guide only approved answers, and nothing when there are none", () => {
     expect(faqPromptBlock([])).toBe("");
-    expect(faqPromptBlock([{ question: "Q1", answer: "A1" }])).toContain("ج: A1");
+    expect(faqPromptBlock([{ question: "Q1", answer: "A1" }])).toContain(
+      "ج: A1",
+    );
   });
 });

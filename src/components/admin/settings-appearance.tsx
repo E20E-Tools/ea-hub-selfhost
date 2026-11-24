@@ -24,7 +24,10 @@ import {
   type SiteSettings,
 } from "@/lib/catalog";
 import { isEmptyCustomization } from "@/lib/theme-customization";
-import { ensureFontStylesheet, useFontStylesheet } from "@/themes/use-theme-fonts";
+import {
+  ensureFontStylesheet,
+  useFontStylesheet,
+} from "@/themes/use-theme-fonts";
 import {
   DESIGN_THEMES,
   PRODUCT_LAYOUTS,
@@ -36,7 +39,15 @@ import {
   type DesignThemeSetting,
 } from "@/lib/design-themes";
 import type { AdminCopyKey } from "@/lib/admin-copy";
-import { Card, SaveBar, SettingRow, selectClass, useAdminCopy, useAssetUrl, useDraft } from "./ui";
+import {
+  Card,
+  SaveBar,
+  SettingRow,
+  selectClass,
+  useAdminCopy,
+  useAssetUrl,
+  useDraft,
+} from "./ui";
 
 type Appearance = {
   designTheme: DesignThemeSetting;
@@ -97,7 +108,8 @@ function applyTheme(s: DesignThemeSetting) {
 
 export function toHex(value: string, fallback = "#808080"): string {
   const raw = (value ?? "").trim();
-  if (!raw || !isValidColor(raw) || typeof document === "undefined") return fallback;
+  if (!raw || !isValidColor(raw) || typeof document === "undefined")
+    return fallback;
   const canvas = document.createElement("canvas");
   canvas.width = canvas.height = 1;
   const ctx = canvas.getContext("2d");
@@ -150,7 +162,9 @@ export function AppearanceSettings({
   const { t, language, dir } = useAdminCopy();
   const [localPreview, setLocalPreview] = useState(false);
   useEffect(() => {
-    setLocalPreview(["127.0.0.1", "localhost"].includes(window.location.hostname));
+    setLocalPreview(
+      ["127.0.0.1", "localhost"].includes(window.location.hostname),
+    );
   }, []);
   // The design chooser previews every design, so its fonts load only while it is open.
   useFontStylesheet(THEME_FONTS_HREF);
@@ -171,7 +185,8 @@ export function AppearanceSettings({
   useEffect(() => {
     const styles = getComputedStyle(document.documentElement);
     const values: Record<string, string> = {};
-    for (const { token } of colorTokens) values[token] = styles.getPropertyValue(token).trim();
+    for (const { token } of colorTokens)
+      values[token] = styles.getPropertyValue(token).trim();
     setComputed(values);
   }, [draft.designTheme.theme]);
 
@@ -191,7 +206,9 @@ export function AppearanceSettings({
           .filter(([, value]) => isValidColor(value))
           .map(([k, v]) => [k, v.trim()]),
       );
-      const result = await saveAppearanceSettings({ data: { ...draft, colors } });
+      const result = await saveAppearanceSettings({
+        data: { ...draft, colors },
+      });
       if (!result.ok) return void toast.error(t(result.message));
       savedTheme.current = draft.designTheme;
       form.reset({ ...draft, colors });
@@ -208,7 +225,9 @@ export function AppearanceSettings({
 
   return (
     <div className="grid gap-5">
-      {form.dirty ? <style>{themeCss({ ...catalog.settings, ...draft })}</style> : null}
+      {form.dirty ? (
+        <style>{themeCss({ ...catalog.settings, ...draft })}</style>
+      ) : null}
       {localPreview && (
         <aside className="settings-runtime-note">
           <Palette size={20} aria-hidden="true" />
@@ -234,7 +253,13 @@ export function AppearanceSettings({
             variant="ghost"
             size="sm"
             onClick={() =>
-              set({ designTheme: { theme: "classic", animations: true, intensity: "medium" } })
+              set({
+                designTheme: {
+                  theme: "classic",
+                  animations: true,
+                  intensity: "medium",
+                },
+              })
             }
           >
             <RotateCcw className="size-4" aria-hidden="true" />
@@ -251,7 +276,11 @@ export function AppearanceSettings({
             const selected = draft.designTheme.theme === theme.id;
             const Thumb = THEME_THUMBS[theme.id];
             return (
-              <div key={theme.id} className="theme-pick" data-selected={selected ? "" : undefined}>
+              <div
+                key={theme.id}
+                className="theme-pick"
+                data-selected={selected ? "" : undefined}
+              >
                 <button
                   type="button"
                   role="radio"
@@ -262,15 +291,24 @@ export function AppearanceSettings({
                   onKeyDown={(event) => {
                     const backwards =
                       event.key === "ArrowUp" ||
-                      event.key === (dir === "rtl" ? "ArrowRight" : "ArrowLeft");
+                      event.key ===
+                        (dir === "rtl" ? "ArrowRight" : "ArrowLeft");
                     const forwards =
                       event.key === "ArrowDown" ||
-                      event.key === (dir === "rtl" ? "ArrowLeft" : "ArrowRight");
-                    if (!backwards && !forwards && event.key !== "Home" && event.key !== "End")
+                      event.key ===
+                        (dir === "rtl" ? "ArrowLeft" : "ArrowRight");
+                    if (
+                      !backwards &&
+                      !forwards &&
+                      event.key !== "Home" &&
+                      event.key !== "End"
+                    )
                       return;
                     event.preventDefault();
                     const count = DESIGN_THEMES.length;
-                    const index = DESIGN_THEMES.findIndex((item) => item.id === theme.id);
+                    const index = DESIGN_THEMES.findIndex(
+                      (item) => item.id === theme.id,
+                    );
                     const nextIndex =
                       event.key === "Home"
                         ? 0
@@ -279,24 +317,34 @@ export function AppearanceSettings({
                           : (index + (backwards ? -1 : 1) + count) % count;
                     const next = DESIGN_THEMES[nextIndex];
                     if (!next) return;
-                    set({ designTheme: { ...draft.designTheme, theme: next.id } });
+                    set({
+                      designTheme: { ...draft.designTheme, theme: next.id },
+                    });
                     event.currentTarget
                       .closest('[role="radiogroup"]')
                       ?.querySelectorAll<HTMLElement>('[role="radio"]')
                       [nextIndex]?.focus();
                   }}
-                  onClick={() => set({ designTheme: { ...draft.designTheme, theme: theme.id } })}
+                  onClick={() =>
+                    set({
+                      designTheme: { ...draft.designTheme, theme: theme.id },
+                    })
+                  }
                 >
                   <span className="theme-pick-thumb">
                     <Thumb />
                   </span>
                   <span className="theme-pick-body">
                     <span className="flex min-h-6 flex-wrap items-center gap-1.5">
-                      <strong className="text-sm">{theme.name[language]}</strong>
+                      <strong className="text-sm">
+                        {theme.name[language]}
+                      </strong>
                       {catalog.settings.designTheme.theme === theme.id ? (
                         <Badge variant="secondary">{t("themeLive")}</Badge>
                       ) : null}
-                      {!isEmptyCustomization(catalog.settings.themeCustomizations?.[theme.id]) ? (
+                      {!isEmptyCustomization(
+                        catalog.settings.themeCustomizations?.[theme.id],
+                      ) ? (
                         <Badge variant="outline">{t("customizeEdited")}</Badge>
                       ) : null}
                       {selected ? (
@@ -340,11 +388,17 @@ export function AppearanceSettings({
           })}
         </div>
         <div className="mt-6">
-          <SettingRow label={t("animations")} hint={t("animationsHint")} htmlFor="theme-anim">
+          <SettingRow
+            label={t("animations")}
+            hint={t("animationsHint")}
+            htmlFor="theme-anim"
+          >
             <Switch
               id="theme-anim"
               checked={draft.designTheme.animations}
-              onCheckedChange={(v) => set({ designTheme: { ...draft.designTheme, animations: v } })}
+              onCheckedChange={(v) =>
+                set({ designTheme: { ...draft.designTheme, animations: v } })
+              }
             />
           </SettingRow>
           <SettingRow label={t("intensity")}>
@@ -359,7 +413,10 @@ export function AppearanceSettings({
                 thumbLabel={t("intensity")}
                 onValueChange={([v]) =>
                   set({
-                    designTheme: { ...draft.designTheme, intensity: LEVELS[v ?? 1] ?? "medium" },
+                    designTheme: {
+                      ...draft.designTheme,
+                      intensity: LEVELS[v ?? 1] ?? "medium",
+                    },
                   })
                 }
               />
@@ -373,12 +430,7 @@ export function AppearanceSettings({
         </div>
       </Card>
 
-      <Card
-        title={t("sl24")}
-        description={
-          t("sl25")
-        }
-      >
+      <Card title={t("sl24")} description={t("sl25")}>
         <div
           className="grid grid-cols-1 items-stretch gap-3 sm:grid-cols-2 lg:grid-cols-4"
           role="radiogroup"
@@ -388,22 +440,39 @@ export function AppearanceSettings({
             const meta = PRODUCT_LAYOUT_META[id];
             const current = draft.designTheme.productLayout ?? "classic";
             const selected = current === id;
-            const live = (catalog.settings.designTheme.productLayout ?? "classic") === id;
+            const live =
+              (catalog.settings.designTheme.productLayout ?? "classic") === id;
             const sample =
-              catalog.products.find((p) => !p.comingSoon)?.id ?? catalog.products[0]?.id ?? "";
+              catalog.products.find((p) => !p.comingSoon)?.id ??
+              catalog.products[0]?.id ??
+              "";
             return (
-              <div key={id} className="theme-pick" data-selected={selected ? "" : undefined}>
+              <div
+                key={id}
+                className="theme-pick"
+                data-selected={selected ? "" : undefined}
+              >
                 <button
                   type="button"
                   role="radio"
                   aria-checked={selected}
                   className="theme-pick-main"
                   onClick={() => {
-                    const { productLayout: _previous, ...rest } = draft.designTheme;
-                    set({ designTheme: id === "classic" ? rest : { ...rest, productLayout: id } });
+                    const { productLayout: _previous, ...rest } =
+                      draft.designTheme;
+                    set({
+                      designTheme:
+                        id === "classic"
+                          ? rest
+                          : { ...rest, productLayout: id },
+                    });
                   }}
                 >
-                  <span className="theme-pick-thumb pl-thumb" data-layout={id} aria-hidden="true">
+                  <span
+                    className="theme-pick-thumb pl-thumb"
+                    data-layout={id}
+                    aria-hidden="true"
+                  >
                     <i />
                     <i />
                     <i />
@@ -411,7 +480,9 @@ export function AppearanceSettings({
                   <span className="theme-pick-body">
                     <span className="flex min-h-6 flex-wrap items-center gap-1.5">
                       <strong className="text-sm">{meta.name[language]}</strong>
-                      {live ? <Badge variant="secondary">{t("themeLive")}</Badge> : null}
+                      {live ? (
+                        <Badge variant="secondary">{t("themeLive")}</Badge>
+                      ) : null}
                       {selected ? (
                         <Badge>
                           <Check className="size-3" aria-hidden="true" />
@@ -464,7 +535,9 @@ export function AppearanceSettings({
               >
                 {pickerFonts(localPreview, saved[key]).map((font) => (
                   <option key={font.id} value={font.id}>
-                    {font.id === defaultSettings[key] ? t("studioProfileFont") : font.label}
+                    {font.id === defaultSettings[key]
+                      ? t("studioProfileFont")
+                      : font.label}
                     {localPreview &&
                     font.id !== defaultSettings[key] &&
                     !bundledFonts.some((id) => id === font.id)
@@ -487,16 +560,26 @@ export function AppearanceSettings({
                   aria-label={name}
                   className="h-9 w-10 shrink-0 cursor-pointer rounded-md border border-input bg-background p-1"
                   value={toHex(value)}
-                  onChange={(e) => set({ colors: { ...draft.colors, [token]: e.target.value } })}
+                  onChange={(e) =>
+                    set({
+                      colors: { ...draft.colors, [token]: e.target.value },
+                    })
+                  }
                 />
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-xs text-muted-foreground">{name}</p>
+                  <p className="truncate text-xs text-muted-foreground">
+                    {name}
+                  </p>
                   <Input
                     dir="ltr"
                     className="h-8 font-mono text-xs"
                     aria-label={t("colorValue", { name })}
                     value={value}
-                    onChange={(e) => set({ colors: { ...draft.colors, [token]: e.target.value } })}
+                    onChange={(e) =>
+                      set({
+                        colors: { ...draft.colors, [token]: e.target.value },
+                      })
+                    }
                   />
                 </div>
               </div>
@@ -540,7 +623,9 @@ export function AppearanceSettings({
                 id="img-fit"
                 className={selectClass}
                 value={draft.imageFit}
-                onChange={(e) => set({ imageFit: e.target.value as Appearance["imageFit"] })}
+                onChange={(e) =>
+                  set({ imageFit: e.target.value as Appearance["imageFit"] })
+                }
               >
                 <option value="contain">{t("imageFit_contain")}</option>
                 <option value="cover">{t("imageFit_cover")}</option>
@@ -561,14 +646,22 @@ export function AppearanceSettings({
               value={draft.imageSaturation}
               onChange={(v) => set({ imageSaturation: v })}
             />
-            <SettingRow label={t("sharpen")} hint={t("sharpenHint")} htmlFor="img-sharpen">
+            <SettingRow
+              label={t("sharpen")}
+              hint={t("sharpenHint")}
+              htmlFor="img-sharpen"
+            >
               <Switch
                 id="img-sharpen"
                 checked={draft.imageSharpen}
                 onCheckedChange={(v) => set({ imageSharpen: v })}
               />
             </SettingRow>
-            <SettingRow label={t("motionEnabled")} hint={t("animationsHint")} htmlFor="img-motion">
+            <SettingRow
+              label={t("motionEnabled")}
+              hint={t("animationsHint")}
+              htmlFor="img-motion"
+            >
               <Switch
                 id="img-motion"
                 checked={draft.motionEnabled}
@@ -597,7 +690,10 @@ export function AppearanceSettings({
                 disabled={!draft.motionEnabled}
                 value={draft.motionDirection}
                 onChange={(e) =>
-                  set({ motionDirection: e.target.value as Appearance["motionDirection"] })
+                  set({
+                    motionDirection: e.target
+                      .value as Appearance["motionDirection"],
+                  })
                 }
               >
                 {(["normal", "reverse", "alternate"] as const).map((d) => (
@@ -619,7 +715,9 @@ export function AppearanceSettings({
                     filter,
                     animationDuration: `${8 / draft.motionSpeed}s`,
                     animationDirection: draft.motionDirection,
-                    imageRendering: draft.imageSharpen ? "crisp-edges" : undefined,
+                    imageRendering: draft.imageSharpen
+                      ? "crisp-edges"
+                      : undefined,
                   }}
                 />
               ) : null}
@@ -628,7 +726,9 @@ export function AppearanceSettings({
               <strong className="block text-sm" dir="ltr">
                 {sample?.name ?? t("sampleProduct")}
               </strong>
-              <span className="text-xs text-muted-foreground">{t("sampleProductDesc")}</span>
+              <span className="text-xs text-muted-foreground">
+                {t("sampleProductDesc")}
+              </span>
             </figcaption>
           </figure>
         </div>

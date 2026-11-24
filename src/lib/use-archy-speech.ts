@@ -5,9 +5,17 @@ import type { Language } from "./language-core";
 
 export type ArchySpeechStatus = "idle" | "speaking" | "unavailable";
 
-export type ArchyVoiceOptions = { voiceOn?: boolean; rate?: number; pitch?: number };
+export type ArchyVoiceOptions = {
+  voiceOn?: boolean;
+  rate?: number;
+  pitch?: number;
+};
 
-export function useArchySpeech(language: Language, text: string, options: ArchyVoiceOptions = {}) {
+export function useArchySpeech(
+  language: Language,
+  text: string,
+  options: ArchyVoiceOptions = {},
+) {
   const { voiceOn = true, rate = 0.96, pitch = 1.02 } = options;
   const [muted, setMuted] = useState(false);
   const [status, setStatus] = useState<ArchySpeechStatus>("idle");
@@ -85,7 +93,10 @@ export function useArchySpeech(language: Language, text: string, options: ArchyV
     }
     try {
       const currentVoices = synthesis.getVoices();
-      const voice = pickArchyVoice(currentVoices.length > 0 ? currentVoices : voices, language);
+      const voice = pickArchyVoice(
+        currentVoices.length > 0 ? currentVoices : voices,
+        language,
+      );
       if (!voice) {
         setStatus("unavailable");
         return;
@@ -99,10 +110,12 @@ export function useArchySpeech(language: Language, text: string, options: ArchyV
       utterance.rate = rate;
       utterance.pitch = pitch;
       utterance.onend = () => {
-        if (mounted.current && generation.current === ownGeneration) setStatus("idle");
+        if (mounted.current && generation.current === ownGeneration)
+          setStatus("idle");
       };
       utterance.onerror = () => {
-        if (mounted.current && generation.current === ownGeneration) setStatus("unavailable");
+        if (mounted.current && generation.current === ownGeneration)
+          setStatus("unavailable");
       };
       synthesis.speak(utterance);
       setStatus("speaking");
@@ -115,7 +128,10 @@ export function useArchySpeech(language: Language, text: string, options: ArchyV
     setMuted((previous) => {
       const next = !previous;
       try {
-        window.localStorage.setItem(ARCHY_MUTED_STORAGE_KEY, next ? "muted" : "on");
+        window.localStorage.setItem(
+          ARCHY_MUTED_STORAGE_KEY,
+          next ? "muted" : "on",
+        );
       } catch {
         // The current tab still respects the choice.
       }

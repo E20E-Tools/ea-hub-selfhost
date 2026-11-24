@@ -28,8 +28,15 @@ describe("aggregate metrics respect privacy choices", () => {
     const { trackJourney } = await client();
     await trackJourney("comparison_opened", "en");
     expect(record).toHaveBeenCalledTimes(1);
-    const data = (record.mock.calls[0] as unknown as [{ data: Record<string, unknown> }])[0].data;
-    expect(Object.keys(data).sort()).toEqual(["event", "eventKey", "language", "rating"]);
+    const data = (
+      record.mock.calls[0] as unknown as [{ data: Record<string, unknown> }]
+    )[0].data;
+    expect(Object.keys(data).sort()).toEqual([
+      "event",
+      "eventKey",
+      "language",
+      "rating",
+    ]);
   });
   it("sends nothing under Global Privacy Control", async () => {
     setNavigator("globalPrivacyControl", true);

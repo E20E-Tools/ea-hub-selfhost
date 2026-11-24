@@ -56,7 +56,11 @@ it("confirms consent and sends a monthly digest only once, then unsubscribes", a
     await db.exec(
       "insert into products(id,name,coming_soon) values('radar','Radar',true)",
     );
-    await db.exec((await readFile("drizzle/migrations/0086_work_assistant.sql","utf8")).split("revoke all")[0]!);
+    await db.exec(
+      (
+        await readFile("drizzle/migrations/0086_work_assistant.sql", "utf8")
+      ).split("revoke all")[0]!,
+    );
     const n = await import("@/lib/newsletter.server");
     await n.subscribe("visitor@example.test", "ar");
     await n.subscribe("visitor@example.test", "ar");
@@ -68,34 +72,59 @@ it("confirms consent and sends a monthly digest only once, then unsubscribes", a
     await db.exec(
       "update newsletter_members set confirmed_at=now()-interval '2 months'; update newsletter_updates set created_at=date_trunc('month',now())-interval '3 days'",
     );
-    await n.subscribe("only-radar@example.test","en",{general:false,products:["radar"]});
-    const secondToken=new URLSearchParams(out.at(-1)!.split("#")[1]).get("token")!;
-    await n.manage(secondToken,"confirm");
-    await db.exec("update newsletter_members set confirmed_at=now()-interval '2 months';update products set description='رادار',description_en='Radar release',updated_at=date_trunc('month',now())-interval '3 days' where id='radar'");
-    const issueMonth = (await db.query<{month:string}>("select to_char(now()-interval '1 month','YYYY-MM') as month")).rows[0]!.month;
+    await n.subscribe("only-radar@example.test", "en", {
+      general: false,
+      products: ["radar"],
+    });
+    const secondToken = new URLSearchParams(out.at(-1)!.split("#")[1]).get(
+      "token",
+    )!;
+    await n.manage(secondToken, "confirm");
+    await db.exec(
+      "update newsletter_members set confirmed_at=now()-interval '2 months';update products set description='رادار',description_en='Radar release',updated_at=date_trunc('month',now())-interval '3 days' where id='radar'",
+    );
+    const issueMonth = (
+      await db.query<{ month: string }>(
+        "select to_char(now()-interval '1 month','YYYY-MM') as month",
+      )
+    ).rows[0]!.month;
     const sources = await n.previewIssue(issueMonth);
-    await expect(n.approveEditorial(issueMonth, "ar", "نص بلا روابط")).rejects.toThrow("Keep source links");
-    for (const lang of ["ar","en"] as const) {
-      const edited = (lang === "ar" ? "مراجعة الفريق" : "Reviewed by the team") + "\n" + sources[lang];
-      await n.approveEditorial(issueMonth,lang,edited);
+    await expect(
+      n.approveEditorial(issueMonth, "ar", "نص بلا روابط"),
+    ).rejects.toThrow("Keep source links");
+    for (const lang of ["ar", "en"] as const) {
+      const edited =
+        (lang === "ar" ? "مراجعة الفريق" : "Reviewed by the team") +
+        "\n" +
+        sources[lang];
+      await n.approveEditorial(issueMonth, lang, edited);
       expect((await n.previewIssue(issueMonth))[lang]).toBe(edited);
     }
-    vi.stubEnv("NEWSLETTER_MONTHLY_ENABLED","false");
-    const offset=out.length;
+    vi.stubEnv("NEWSLETTER_MONTHLY_ENABLED", "false");
+    const offset = out.length;
     expect((await n.sendDue()).delivered).toBe(0);
     expect(out).toHaveLength(offset);
-    vi.stubEnv("NEWSLETTER_MONTHLY_ENABLED","true");
+    vi.stubEnv("NEWSLETTER_MONTHLY_ENABLED", "true");
     expect((await n.sendDue()).delivered).toBe(2);
-    const delivered=out.slice(offset);expect(delivered.some(s=>s.includes("مستجد تجريبي"))).toBe(true);
-    expect(delivered.some(s=>s.includes("مراجعة الفريق"))).toBe(true);
-    await expect(n.approveEditorial(issueMonth,"en",sources.en)).rejects.toThrow("Issue already finalized");
-    const only=delivered.find(s=>s.includes("Radar release"))!;
-    expect(only).toContain("/product/radar");expect(only).not.toContain("Fixture update");
+    const delivered = out.slice(offset);
+    expect(delivered.some((s) => s.includes("مستجد تجريبي"))).toBe(true);
+    expect(delivered.some((s) => s.includes("مراجعة الفريق"))).toBe(true);
+    await expect(
+      n.approveEditorial(issueMonth, "en", sources.en),
+    ).rejects.toThrow("Issue already finalized");
+    const only = delivered.find((s) => s.includes("Radar release"))!;
+    expect(only).toContain("/product/radar");
+    expect(only).not.toContain("Fixture update");
     expect((await n.sendDue()).delivered).toBe(0);
-    const month=(await db.query<{month:string}>("select month::text from newsletter_issues")).rows[0]!.month.slice(0,7);
+    const month = (
+      await db.query<{ month: string }>(
+        "select month::text from newsletter_issues",
+      )
+    ).rows[0]!.month.slice(0, 7);
     expect((await n.previewIssue(month)).en).toContain("Fixture update");
-    await n.sendPreview(month,"ar","admin@example.test");expect(out.at(-1)).toContain("مستجد تجريبي");
-    await n.manage(secondToken,"unsubscribe");
+    await n.sendPreview(month, "ar", "admin@example.test");
+    expect(out.at(-1)).toContain("مستجد تجريبي");
+    await n.manage(secondToken, "unsubscribe");
     const prefs = await n.preferences(token, {
       general: false,
       products: ["radar"],

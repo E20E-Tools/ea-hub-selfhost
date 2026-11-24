@@ -1,4 +1,10 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+} from "react";
 import type { Product } from "@/lib/catalog";
 import { useLanguage } from "@/lib/language";
 import { fill } from "@/lib/copy";
@@ -82,7 +88,10 @@ function HudBody({ product }: { product: Product }) {
           <ul>
             {facts.features.map((f, i) => (
               <li key={f}>
-                <span dir="ltr" className="gx-mod-id">{`M${String(i + 1).padStart(2, "0")}`}</span>{" "}
+                <span
+                  dir="ltr"
+                  className="gx-mod-id"
+                >{`M${String(i + 1).padStart(2, "0")}`}</span>{" "}
                 {f}
               </li>
             ))}
@@ -100,7 +109,14 @@ function HudBody({ product }: { product: Product }) {
   );
 }
 
-type Star = { x: number; y: number; r: number; a: number; ph: number; sp: number };
+type Star = {
+  x: number;
+  y: number;
+  r: number;
+  a: number;
+  ph: number;
+  sp: number;
+};
 
 export default function GalaxyStage({ products, settings }: StageProps) {
   const { t, language, dir } = useLanguage();
@@ -133,7 +149,10 @@ export default function GalaxyStage({ products, settings }: StageProps) {
   const cy = size.h * (mobile ? 0.5 : 0.53);
   const R = Math.max(
     80,
-    Math.min(size.w * (mobile ? 0.42 : 0.39), (size.h * (mobile ? 0.36 : 0.36)) / tilt),
+    Math.min(
+      size.w * (mobile ? 0.42 : 0.39),
+      (size.h * (mobile ? 0.36 : 0.36)) / tilt,
+    ),
   );
   const sunR = Math.min(Math.max(R * 0.16, 34), 84);
   const planetSize = Math.min(Math.max(R * 0.13, 38), 74);
@@ -171,7 +190,13 @@ export default function GalaxyStage({ products, settings }: StageProps) {
       })),
     );
     const times = orbits.map(() => 0);
-    let shoot: { x: number; y: number; vx: number; vy: number; life: number } | null = null;
+    let shoot: {
+      x: number;
+      y: number;
+      vx: number;
+      vy: number;
+      life: number;
+    } | null = null;
     const pointer = { x: 0, y: 0, tx: 0, ty: 0 };
     const onMove = (e: PointerEvent) => {
       const r = root.current?.getBoundingClientRect();
@@ -283,14 +308,22 @@ export default function GalaxyStage({ products, settings }: StageProps) {
           // Label sits on the reading-end side of the planet, flips to the inner side near the
           // stage edge, then clamps so it is always fully inside the stage.
           const [lw = 0, lh = 0] = labelBoxes[i] ?? [];
-          const placed = placeLabel(x, (planetSize * s) / 2 + 8, lw, size.w, dir === "rtl");
+          const placed = placeLabel(
+            x,
+            (planetSize * s) / 2 + 8,
+            lw,
+            size.w,
+            dir === "rtl",
+          );
           const pad = 8;
           const lx = placed.x;
           const ly = Math.max(pad, Math.min(size.h - pad - lh, y - 14));
           const side = placed.side;
           if (lab.dataset["side"] !== side) lab.dataset["side"] = side;
           lab.style.transform = `translate3d(${lx.toFixed(1)}px, ${ly.toFixed(1)}px, 0)`;
-          lab.style.opacity = hidden ? "0" : String(0.55 + 0.45 * ((pr.z + 1) / 2));
+          lab.style.opacity = hidden
+            ? "0"
+            : String(0.55 + 0.45 * ((pr.z + 1) / 2));
           lab.style.zIndex = String(depthIndex(pr.z) + 1);
         }
       });
@@ -299,13 +332,19 @@ export default function GalaxyStage({ products, settings }: StageProps) {
       const target = st.open && animate ? 1 : 0;
       st.zoom += (target - st.zoom) * Math.min(1, dt * 2.6);
       if (st.open) {
-        st.fx += (st.px - st.fx) * Math.min(1, dt * 4 + (st.zoom < 0.02 ? 1 : 0));
-        st.fy += (st.py - st.fy) * Math.min(1, dt * 4 + (st.zoom < 0.02 ? 1 : 0));
+        st.fx +=
+          (st.px - st.fx) * Math.min(1, dt * 4 + (st.zoom < 0.02 ? 1 : 0));
+        st.fy +=
+          (st.py - st.fy) * Math.min(1, dt * 4 + (st.zoom < 0.02 ? 1 : 0));
       }
       if (scene.current) {
         const k = st.zoom;
         const z = 1 + 0.75 * k;
-        const tx = mobile ? size.w / 2 : dir === "rtl" ? size.w * 0.7 : size.w * 0.3;
+        const tx = mobile
+          ? size.w / 2
+          : dir === "rtl"
+            ? size.w * 0.7
+            : size.w * 0.3;
         const ty = mobile ? size.h * 0.3 : size.h * 0.5;
         const sx = st.fx + (tx - st.fx) * k;
         const sy = st.fy + (ty - st.fy) * k;
@@ -359,10 +398,16 @@ export default function GalaxyStage({ products, settings }: StageProps) {
       <canvas ref={canvas} className="gx-stars" aria-hidden="true" />
 
       <div ref={scene} className="gx-scene" dir="ltr">
-        <svg className="gx-orbits" width={size.w} height={size.h} aria-hidden="true">
+        <svg
+          className="gx-orbits"
+          width={size.w}
+          height={size.h}
+          aria-hidden="true"
+        >
           {orbits.map((o, i) => {
             const p = list[i];
-            const firstOnRing = orbits.findIndex((x) => x.ring === o.ring) === i;
+            const firstOnRing =
+              orbits.findIndex((x) => x.ring === o.ring) === i;
             const hot = p && (hover === p.id || inspector.openId === p.id);
             const ringHot = orbits.some(
               (x, j) =>
@@ -398,7 +443,9 @@ export default function GalaxyStage({ products, settings }: StageProps) {
         >
           <span className="gx-corona" />
           <span className="gx-boil" />
-          {settings.logoUrl ? <img src={settings.logoUrl} alt="" className="gx-sun-logo" /> : null}
+          {settings.logoUrl ? (
+            <img src={settings.logoUrl} alt="" className="gx-sun-logo" />
+          ) : null}
         </div>
 
         {list.map((p, i) => {
@@ -419,7 +466,9 @@ export default function GalaxyStage({ products, settings }: StageProps) {
                 className="gx-planet"
                 data-soon={p.comingSoon ? "" : undefined}
                 data-ring={!p.comingSoon && hue % 2 === 0 ? "" : undefined}
-                data-hot={hover === p.id || inspector.openId === p.id ? "" : undefined}
+                data-hot={
+                  hover === p.id || inspector.openId === p.id ? "" : undefined
+                }
                 style={
                   {
                     width: planetSize,
@@ -441,7 +490,9 @@ export default function GalaxyStage({ products, settings }: StageProps) {
                     : inspector.open(p.id, e.currentTarget)
                 }
               >
-                {p.comingSoon ? <span className="gx-disk" aria-hidden="true" /> : null}
+                {p.comingSoon ? (
+                  <span className="gx-disk" aria-hidden="true" />
+                ) : null}
                 <span className="gx-ringback" aria-hidden="true" />
                 <span
                   className="gx-surface"
@@ -450,7 +501,9 @@ export default function GalaxyStage({ products, settings }: StageProps) {
                 />
                 <span className="gx-shade" aria-hidden="true" />
                 <span className="gx-ringfront" aria-hidden="true" />
-                {!p.comingSoon ? <span className="gx-moon" aria-hidden="true" /> : null}
+                {!p.comingSoon ? (
+                  <span className="gx-moon" aria-hidden="true" />
+                ) : null}
                 <span className="gx-reticle" aria-hidden="true">
                   <i />
                   <i />
@@ -469,7 +522,9 @@ export default function GalaxyStage({ products, settings }: StageProps) {
                 <strong dir="ltr">{p.name}</strong>
                 <small>
                   {p.label}
-                  {p.comingSoon ? <b dir="ltr"> · {tdays ?? t("gxFormingShort")}</b> : null}
+                  {p.comingSoon ? (
+                    <b dir="ltr"> · {tdays ?? t("gxFormingShort")}</b>
+                  ) : null}
                 </small>
               </div>
             </div>
@@ -482,7 +537,9 @@ export default function GalaxyStage({ products, settings }: StageProps) {
         <p className="gx-title" aria-hidden="true">
           {settings.displayTitle}
         </p>
-        {settings.tagline ? <p className="gx-tagline">{settings.tagline}</p> : null}
+        {settings.tagline ? (
+          <p className="gx-tagline">{settings.tagline}</p>
+        ) : null}
       </div>
 
       <div className="gx-clock" dir={dir} role="status" aria-live="off">
@@ -506,7 +563,9 @@ export default function GalaxyStage({ products, settings }: StageProps) {
             <bdi>
               {fill(
                 t("gxTarget"),
-                language === "ar" ? openProduct.name : openProduct.name.toUpperCase(),
+                language === "ar"
+                  ? openProduct.name
+                  : openProduct.name.toUpperCase(),
               )}
             </bdi>
           }

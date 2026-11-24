@@ -1,4 +1,9 @@
-import { useMemo, useRef, useState, type PointerEvent as RPointerEvent } from "react";
+import {
+  useMemo,
+  useRef,
+  useState,
+  type PointerEvent as RPointerEvent,
+} from "react";
 import { useLanguage } from "@/lib/language";
 import { fill } from "@/lib/copy";
 import type { StageProps } from "../registry";
@@ -11,7 +16,12 @@ import {
   useStageInspector,
 } from "../stage-kit";
 import { legacyFileName } from "../legacy-to-digital/model";
-import { orthoRoute, along, tanglePath, fileSlots } from "../untangle-chaos/model";
+import {
+  orthoRoute,
+  along,
+  tanglePath,
+  fileSlots,
+} from "../untangle-chaos/model";
 import {
   EXPAND_MS,
   IDLE_MS,
@@ -75,7 +85,10 @@ export default function RevealLensStage({ products, settings }: StageProps) {
       const time = still ? 0 : ms;
       // Lens position: pointer, else calm Lissajous wander after the idle delay.
       const p = pointer.current;
-      const target = p && ms - p.at < IDLE_MS ? p : lissajous(time, size.w, size.h, motion.scale);
+      const target =
+        p && ms - p.at < IDLE_MS
+          ? p
+          : lissajous(time, size.w, size.h, motion.scale);
       lens.current.x += (target.x - lens.current.x) * 0.14;
       lens.current.y += (target.y - lens.current.y) * 0.14;
       const cover = coverRadius(lens.current.x, lens.current.y, size.w, size.h);
@@ -84,7 +97,10 @@ export default function RevealLensStage({ products, settings }: StageProps) {
       if (still) radius = cover;
       else if (e) {
         const k = Math.min(1, (ms - e.at) / EXPAND_MS);
-        radius = e.dir === 1 ? lensRadius(k, radius, cover) : lensRadius(1 - k, radius, cover);
+        radius =
+          e.dir === 1
+            ? lensRadius(k, radius, cover)
+            : lensRadius(1 - k, radius, cover);
       }
 
       // Legacy world.
@@ -105,7 +121,9 @@ export default function RevealLensStage({ products, settings }: StageProps) {
         ctx.strokeStyle = "rgba(74,69,54,0.8)";
         ctx.lineWidth = 2;
         ctx.beginPath();
-        pts.forEach((q, k) => (k ? ctx.lineTo(q.x, q.y) : ctx.moveTo(q.x, q.y)));
+        pts.forEach((q, k) =>
+          k ? ctx.lineTo(q.x, q.y) : ctx.moveTo(q.x, q.y),
+        );
         ctx.stroke();
         ctx.fillStyle = "#F6F1E3";
         ctx.strokeStyle = INK;
@@ -159,10 +177,15 @@ export default function RevealLensStage({ products, settings }: StageProps) {
         ctx.strokeStyle = BLUE;
         ctx.lineWidth = 2.5;
         ctx.beginPath();
-        route.forEach((q, k) => (k ? ctx.lineTo(q.x, q.y) : ctx.moveTo(q.x, q.y)));
+        route.forEach((q, k) =>
+          k ? ctx.lineTo(q.x, q.y) : ctx.moveTo(q.x, q.y),
+        );
         ctx.stroke();
         for (let j = 0; j < 3; j++) {
-          const q = along(route, still ? (j + 0.5) / 3 : (time * 0.0004 + j / 3 + i * 0.1) % 1);
+          const q = along(
+            route,
+            still ? (j + 0.5) / 3 : (time * 0.0004 + j / 3 + i * 0.1) % 1,
+          );
           ctx.fillStyle = j % 2 ? VIOLET : CYAN;
           ctx.beginPath();
           ctx.arc(q.x, q.y, 3, 0, Math.PI * 2);
@@ -172,7 +195,12 @@ export default function RevealLensStage({ products, settings }: StageProps) {
       list.forEach((product, i) => {
         const s = chips[i];
         if (!s) return;
-        const cg = ctx.createLinearGradient(s.x - chipW / 2, 0, s.x + chipW / 2, 0);
+        const cg = ctx.createLinearGradient(
+          s.x - chipW / 2,
+          0,
+          s.x + chipW / 2,
+          0,
+        );
         cg.addColorStop(0, BLUE);
         cg.addColorStop(1, product.comingSoon ? VIOLET : "#1B9FD6");
         ctx.fillStyle = cg;
@@ -187,7 +215,12 @@ export default function RevealLensStage({ products, settings }: StageProps) {
         ctx.direction = rtl ? "rtl" : "ltr";
       });
       const r = 52;
-      const cg = ctx.createLinearGradient(core.x - r, core.y - r, core.x + r, core.y + r);
+      const cg = ctx.createLinearGradient(
+        core.x - r,
+        core.y - r,
+        core.x + r,
+        core.y + r,
+      );
       cg.addColorStop(0, BLUE);
       cg.addColorStop(0.5, CYAN);
       cg.addColorStop(1, VIOLET);
@@ -248,7 +281,12 @@ export default function RevealLensStage({ products, settings }: StageProps) {
             key={product.id}
             type="button"
             className="rl-hit"
-            style={{ left: s.x - chipW / 2, top: s.y - chipH / 2, width: chipW, height: chipH }}
+            style={{
+              left: s.x - chipW / 2,
+              top: s.y - chipH / 2,
+              width: chipW,
+              height: chipH,
+            }}
             aria-label={fill(t("ucToolLabel"), product.name)}
             onFocus={() => {
               pointer.current = { x: s.x, y: s.y, at: clock.current };
@@ -260,7 +298,11 @@ export default function RevealLensStage({ products, settings }: StageProps) {
       <div className="rl-bar">
         <p className="rl-hint">{t("rlHint")}</p>
         {motion.animate ? (
-          <button type="button" className="rl-btn" onClick={() => setExpanded(!revealed)}>
+          <button
+            type="button"
+            className="rl-btn"
+            onClick={() => setExpanded(!revealed)}
+          >
             {revealed ? t("rlReset") : t("rlRevealAll")}
           </button>
         ) : null}

@@ -1,4 +1,10 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+} from "react";
 import { useQueryClient } from "@tanstack/react-query";
 import { useServerFn } from "@tanstack/react-start";
 import { ExternalLink, ImagePlus, Images, RotateCcw, X } from "lucide-react";
@@ -38,7 +44,15 @@ import { previewUrl } from "@/themes/preview";
 import { themedImage, themedLogo } from "@/themes/theme-art";
 import { ImagePicker, useImageUpload } from "./media";
 import { toHex } from "./settings-appearance";
-import { Card, SaveBar, SettingRow, selectClass, useAdminCopy, useAssetUrl, useDraft } from "./ui";
+import {
+  Card,
+  SaveBar,
+  SettingRow,
+  selectClass,
+  useAdminCopy,
+  useAssetUrl,
+  useDraft,
+} from "./ui";
 
 type Drafts = Record<DesignThemeId, ThemeCustomization>;
 
@@ -68,7 +82,10 @@ const SIZE_DEFAULT: Record<SizeKey, number> = {
 function fromCatalog(catalog: Catalog): Drafts {
   const saved = catalog.settings.themeCustomizations ?? {};
   return Object.fromEntries(
-    DESIGN_THEME_IDS.map((id) => [id, { ...emptyCustomization(), ...(saved[id] ?? {}) }]),
+    DESIGN_THEME_IDS.map((id) => [
+      id,
+      { ...emptyCustomization(), ...(saved[id] ?? {}) },
+    ]),
   ) as Drafts;
 }
 
@@ -80,7 +97,8 @@ function readDesignColors(theme: DesignThemeId): Record<string, string> {
   el.setAttribute("data-design-theme", theme);
   const styles = getComputedStyle(el);
   const out: Record<string, string> = {};
-  for (const token of CUSTOM_COLOR_TOKENS) out[token] = styles.getPropertyValue(token).trim();
+  for (const token of CUSTOM_COLOR_TOKENS)
+    out[token] = styles.getPropertyValue(token).trim();
   el.removeAttribute("data-theme-defaults");
   if (previous === null) el.removeAttribute("data-design-theme");
   else el.setAttribute("data-design-theme", previous);
@@ -88,7 +106,9 @@ function readDesignColors(theme: DesignThemeId): Record<string, string> {
 }
 
 function formatSize(key: SizeKey, value: number): string {
-  return key === "header" ? `${Math.round(value)}px` : `${Math.round(value * 100)}%`;
+  return key === "header"
+    ? `${Math.round(value)}px`
+    : `${Math.round(value * 100)}%`;
 }
 
 export function ImageChoice({
@@ -122,7 +142,9 @@ export function ImageChoice({
           {shown ? (
             <img src={shown} alt="" className="h-full w-full object-contain" />
           ) : (
-            <span className="px-2 text-center text-xs text-muted-foreground">{fallbackText}</span>
+            <span className="px-2 text-center text-xs text-muted-foreground">
+              {fallbackText}
+            </span>
           )}
         </div>
         <div className="grid min-w-0 gap-2">
@@ -156,12 +178,22 @@ export function ImageChoice({
               <ImagePlus className="size-4" aria-hidden="true" />
               {t("uploadImage")}
             </Button>
-            <Button type="button" variant="outline" size="sm" onClick={() => setPicking(true)}>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => setPicking(true)}
+            >
               <Images className="size-4" aria-hidden="true" />
               {t("pickFromGallery")}
             </Button>
             {path ? (
-              <Button type="button" variant="ghost" size="sm" onClick={() => onChange("")}>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={() => onChange("")}
+              >
                 <X className="size-4" aria-hidden="true" />
                 {t("resetToDesign")}
               </Button>
@@ -233,7 +265,8 @@ export function CustomizeSettings({
     const badContact = changed.find((id) => {
       const c = drafts[id].consultants;
       return (
-        (c?.email && !isConsultantEmail(c.email)) || (c?.whatsapp && !isWhatsappNumber(c.whatsapp))
+        (c?.email && !isConsultantEmail(c.email)) ||
+        (c?.whatsapp && !isWhatsappNumber(c.whatsapp))
       );
     });
     if (badContact) return void toast.error(t("consultantsInvalid"));
@@ -243,7 +276,8 @@ export function CustomizeSettings({
         const result = await save({
           data: { theme: id, value: compactCustomization(drafts[id]) },
         });
-        if (!result.ok) return void toast.error(t(result.message as AdminCopyKey));
+        if (!result.ok)
+          return void toast.error(t(result.message as AdminCopyKey));
         queryClient.setQueryData<Catalog>(
           ["catalog"],
           (current) =>
@@ -284,9 +318,15 @@ export function CustomizeSettings({
   const samplePath = sample ? (draft.productImages[sample.id] ?? "") : "";
   const sampleSigned = useAssetUrl(samplePath);
   const bgSigned = useAssetUrl(draft.background);
-  const sampleImage = samplePath ? sampleSigned : sample ? themedImage(theme, sample) : "";
+  const sampleImage = samplePath
+    ? sampleSigned
+    : sample
+      ? themedImage(theme, sample)
+      : "";
   const previewStyle = {
-    ...Object.fromEntries(CUSTOM_COLOR_TOKENS.map((token) => [token, color(token)])),
+    ...Object.fromEntries(
+      CUSTOM_COLOR_TOKENS.map((token) => [token, color(token)]),
+    ),
     backgroundColor: "var(--background)",
     color: "var(--foreground)",
     ...(bgSigned
@@ -312,13 +352,21 @@ export function CustomizeSettings({
               <option key={d.id} value={d.id}>
                 {d.name[language]}
                 {d.id === live ? ` — ${t("themeLive")}` : ""}
-                {!isEmptyCustomization(drafts[d.id]) ? ` · ${t("customizeEdited")}` : ""}
+                {!isEmptyCustomization(drafts[d.id])
+                  ? ` · ${t("customizeEdited")}`
+                  : ""}
               </option>
             ))}
           </select>
-          {theme === live ? <Badge variant="secondary">{t("themeLive")}</Badge> : null}
+          {theme === live ? (
+            <Badge variant="secondary">{t("themeLive")}</Badge>
+          ) : null}
           <Button asChild variant="outline" size="sm">
-            <a href={previewUrl(theme)} target="_blank" rel="noopener noreferrer">
+            <a
+              href={previewUrl(theme)}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               <ExternalLink className="size-4" aria-hidden="true" />
               {t("customizeOpenPreview")}
             </a>
@@ -335,7 +383,9 @@ export function CustomizeSettings({
             </Button>
           ) : null}
         </div>
-        <p className="mt-2 text-xs text-muted-foreground">{t("customizePreviewNote")}</p>
+        <p className="mt-2 text-xs text-muted-foreground">
+          {t("customizePreviewNote")}
+        </p>
 
         <div
           className="mt-4 overflow-hidden rounded-xl border"
@@ -350,9 +400,16 @@ export function CustomizeSettings({
               paddingBlock: `${Math.max(4, size("header"))}px`,
             }}
           >
-            <div className="flex items-center gap-2" style={{ zoom: size("logo") }}>
+            <div
+              className="flex items-center gap-2"
+              style={{ zoom: size("logo") }}
+            >
               {logoSigned || designLogo ? (
-                <img src={logoSigned || designLogo} alt="" className="h-8 w-auto" />
+                <img
+                  src={logoSigned || designLogo}
+                  alt=""
+                  className="h-8 w-auto"
+                />
               ) : null}
               <strong className="text-base" dir="ltr">
                 {catalog.settings.displayTitle}
@@ -374,7 +431,11 @@ export function CustomizeSettings({
               >
                 <div className="aspect-video bg-muted/40">
                   {sampleImage ? (
-                    <img src={sampleImage} alt="" className="h-full w-full object-contain" />
+                    <img
+                      src={sampleImage}
+                      alt=""
+                      className="h-full w-full object-contain"
+                    />
                   ) : null}
                 </div>
                 <div className="p-2 text-sm font-semibold">{sample?.name}</div>
@@ -415,7 +476,9 @@ export function CustomizeSettings({
                   className="size-9 shrink-0 cursor-pointer rounded-md border border-border bg-transparent p-0.5"
                 />
                 <div className="min-w-0 flex-1">
-                  <span className="block truncate text-xs font-medium">{name}</span>
+                  <span className="block truncate text-xs font-medium">
+                    {name}
+                  </span>
                   <Input
                     dir="ltr"
                     value={value}
@@ -512,7 +575,9 @@ export function CustomizeSettings({
           folder="branding"
           onChange={(aboutImage) => set({ aboutImage })}
         />
-        <h3 className="mt-5 text-sm font-semibold">{t("customProductImages")}</h3>
+        <h3 className="mt-5 text-sm font-semibold">
+          {t("customProductImages")}
+        </h3>
         {catalog.products.map((product) => (
           <ImageChoice
             key={product.id}
@@ -531,7 +596,10 @@ export function CustomizeSettings({
         ))}
       </Card>
 
-      <Card title={t("customizeConsultants")} description={t("customizeConsultantsDesc")}>
+      <Card
+        title={t("customizeConsultants")}
+        description={t("customizeConsultantsDesc")}
+      >
         <SettingRow
           label={t("consultantsEmail")}
           hint={t("consultantsEmailHint", {
@@ -549,7 +617,9 @@ export function CustomizeSettings({
             type="email"
             dir="ltr"
             maxLength={160}
-            placeholder={catalog.settings.contactInfo.email || "team@example.com"}
+            placeholder={
+              catalog.settings.contactInfo.email || "team@example.com"
+            }
             value={consultantEmail}
             onChange={(event) =>
               set({
@@ -615,7 +685,12 @@ export function CustomizeSettings({
         </div>
       </Card>
 
-      <SaveBar dirty={form.dirty} busy={busy} onSave={onSave} onDiscard={form.discard} />
+      <SaveBar
+        dirty={form.dirty}
+        busy={busy}
+        onSave={onSave}
+        onDiscard={form.discard}
+      />
     </fieldset>
   );
 }

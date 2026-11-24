@@ -21,14 +21,18 @@ export function useMobile(): boolean {
 }
 
 /** Tracks an element's CSS size (re-renders only on resize). */
-export function useElementSize(ref: RefObject<HTMLElement | null>, fallback = { w: 1100, h: 620 }) {
+export function useElementSize(
+  ref: RefObject<HTMLElement | null>,
+  fallback = { w: 1100, h: 620 },
+) {
   const [size, setSize] = useState(fallback);
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
     const read = () => {
       const r = el.getBoundingClientRect();
-      if (r.width > 0 && r.height > 0) setSize({ w: Math.round(r.width), h: Math.round(r.height) });
+      if (r.width > 0 && r.height > 0)
+        setSize({ w: Math.round(r.width), h: Math.round(r.height) });
     };
     read();
     if (typeof ResizeObserver === "undefined") return;
@@ -42,7 +46,10 @@ export function useElementSize(ref: RefObject<HTMLElement | null>, fallback = { 
 /** Sizes a canvas for the device pixel ratio and returns its 2D context scaled to CSS pixels. */
 export function prepareCanvas(canvas: HTMLCanvasElement, w: number, h: number) {
   const dpr = Math.min(2, window.devicePixelRatio || 1);
-  if (canvas.width !== Math.round(w * dpr) || canvas.height !== Math.round(h * dpr)) {
+  if (
+    canvas.width !== Math.round(w * dpr) ||
+    canvas.height !== Math.round(h * dpr)
+  ) {
     canvas.width = Math.round(w * dpr);
     canvas.height = Math.round(h * dpr);
   }

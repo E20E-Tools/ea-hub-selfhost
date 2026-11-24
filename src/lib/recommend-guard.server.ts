@@ -14,14 +14,18 @@ export function createRecommendationGuard() {
 
     // Cloudflare overwrites this header at the trusted ingress. Never trust
     // caller-controlled X-Forwarded-For. Without an ingress IP, share a quota.
-    const ip = request.headers.get("cf-connecting-ip")?.trim() || "unknown-client";
+    const ip =
+      request.headers.get("cf-connecting-ip")?.trim() || "unknown-client";
     for (const [key, timestamps] of clients) {
       const active = timestamps.filter((time) => time > now - WINDOW_MS);
       if (active.length === 0) clients.delete(key);
       else clients.set(key, active);
     }
     const timestamps = clients.get(ip) ?? [];
-    if (timestamps.length >= MAX_REQUESTS || (!clients.has(ip) && clients.size >= MAX_CLIENTS)) {
+    if (
+      timestamps.length >= MAX_REQUESTS ||
+      (!clients.has(ip) && clients.size >= MAX_CLIENTS)
+    ) {
       return RECOMMEND_LIMIT_MESSAGE;
     }
     timestamps.push(now);

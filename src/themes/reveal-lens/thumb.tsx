@@ -34,7 +34,14 @@ export function RevealLensThumb() {
         <rect x="132" y="120" width="44" height="16" rx="6" fill="#8B5CF6" />
         <circle cx="160" cy="92" r="3" fill="#00D4FF" />
       </g>
-      <circle cx="190" cy="92" r="58" fill="none" stroke="#0F1730" strokeWidth="3" />
+      <circle
+        cx="190"
+        cy="92"
+        r="58"
+        fill="none"
+        stroke="#0F1730"
+        strokeWidth="3"
+      />
     </svg>
   );
 }

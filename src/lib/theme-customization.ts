@@ -5,7 +5,11 @@
  * layout turns it into CSS, the admin edits it, the server validates it.
  */
 import { z } from "zod";
-import { DESIGN_THEME_IDS, isDesignThemeId, type DesignThemeId } from "./design-themes";
+import {
+  DESIGN_THEME_IDS,
+  isDesignThemeId,
+  type DesignThemeId,
+} from "./design-themes";
 
 const SAFE_COLOR =
   /^(#[0-9a-f]{3,8}|rgba?\([^)]{1,60}\)|oklch\([^)]{1,60}\)|hsla?\([^)]{1,60}\))$/i;
@@ -53,7 +57,9 @@ export type ThemeCustomization = {
   consultants?: ConsultantContact;
 };
 export type ConsultantContact = { email?: string; whatsapp?: string };
-export type ThemeCustomizations = Partial<Record<DesignThemeId, ThemeCustomization>>;
+export type ThemeCustomizations = Partial<
+  Record<DesignThemeId, ThemeCustomization>
+>;
 
 export const emptyCustomization = (): ThemeCustomization => ({
   colors: {},
@@ -72,7 +78,8 @@ const assetPath = z
   .refine((v) => v === "" || ASSET_PATH.test(v), "مسار الصورة غير صالح.");
 
 const EMAIL = /^[^\s@<>()"',;:]{1,64}@[^\s@<>()"',;:]+\.[a-z]{2,24}$/i;
-export const isConsultantEmail = (v: string) => EMAIL.test(v.trim()) && v.trim().length <= 160;
+export const isConsultantEmail = (v: string) =>
+  EMAIL.test(v.trim()) && v.trim().length <= 160;
 /** International number, digits only (country code first, no + or leading zeros). */
 export const isWhatsappNumber = (v: string) => /^[1-9]\d{7,14}$/.test(v);
 /** Turns what an admin types (+966 5x…, 00966…) into the stored digits-only form. */
@@ -84,14 +91,22 @@ export function whatsappUrl(digits: string): string {
 }
 
 const sizeValue = (key: SizeKey) =>
-  z.number().finite().min(SIZE_LIMITS[key].min).max(SIZE_LIMITS[key].max).optional();
+  z
+    .number()
+    .finite()
+    .min(SIZE_LIMITS[key].min)
+    .max(SIZE_LIMITS[key].max)
+    .optional();
 
 export const themeCustomizationSchema = z.object({
   colors: z
     .record(
       z
         .string()
-        .refine((k) => (CUSTOM_COLOR_TOKENS as readonly string[]).includes(k), "لون غير معروف."),
+        .refine(
+          (k) => (CUSTOM_COLOR_TOKENS as readonly string[]).includes(k),
+          "لون غير معروف.",
+        ),
       z.string().trim().max(80).refine(isSafeColor, "قيمة اللون غير صحيحة."),
     )
     .default({}),
@@ -108,7 +123,10 @@ export const themeCustomizationSchema = z.object({
   background: assetPath.default(""),
   aboutImage: assetPath.default(""),
   productImages: z
-    .record(z.string().regex(/^[a-z0-9-]{1,60}$/i, "معرّف المنتج غير صالح."), assetPath)
+    .record(
+      z.string().regex(/^[a-z0-9-]{1,60}$/i, "معرّف المنتج غير صالح."),
+      assetPath,
+    )
     .refine((v) => Object.keys(v).length <= 40, "عدد الصور كبير جدًا.")
     .default({}),
   consultants: z
@@ -136,12 +154,18 @@ export const saveThemeCustomizationSchema = z.object({
 });
 
 /** Drops empty values so "back to the design default" removes the key entirely. */
-export function compactCustomization(value: ThemeCustomization): ThemeCustomization {
+export function compactCustomization(
+  value: ThemeCustomization,
+): ThemeCustomization {
   const colors = Object.fromEntries(
-    Object.entries(value.colors).filter(([, v]) => typeof v === "string" && v.trim() !== ""),
+    Object.entries(value.colors).filter(
+      ([, v]) => typeof v === "string" && v.trim() !== "",
+    ),
   ) as ThemeCustomization["colors"];
   const sizes = Object.fromEntries(
-    Object.entries(value.sizes).filter(([, v]) => typeof v === "number" && Number.isFinite(v)),
+    Object.entries(value.sizes).filter(
+      ([, v]) => typeof v === "number" && Number.isFinite(v),
+    ),
   ) as ThemeCustomization["sizes"];
   const productImages = Object.fromEntries(
     Object.entries(value.productImages).filter(([, v]) => v !== ""),
@@ -157,11 +181,16 @@ export function compactCustomization(value: ThemeCustomization): ThemeCustomizat
   const email = value.consultants?.email?.trim() ?? "";
   const whatsapp = value.consultants?.whatsapp?.trim() ?? "";
   if (email || whatsapp)
-    out.consultants = { ...(email ? { email } : {}), ...(whatsapp ? { whatsapp } : {}) };
+    out.consultants = {
+      ...(email ? { email } : {}),
+      ...(whatsapp ? { whatsapp } : {}),
+    };
   return out;
 }
 
-export function isEmptyCustomization(value: ThemeCustomization | undefined): boolean {
+export function isEmptyCustomization(
+  value: ThemeCustomization | undefined,
+): boolean {
   if (!value) return true;
   const c = compactCustomization(value);
   return (
@@ -176,7 +205,9 @@ export function isEmptyCustomization(value: ThemeCustomization | undefined): boo
 }
 
 /** Reads the saved column; invalid designs or entries are ignored, never fatal. */
-export function normalizeThemeCustomizations(raw: unknown): ThemeCustomizations {
+export function normalizeThemeCustomizations(
+  raw: unknown,
+): ThemeCustomizations {
   if (raw === null || typeof raw !== "object" || Array.isArray(raw)) return {};
   const out: ThemeCustomizations = {};
   for (const [id, entry] of Object.entries(raw as Record<string, unknown>)) {
@@ -251,7 +282,10 @@ export function themeCustomizationCss(
   urls: Readonly<Record<string, string>>,
 ): string {
   const rules: string[] = [];
-  for (const [id, entry] of Object.entries(map) as [DesignThemeId, ThemeCustomization][]) {
+  for (const [id, entry] of Object.entries(map) as [
+    DesignThemeId,
+    ThemeCustomization,
+  ][]) {
     if (!isDesignThemeId(id) || !entry) continue;
     const root = `:root:root:root[data-design-theme="${id}"]:not([data-theme-defaults])`;
     const site = `${root} [data-surface="site"]`;
@@ -265,12 +299,18 @@ export function themeCustomizationCss(
       .map(([token, value]) => `${token}:${(value as string).trim()}`);
     if (colors.length > 0) rules.push(`${root}{${colors.join(";")}}`);
     const { logo, text, cards, header } = entry.sizes;
-    if (typeof logo === "number") rules.push(`${site} .site-brand{zoom:${clamp("logo", logo)}}`);
+    if (typeof logo === "number")
+      rules.push(`${site} .site-brand{zoom:${clamp("logo", logo)}}`);
     if (typeof header === "number")
-      rules.push(`${site} .site-header{padding-block:${clamp("header", header)}px}`);
-    if (typeof cards === "number") rules.push(...cardRules(site, clamp("cards", cards)));
+      rules.push(
+        `${site} .site-header{padding-block:${clamp("header", header)}px}`,
+      );
+    if (typeof cards === "number")
+      rules.push(...cardRules(site, clamp("cards", cards)));
     if (typeof text === "number")
-      rules.push(`${site} :is(.site-content,.site-footer){zoom:${clamp("text", text)}}`);
+      rules.push(
+        `${site} :is(.site-content,.site-footer){zoom:${clamp("text", text)}}`,
+      );
     const bg = entry.background ? (urls[entry.background] ?? "") : "";
     if (bg && SAFE_CSS_URL.test(bg)) {
       const veil = "color-mix(in oklab,var(--background) 72%,transparent)";

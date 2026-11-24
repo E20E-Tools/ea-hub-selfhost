@@ -19,7 +19,9 @@ export const footerLinksSchema = z
     }),
   )
   .max(20)
-  .refine((links) => new Set(links.map((link) => link.name)).size === links.length);
+  .refine(
+    (links) => new Set(links.map((link) => link.name)).size === links.length,
+  );
 export type FooterLink = z.infer<typeof footerLinksSchema>[number];
 export function readFooterLinks(value: unknown): FooterLink[] {
   const result = footerLinksSchema.safeParse(value);
@@ -35,12 +37,15 @@ export function linkedFooterParts(
     const match = links
       .map((link) => ({ link, index: text.indexOf(link.name, offset) }))
       .filter((entry) => entry.index >= 0)
-      .sort((a, b) => a.index - b.index || b.link.name.length - a.link.name.length)[0];
+      .sort(
+        (a, b) => a.index - b.index || b.link.name.length - a.link.name.length,
+      )[0];
     if (!match) {
       parts.push({ text: text.slice(offset) });
       break;
     }
-    if (match.index > offset) parts.push({ text: text.slice(offset, match.index) });
+    if (match.index > offset)
+      parts.push({ text: text.slice(offset, match.index) });
     parts.push({ text: match.link.name, url: match.link.url });
     offset = match.index + match.link.name.length;
   }

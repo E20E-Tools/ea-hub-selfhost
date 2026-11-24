@@ -22,14 +22,23 @@ export function Calendar({
         dropdown: "absolute inset-0 w-full cursor-pointer opacity-0",
         chevron: "size-4",
         nav: "absolute inset-x-0 top-0 flex justify-between",
-        button_previous: cn(buttonVariants({ variant: "outline", size: "icon" }), "size-9"),
-        button_next: cn(buttonVariants({ variant: "outline", size: "icon" }), "size-9"),
+        button_previous: cn(
+          buttonVariants({ variant: "outline", size: "icon" }),
+          "size-9",
+        ),
+        button_next: cn(
+          buttonVariants({ variant: "outline", size: "icon" }),
+          "size-9",
+        ),
         month_grid: "w-full border-collapse",
         weekdays: "flex",
         weekday: "w-9 text-center text-xs text-muted-foreground",
         week: "mt-1 flex",
         day: "size-9 text-center text-sm",
-        day_button: cn(buttonVariants({ variant: "ghost", size: "icon" }), "size-9 font-normal"),
+        day_button: cn(
+          buttonVariants({ variant: "ghost", size: "icon" }),
+          "size-9 font-normal",
+        ),
         selected:
           "rounded-md bg-primary text-primary-foreground [&_button]:bg-primary [&_button]:text-primary-foreground",
         today: "rounded-md bg-accent text-accent-foreground",

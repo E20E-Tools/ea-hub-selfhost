@@ -39,13 +39,17 @@ export function useStageMotion(
   useEffect(() => {
     try {
       setLessMotion(localStorage.getItem("ea-less-motion") === "1");
-    } catch {}
+    } catch {
+      // Storage can be blocked; the default stays.
+    }
   }, []);
   const toggleLessMotion = () => {
     setLessMotion(!lessMotion);
     try {
       localStorage.setItem("ea-less-motion", lessMotion ? "0" : "1");
-    } catch {}
+    } catch {
+      // Storage can be blocked; the choice then lasts for this page only.
+    }
   };
   const [reduced, setReduced] = useState(false);
   const [onScreen, setOnScreen] = useState(true);

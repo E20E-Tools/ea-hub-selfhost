@@ -2,7 +2,14 @@ import { useQuery } from "@tanstack/react-query";
 import { Link, useRouterState } from "@tanstack/react-router";
 import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useRef, useState } from "react";
-import { ArrowUpRight, LifeBuoy, MessageCircle, Sparkles, Users, X } from "lucide-react";
+import {
+  ArrowUpRight,
+  LifeBuoy,
+  MessageCircle,
+  Sparkles,
+  Users,
+  X,
+} from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { getMyArchySummary } from "@/lib/archy-visitor.functions";
 import { suggestArchyRoute, type ArchyRoute } from "@/lib/archy-settings";
@@ -43,7 +50,8 @@ export function ArchyGuide({
     void supabase.auth
       .getUser()
       .then(({ data }) => {
-        if (active) setAccountId(data.user?.email_confirmed_at ? data.user.id : null);
+        if (active)
+          setAccountId(data.user?.email_confirmed_at ? data.user.id : null);
       })
       .catch(() => {
         if (active) setAccountId(null);
@@ -78,21 +86,33 @@ export function ArchyGuide({
   const contextual = archyContext(catalog?.products ?? [], language, pathname);
   const route = suggestArchyRoute(pathname, info?.openSupport ?? 0);
   const productId = /^\/product\/([^/]+)/.exec(pathname)?.[1];
-  const product = productId ? catalog?.products.find((p) => p.id === productId) : undefined;
-  const productName = product ? (language === "en" && product.labelEn) || product.label : "";
+  const product = productId
+    ? catalog?.products.find((p) => p.id === productId)
+    : undefined;
+  const productName = product
+    ? (language === "en" && product.labelEn) || product.label
+    : "";
 
-  const suggestion: Record<ArchyRoute, { label: string; intent: ArchyOpenIntent }> = {
+  const suggestion: Record<
+    ArchyRoute,
+    { label: string; intent: ArchyOpenIntent }
+  > = {
     tool: {
       label: t("archyRouteTool"),
       intent: {
-        prefill: t("archyPrefillTool") + (productName || decodeURIComponent(productId ?? "")),
+        prefill:
+          t("archyPrefillTool") +
+          (productName || decodeURIComponent(productId ?? "")),
       },
     },
     support: {
       label: t("archyRouteSupport"),
       intent: { prefill: t("archyPrefillSupport"), human: true },
     },
-    request: { label: t("archyRouteRequest"), intent: { prefill: t("archyPrefillRequest") } },
+    request: {
+      label: t("archyRouteRequest"),
+      intent: { prefill: t("archyPrefillRequest") },
+    },
     guide: { label: t("archyRouteGuide"), intent: {} },
   };
   const main = suggestion[route];
@@ -136,19 +156,29 @@ export function ArchyGuide({
               <ul>
                 {info.support.map((r) => {
                   const fresh =
-                    r.updatedAt && Date.now() - Date.parse(r.updatedAt) < 14 * 86_400_000;
+                    r.updatedAt &&
+                    Date.now() - Date.parse(r.updatedAt) < 14 * 86_400_000;
                   return (
                     <li key={r.id}>
                       <span dir="ltr">#{r.id}</span>
-                      <span className="archy-guide-status" data-status={r.status}>
-                        {t(`archyStatus_${r.status}` as Parameters<typeof t>[0])}
+                      <span
+                        className="archy-guide-status"
+                        data-status={r.status}
+                      >
+                        {t(
+                          `archyStatus_${r.status}` as Parameters<typeof t>[0],
+                        )}
                       </span>
                       {fresh ? <em>{t("archySupportUpdated")}</em> : null}
                     </li>
                   );
                 })}
               </ul>
-              <Link to="/support" onClick={onClose} className="archy-guide-support-link">
+              <Link
+                to="/support"
+                onClick={onClose}
+                className="archy-guide-support-link"
+              >
                 <LifeBuoy aria-hidden="true" />
                 {t("archySupportView")}
               </Link>
@@ -171,7 +201,10 @@ export function ArchyGuide({
       </button>
       <p className="archy-guide-label">{t("archyGuideMore")}</p>
       <div className="grid gap-2">
-        <Button variant="outline" onClick={() => onChoose({ prefill: t("archyHelpChoosePrompt") })}>
+        <Button
+          variant="outline"
+          onClick={() => onChoose({ prefill: t("archyHelpChoosePrompt") })}
+        >
           {t("archyHelpChoose")}
         </Button>
         {contextual.length >= 2 && (
@@ -204,7 +237,9 @@ export function ArchyGuide({
             <Button
               variant="ghost"
               size="sm"
-              onClick={() => onChoose({ prefill: t("archyPrefillTool") + p.name })}
+              onClick={() =>
+                onChoose({ prefill: t("archyPrefillTool") + p.name })
+              }
             >
               {t("archyRouteTool")}
             </Button>

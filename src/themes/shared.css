@@ -23,7 +23,8 @@ html.theme-transition *::after {
   background: var(--popover);
   color: var(--popover-foreground);
   border: 1px solid var(--border);
-  box-shadow: 0 24px 60px -20px color-mix(in oklab, var(--foreground) 35%, transparent);
+  box-shadow: 0 24px 60px -20px
+    color-mix(in oklab, var(--foreground) 35%, transparent);
   outline: none;
 }
 .inspector-head {
@@ -70,7 +71,8 @@ html.theme-transition *::after {
   background: var(--foreground);
   color: var(--background);
   border-radius: 999px;
-  box-shadow: 0 10px 30px -10px color-mix(in oklab, var(--foreground) 60%, transparent);
+  box-shadow: 0 10px 30px -10px
+    color-mix(in oklab, var(--foreground) 60%, transparent);
   white-space: nowrap;
 }
 .theme-preview-bar button {

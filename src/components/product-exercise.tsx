@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import type { Product } from "@/lib/products";
 import { trackJourney } from "@/lib/journey-client";
+import { dictionaries } from "@/lib/copy";
 
 export function ProductExercise({
   product,
@@ -45,20 +46,20 @@ export function ProductExercise({
     ? [
         "RabbitMQ",
         "trial",
-        ar ? "أتم اختبار الحمل بنجاح" : "Passed the initial load test",
+        dictionaries[ar ? "ar" : "en"].productExercisePassedTheInitialLoad,
         new Date(Date.now() + 30 * 86400000).toISOString().slice(0, 10),
       ]
     : apm
       ? [
-          ar ? "نظام الشراء" : "Purchasing",
-          ar ? "اعتماد المشتريات" : "Purchase approval",
-          ar ? "بوابة الموردين" : "Supplier portal",
-          ar ? "اعتماد المشتريات" : "Purchase approval",
+          dictionaries[ar ? "ar" : "en"].productExercisePurchasing,
+          dictionaries[ar ? "ar" : "en"].productExercisePurchaseApproval,
+          dictionaries[ar ? "ar" : "en"].productExerciseSupplierPortal,
+          dictionaries[ar ? "ar" : "en"].productExercisePurchaseApproval,
         ]
       : [
-          ar ? "تنفيذ الطلبات" : "Order fulfilment",
-          ar ? "التحقق من المخزون" : "Inventory validation",
-          ar ? "المبيعات، المخزون" : "Sales, Inventory",
+          dictionaries[ar ? "ar" : "en"].productExerciseOrderFulfilment,
+          dictionaries[ar ? "ar" : "en"].productExerciseInventoryValidation,
+          dictionaries[ar ? "ar" : "en"].productExerciseSalesInventory,
         ];
   const rings = ar
     ? ["تبنّي", "تجربة", "تقييم", "إيقاف"]
@@ -67,16 +68,32 @@ export function ProductExercise({
   const [values, setValues] = useState(defaults);
   const [saved, setSaved] = useState(false);
   useEffect(() => {
-    if (new URLSearchParams(location.search).get("resume") !== "exercise") return;
+    if (new URLSearchParams(location.search).get("resume") !== "exercise")
+      return;
     const record = readExercise(product.id);
-    if (record) { setValues(record.values); setResult(record.result); setSaved(true); }
-    else setError(ar ? "لم نجد التمرين المحفوظ على هذا الجهاز." : "No saved exercise was found on this device.");
+    if (record) {
+      setValues(record.values);
+      setResult(record.result);
+      setSaved(true);
+    } else
+      setError(
+        dictionaries[ar ? "ar" : "en"].productExerciseNoSavedExerciseWas,
+      );
   }, [product.id, ar]);
   function save() {
     try {
-      localStorage.setItem(exerciseKey(product.id), JSON.stringify({ name:product.name, values, result, language }));
-      setSaved(true); setError("");
-    } catch { setError(ar ? "تعذر الحفظ على الجهاز. يمكنك تنزيل النتيجة." : "Device storage is unavailable. You can download the result."); }
+      localStorage.setItem(
+        exerciseKey(product.id),
+        JSON.stringify({ name: product.name, values, result, language }),
+      );
+      setSaved(true);
+      setError("");
+    } catch {
+      setError(
+        dictionaries[ar ? "ar" : "en"]
+          .productExerciseDeviceStorageIsUnavailable,
+      );
+    }
   }
   function start() {
     if (!started) {
@@ -122,19 +139,23 @@ export function ProductExercise({
       );
     } catch {
       setError(
-        ar
-          ? "تعذر نقل النتيجة. يمكنك تنزيلها ونسخها في طلب الخدمة."
-          : "Could not transfer the result. Download it and copy it into your request.",
+        dictionaries[ar ? "ar" : "en"].productExerciseCouldNotTransferThe,
       );
     }
   }
   return (
     <section className="bx-panel ea-exercise" id="exercise">
-      <h2>{ar ? "جرّبها على مثال" : "Try a worked example"}</h2>
-      <p>{radar
-        ? (ar ? "راجع سبب تجربة التقنية وحدّد تاريخ المراجعة، ثم أنشئ سجل القرار." : "Review the trial rationale and review date, then generate the decision record.")
-        : apm ? (ar ? "غيّر القدرة التي يدعمها التطبيق الثاني، ثم قارن النتيجة لمعرفة أين يوجد تداخل." : "Change the second application’s capability and generate the finding to see how overlap changes.")
-        : (ar ? "غيّر التطبيقات التي تدعم العملية، ثم أنشئ خريطة الاعتماديات." : "Change the applications supporting the process, then generate its dependency map.")}</p>
+      <h2>{dictionaries[ar ? "ar" : "en"].productExerciseTryAWorkedExample}</h2>
+      <p>
+        {radar
+          ? dictionaries[ar ? "ar" : "en"]
+              .productExerciseReviewTheTrialRationale
+          : apm
+            ? dictionaries[ar ? "ar" : "en"]
+                .productExerciseChangeTheSecondApplication
+            : dictionaries[ar ? "ar" : "en"]
+                .productExerciseChangeTheApplicationsSupporting}
+      </p>
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -150,12 +171,10 @@ export function ProductExercise({
           if (apm)
             lines.push(
               v[1]?.toLocaleLowerCase() === v[3]?.toLocaleLowerCase()
-                ? ar
-                  ? "النتيجة: التطبيقان يدعمان القدرة نفسها. تحقّق من الاعتماديات قبل اقتراح الدمج."
-                  : "Finding: both applications support the same capability. Check dependencies before consolidation."
-                : ar
-                  ? "النتيجة: القدرتان المدخلتان مختلفتان."
-                  : "Finding: the two capabilities entered are distinct.",
+                ? dictionaries[ar ? "ar" : "en"]
+                    .productExerciseFindingBothApplicationsSupport
+                : dictionaries[ar ? "ar" : "en"]
+                    .productExerciseFindingTheTwoCapabilities,
             );
           if (!apm && !radar) lines.push(v.join(" → "));
           setResult(lines.join("\n"));
@@ -191,28 +210,48 @@ export function ProductExercise({
             </label>
           ))}
         </div>
-        <Button>{ar ? "إنشاء النتيجة" : "Generate result"}</Button>
+        <Button>
+          {dictionaries[ar ? "ar" : "en"].productExerciseGenerateResult}
+        </Button>
       </form>
       {result && (
         <div role="status">
           <pre className="whitespace-pre-wrap">{result}</pre>
           <div className="bx-actions">
-            <Button onClick={save}>{ar ? "حفظ على هذا الجهاز" : "Save on this device"}</Button>
-            {saved && (showMyTools ? <a href="/my-tools">{ar ? "تم الحفظ · عرض تماريني" : "Saved · View my exercises"}</a> : <span role="status">{ar ? "تم الحفظ" : "Saved"}</span>)}
+            <Button onClick={save}>
+              {dictionaries[ar ? "ar" : "en"].productExerciseSaveOnThisDevice}
+            </Button>
+            {saved &&
+              (showMyTools ? (
+                <a href="/my-tools">
+                  {
+                    dictionaries[ar ? "ar" : "en"]
+                      .productExerciseSavedViewMyExercises
+                  }
+                </a>
+              ) : (
+                <span role="status">
+                  {dictionaries[ar ? "ar" : "en"].productExerciseSaved}
+                </span>
+              ))}
             <Button onClick={download}>
-              {ar ? "تنزيل النتيجة" : "Download result"}
+              {dictionaries[ar ? "ar" : "en"].productExerciseDownloadResult}
             </Button>
             {product.servicesEnabled !== false && (
               <Button variant="outline" onClick={attach}>
-                {ar
-                  ? "أرفق النتيجة بطلب تدريب"
-                  : "Attach result to a training request"}
+                {dictionaries[ar ? "ar" : "en"].productExerciseAttachResultToA}
               </Button>
             )}
           </div>
         </div>
       )}
-      <StepHelp key={result} product={product} ar={ar} step={ar ? "التمرين العملي" : "Worked example"} result={result} />
+      <StepHelp
+        key={result}
+        product={product}
+        ar={ar}
+        step={dictionaries[ar ? "ar" : "en"].productExerciseWorkedExample}
+        result={result}
+      />
       {error && <p role="alert">{error}</p>}
     </section>
   );

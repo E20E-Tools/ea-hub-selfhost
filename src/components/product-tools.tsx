@@ -25,19 +25,25 @@ export function ProductToolsActions({
   return (
     <div className="bx-product-tools" aria-label={t("bxMyTools")}>
       {canSave && (
-      <Button
-        type="button"
-        variant={favorite ? "secondary" : "outline"}
-        size={compact ? "icon" : "sm"}
-        className={compact ? "min-h-11 min-w-11" : ""}
-        aria-label={`${favorite ? t("bxRemove") : t("bxSaveTool")}: ${product.name}`}
-        aria-pressed={favorite}
-        title={favorite ? t("bxSavedTool") : t("bxSaveTool")}
-        onClick={() => tools.toggleFavorite(product.id)}
-      >
-        <Heart size={16} fill={favorite ? "currentColor" : "none"} aria-hidden="true" />
-        {!compact && <span>{favorite ? t("bxSavedTool") : t("bxSaveTool")}</span>}
-      </Button>
+        <Button
+          type="button"
+          variant={favorite ? "secondary" : "outline"}
+          size={compact ? "icon" : "sm"}
+          className={compact ? "min-h-11 min-w-11" : ""}
+          aria-label={`${favorite ? t("bxRemove") : t("bxSaveTool")}: ${product.name}`}
+          aria-pressed={favorite}
+          title={favorite ? t("bxSavedTool") : t("bxSaveTool")}
+          onClick={() => tools.toggleFavorite(product.id)}
+        >
+          <Heart
+            size={16}
+            fill={favorite ? "currentColor" : "none"}
+            aria-hidden="true"
+          />
+          {!compact && (
+            <span>{favorite ? t("bxSavedTool") : t("bxSaveTool")}</span>
+          )}
+        </Button>
       )}
       {canCompare && (
         <Button
@@ -72,7 +78,11 @@ export function ProductToolsActions({
   );
 }
 
-export function CompareTray({ goal }: { goal?: import("@/lib/beneficiary-metadata").DiscoveryGoal | undefined } = {}) {
+export function CompareTray({
+  goal,
+}: {
+  goal?: import("@/lib/beneficiary-metadata").DiscoveryGoal | undefined;
+} = {}) {
   const { t, language } = useLanguage();
   const tools = useMyTools();
   const enabled = useFeature("compare");
@@ -81,7 +91,8 @@ export function CompareTray({ goal }: { goal?: import("@/lib/beneficiary-metadat
   return (
     <section className="bx-compare-tray" aria-label={t("bxCompare")}>
       <p>
-        <strong>{tools.compare.length}</strong> / {tools.maxCompare} {t("bxSelected")}
+        <strong>{tools.compare.length}</strong> / {tools.maxCompare}{" "}
+        {t("bxSelected")}
       </p>
       <div className="bx-chip-list">
         {tools.compare.map((id) => (

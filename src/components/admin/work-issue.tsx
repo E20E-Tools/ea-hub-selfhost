@@ -30,12 +30,7 @@ export function IssueEditor({
       <Button
         variant="outline"
         onClick={() =>
-          set(
-            adminDictionaries[lang].wiIssueHeading +
-              month +
-              "\n\n" +
-              source,
-          )
+          set(adminDictionaries[lang].wiIssueHeading + month + "\n\n" + source)
         }
       >
         {ui.wiDraftMonthly}

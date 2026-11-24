@@ -5,8 +5,14 @@ export const METRICS_PREFERENCE_EVENT = "e20e-metrics-preference";
 /** True when the browser sends Global Privacy Control or Do Not Track. */
 export function browserPrivacySignal(): boolean {
   if (typeof navigator === "undefined") return false;
-  const nav = navigator as Navigator & { globalPrivacyControl?: boolean; msDoNotTrack?: string };
-  const win = typeof window === "undefined" ? undefined : (window as { doNotTrack?: string });
+  const nav = navigator as Navigator & {
+    globalPrivacyControl?: boolean;
+    msDoNotTrack?: string;
+  };
+  const win =
+    typeof window === "undefined"
+      ? undefined
+      : (window as { doNotTrack?: string });
   const dnt = nav.doNotTrack ?? win?.doNotTrack ?? nav.msDoNotTrack;
   return nav.globalPrivacyControl === true || dnt === "1" || dnt === "yes";
 }
@@ -47,10 +53,15 @@ export function setMetricsOptOut(optOut: boolean): boolean {
  * Optional product analytics: skipped under GPC/DNT or the local opt-out, and collector
  * failures are contained so they can never turn a confirmed action into a UI failure.
  */
-export function trackProductEvent(name: string, properties?: Record<string, unknown>): void {
+export function trackProductEvent(
+  name: string,
+  properties?: Record<string, unknown>,
+): void {
   try {
     if (!metricsAllowed()) return;
-    window.dispatchEvent(new CustomEvent("e20e-product-event", { detail: { name, properties } }));
+    window.dispatchEvent(
+      new CustomEvent("e20e-product-event", { detail: { name, properties } }),
+    );
   } catch {
     /* analytics is optional */
   }

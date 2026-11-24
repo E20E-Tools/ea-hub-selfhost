@@ -1,10 +1,23 @@
 import { useState } from "react";
 import { useLanguage } from "@/lib/language";
 import { Button } from "./ui/button";
+import { dictionaries } from "@/lib/copy";
 
-export type Receipt = { id: string; createdAt: string; tracking: "none" | "guest" | "account" };
+export type Receipt = {
+  id: string;
+  createdAt: string;
+  tracking: "none" | "guest" | "account";
+};
 
-export function RequestReceipt({ receipt, subject, summary }: { receipt: Receipt; subject: string; summary: string }) {
+export function RequestReceipt({
+  receipt,
+  subject,
+  summary,
+}: {
+  receipt: Receipt;
+  subject: string;
+  summary: string;
+}) {
   const { language, t } = useLanguage();
   const ar = language === "ar";
   const [copy, setCopy] = useState<"idle" | "done" | "manual">("idle");
@@ -19,15 +32,46 @@ export function RequestReceipt({ receipt, subject, summary }: { receipt: Receipt
   return (
     <div className="grid gap-3">
       <dl className="request-receipt">
-        <dt>{t("requestNumberLabel")}</dt><dd dir="ltr" className="select-all">{receipt.id}</dd>
-        <dt>{t("requestTimeLabel")}</dt><dd><time dateTime={receipt.createdAt}>{new Date(receipt.createdAt).toLocaleString(language)}</time></dd>
+        <dt>{t("requestNumberLabel")}</dt>
+        <dd dir="ltr" className="select-all">
+          {receipt.id}
+        </dd>
+        <dt>{t("requestTimeLabel")}</dt>
+        <dd>
+          <time dateTime={receipt.createdAt}>
+            {new Date(receipt.createdAt).toLocaleString(language)}
+          </time>
+        </dd>
       </dl>
-      <div><Button type="button" variant="outline" onClick={copyNumber}>{ar ? "نسخ رقم الطلب" : "Copy receipt number"}</Button>
-        <span role="status">{copy === "done" ? (ar ? " تم النسخ" : " Copied") : copy === "manual" ? (ar ? " حدّد الرقم وانسخه يدويًا." : " Select the number to copy it manually.") : ""}</span></div>
+      <div>
+        <Button type="button" variant="outline" onClick={copyNumber}>
+          {dictionaries[ar ? "ar" : "en"].requestReceiptCopyReceiptNumber}
+        </Button>
+        <span role="status">
+          {copy === "done"
+            ? dictionaries[ar ? "ar" : "en"].requestReceiptCopied
+            : copy === "manual"
+              ? dictionaries[ar ? "ar" : "en"].requestReceiptSelectTheNumberTo
+              : ""}
+        </span>
+      </div>
       <strong>{subject}</strong>
-      <p dir="auto" className="ea-request-summary">{summary}</p>
-      <p>{ar ? "الخطوة التالية هي مراجعة الفريق لطلبك." : "The team will review your request next."} {receipt.tracking === "none" ? t("bxTrackingUnavailable") : t("bxTrackingEnabled")}</p>
-      {receipt.tracking !== "none" && <Button asChild><a href={"/my-requests#receipt-" + receipt.id}>{t("bxTrackRequests")}</a></Button>}
+      <p dir="auto" className="ea-request-summary">
+        {summary}
+      </p>
+      <p>
+        {dictionaries[ar ? "ar" : "en"].requestReceiptTheTeamWillReview}{" "}
+        {receipt.tracking === "none"
+          ? t("bxTrackingUnavailable")
+          : t("bxTrackingEnabled")}
+      </p>
+      {receipt.tracking !== "none" && (
+        <Button asChild>
+          <a href={"/my-requests#receipt-" + receipt.id}>
+            {t("bxTrackRequests")}
+          </a>
+        </Button>
+      )}
     </div>
   );
 }

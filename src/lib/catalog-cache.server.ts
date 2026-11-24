@@ -23,7 +23,11 @@ export function cachedSignedUrl(path: string, now = Date.now()): string | null {
   return hit.value;
 }
 
-export function rememberSignedUrl(path: string, url: string, now = Date.now()): void {
+export function rememberSignedUrl(
+  path: string,
+  url: string,
+  now = Date.now(),
+): void {
   if (!url) return;
   if (signed.size >= MAX_SIGNED_ENTRIES) {
     const oldest = signed.keys().next().value;
@@ -38,7 +42,11 @@ export function cachedCatalog<T>(now = Date.now()): T | null {
 }
 
 /** Stores a freshly built catalog unless an admin save happened while it was being built. */
-export function rememberCatalog<T>(value: T, builtAtGeneration: number, now = Date.now()): void {
+export function rememberCatalog<T>(
+  value: T,
+  builtAtGeneration: number,
+  now = Date.now(),
+): void {
   if (builtAtGeneration !== generation) return;
   catalogEntry = { value, until: now + CATALOG_TTL_MS };
 }

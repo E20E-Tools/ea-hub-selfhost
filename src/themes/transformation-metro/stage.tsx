@@ -1,4 +1,10 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type CSSProperties,
+} from "react";
 import type { Product } from "@/lib/catalog";
 import { useLanguage } from "@/lib/language";
 import type { Language } from "@/lib/language-core";
@@ -12,7 +18,13 @@ import {
   useProductInspector,
 } from "../product-inspector";
 import { countdownParts, launchInstant } from "../launch";
-import { layoutBoxes, metroLayout, pointAt, type LayoutBranch, type Pt } from "./layout";
+import {
+  layoutBoxes,
+  metroLayout,
+  pointAt,
+  type LayoutBranch,
+  type Pt,
+} from "./layout";
 import { metroLines } from "./lines";
 import { flapGlyph, hasArabic, splitFlapUnits } from "./flap";
 
@@ -31,15 +43,20 @@ function useMobile(): boolean {
 function shortDate(date: string, language: Language): string {
   const at = new Date(`${date}T12:00:00Z`);
   if (Number.isNaN(at.getTime())) return date;
-  return new Intl.DateTimeFormat(language === "ar" ? "ar-SA-u-ca-gregory" : "en-GB", {
-    day: "numeric",
-    month: language === "ar" ? "long" : "short",
-    timeZone: "UTC",
-  }).format(at);
+  return new Intl.DateTimeFormat(
+    language === "ar" ? "ar-SA-u-ca-gregory" : "en-GB",
+    {
+      day: "numeric",
+      month: language === "ar" ? "long" : "short",
+      timeZone: "UTC",
+    },
+  ).format(at);
 }
 
 function d(points: Pt[]): string {
-  return points.map(([x, y], i) => `${i ? "L" : "M"}${x.toFixed(1)} ${y.toFixed(1)}`).join("");
+  return points
+    .map(([x, y], i) => `${i ? "L" : "M"}${x.toFixed(1)} ${y.toFixed(1)}`)
+    .join("");
 }
 
 /** Splits a polyline at a distance: [service part, construction part]. */
@@ -75,7 +92,10 @@ function FlapText({
 }) {
   const units = useMemo(() => splitFlapUnits(text), [text]);
   const arabic = hasArabic(text);
-  const pool = useMemo(() => (arabic ? units.filter((u) => u.trim()) : []), [units, arabic]);
+  const pool = useMemo(
+    () => (arabic ? units.filter((u) => u.trim()) : []),
+    [units, arabic],
+  );
   const stride = arabic ? 1 : Math.min(1, 28 / Math.max(1, units.length));
   const last = Math.ceil((units.length - 1) * stride) + 5;
   const [step, setStep] = useState(animate ? -Math.round(delay / 55) : last);
@@ -91,12 +111,22 @@ function FlapText({
     return () => window.clearInterval(id);
   }, [animate, text, delay, last]);
   return (
-    <span className="tm-flap" aria-label={text} role="text" dir={arabic ? "rtl" : "ltr"}>
+    <span
+      className="tm-flap"
+      aria-label={text}
+      role="text"
+      dir={arabic ? "rtl" : "ltr"}
+    >
       {units.map((u, i) => {
-        if (!u.trim()) return <span key={i} className="tm-flap-gap" aria-hidden="true" />;
+        if (!u.trim())
+          return <span key={i} className="tm-flap-gap" aria-hidden="true" />;
         const settle = Math.ceil(i * stride) + 4;
         const blank = step < Math.ceil(i * stride);
-        const glyph = blank ? " " : step < settle ? flapGlyph(i + step, pool) : u;
+        const glyph = blank
+          ? " "
+          : step < settle
+            ? flapGlyph(i + step, pool)
+            : u;
         return (
           <span
             key={`${i}-${glyph}`}
@@ -158,7 +188,9 @@ function BoardBody({
           <dt>{t("tmStatus")}</dt>
           <dd data-soon={facts.available ? undefined : ""}>
             <FlapText text={up(status)} animate={animate} delay={360} />
-            {facts.countdown ? <small className="tm-board-count">{facts.countdown}</small> : null}
+            {facts.countdown ? (
+              <small className="tm-board-count">{facts.countdown}</small>
+            ) : null}
           </dd>
         </div>
       </dl>
@@ -185,16 +217,25 @@ function BoardBody({
   );
 }
 
-type Train = { branch: LayoutBranch; stops: number[]; stationIds: (string | null)[] };
+type Train = {
+  branch: LayoutBranch;
+  stops: number[];
+  stationIds: (string | null)[];
+};
 
-export default function TransformationMetroStage({ products, settings }: StageProps) {
+export default function TransformationMetroStage({
+  products,
+  settings,
+}: StageProps) {
   const { t, language, dir } = useLanguage();
   const root = useRef<HTMLDivElement>(null);
   const motion = useStageMotion(root);
   const mobile = useMobile();
   const list = products.slice(0, 12);
   const lines = useMemo(() => metroLines(list), [list]);
-  const key = list.map((p) => [p.id, p.name, p.category, p.comingSoon].join("~")).join("|");
+  const key = list
+    .map((p) => [p.id, p.name, p.category, p.comingSoon].join("~"))
+    .join("|");
   const layout = useMemo(
     () =>
       metroLayout(
@@ -202,7 +243,11 @@ export default function TransformationMetroStage({ products, settings }: StagePr
           category: l.category,
           stations: list
             .filter((p) => p.category === l.category)
-            .map((p) => ({ id: p.id, name: p.name, soon: Boolean(p.comingSoon) })),
+            .map((p) => ({
+              id: p.id,
+              name: p.name,
+              soon: Boolean(p.comingSoon),
+            })),
         })),
         mobile,
       ),
@@ -235,9 +280,13 @@ export default function TransformationMetroStage({ products, settings }: StagePr
     return { x, y, w, h };
   }, [layout, mobile]);
   const byId = new Map(list.map((p) => [p.id, p]));
-  const lineOf = (category: string) => lines.find((l) => l.category === category);
+  const lineOf = (category: string) =>
+    lines.find((l) => l.category === category);
   const inspector = useProductInspector();
-  const [hover, setHover] = useState<{ category: string; productId?: string } | null>(null);
+  const [hover, setHover] = useState<{
+    category: string;
+    productId?: string;
+  } | null>(null);
   const [pinned, setPinned] = useState<string | null>(null);
   const hot = hover?.category ?? pinned;
 
@@ -256,22 +305,31 @@ export default function TransformationMetroStage({ products, settings }: StagePr
       .sort((a, b) => a.at.getTime() - b.at.getTime())[0];
     if (next?.p.publicationDate) {
       const parts = countdownParts(next.at, now);
-      const date = new Intl.DateTimeFormat(language === "ar" ? "ar-SA-u-ca-gregory" : "en-GB", {
-        day: "numeric",
-        month: "short",
-        year: "numeric",
-        timeZone: "Asia/Riyadh",
-      }).format(next.at);
+      const date = new Intl.DateTimeFormat(
+        language === "ar" ? "ar-SA-u-ca-gregory" : "en-GB",
+        {
+          day: "numeric",
+          month: "short",
+          year: "numeric",
+          timeZone: "Asia/Riyadh",
+        },
+      ).format(next.at);
       items.push(
         fill(
           t("tmNextOpening"),
-          [next.p.name, date, parts ? fill(t("tmInDays"), String(parts.days)) : ""]
+          [
+            next.p.name,
+            date,
+            parts ? fill(t("tmInDays"), String(parts.days)) : "",
+          ]
             .filter(Boolean)
             .join(" · "),
         ),
       );
     }
-    items.push(fill(t("tmInService"), String(list.filter((p) => !p.comingSoon).length)));
+    items.push(
+      fill(t("tmInService"), String(list.filter((p) => !p.comingSoon).length)),
+    );
     items.push(`${lines.length} ${t("tmLines")}`);
     return items;
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -360,7 +418,9 @@ export default function TransformationMetroStage({ products, settings }: StagePr
     return () => cancelAnimationFrame(raf);
   }, [trains, motion.running, motion.scale, mobile]);
 
-  const openProduct = inspector.openId ? (byId.get(inspector.openId) ?? null) : null;
+  const openProduct = inspector.openId
+    ? (byId.get(inspector.openId) ?? null)
+    : null;
   const openLine = openProduct ? lineOf(openProduct.category) : undefined;
   const tipStation = hover?.productId
     ? layout.lines
@@ -374,7 +434,9 @@ export default function TransformationMetroStage({ products, settings }: StagePr
     : undefined;
   // Dock the board on the physical side away from the selected station so it stays visible.
   const dock =
-    openStation && (openStation.x - view.x) / view.w > 0.5 ? "tm-dock-left" : "tm-dock-right";
+    openStation && (openStation.x - view.x) / view.w > 0.5
+      ? "tm-dock-left"
+      : "tm-dock-right";
   const px = (x: number) => `${((x - view.x) / view.w) * 100}%`;
   const py = (y: number) => `${((y - view.y) / view.h) * 100}%`;
 
@@ -390,7 +452,10 @@ export default function TransformationMetroStage({ products, settings }: StagePr
           {t("tmDepartures")}
         </span>
         <div className="tm-ticker-window" aria-hidden="true">
-          <div className="tm-ticker-track" data-static={motion.animate ? undefined : ""}>
+          <div
+            className="tm-ticker-track"
+            data-static={motion.animate ? undefined : ""}
+          >
             {[0, 1].map((copy) => (
               <span key={copy} className="tm-ticker-run">
                 {ticker.map((item) => (
@@ -410,12 +475,15 @@ export default function TransformationMetroStage({ products, settings }: StagePr
           <p className="tm-title" aria-hidden="true">
             {settings.displayTitle}
           </p>
-          {settings.tagline ? <p className="tm-tagline">{settings.tagline}</p> : null}
+          {settings.tagline ? (
+            <p className="tm-tagline">{settings.tagline}</p>
+          ) : null}
         </div>
         <div className="tm-legend" role="group" aria-label={t("tmLines")}>
           {lines.map((l) => {
             const label =
-              byId.get(list.find((p) => p.category === l.category)?.id ?? "")?.label ?? l.category;
+              byId.get(list.find((p) => p.category === l.category)?.id ?? "")
+                ?.label ?? l.category;
             return (
               <button
                 key={l.category}
@@ -424,9 +492,14 @@ export default function TransformationMetroStage({ products, settings }: StagePr
                 aria-pressed={pinned === l.category}
                 aria-label={fill(t("tmHighlight"), label)}
                 data-dim={hot && hot !== l.category ? "" : undefined}
-                onClick={() => setPinned((v) => (v === l.category ? null : l.category))}
+                onClick={() =>
+                  setPinned((v) => (v === l.category ? null : l.category))
+                }
               >
-                <span className="tm-roundel" style={{ "--line": l.color } as CSSProperties}>
+                <span
+                  className="tm-roundel"
+                  style={{ "--line": l.color } as CSSProperties}
+                >
                   {l.badge}
                 </span>
                 <span>{label}</span>
@@ -463,7 +536,11 @@ export default function TransformationMetroStage({ products, settings }: StagePr
           {layout.lines.map((line) => {
             const info = lineOf(line.category);
             if (!info) return null;
-            const state = hot ? (hot === line.category ? "hot" : "dim") : undefined;
+            const state = hot
+              ? hot === line.category
+                ? "hot"
+                : "dim"
+              : undefined;
             return (
               <g
                 key={line.category}
@@ -481,7 +558,9 @@ export default function TransformationMetroStage({ products, settings }: StagePr
                           <path d={d(build)} className="tm-build" />
                         </>
                       ) : null}
-                      {live.length > 1 ? <path d={d(live)} className="tm-track" /> : null}
+                      {live.length > 1 ? (
+                        <path d={d(live)} className="tm-track" />
+                      ) : null}
                     </g>
                   );
                 })}
@@ -491,12 +570,15 @@ export default function TransformationMetroStage({ products, settings }: StagePr
           {layout.headers?.map((h) => {
             const info = lineOf(h.category);
             if (!info) return null;
-            const label = list.find((p) => p.category === h.category)?.label ?? h.category;
+            const label =
+              list.find((p) => p.category === h.category)?.label ?? h.category;
             return (
               <g
                 key={h.category}
                 className="tm-line"
-                data-state={hot ? (hot === h.category ? "hot" : "dim") : undefined}
+                data-state={
+                  hot ? (hot === h.category ? "hot" : "dim") : undefined
+                }
               >
                 <circle cx={h.x} cy={h.y} r={13} fill={info.color} />
                 <text x={h.x} y={h.y + 4.5} className="tm-badge-text">
@@ -509,7 +591,9 @@ export default function TransformationMetroStage({ products, settings }: StagePr
             );
           })}
           {trains.map((tr, i) => {
-            const line = layout.lines.find((l) => l.branches.includes(tr.branch));
+            const line = layout.lines.find((l) =>
+              l.branches.includes(tr.branch),
+            );
             const info = line ? lineOf(line.category) : undefined;
             return (
               <g
@@ -518,7 +602,13 @@ export default function TransformationMetroStage({ products, settings }: StagePr
                   trainRefs.current[i] = el;
                 }}
                 className="tm-train"
-                data-state={hot && line ? (hot === line.category ? "hot" : "dim") : undefined}
+                data-state={
+                  hot && line
+                    ? hot === line.category
+                      ? "hot"
+                      : "dim"
+                    : undefined
+                }
               >
                 <rect
                   x={-18}
@@ -530,18 +620,33 @@ export default function TransformationMetroStage({ products, settings }: StagePr
                   stroke="var(--tm-ink)"
                   strokeWidth={1.5}
                 />
-                <rect x={-11} y={-3} width={22} height={4.5} rx={2} fill="var(--tm-paper)" />
+                <rect
+                  x={-11}
+                  y={-3}
+                  width={22}
+                  height={4.5}
+                  rx={2}
+                  fill="var(--tm-paper)"
+                />
               </g>
             );
           })}
           {layout.lines.map((line) => {
             const info = lineOf(line.category);
-            const state = hot ? (hot === line.category ? "hot" : "dim") : undefined;
+            const state = hot
+              ? hot === line.category
+                ? "hot"
+                : "dim"
+              : undefined;
             return line.branches.flatMap((b) =>
               b.stations.map((s) => {
                 const p = byId.get(s.productId);
                 const tagY =
-                  s.anchor === "middle" ? (s.ly < s.y ? s.ly - 18 : s.ly + 18) : s.ly + 17;
+                  s.anchor === "middle"
+                    ? s.ly < s.y
+                      ? s.ly - 18
+                      : s.ly + 18
+                    : s.ly + 17;
                 return (
                   <g
                     key={s.productId}
@@ -559,13 +664,26 @@ export default function TransformationMetroStage({ products, settings }: StagePr
                       className="tm-marker"
                       style={{ "--line": info?.color } as CSSProperties}
                     />
-                    <text x={s.lx} y={s.ly} textAnchor={s.anchor} className="tm-label">
+                    <text
+                      x={s.lx}
+                      y={s.ly}
+                      textAnchor={s.anchor}
+                      className="tm-label"
+                    >
                       {s.label}
                     </text>
                     {s.soon ? (
-                      <text x={s.lx} y={tagY} textAnchor={s.anchor} className="tm-tag">
+                      <text
+                        x={s.lx}
+                        y={tagY}
+                        textAnchor={s.anchor}
+                        className="tm-tag"
+                      >
                         {p?.publicationDate
-                          ? fill(t("tmOpening"), shortDate(p.publicationDate, language))
+                          ? fill(
+                              t("tmOpening"),
+                              shortDate(p.publicationDate, language),
+                            )
                           : t("tmOpeningSoon")}
                       </text>
                     ) : null}
@@ -595,7 +713,9 @@ export default function TransformationMetroStage({ products, settings }: StagePr
               x={
                 layout.central.x +
                 (settings.logoUrl ? layout.central.h - 4 : 0) +
-                (layout.central.w - (settings.logoUrl ? layout.central.h - 4 : 0)) / 2
+                (layout.central.w -
+                  (settings.logoUrl ? layout.central.h - 4 : 0)) /
+                  2
               }
               y={layout.central.y + layout.central.h / 2 + 6}
               className="tm-central-text"
@@ -619,9 +739,13 @@ export default function TransformationMetroStage({ products, settings }: StagePr
                   aria-label={`${p.name} — ${p.label} — ${p.comingSoon ? t("comingSoonBadge") : t("tmInServiceStatus")}`}
                   aria-expanded={inspector.openId === p.id}
                   data-selected={inspector.openId === p.id ? "" : undefined}
-                  onPointerEnter={() => setHover({ category: line.category, productId: p.id })}
+                  onPointerEnter={() =>
+                    setHover({ category: line.category, productId: p.id })
+                  }
                   onPointerLeave={() => setHover(null)}
-                  onFocus={() => setHover({ category: line.category, productId: p.id })}
+                  onFocus={() =>
+                    setHover({ category: line.category, productId: p.id })
+                  }
                   onBlur={() => setHover(null)}
                   onPointerDown={(e) => e.stopPropagation()}
                   onClick={(e) =>
@@ -644,7 +768,9 @@ export default function TransformationMetroStage({ products, settings }: StagePr
           >
             <span
               className="tm-roundel"
-              style={{ "--line": lineOf(hover.category)?.color } as CSSProperties}
+              style={
+                { "--line": lineOf(hover.category)?.color } as CSSProperties
+              }
             >
               {lineOf(hover.category)?.badge}
             </span>

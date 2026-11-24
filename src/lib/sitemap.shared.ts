@@ -27,15 +27,22 @@ export type SitemapInput = {
   navigationItems: unknown;
   /** True when at least one testimonial is published. */
   hasTestimonials: boolean;
-  products: { id: string; coming_soon: boolean; publication_date?: string | null }[];
+  products: {
+    id: string;
+    coming_soon: boolean;
+    publication_date?: string | null;
+  }[];
   now?: number;
 };
 
 /** Pages linked only from hidden menu items (an internal path no visible item points to). */
 export function hiddenMenuPaths(navigationItems: unknown): Set<string> {
   const items = readNavigation(navigationItems);
-  const path = (url: string) => (url.startsWith("/") ? url.split(/[?#]/)[0] || "/" : null);
-  const visible = new Set(items.filter((i) => !i.hidden).map((i) => path(i.url)));
+  const path = (url: string) =>
+    url.startsWith("/") ? url.split(/[?#]/)[0] || "/" : null;
+  const visible = new Set(
+    items.filter((i) => !i.hidden).map((i) => path(i.url)),
+  );
   const hidden = new Set<string>();
   for (const item of items) {
     const p = path(item.url);
@@ -60,7 +67,8 @@ export function sitemapPaths(input: SitemapInput): string[] {
   for (const row of input.products) {
     const product = `/product/${encodeURIComponent(row.id)}`;
     if (!hidden.has(product)) paths.push(product);
-    const available = !row.coming_soon || hasLaunched(row.id, row.publication_date, now);
+    const available =
+      !row.coming_soon || hasLaunched(row.id, row.publication_date, now);
     if (available) paths.push(`/try/${encodeURIComponent(row.id)}`);
   }
   return paths;

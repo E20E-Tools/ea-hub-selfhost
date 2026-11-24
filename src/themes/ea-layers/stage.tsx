@@ -62,7 +62,11 @@ export default function EaLayersStage({ products, settings }: StageProps) {
       const gapMax = mobile ? 80 : 70;
       const s = Math.max(
         60,
-        Math.min(size.w * (mobile ? 0.4 : 0.3), (size.h - 3 * gapMax - 170) / 2, 260),
+        Math.min(
+          size.w * (mobile ? 0.4 : 0.3),
+          (size.h - 3 * gapMax - 170) / 2,
+          260,
+        ),
       );
       const cx = size.w / 2;
       const gap = (mobile ? 46 : 38) + explode * (gapMax - (mobile ? 46 : 38));
@@ -80,7 +84,9 @@ export default function EaLayersStage({ products, settings }: StageProps) {
           iso(-1, 1, z, cx, base, s),
         ];
         ctx.beginPath();
-        corners.forEach((p, k) => (k ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y)));
+        corners.forEach((p, k) =>
+          k ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y),
+        );
         ctx.closePath();
         ctx.fillStyle = LAYER_COLORS[layer].fill;
         ctx.fill();
@@ -92,14 +98,28 @@ export default function EaLayersStage({ products, settings }: StageProps) {
         ctx.direction = rtl ? "rtl" : "ltr";
         ctx.textAlign = rtl ? "right" : "left";
         ctx.font = `600 ${mobile ? 12 : 14}px "Sora", "IBM Plex Sans Arabic", sans-serif`;
-        ctx.fillText(t(LABEL_KEY[layer]), edge.x + (rtl ? -10 : 10), edge.y + 4);
+        ctx.fillText(
+          t(LABEL_KEY[layer]),
+          edge.x + (rtl ? -10 : 10),
+          edge.y + 4,
+        );
         const items = groups[layer];
         items.forEach((p, j) => {
           const slot = slotOnLayer(j, items.length);
           const fall = still
             ? 0
-            : Math.max(0, Math.min(1, 1 - (ms / 900 - j * 0.2 - (3 - li) * 0.25)));
-          const q = iso(slot.x, slot.y, z + 10 + fall * fall * 160, cx, base, s);
+            : Math.max(
+                0,
+                Math.min(1, 1 - (ms / 900 - j * 0.2 - (3 - li) * 0.25)),
+              );
+          const q = iso(
+            slot.x,
+            slot.y,
+            z + 10 + fall * fall * 160,
+            cx,
+            base,
+            s,
+          );
           const w = chipWidth(items.length, s, mobile ? 104 : 130);
           chipPos.set(p.id, { ...q, w });
           ctx.fillStyle = LAYER_COLORS[layer].edge;
@@ -113,7 +133,11 @@ export default function EaLayersStage({ products, settings }: StageProps) {
           let label = p.name;
           while (label.length > 3 && ctx.measureText(label).width > w - 10)
             label = label.slice(0, -1);
-          ctx.fillText(label === p.name ? label : `${label.slice(0, -1)}…`, q.x, q.y + 4);
+          ctx.fillText(
+            label === p.name ? label : `${label.slice(0, -1)}…`,
+            q.x,
+            q.y + 4,
+          );
         });
       });
       // Dotted links between adjacent layers with travelling particles.
@@ -128,10 +152,18 @@ export default function EaLayersStage({ products, settings }: StageProps) {
           ctx.lineTo(b.x, b.y);
           ctx.stroke();
           ctx.setLineDash([]);
-          const k = still ? 0.5 : (time * 0.0006 + li * 0.3 + (side > 0 ? 0.5 : 0)) % 1;
+          const k = still
+            ? 0.5
+            : (time * 0.0006 + li * 0.3 + (side > 0 ? 0.5 : 0)) % 1;
           ctx.fillStyle = side > 0 ? "#00D4FF" : "#8B5CF6";
           ctx.beginPath();
-          ctx.arc(a.x + (b.x - a.x) * k, a.y + (b.y - a.y) * k, 3.5, 0, Math.PI * 2);
+          ctx.arc(
+            a.x + (b.x - a.x) * k,
+            a.y + (b.y - a.y) * k,
+            3.5,
+            0,
+            Math.PI * 2,
+          );
           ctx.fill();
         }
       }

@@ -9,7 +9,11 @@ export async function serverFeatureEnabled(key: FeatureKey): Promise<boolean> {
     const publishableKey = process.env["SUPABASE_PUBLISHABLE_KEY"];
     if (!url || !publishableKey) return false;
     const client = createClient<Database>(url, publishableKey, {
-      auth: { storage: undefined, persistSession: false, autoRefreshToken: false },
+      auth: {
+        storage: undefined,
+        persistSession: false,
+        autoRefreshToken: false,
+      },
       global: {
         fetch: (input, init) => {
           const headers = new Headers(init?.headers);

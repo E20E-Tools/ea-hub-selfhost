@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 import { fallbackCatalog } from "@/lib/catalog";
-import { buildTechnologyRoadmap, proposedPhase, roadmapPeriods } from "@/lib/technology-roadmap";
+import {
+  buildTechnologyRoadmap,
+  proposedPhase,
+  roadmapPeriods,
+} from "@/lib/technology-roadmap";
 
 describe("2026–2027 technology adoption roadmap", () => {
   it("covers all eight quarters in exactly 2026 and 2027", () => {
@@ -28,21 +32,30 @@ describe("2026–2027 technology adoption roadmap", () => {
       ...fallbackCatalog.products,
       { ...first, id: "new-technology", name: "New technology" },
     ];
-    expect(buildTechnologyRoadmap(products).map((row) => row.product.id)).toEqual(
-      products.map((p) => p.id),
-    );
-    expect(buildTechnologyRoadmap(products).every((row) => row.milestones.length === 8)).toBe(true);
+    expect(
+      buildTechnologyRoadmap(products).map((row) => row.product.id),
+    ).toEqual(products.map((p) => p.id));
+    expect(
+      buildTechnologyRoadmap(products).every(
+        (row) => row.milestones.length === 8,
+      ),
+    ).toBe(true);
   });
   it("does not imply past adoption or a fixed launch date for coming-soon tools", () => {
-    expect(proposedPhase({ comingSoon: true }, { id: "2026-Q1", year: 2026, quarter: 1 })).toBe(
-      "unrecorded",
-    );
+    expect(
+      proposedPhase(
+        { comingSoon: true },
+        { id: "2026-Q1", year: 2026, quarter: 1 },
+      ),
+    ).toBe("unrecorded");
     expect(
       buildTechnologyRoadmap(
         fallbackCatalog.products.map((p) => ({ ...p, comingSoon: true })),
         2027,
       ).every((row) =>
-        row.milestones.every((m) => m.phase === "plan" || m.phase === "conditional"),
+        row.milestones.every(
+          (m) => m.phase === "plan" || m.phase === "conditional",
+        ),
       ),
     ).toBe(true);
   });

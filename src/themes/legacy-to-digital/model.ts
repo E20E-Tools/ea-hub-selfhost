@@ -30,7 +30,9 @@ export function legacyFileName(product: { id: string; name: string }): string {
   return `${base}_FINAL_v2.xlsx`;
 }
 
-export function legacyKind(name: string): "sheet" | "doc" | "diagram" | "mail" | "folder" {
+export function legacyKind(
+  name: string,
+): "sheet" | "doc" | "diagram" | "mail" | "folder" {
   if (name.endsWith("\\")) return "folder";
   if (/\.xlsx?$/.test(name)) return "sheet";
   if (/\.docx?$/.test(name)) return "doc";
@@ -51,8 +53,16 @@ export function sliderKey(
 ): number | null {
   const step = opts.step ?? 5;
   const clamp = (v: number) => Math.max(0, Math.min(100, Math.round(v)));
-  const towardStart = opts.vertical ? "ArrowUp" : opts.rtl ? "ArrowRight" : "ArrowLeft";
-  const towardEnd = opts.vertical ? "ArrowDown" : opts.rtl ? "ArrowLeft" : "ArrowRight";
+  const towardStart = opts.vertical
+    ? "ArrowUp"
+    : opts.rtl
+      ? "ArrowRight"
+      : "ArrowLeft";
+  const towardEnd = opts.vertical
+    ? "ArrowDown"
+    : opts.rtl
+      ? "ArrowLeft"
+      : "ArrowRight";
   switch (key) {
     case towardStart:
       return clamp(value + step);
@@ -81,9 +91,12 @@ export function lerp(a: number, b: number, t: number): number {
 }
 /** Interpolates two control-point lists of equal length (t clamped to 0..1). */
 export function lerpPoints(a: Pt[], b: Pt[], t: number): Pt[] {
-  if (a.length !== b.length) throw new Error("lerpPoints needs equal point counts");
+  if (a.length !== b.length)
+    throw new Error("lerpPoints needs equal point counts");
   const k = Math.max(0, Math.min(1, t));
-  return a.map((p, i) => [lerp(p[0], b[i]![0], k), lerp(p[1], b[i]![1], k)] as Pt);
+  return a.map(
+    (p, i) => [lerp(p[0], b[i]![0], k), lerp(p[1], b[i]![1], k)] as Pt,
+  );
 }
 /** Cubic Bézier chain through 1 + 3k points: M p0 C p1 p2 p3 C … */
 export function cubicPath(points: Pt[]): string {
@@ -164,7 +177,10 @@ export function l2dLayout(count: number, vertical: boolean): L2DItem[] {
     );
     return Array.from({ length: n }, (_, i) => {
       const row = Math.floor(i / 2);
-      const u = row < top ? hu - gap - (top - 1 - row) * pitch : hu + gap + (row - top) * pitch;
+      const u =
+        row < top
+          ? hu - gap - (top - 1 - row) * pitch
+          : hu + gap + (row - top) * pitch;
       return { u, c: i % 2 === 0 ? 0.25 : 0.75 };
     });
   }

@@ -25,9 +25,13 @@ export async function deriveSubkey(
   label: string,
   secret = rootSecret(),
 ): Promise<Uint8Array<ArrayBuffer>> {
-  const base = await crypto.subtle.importKey("raw", encoder.encode(secret), "HKDF", false, [
-    "deriveBits",
-  ]);
+  const base = await crypto.subtle.importKey(
+    "raw",
+    encoder.encode(secret),
+    "HKDF",
+    false,
+    ["deriveBits"],
+  );
   const bits = await crypto.subtle.deriveBits(
     {
       name: "HKDF",
@@ -42,18 +46,24 @@ export async function deriveSubkey(
 }
 
 /** Hex form of a derived subkey, for HMAC-based token signing. */
-export async function deriveSigningSecret(label: string, secret?: string): Promise<string> {
+export async function deriveSigningSecret(
+  label: string,
+  secret?: string,
+): Promise<string> {
   const bytes = await deriveSubkey(label, secret);
   return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
 }
 
 /** Signing secrets for verification, current first: tokens from either root stay valid. */
 export async function deriveSigningSecrets(label: string): Promise<string[]> {
-  return Promise.all(rootSecrets().map((root) => deriveSigningSecret(label, root)));
+  return Promise.all(
+    rootSecrets().map((root) => deriveSigningSecret(label, root)),
+  );
 }
 
 const toB64 = (bytes: Uint8Array) => btoa(String.fromCharCode(...bytes));
-const fromB64 = (value: string) => Uint8Array.from(atob(value), (c) => c.charCodeAt(0));
+const fromB64 = (value: string) =>
+  Uint8Array.from(atob(value), (c) => c.charCodeAt(0));
 
 async function aesKey(secret?: string) {
   return crypto.subtle.importKey(
@@ -68,7 +78,10 @@ async function aesKey(secret?: string) {
 export const isEncrypted = (value: string | null | undefined) =>
   typeof value === "string" && value.startsWith(PREFIX);
 
-export async function encryptSecret(plain: string, secret?: string): Promise<string> {
+export async function encryptSecret(
+  plain: string,
+  secret?: string,
+): Promise<string> {
   const iv = crypto.getRandomValues(new Uint8Array(12));
   const cipher = new Uint8Array(
     await crypto.subtle.encrypt(
@@ -80,7 +93,11 @@ export async function encryptSecret(plain: string, secret?: string): Promise<str
   return `${PREFIX}${toB64(iv)}:${toB64(cipher)}`;
 }
 
-async function decryptWith(iv: string, cipher: string, secret?: string): Promise<string | null> {
+async function decryptWith(
+  iv: string,
+  cipher: string,
+  secret?: string,
+): Promise<string | null> {
   try {
     const plain = await crypto.subtle.decrypt(
       { name: "AES-GCM", iv: fromB64(iv) },
@@ -119,5 +136,6 @@ export async function decryptSecret(
   stored: string | null | undefined,
   secret?: string,
 ): Promise<string> {
-  return (await openSecret(stored, secret === undefined ? undefined : [secret])).plain;
+  return (await openSecret(stored, secret === undefined ? undefined : [secret]))
+    .plain;
 }

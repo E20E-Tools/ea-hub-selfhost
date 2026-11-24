@@ -14,18 +14,22 @@ export const getAdminAiUsage = createServerFn({ method: "GET" })
   .handler(async ({ context }): Promise<AiUsageView> => {
     const { requireAdmin } = await import("./admin-guard.server");
     await requireAdmin(context);
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { supabaseAdmin } =
+      await import("@/integrations/supabase/client.server");
     const since = new Date(Date.now() - 86_400_000).toISOString();
     const counts = await Promise.all(
-      [CHAT_GLOBAL_BUCKET, RECOMMEND_GLOBAL_BUCKET, "chat:ban"].map(async (bucket) => {
-        const { count, error } = await supabaseAdmin
-          .from("rate_limit_events")
-          .select("id", { count: "exact", head: true })
-          .eq("bucket", bucket)
-          .gte("created_at", since);
-        if (error || count === null) throw new Error("تعذّر تحميل استهلاك المساعد.");
-        return count;
-      }),
+      [CHAT_GLOBAL_BUCKET, RECOMMEND_GLOBAL_BUCKET, "chat:ban"].map(
+        async (bucket) => {
+          const { count, error } = await supabaseAdmin
+            .from("rate_limit_events")
+            .select("id", { count: "exact", head: true })
+            .eq("bucket", bucket)
+            .gte("created_at", since);
+          if (error || count === null)
+            throw new Error("تعذّر تحميل استهلاك المساعد.");
+          return count;
+        },
+      ),
     );
     return {
       since,
@@ -43,10 +47,13 @@ export const listAssistantReplies = createServerFn({ method: "GET" })
   .handler(async ({ context }): Promise<AssistantReplyRow[]> => {
     const { requireAdmin } = await import("./admin-guard.server");
     await requireAdmin(context);
-    const { supabaseAdmin } = await import("@/integrations/supabase/client.server");
+    const { supabaseAdmin } =
+      await import("@/integrations/supabase/client.server");
     const { data, error } = await supabaseAdmin
       .from("live_chat_messages")
-      .select("id, body, created_at, live_chats!inner(visitor_email, visitor_name, language)")
+      .select(
+        "id, body, created_at, live_chats!inner(visitor_email, visitor_name, language)",
+      )
       .eq("sender", "ai")
       .order("created_at", { ascending: false })
       .limit(200);
@@ -65,7 +72,9 @@ type AiMessageRow = {
 };
 
 export function toAssistantReplyRow(row: AiMessageRow): AssistantReplyRow {
-  const chat = Array.isArray(row.live_chats) ? row.live_chats[0] : row.live_chats;
+  const chat = Array.isArray(row.live_chats)
+    ? row.live_chats[0]
+    : row.live_chats;
   return {
     id: row.id,
     visitor_email: chat?.visitor_email ?? "",

@@ -1,5 +1,5 @@
 import { adminDictionaries } from "@/lib/admin-copy";
-import {NewsletterPreview} from "./newsletter-preview";
+import { NewsletterPreview } from "./newsletter-preview";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { archyHealth } from "@/lib/archy-quality.functions";
@@ -29,19 +29,27 @@ export function ArchyOperations() {
   return (
     <>
       <Card
-        title={adminDictionaries[ar ? "ar" : "en"].consoleArchyHealthAndSettingsHistory}
+        title={
+          adminDictionaries[ar ? "ar" : "en"]
+            .consoleArchyHealthAndSettingsHistory
+        }
       >
         <button className="underline" onClick={() => void health.refetch()}>
           {adminDictionaries[ar ? "ar" : "en"].consoleRefresh}
         </button>
         {health.isError ? (
-          <p role="alert">{adminDictionaries[ar ? "ar" : "en"].consoleCouldNotLoadHealth}</p>
+          <p role="alert">
+            {adminDictionaries[ar ? "ar" : "en"].consoleCouldNotLoadHealth}
+          </p>
         ) : (
           h && (
             <div className="grid gap-3">
               <div>
                 <strong>
-                  {adminDictionaries[ar ? "ar" : "en"].consoleLastSuccessfulVisitorReply}
+                  {
+                    adminDictionaries[ar ? "ar" : "en"]
+                      .consoleLastSuccessfulVisitorReply
+                  }
                 </strong>
                 <p>
                   {v
@@ -58,7 +66,10 @@ export function ArchyOperations() {
               </div>
               <div>
                 <strong>
-                  {adminDictionaries[ar ? "ar" : "en"].consoleLatestAdminTestPerEngine}
+                  {
+                    adminDictionaries[ar ? "ar" : "en"]
+                      .consoleLatestAdminTestPerEngine
+                  }
                 </strong>
                 {h.tests.length ? (
                   h.tests.map((r) => (
@@ -66,7 +77,8 @@ export function ArchyOperations() {
                       {r.engine} ·{" "}
                       {r.succeeded
                         ? adminDictionaries[ar ? "ar" : "en"].consolePassed
-                        : adminDictionaries[ar ? "ar" : "en"].consoleFailed}{" "}
+                        : adminDictionaries[ar ? "ar" : "en"]
+                            .consoleFailed}{" "}
                       · {r.source} {r.model} · {r.elapsed_ms} ms ·{" "}
                       {date(r.checked_at)}
                     </p>
@@ -77,7 +89,10 @@ export function ArchyOperations() {
               </div>
               <details>
                 <summary>
-                  {adminDictionaries[ar ? "ar" : "en"].consoleSensitiveSettingsHistory}
+                  {
+                    adminDictionaries[ar ? "ar" : "en"]
+                      .consoleSensitiveSettingsHistory
+                  }
                 </summary>
                 {h.events.length ? (
                   h.events.map((e, i) => (
@@ -87,7 +102,10 @@ export function ArchyOperations() {
                   ))
                 ) : (
                   <p>
-                    {adminDictionaries[ar ? "ar" : "en"].consoleNoChangesSinceLoggingBegan}
+                    {
+                      adminDictionaries[ar ? "ar" : "en"]
+                        .consoleNoChangesSinceLoggingBegan
+                    }
                   </p>
                 )}
               </details>
@@ -95,12 +113,15 @@ export function ArchyOperations() {
           )
         )}
       </Card>
-      <Card title={adminDictionaries[ar ? "ar" : "en"].consoleMonthlyNewsletter}>
+      <Card
+        title={adminDictionaries[ar ? "ar" : "en"].consoleMonthlyNewsletter}
+      >
         <p>
           {mail.data
             ? (mail.data.ready
                 ? adminDictionaries[ar ? "ar" : "en"].consoleDeliveryEnabled
-                : adminDictionaries[ar ? "ar" : "en"].consoleEmailProviderSetupPending) +
+                : adminDictionaries[ar ? "ar" : "en"]
+                    .consoleEmailProviderSetupPending) +
               " · " +
               adminDictionaries[ar ? "ar" : "en"].consoleConfirmed +
               " " +
@@ -114,7 +135,9 @@ export function ArchyOperations() {
               : "…"}
         </p>
         <details>
-          <summary>{adminDictionaries[ar ? "ar" : "en"].consoleAddASiteUpdate}</summary>
+          <summary>
+            {adminDictionaries[ar ? "ar" : "en"].consoleAddASiteUpdate}
+          </summary>
           <form
             className="grid gap-2"
             onSubmit={async (e) => {
@@ -132,10 +155,13 @@ export function ArchyOperations() {
                 });
                 f.reset();
                 setStatus(
-                  adminDictionaries[ar ? "ar" : "en"].consoleAddedToTheMonthlyIssue,
+                  adminDictionaries[ar ? "ar" : "en"]
+                    .consoleAddedToTheMonthlyIssue,
                 );
               } catch {
-                setStatus(adminDictionaries[ar ? "ar" : "en"].consoleSaveFailed);
+                setStatus(
+                  adminDictionaries[ar ? "ar" : "en"].consoleSaveFailed,
+                );
               } finally {
                 setBusy(false);
               }
@@ -159,11 +185,14 @@ export function ArchyOperations() {
                 />
               </label>
             ))}
-            <Button disabled={busy}>{adminDictionaries[ar ? "ar" : "en"].consoleAdd}</Button>
+            <Button disabled={busy}>
+              {adminDictionaries[ar ? "ar" : "en"].consoleAdd}
+            </Button>
             <p role="status">{status}</p>
           </form>
         </details>
-      <NewsletterPreview ar={ar}/></Card>
+        <NewsletterPreview ar={ar} />
+      </Card>
     </>
   );
 }

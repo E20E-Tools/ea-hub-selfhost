@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { dictionaries } from "@/lib/copy";
 
 type Shot = { url: string; caption: string };
 
@@ -37,11 +38,11 @@ export function ProductScreenshots({
   return (
     <section
       className={`ea-shots ${className}`}
-      aria-label={ar ? "لقطات من الأداة" : "Screenshots"}
+      aria-label={dictionaries[ar ? "ar" : "en"].productScreenshotsScreenshots}
     >
       {heading ?? (
         <h2 className="ea-shots-title">
-          {ar ? "من داخل الأداة" : "Inside the tool"}
+          {dictionaries[ar ? "ar" : "en"].layoutsInsideTheTool}
         </h2>
       )}
       <ul className="ea-shots-grid" data-count={Math.min(shots.length, 3)}>
@@ -50,7 +51,7 @@ export function ProductScreenshots({
             <button
               type="button"
               onClick={() => setOpen(i)}
-              aria-label={`${label(i)} — ${ar ? "عرض بالحجم الكامل" : "view full size"}`}
+              aria-label={`${label(i)} — ${dictionaries[ar ? "ar" : "en"].productScreenshotsViewFullSize}`}
             >
               <img src={shot.url} alt="" loading="lazy" decoding="async" />
             </button>
@@ -81,7 +82,10 @@ export function ProductScreenshots({
                   type="button"
                   className="ea-shots-nav"
                   onClick={() => step(-1)}
-                  aria-label={ar ? "اللقطة السابقة" : "Previous screenshot"}
+                  aria-label={
+                    dictionaries[ar ? "ar" : "en"]
+                      .productScreenshotsPreviousScreenshot
+                  }
                 >
                   <Prev size={18} aria-hidden />
                 </button>
@@ -92,7 +96,10 @@ export function ProductScreenshots({
                   type="button"
                   className="ea-shots-nav"
                   onClick={() => step(1)}
-                  aria-label={ar ? "اللقطة التالية" : "Next screenshot"}
+                  aria-label={
+                    dictionaries[ar ? "ar" : "en"]
+                      .productScreenshotsNextScreenshot
+                  }
                 >
                   <Next size={18} aria-hidden />
                 </button>

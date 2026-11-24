@@ -5,7 +5,10 @@ export const PREVIEW_PARAM = "preview-theme";
 export const PREVIEW_STORAGE_KEY = "e20e-preview-theme";
 
 /** A valid URL param wins; otherwise a valid value already stored for this tab; otherwise none. */
-export function resolvePreviewTheme(search: string, stored: string | null): DesignThemeId | null {
+export function resolvePreviewTheme(
+  search: string,
+  stored: string | null,
+): DesignThemeId | null {
   const param = new URLSearchParams(search).get(PREVIEW_PARAM);
   if (isDesignThemeId(param)) return param;
   return isDesignThemeId(stored) ? stored : null;

@@ -7,7 +7,12 @@ import { toast } from "sonner";
 import { Badge, type BadgeProps } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Sheet, SheetContent, SheetDescription, SheetTitle } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import {
   addRequestReply,
   getRequestAttachment,
@@ -168,13 +173,17 @@ function ListItem({
             <span className="truncate font-medium" dir="auto">
               {title}
             </span>
-            <Badge variant={STATUS_VARIANT[status] ?? "outline"}>{statusLabel}</Badge>
+            <Badge variant={STATUS_VARIANT[status] ?? "outline"}>
+              {statusLabel}
+            </Badge>
           </div>
           <p className="mt-1 truncate text-sm text-muted-foreground" dir="auto">
             {preview}
           </p>
         </div>
-        <span className="hidden shrink-0 text-xs text-muted-foreground sm:block">{meta}</span>
+        <span className="hidden shrink-0 text-xs text-muted-foreground sm:block">
+          {meta}
+        </span>
         <ChevronLeft
           className="size-4 shrink-0 text-muted-foreground ltr:-scale-x-100"
           aria-hidden="true"
@@ -184,7 +193,15 @@ function ListItem({
   );
 }
 
-function Detail({ label, children, ltr }: { label: string; children: ReactNode; ltr?: boolean }) {
+function Detail({
+  label,
+  children,
+  ltr,
+}: {
+  label: string;
+  children: ReactNode;
+  ltr?: boolean;
+}) {
   return (
     <div className="grid gap-0.5 border-b border-border py-2.5 last:border-b-0">
       <dt className="text-xs text-muted-foreground">{label}</dt>
@@ -241,7 +258,11 @@ function StatusPicker<S extends string>({
   return (
     <div className="mt-6 grid gap-2">
       <p className="text-sm font-medium">{t("changeStatus")}</p>
-      <div className="flex flex-wrap gap-2" role="group" aria-label={t("changeStatus")}>
+      <div
+        className="flex flex-wrap gap-2"
+        role="group"
+        aria-label={t("changeStatus")}
+      >
         {statuses.map((s) => (
           <Button
             key={s}
@@ -254,7 +275,12 @@ function StatusPicker<S extends string>({
             {t(`${prefix}${s}`)}
           </Button>
         ))}
-        {busy ? <Loader2 className="size-4 animate-spin self-center" aria-hidden="true" /> : null}
+        {busy ? (
+          <Loader2
+            className="size-4 animate-spin self-center"
+            aria-hidden="true"
+          />
+        ) : null}
       </div>
     </div>
   );
@@ -264,11 +290,16 @@ function StatusPicker<S extends string>({
 function serviceDetails(details: RequestRow["details"], language: "ar" | "en") {
   const copy = dictionaries[language] as Record<string, string>;
   const d = details ?? {};
-  const key = (value: string) => value.replace(/[^a-z0-9]+/gi, "_").replace(/_+$/, "");
+  const key = (value: string) =>
+    value.replace(/[^a-z0-9]+/gi, "_").replace(/_+$/, "");
   const label = (prefix: string, value: unknown) =>
-    typeof value === "string" && value ? (copy[`${prefix}${key(value)}`] ?? value) : "";
+    typeof value === "string" && value
+      ? (copy[`${prefix}${key(value)}`] ?? value)
+      : "";
   const list = (value: unknown) =>
-    Array.isArray(value) ? value.filter((item): item is string => typeof item === "string") : [];
+    Array.isArray(value)
+      ? value.filter((item): item is string => typeof item === "string")
+      : [];
   return {
     services: list(d["services"]).map((item) => label("srService_", item)),
     tools: list(d["tools"]),
@@ -277,7 +308,10 @@ function serviceDetails(details: RequestRow["details"], language: "ar" | "en") {
   };
 }
 
-export function RequestsTab({ only, email }: { only?: "service"; email?: string } = {}) {
+export function RequestsTab({
+  only,
+  email,
+}: { only?: "service"; email?: string } = {}) {
   const { t, date, language } = useAdminCopy();
   const queryClient = useQueryClient();
   const [q, setQ] = useState("");
@@ -289,7 +323,12 @@ export function RequestsTab({ only, email }: { only?: "service"; email?: string 
     return () => clearTimeout(id);
   }, [q]);
   const [waiting, setWaiting] = useState<"team" | "visitor" | undefined>();
-  const search = { waiting, q: debouncedQ || undefined, from: from || undefined, to: to || undefined };
+  const search = {
+    waiting,
+    q: debouncedQ || undefined,
+    from: from || undefined,
+    to: to || undefined,
+  };
   const query = useQuery({
     queryKey: ["admin", "requests", search],
     queryFn: () => listRequests({ data: search }),
@@ -374,11 +413,26 @@ export function RequestsTab({ only, email }: { only?: "service"; email?: string 
         ) : null}
         {query.isFetching ? <Loader2 className="size-4 animate-spin" /> : null}
       </div>
-      <div className="mb-3 flex flex-wrap gap-2" role="group" aria-label={t("requestQueues")}>
+      <div
+        className="mb-3 flex flex-wrap gap-2"
+        role="group"
+        aria-label={t("requestQueues")}
+      >
         {([undefined, "team", "visitor"] as const).map((value) => (
-          <Button key={value ?? "all"} type="button" variant={waiting === value ? "default" : "outline"}
-            aria-pressed={waiting === value} onClick={() => setWaiting(value)}>
-            {t(value === "team" ? "waitingTeam" : value === "visitor" ? "waitingVisitor" : "allRequestQueues")}
+          <Button
+            key={value ?? "all"}
+            type="button"
+            variant={waiting === value ? "default" : "outline"}
+            aria-pressed={waiting === value}
+            onClick={() => setWaiting(value)}
+          >
+            {t(
+              value === "team"
+                ? "waitingTeam"
+                : value === "visitor"
+                  ? "waitingVisitor"
+                  : "allRequestQueues",
+            )}
           </Button>
         ))}
       </div>
@@ -401,7 +455,9 @@ export function RequestsTab({ only, email }: { only?: "service"; email?: string 
                   <option value="all">{t("allServices")}</option>
                   {SERVICE_KINDS.map((k) => (
                     <option key={k} value={k}>
-                      {(dictionaries[language] as Record<string, string>)[`srService_${k}`] ?? k}
+                      {(dictionaries[language] as Record<string, string>)[
+                        `srService_${k}`
+                      ] ?? k}
                     </option>
                   ))}
                 </select>
@@ -423,7 +479,10 @@ export function RequestsTab({ only, email }: { only?: "service"; email?: string 
               title={r.name}
               status={r.status}
               statusLabel={t(`reqStatus_${r.status}`)}
-              meta={date(r.created_at, { dateStyle: "medium", timeStyle: "short" })}
+              meta={date(r.created_at, {
+                dateStyle: "medium",
+                timeStyle: "short",
+              })}
               preview={r.need}
             />
           ))}
@@ -438,11 +497,18 @@ export function RequestsTab({ only, email }: { only?: "service"; email?: string 
         {open ? (
           <>
             <dl>
-              <Detail label={t("fieldType")}>{t(`reqType_${open.request_type}`)}</Detail>
-              <Detail label={t("fieldTime")}>
-                {date(open.created_at, { dateStyle: "full", timeStyle: "short" })}
+              <Detail label={t("fieldType")}>
+                {t(`reqType_${open.request_type}`)}
               </Detail>
-              <Detail label={t("fieldStatus")}>{t(`reqStatus_${open.status}`)}</Detail>
+              <Detail label={t("fieldTime")}>
+                {date(open.created_at, {
+                  dateStyle: "full",
+                  timeStyle: "short",
+                })}
+              </Detail>
+              <Detail label={t("fieldStatus")}>
+                {t(`reqStatus_${open.status}`)}
+              </Detail>
               <Detail label={t("fieldReplyState")}>
                 {t(`replyState_${open.status}`)}
                 {open.status_updated_at
@@ -450,7 +516,10 @@ export function RequestsTab({ only, email }: { only?: "service"; email?: string 
                   : ""}
               </Detail>
               <Detail label={t("fieldEmail")} ltr>
-                <a className="underline-offset-4 hover:underline" href={`mailto:${open.email}`}>
+                <a
+                  className="underline-offset-4 hover:underline"
+                  href={`mailto:${open.email}`}
+                >
                   {open.email}
                 </a>
               </Detail>
@@ -464,7 +533,9 @@ export function RequestsTab({ only, email }: { only?: "service"; email?: string 
                 </Detail>
               ) : null}
               {open.urgency ? (
-                <Detail label={t("fieldUrgency")}>{t(`urgency_${open.urgency}`)}</Detail>
+                <Detail label={t("fieldUrgency")}>
+                  {t(`urgency_${open.urgency}`)}
+                </Detail>
               ) : null}
               {open.request_type === "service"
                 ? (() => {
@@ -477,15 +548,21 @@ export function RequestsTab({ only, email }: { only?: "service"; email?: string 
                         <Detail label={t("fieldTools")} ltr>
                           {service.tools.join(" · ") || "—"}
                         </Detail>
-                        <Detail label={t("fieldTeamSize")}>{service.teamSize || "—"}</Detail>
-                        <Detail label={t("fieldTimeline")}>{service.timeline || "—"}</Detail>
+                        <Detail label={t("fieldTeamSize")}>
+                          {service.teamSize || "—"}
+                        </Detail>
+                        <Detail label={t("fieldTimeline")}>
+                          {service.timeline || "—"}
+                        </Detail>
                       </>
                     );
                   })()
                 : null}
               {open.recommendation?.picks?.length ? (
                 <Detail label={t("fieldSuggested")}>
-                  {open.recommendation.picks.map((p) => p.name ?? p.productId ?? p.id).join(" · ")}
+                  {open.recommendation.picks
+                    .map((p) => p.name ?? p.productId ?? p.id)
+                    .join(" · ")}
                 </Detail>
               ) : null}
               <Detail label={t("fieldMessage")}>
@@ -506,7 +583,11 @@ export function RequestsTab({ only, email }: { only?: "service"; email?: string 
                       key={image.path}
                       className="overflow-hidden rounded-lg border border-border"
                     >
-                      <PrivatePhoto requestId={open.id} path={image.path} name={image.name} />
+                      <PrivatePhoto
+                        requestId={open.id}
+                        path={image.path}
+                        name={image.name}
+                      />
                       <figcaption
                         className="truncate px-2 py-1 text-xs text-muted-foreground"
                         dir="ltr"
@@ -518,8 +599,17 @@ export function RequestsTab({ only, email }: { only?: "service"; email?: string 
                 </div>
               </div>
             ) : null}
-            {open.details?.exercise && <section><h3>{adminDictionaries[language].consoleCustomerExerciseResult}</h3><pre className="whitespace-pre-wrap">{open.details.exercise}</pre></section>}
-                <RequestReplies requestId={open.id} />
+            {open.details?.exercise && (
+              <section>
+                <h3>
+                  {adminDictionaries[language].consoleCustomerExerciseResult}
+                </h3>
+                <pre className="whitespace-pre-wrap">
+                  {open.details.exercise}
+                </pre>
+              </section>
+            )}
+            <RequestReplies requestId={open.id} />
             <a
               className="mt-4 inline-flex h-9 items-center rounded-md border border-input bg-background px-4 text-sm font-medium hover:bg-accent"
               href={`mailto:${open.email}?subject=${encodeURIComponent(`${t("replySubject")} ${t(`reqType_${open.request_type}`)}`)}`}
@@ -547,7 +637,9 @@ function offerDetailText(row: SupportOfferRow, language: "ar" | "en") {
   const copy = dictionaries[language] as Record<string, string>;
   const d = row.details ?? {};
   const label = (prefix: string, value: unknown) =>
-    typeof value === "string" && value ? (copy[`${prefix}${value}`] ?? value) : "";
+    typeof value === "string" && value
+      ? (copy[`${prefix}${value}`] ?? value)
+      : "";
   const parts =
     row.offer_type === "partnership"
       ? [
@@ -558,12 +650,16 @@ function offerDetailText(row: SupportOfferRow, language: "ar" | "en") {
       : row.offer_type === "financial"
         ? [
             label("spKind_", d["kind"]),
-            d["amount"] ? `${label("spAmount_", d["amount"])} ${String(d["currency"] ?? "")}` : "",
+            d["amount"]
+              ? `${label("spAmount_", d["amount"])} ${String(d["currency"] ?? "")}`
+              : "",
             typeof d["productId"] === "string" ? d["productId"] : "",
           ]
         : [
             Array.isArray(d["skills"])
-              ? (d["skills"] as string[]).map((s) => label("spSkill_", s)).join(", ")
+              ? (d["skills"] as string[])
+                  .map((s) => label("spSkill_", s))
+                  .join(", ")
               : "",
             label("spHours_", d["hours"]),
             typeof d["interest"] === "string" ? d["interest"] : "",
@@ -599,7 +695,9 @@ export function offersCsv(rows: SupportOfferRow[]) {
 }
 
 export function downloadCsv(name: string, csv: string) {
-  const url = URL.createObjectURL(new Blob([csv], { type: "text/csv;charset=utf-8" }));
+  const url = URL.createObjectURL(
+    new Blob([csv], { type: "text/csv;charset=utf-8" }),
+  );
   const link = document.createElement("a");
   link.href = url;
   link.download = name;
@@ -619,7 +717,8 @@ export function OffersTab() {
     rows,
     (r) => r.offer_type,
     (r) => r.status,
-    (r) => `${r.name} ${r.email} ${r.organization} ${r.message} ${JSON.stringify(r.details)}`,
+    (r) =>
+      `${r.name} ${r.email} ${r.organization} ${r.message} ${JSON.stringify(r.details)}`,
   );
   const [openId, setOpenId] = useState("");
   const [busy, setBusy] = useState(false);
@@ -632,7 +731,9 @@ export function OffersTab() {
       if (!result.ok) return void toast.error(t(result.message));
       toast.success(t("statusUpdated"));
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ["admin", "support-offers"] }),
+        queryClient.invalidateQueries({
+          queryKey: ["admin", "support-offers"],
+        }),
         queryClient.invalidateQueries({ queryKey: ["admin", "dashboard"] }),
       ]);
     } catch {
@@ -660,7 +761,9 @@ export function OffersTab() {
           <Button
             variant="outline"
             disabled={filter.visible.length === 0}
-            onClick={() => downloadCsv("e20e-support-offers.csv", offersCsv(filter.visible))}
+            onClick={() =>
+              downloadCsv("e20e-support-offers.csv", offersCsv(filter.visible))
+            }
           >
             <Download className="size-4" aria-hidden="true" />
             {t("exportCsv")}
@@ -681,7 +784,10 @@ export function OffersTab() {
               title={r.organization || r.name}
               status={r.status}
               statusLabel={t(`offerStatus_${r.status}`)}
-              meta={date(r.created_at, { dateStyle: "medium", timeStyle: "short" })}
+              meta={date(r.created_at, {
+                dateStyle: "medium",
+                timeStyle: "short",
+              })}
               preview={offerDetailText(r, language) || r.message}
             />
           ))}
@@ -696,20 +802,32 @@ export function OffersTab() {
         {open ? (
           <>
             <dl>
-              <Detail label={t("fieldType")}>{t(`offerType_${open.offer_type}`)}</Detail>
-              <Detail label={t("fieldTime")}>
-                {date(open.created_at, { dateStyle: "full", timeStyle: "short" })}
+              <Detail label={t("fieldType")}>
+                {t(`offerType_${open.offer_type}`)}
               </Detail>
-              {open.organization ? <Detail label={t("fieldPerson")}>{open.name}</Detail> : null}
+              <Detail label={t("fieldTime")}>
+                {date(open.created_at, {
+                  dateStyle: "full",
+                  timeStyle: "short",
+                })}
+              </Detail>
+              {open.organization ? (
+                <Detail label={t("fieldPerson")}>{open.name}</Detail>
+              ) : null}
               <Detail label={t("fieldEmail")} ltr>
-                <a className="underline-offset-4 hover:underline" href={`mailto:${open.email}`}>
+                <a
+                  className="underline-offset-4 hover:underline"
+                  href={`mailto:${open.email}`}
+                >
                   {open.email}
                 </a>
               </Detail>
               <Detail label={t("fieldPhone")} ltr>
                 {open.phone || "—"}
               </Detail>
-              <Detail label={t("fieldDetails")}>{offerDetailText(open, language) || "—"}</Detail>
+              <Detail label={t("fieldDetails")}>
+                {offerDetailText(open, language) || "—"}
+              </Detail>
               {links.length ? (
                 <Detail label={t("fieldLinks")} ltr>
                   {links.map((l) => (
@@ -779,10 +897,17 @@ export function AssistantTab() {
           }}
         />
       </div>
-      <QueryState query={query} empty={t("noMatches")} isEmpty={rows.length === 0}>
+      <QueryState
+        query={query}
+        empty={t("noMatches")}
+        isEmpty={rows.length === 0}
+      >
         <ul className="grid gap-3">
           {rows.slice(current * 20, current * 20 + 20).map((row) => (
-            <li key={row.id} className="rounded-xl border border-border bg-card p-4">
+            <li
+              key={row.id}
+              className="rounded-xl border border-border bg-card p-4"
+            >
               <div className="flex flex-wrap items-center gap-2 text-sm">
                 <span className="font-medium" dir="auto">
                   {row.visitor_name || "—"}
@@ -791,7 +916,10 @@ export function AssistantTab() {
                   {row.visitor_email}
                 </span>
                 <span className="ms-auto text-xs text-muted-foreground">
-                  {date(row.created_at, { dateStyle: "medium", timeStyle: "short" })}
+                  {date(row.created_at, {
+                    dateStyle: "medium",
+                    timeStyle: "short",
+                  })}
                 </span>
               </div>
               <p
@@ -825,7 +953,12 @@ export function Pager({
     <div className="mt-4 flex items-center justify-between gap-3 text-sm text-muted-foreground">
       <span>{t("pageOf", { page: page + 1 })}</span>
       <div className="flex gap-2">
-        <Button variant="outline" size="sm" disabled={page === 0} onClick={() => onPage(page - 1)}>
+        <Button
+          variant="outline"
+          size="sm"
+          disabled={page === 0}
+          onClick={() => onPage(page - 1)}
+        >
           {t("previous")}
         </Button>
         <Button
@@ -860,7 +993,11 @@ export function InboxSection({
   return (
     <div>
       <PageHeader title={t("navInbox")} description={t("navInboxDesc")} />
-      <Tabs value={tab ?? "requests"} onValueChange={(v) => onTab(v as AdminTab)} dir={dir}>
+      <Tabs
+        value={tab ?? "requests"}
+        onValueChange={(v) => onTab(v as AdminTab)}
+        dir={dir}
+      >
         <TabsList>
           <TabsTrigger value="requests">
             {t("tabRequests")}
@@ -916,14 +1053,20 @@ function PrivatePhoto({
     };
   }, [load, requestId, path]);
   if (failed)
-    return <span className="block p-3 text-xs text-muted-foreground">{t("attachmentFailed")}</span>;
+    return (
+      <span className="block p-3 text-xs text-muted-foreground">
+        {t("attachmentFailed")}
+      </span>
+    );
   if (!src)
     return (
       <span className="flex aspect-video items-center justify-center">
         <Loader2 className="size-4 animate-spin" aria-hidden="true" />
       </span>
     );
-  return <img src={src} alt={name} className="aspect-video w-full object-cover" />;
+  return (
+    <img src={src} alt={name} className="aspect-video w-full object-cover" />
+  );
 }
 
 /** Admin screen listing only enterprise service requests, with the shared request drawer. */
@@ -931,7 +1074,10 @@ export function EnterpriseSection() {
   const { t } = useAdminCopy();
   return (
     <div>
-      <PageHeader title={t("navEnterprise")} description={t("navEnterpriseDesc")} />
+      <PageHeader
+        title={t("navEnterprise")}
+        description={t("navEnterpriseDesc")}
+      />
       <RequestsTab only="service" />
     </div>
   );
@@ -947,7 +1093,7 @@ function RequestReplies({ requestId }: { requestId: string }) {
     queryKey: ["admin", "request-replies", requestId],
     queryFn: () => read({ data: { id: requestId } }),
   });
-  const [needsReply,setNeedsReply]=useState(false);
+  const [needsReply, setNeedsReply] = useState(false);
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
   const submit = async () => {
@@ -957,7 +1103,8 @@ function RequestReplies({ requestId }: { requestId: string }) {
     try {
       const result = await save({ data: { id: requestId, body, needsReply } });
       if (!result.ok) return void toast.error(t("errReplySave"));
-      setText("");setNeedsReply(false);
+      setText("");
+      setNeedsReply(false);
       toast.success(t("replySaved"));
       await queryClient.invalidateQueries({ queryKey: ["admin"] });
     } catch {
@@ -976,17 +1123,35 @@ function RequestReplies({ requestId }: { requestId: string }) {
       ) : (
         <ol className="space-y-2">
           {(replies.data ?? []).map((r) => (
-            <li key={r.id} className="rounded-md border border-border p-2 text-sm">
+            <li
+              key={r.id}
+              className="rounded-md border border-border p-2 text-sm"
+            >
               <span className="mb-1 block text-xs text-muted-foreground">
-                <span dir="ltr">{r.author_kind==="visitor" ? t("visitorClarification") : r.author_email || "—"}</span> ·{" "}
-                {date(r.created_at, { dateStyle: "medium", timeStyle: "short" })}
+                <span dir="ltr">
+                  {r.author_kind === "visitor"
+                    ? t("visitorClarification")
+                    : r.author_email || "—"}
+                </span>{" "}
+                ·{" "}
+                {date(r.created_at, {
+                  dateStyle: "medium",
+                  timeStyle: "short",
+                })}
               </span>
               <p className="whitespace-pre-wrap break-words">{r.body}</p>
             </li>
           ))}
         </ol>
       )}
-      <label className="flex gap-2"><input type="checkbox" checked={needsReply} onChange={e=>setNeedsReply(e.target.checked)}/>{adminDictionaries[language].consoleThisQuestionNeedsACustomerResponse}</label>
+      <label className="flex gap-2">
+        <input
+          type="checkbox"
+          checked={needsReply}
+          onChange={(e) => setNeedsReply(e.target.checked)}
+        />
+        {adminDictionaries[language].consoleThisQuestionNeedsACustomerResponse}
+      </label>
       <textarea
         className="mt-2 min-h-20 w-full rounded-md border border-input bg-background p-2 text-sm"
         value={text}

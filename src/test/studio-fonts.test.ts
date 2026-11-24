@@ -1,13 +1,26 @@
 import { expect, it } from "vitest";
-import { defaultSettings, fontsHref, pickerFonts, themeCss } from "@/lib/catalog";
+import {
+  defaultSettings,
+  fontsHref,
+  pickerFonts,
+  themeCss,
+} from "@/lib/catalog";
 
 it("offers bundled faces offline and preserves a saved web font", () => {
   const local = pickerFonts(true, "Tajawal").map((font) => font.id);
   expect(local).toEqual(
-    expect.arrayContaining(["Geist", "Signifier", "IBM Plex Sans Arabic", "Alexandria", "Tajawal"]),
+    expect.arrayContaining([
+      "Geist",
+      "Signifier",
+      "IBM Plex Sans Arabic",
+      "Alexandria",
+      "Tajawal",
+    ]),
   );
   expect(local).not.toContain("Cairo");
-  expect(pickerFonts(false, "Tajawal").map((font) => font.id)).toContain("Cairo");
+  expect(pickerFonts(false, "Tajawal").map((font) => font.id)).toContain(
+    "Cairo",
+  );
   expect(fontsHref("Geist", "IBM Plex Sans Arabic")).toBe("");
   expect(fontsHref("Signifier", "Tajawal")).toContain("family=Tajawal");
   expect(fontsHref("Signifier", "Tajawal")).not.toContain("Signifier");

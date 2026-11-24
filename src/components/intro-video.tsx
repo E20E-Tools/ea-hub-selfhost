@@ -47,12 +47,26 @@ export function IntroVideoDialog({
         >
           <source src={film.mp4} type="video/mp4" />
           <source src={film.webm} type="video/webm" />
-          <track kind="subtitles" src="/captions/intro-ar.vtt" srcLang="ar" label="العربية" default={language === "ar"} />
-          <track kind="subtitles" src="/captions/intro-en.vtt" srcLang="en" label="English" default={language === "en"} />
+          <track
+            kind="subtitles"
+            src="/captions/intro-ar.vtt"
+            srcLang="ar"
+            label="العربية"
+            default={language === "ar"}
+          />
+          <track
+            kind="subtitles"
+            src="/captions/intro-en.vtt"
+            srcLang="en"
+            label="English"
+            default={language === "en"}
+          />
           <a href={film.mp4}>{t("blogVideoFallback")}</a>
         </video>
         <a className="underline underline-offset-4" href={film.guide}>
-          {language === "ar" ? "اقرأ دليل الاستخدام المصوّر" : "Read the illustrated user guide"}
+          {language === "ar"
+            ? "اقرأ دليل الاستخدام المصوّر"
+            : "Read the illustrated user guide"}
         </a>
       </DialogContent>
     </Dialog>
@@ -99,13 +113,7 @@ export function IntroVideoCard({ className }: { className?: string }) {
         onClick={() => setOpen(true)}
         aria-label={t("aboutFilmPlay")}
       >
-        <img
-          src={film.poster}
-          alt=""
-          width={640}
-          height={360}
-          loading="lazy"
-        />
+        <img src={film.poster} alt="" width={640} height={360} loading="lazy" />
         <span className="about-film-play" aria-hidden="true">
           <Play size={22} />
         </span>
@@ -115,9 +123,19 @@ export function IntroVideoCard({ className }: { className?: string }) {
       </button>
       <div className="about-film-copy">
         <h2 id="about-film-title">{t("aboutFilmTitle")}</h2>
-        <button className="underline underline-offset-4" type="button" onClick={() => setOpen(true)}>{t("aboutFilmPlay")}</button>
+        <button
+          className="underline underline-offset-4"
+          type="button"
+          onClick={() => setOpen(true)}
+        >
+          {t("aboutFilmPlay")}
+        </button>
         <p>{t("aboutFilmMeta")}</p>
-        <a className="block underline underline-offset-4" href={film.guide}>{language === "ar" ? "دليل الاستخدام المصوّر" : "Illustrated user guide"}</a>
+        <a className="block underline underline-offset-4" href={film.guide}>
+          {language === "ar"
+            ? "دليل الاستخدام المصوّر"
+            : "Illustrated user guide"}
+        </a>
       </div>
       <IntroVideoDialog open={open} onOpenChange={setOpen} />
     </aside>

@@ -22,7 +22,9 @@ function localStore(): Storage | null {
 export function useMyTools() {
   const [value, setValue] = useState<MyToolsValue>(EMPTY_MY_TOOLS);
   const [hydrated, setHydrated] = useState(false);
-  const [status, setStatus] = useState<"ok" | "malformed" | "unavailable">("ok");
+  const [status, setStatus] = useState<"ok" | "malformed" | "unavailable">(
+    "ok",
+  );
   const [limited, setLimited] = useState(false);
   const valueRef = useRef(value);
   valueRef.current = value;
@@ -85,22 +87,38 @@ export function useMyTools() {
     },
     [commit],
   );
-  const replaceCompare = useCallback((ids: string[]) => commit({ ...current(), compare: productIds(ids, MAX_COMPARE) }), [commit]);
-  const clearCompare = useCallback(() => commit({ ...current(), compare: [] }), [commit]);
+  const replaceCompare = useCallback(
+    (ids: string[]) =>
+      commit({ ...current(), compare: productIds(ids, MAX_COMPARE) }),
+    [commit],
+  );
+  const clearCompare = useCallback(
+    () => commit({ ...current(), compare: [] }),
+    [commit],
+  );
   const clearFavorites = useCallback(() => {
     const before = current();
     commit({ ...before, favorites: [] });
     return before.favorites;
   }, [commit]);
-  const restoreFavorites = useCallback((removed: string[]) => {
-    const before = current();
-    commit({ ...before, favorites: productIds([...before.favorites, ...removed], 100) });
-  }, [commit]);
+  const restoreFavorites = useCallback(
+    (removed: string[]) => {
+      const before = current();
+      commit({
+        ...before,
+        favorites: productIds([...before.favorites, ...removed], 100),
+      });
+    },
+    [commit],
+  );
   const removeFavorite = useCallback(
     (id: string) => {
       const before = current();
       if (before.favorites.includes(id)) {
-        commit({ ...before, favorites: before.favorites.filter((item) => item !== id) });
+        commit({
+          ...before,
+          favorites: before.favorites.filter((item) => item !== id),
+        });
       }
     },
     [commit],

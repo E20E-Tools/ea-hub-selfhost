@@ -9,7 +9,16 @@ import {
   type PointerEvent as RPointerEvent,
 } from "react";
 import type { Product } from "@/lib/catalog";
-import { Boxes, ChartNoAxesCombined, CircuitBoard, Layers3, Lightbulb, Network, Radar, type LucideIcon } from "lucide-react";
+import {
+  Boxes,
+  ChartNoAxesCombined,
+  CircuitBoard,
+  Layers3,
+  Lightbulb,
+  Network,
+  Radar,
+  type LucideIcon,
+} from "lucide-react";
 import { useLanguage } from "@/lib/language";
 import { fill } from "@/lib/copy";
 import type { StageProps } from "../registry";
@@ -54,7 +63,9 @@ function x0Edge(x: number, bus: number, edge: number): number {
 function useMobile(): boolean {
   // The stage mounts client-side only, so read the query up front instead of flipping layouts after mount.
   const [mobile, setMobile] = useState(
-    () => typeof window !== "undefined" && window.matchMedia("(max-width: 639px)").matches,
+    () =>
+      typeof window !== "undefined" &&
+      window.matchMedia("(max-width: 639px)").matches,
   );
   useEffect(() => {
     const mq = window.matchMedia("(max-width: 639px)");
@@ -362,7 +373,7 @@ export default function LegacyDigitalStage({ products, settings }: StageProps) {
   const endDrag = (e: RPointerEvent<HTMLDivElement>) => {
     if (drag.current?.pointerId === e.pointerId) drag.current = null;
   };
-  const moveHandle=(next:number)=>{
+  const moveHandle = (next: number) => {
     stopDemo();
     userMoved.current = true;
     setOut(0);
@@ -422,7 +433,12 @@ export default function LegacyDigitalStage({ products, settings }: StageProps) {
         <div className="ld-legacy-bg" />
         <svg className="ld-cables" width={W} height={H} aria-hidden="true">
           {cables.map((c, i) => (
-            <path key={i} d={c.d} className="ld-cable-old" style={{ opacity: 1 - c.m }} />
+            <path
+              key={i}
+              d={c.d}
+              className="ld-cable-old"
+              style={{ opacity: 1 - c.m }}
+            />
           ))}
         </svg>
         <p className="ld-world-label ld-world-legacy" dir={dir}>
@@ -754,7 +770,12 @@ export default function LegacyDigitalStage({ products, settings }: StageProps) {
             <g key={i} style={{ opacity: c.m }}>
               <path d={c.d} className="ld-cable-track" />
               <path d={c.d} className="ld-cable-new" />
-              <circle cx={c.end[0]} cy={c.end[1]} r={4} className="ld-cable-port" />
+              <circle
+                cx={c.end[0]}
+                cy={c.end[1]}
+                r={4}
+                className="ld-cable-port"
+              />
             </g>
           ))}
         </svg>
@@ -808,10 +829,16 @@ export default function LegacyDigitalStage({ products, settings }: StageProps) {
           if (!it) return null;
           const m = morphAt(it.u, h);
           const Icon = moduleIcons[product.id] ?? CircuitBoard;
-          const status = t(product.comingSoon ? "comingSoonBadge" : "inspectorAvailable");
+          const status = t(
+            product.comingSoon ? "comingSoonBadge" : "inspectorAvailable",
+          );
           const port = vertical
-            ? (it.c < 0.5 ? "right" : "left")
-            : (it.c < 0.5 ? "bottom" : "top");
+            ? it.c < 0.5
+              ? "right"
+              : "left"
+            : it.c < 0.5
+              ? "bottom"
+              : "top";
           return (
             <button
               key={product.id}
@@ -821,20 +848,28 @@ export default function LegacyDigitalStage({ products, settings }: StageProps) {
               data-port={port}
               data-dense={list.length > 8 ? "" : undefined}
               dir={dir}
-              style={{
-                ...pos(it.u, it.c),
-                "--m": m,
-                "--ld-module-column": `${84 / Math.ceil(list.length / 2)}cqw`,
-              } as CSSProperties}
+              style={
+                {
+                  ...pos(it.u, it.c),
+                  "--m": m,
+                  "--ld-module-column": `${84 / Math.ceil(list.length / 2)}cqw`,
+                } as CSSProperties
+              }
               tabIndex={m > 0.5 ? 0 : -1}
-              aria-label={[product.name, product.label, status].filter(Boolean).join(" — ")}
+              aria-label={[product.name, product.label, status]
+                .filter(Boolean)
+                .join(" — ")}
               aria-haspopup="dialog"
               aria-expanded={inspector.openId === product.id}
               onPointerDown={(e) => e.stopPropagation()}
               onClick={(e) => openFrom(product, e.currentTarget, false)}
             >
               <span className="ld-module-head" aria-hidden="true">
-                <Icon className="ld-module-glyph" size={16} strokeWidth={1.65} />
+                <Icon
+                  className="ld-module-glyph"
+                  size={16}
+                  strokeWidth={1.65}
+                />
                 <span className="ld-module-status">{status}</span>
               </span>
               <strong dir="auto">{product.name}</strong>
@@ -853,7 +888,15 @@ export default function LegacyDigitalStage({ products, settings }: StageProps) {
       >
         <div className="ld-hub-face">
           {settings.logoUrl && (
-            <span className="ld-hub-emblem"><img src={settings.logoUrl} alt="" width={62} height={46} decoding="async" /></span>
+            <span className="ld-hub-emblem">
+              <img
+                src={settings.logoUrl}
+                alt=""
+                width={62}
+                height={46}
+                decoding="async"
+              />
+            </span>
           )}
           <div className="ld-hub-copy">
             <h1 dir="auto">{settings.displayTitle}</h1>

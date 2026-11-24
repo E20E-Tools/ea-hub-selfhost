@@ -7,7 +7,10 @@ import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { saveContactInfo } from "@/lib/admin.functions";
-import { getContactSettings, saveContactSettings } from "@/lib/contact-settings.functions";
+import {
+  getContactSettings,
+  saveContactSettings,
+} from "@/lib/contact-settings.functions";
 import type { Catalog } from "@/lib/catalog";
 import type { ContactInfo } from "@/lib/contact-info";
 import {
@@ -70,7 +73,11 @@ export function ContactSettings({
     const found: Record<string, string> = {};
     if (info.dirty && c.email.trim() && !EMAIL.test(c.email.trim()))
       found["email"] = t("invalidEmail");
-    if (info.dirty && c.website.trim() && !/^https:\/\/\S+$/i.test(c.website.trim()))
+    if (
+      info.dirty &&
+      c.website.trim() &&
+      !/^https:\/\/\S+$/i.test(c.website.trim())
+    )
       found["website"] = t("invalidUrl");
     if (notify.dirty && n && !EMAIL.test(n.recipientEmail.trim()))
       found["recipient"] = t("invalidEmail");
@@ -104,7 +111,11 @@ export function ContactSettings({
     <div className="grid gap-5">
       {mode === "public" && (
         <Card title={t("publicContact")} description={t("publicContactDesc")}>
-          <SettingRow label={t("email")} htmlFor="c-email" error={errors["email"]}>
+          <SettingRow
+            label={t("email")}
+            htmlFor="c-email"
+            error={errors["email"]}
+          >
             <Input
               id="c-email"
               type="email"
@@ -121,7 +132,11 @@ export function ContactSettings({
               onChange={(e) => setInfo({ phone: e.target.value })}
             />
           </SettingRow>
-          <SettingRow label={t("website")} htmlFor="c-web" error={errors["website"]}>
+          <SettingRow
+            label={t("website")}
+            htmlFor="c-web"
+            error={errors["website"]}
+          >
             <Input
               id="c-web"
               dir="ltr"
@@ -146,7 +161,9 @@ export function ContactSettings({
       {mode === "notifications" && (
         <Card title={t("notifications")} description={t("notificationsDesc")}>
           {settings.isPending ? <LoadingBlock rows={2} /> : null}
-          {settings.isError ? <ErrorBlock onRetry={() => void settings.refetch()} /> : null}
+          {settings.isError ? (
+            <ErrorBlock onRetry={() => void settings.refetch()} />
+          ) : null}
           {settings.data && n ? (
             <>
               {!settings.data.emailSendingActive ? (
@@ -166,7 +183,9 @@ export function ContactSettings({
                   type="email"
                   dir="ltr"
                   value={n.recipientEmail}
-                  onChange={(e) => setNotify({ recipientEmail: e.target.value })}
+                  onChange={(e) =>
+                    setNotify({ recipientEmail: e.target.value })
+                  }
                 />
               </SettingRow>
               <SettingRow label={t("notifyEnabled")} htmlFor="n-notify">
@@ -191,14 +210,18 @@ export function ContactSettings({
                     rows={4}
                     maxLength={1000}
                     value={n.autoReplyText}
-                    onChange={(e) => setNotify({ autoReplyText: e.target.value })}
+                    onChange={(e) =>
+                      setNotify({ autoReplyText: e.target.value })
+                    }
                   />
                 </SettingRow>
               ) : null}
               {settings.data.updatedAt ? (
                 <p className="pt-3 text-xs text-muted-foreground">
                   {t("lastUpdated", { date: date(settings.data.updatedAt) })}
-                  {settings.data.updatedBy ? ` · ${settings.data.updatedBy}` : ""}
+                  {settings.data.updatedBy
+                    ? ` · ${settings.data.updatedBy}`
+                    : ""}
                 </p>
               ) : null}
             </>

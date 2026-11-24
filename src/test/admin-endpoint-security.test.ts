@@ -3,7 +3,11 @@ import { FEATURE_KEYS } from "@/lib/site-features";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 const mocks = vi.hoisted(() => ({
-  context: null as null | { userId: string; claims: unknown; supabase: unknown },
+  context: null as null | {
+    userId: string;
+    claims: unknown;
+    supabase: unknown;
+  },
   role: vi.fn(),
   user: vi.fn(),
   from: vi.fn(),
@@ -39,15 +43,23 @@ vi.mock("@tanstack/react-start", () => ({
         validate = validator;
         return builder;
       },
-      handler: (handler: (args: unknown) => unknown) => async (args?: { data?: unknown }) => {
-        if (protectedEndpoint && !mocks.context) throw new Error("Unauthorized");
-        return handler({ context: mocks.context, data: validate(args?.data) });
-      },
+      handler:
+        (handler: (args: unknown) => unknown) =>
+        async (args?: { data?: unknown }) => {
+          if (protectedEndpoint && !mocks.context)
+            throw new Error("Unauthorized");
+          return handler({
+            context: mocks.context,
+            data: validate(args?.data),
+          });
+        },
     };
     return builder;
   },
 }));
-vi.mock("@/integrations/supabase/auth-middleware", () => ({ requireSupabaseAuth: {} }));
+vi.mock("@/integrations/supabase/auth-middleware", () => ({
+  requireSupabaseAuth: {},
+}));
 vi.mock("@/integrations/supabase/client.server", () => ({
   supabaseAdmin: {
     from: mocks.privilegedFrom,
@@ -78,7 +90,11 @@ const product = {
   sortOrder: 0,
 };
 
-function uploadData(bytes = new Uint8Array([1, 2, 3]), type = "image/png", folder = "products") {
+function uploadData(
+  bytes = new Uint8Array([1, 2, 3]),
+  type = "image/png",
+  folder = "products",
+) {
   const data = new FormData();
   data.set("file", new File([bytes], "fixture.png", { type }));
   data.set("folder", folder);
@@ -104,9 +120,14 @@ beforeEach(() => {
   mocks.range.mockResolvedValue({ data: [], error: null });
   mocks.limit.mockResolvedValue({ data: [], error: null });
   mocks.del.mockReturnValue({ eq: mocks.eq });
-  mocks.eq.mockReturnValue({ eq: () => ({ select: () => ({ maybeSingle: mocks.maybeSingle }) }) });
+  mocks.eq.mockReturnValue({
+    eq: () => ({ select: () => ({ maybeSingle: mocks.maybeSingle }) }),
+  });
   mocks.maybeSingle.mockResolvedValue({ data: null, error: null });
-  mocks.privilegedFrom.mockReturnValue({ select: mocks.select, insert: mocks.insert });
+  mocks.privilegedFrom.mockReturnValue({
+    select: mocks.select,
+    insert: mocks.insert,
+  });
   mocks.insert.mockResolvedValue({ error: null });
   mocks.storage.mockReturnValue({
     upload: mocks.upload,
@@ -127,7 +148,10 @@ beforeEach(() => {
 const actions = [
   ["list admins", () => endpoints.listAdmins()],
   ["save product", () => endpoints.saveProduct({ data: product })],
-  ["delete product", () => endpoints.deleteProduct({ data: { id: product.id } })],
+  [
+    "delete product",
+    () => endpoints.deleteProduct({ data: { id: product.id } }),
+  ],
   [
     "save general settings",
     () =>
@@ -146,27 +170,43 @@ const actions = [
         },
       }),
   ],
-  ["save appearance", () => endpoints.saveAppearanceSettings({ data: { imageFit: "cover" } })],
-  ["save navigation", () => endpoints.saveNavigationSettings({ data: { items: [] } })],
+  [
+    "save appearance",
+    () => endpoints.saveAppearanceSettings({ data: { imageFit: "cover" } }),
+  ],
+  [
+    "save navigation",
+    () => endpoints.saveNavigationSettings({ data: { items: [] } }),
+  ],
   [
     "save categories",
-    () => endpoints.saveCategories({ data: { categories: {}, categoriesEn: {} } }),
+    () =>
+      endpoints.saveCategories({ data: { categories: {}, categoriesEn: {} } }),
   ],
   [
     "change password",
     () =>
       endpoints.changeAdminPassword({
-        data: { currentPassword: "old-password-1", password: "new-password-12" },
+        data: {
+          currentPassword: "old-password-1",
+          password: "new-password-12",
+        },
       }),
   ],
-  ["delete affiliate", () => endpoints.deleteAffiliate({ data: { id: "courses" } })],
+  [
+    "delete affiliate",
+    () => endpoints.deleteAffiliate({ data: { id: "courses" } }),
+  ],
   ["read activity", () => endpoints.listAdminActivity()],
   ["read requests", () => endpoints.listRequests()],
   [
     "change request status",
     () =>
       endpoints.setRequestStatus({
-        data: { id: "725e1a8f-01cb-4cdd-a274-72a373480b31", status: "resolved" },
+        data: {
+          id: "725e1a8f-01cb-4cdd-a274-72a373480b31",
+          status: "resolved",
+        },
       }),
   ],
   ["read support offers", () => endpoints.listSupportOffers()],
@@ -183,7 +223,10 @@ const actions = [
     "view request photo",
     () =>
       endpoints.getRequestAttachment({
-        data: { id: "725e1a8f-01cb-4cdd-a274-72a373480b31", path: "r/image.png" },
+        data: {
+          id: "725e1a8f-01cb-4cdd-a274-72a373480b31",
+          path: "r/image.png",
+        },
       }),
   ],
 ] as const;
@@ -203,20 +246,29 @@ describe("Every protected admin operation", () => {
     expect(mocks.role).not.toHaveBeenCalled();
     expectNoDataAccess();
   });
-  it.each(actions)("rejects ordinary users even with MFA: %s", async (_, action) => {
-    mocks.role.mockResolvedValue({ data: false, error: null });
-    await expect(action()).rejects.toThrow();
-    expect(mocks.role).toHaveBeenCalledWith("has_role", {
-      _user_id: "admin-fixture",
-      _role: "admin",
-    });
-    expectNoDataAccess();
-  });
-  it.each(actions)("fails closed on role lookup errors: %s", async (_, action) => {
-    mocks.role.mockResolvedValue({ data: true, error: { message: "unavailable" } });
-    await expect(action()).rejects.toThrow();
-    expectNoDataAccess();
-  });
+  it.each(actions)(
+    "rejects ordinary users even with MFA: %s",
+    async (_, action) => {
+      mocks.role.mockResolvedValue({ data: false, error: null });
+      await expect(action()).rejects.toThrow();
+      expect(mocks.role).toHaveBeenCalledWith("has_role", {
+        _user_id: "admin-fixture",
+        _role: "admin",
+      });
+      expectNoDataAccess();
+    },
+  );
+  it.each(actions)(
+    "fails closed on role lookup errors: %s",
+    async (_, action) => {
+      mocks.role.mockResolvedValue({
+        data: true,
+        error: { message: "unavailable" },
+      });
+      await expect(action()).rejects.toThrow();
+      expectNoDataAccess();
+    },
+  );
 });
 
 describe("Verified admin reads", () => {
@@ -226,26 +278,40 @@ describe("Verified admin reads", () => {
       upsert,
       select: () => ({
         eq: () => ({
-          maybeSingle: async () => ({ data: { categories: { architecture: "Architecture" } } }),
+          maybeSingle: async () => ({
+            data: { categories: { architecture: "Architecture" } },
+          }),
         }),
       }),
     });
-    await endpoints.saveProduct({ data: { ...product, publicationDate: "2026-11-22" } });
+    await endpoints.saveProduct({
+      data: { ...product, publicationDate: "2026-11-22" },
+    });
     expect(upsert).toHaveBeenLastCalledWith(
-      expect.objectContaining({ coming_soon: true, publication_date: "2026-11-22" }),
+      expect.objectContaining({
+        coming_soon: true,
+        publication_date: "2026-11-22",
+      }),
     );
     await endpoints.saveProduct({ data: { ...product, publicationDate: "" } });
-    expect(upsert).toHaveBeenLastCalledWith(expect.objectContaining({ publication_date: null }));
+    expect(upsert).toHaveBeenLastCalledWith(
+      expect.objectContaining({ publication_date: null }),
+    );
   });
   it("rejects impossible publication dates before any database write", async () => {
     await expect(
-      endpoints.saveProduct({ data: { ...product, publicationDate: "2026-02-30" } }),
+      endpoints.saveProduct({
+        data: { ...product, publicationDate: "2026-02-30" },
+      }),
     ).rejects.toThrow();
     expectNoDataAccess();
   });
   it("lists nested gallery images and signs private paths without modifying storage", async () => {
     mocks.list
-      .mockResolvedValueOnce({ data: [{ name: "products", id: null }], error: null })
+      .mockResolvedValueOnce({
+        data: [{ name: "products", id: null }],
+        error: null,
+      })
       .mockResolvedValueOnce({
         data: [
           {
@@ -259,7 +325,12 @@ describe("Verified admin reads", () => {
         error: null,
       });
     mocks.signs.mockResolvedValue({
-      data: [{ path: "products/fixture.png", signedUrl: "https://example.com/private-fixture" }],
+      data: [
+        {
+          path: "products/fixture.png",
+          signedUrl: "https://example.com/private-fixture",
+        },
+      ],
       error: null,
     });
     expect(await endpoints.listAdminImages()).toEqual([
@@ -302,7 +373,10 @@ describe("Verified admin reads", () => {
     expect(mocks.privilegedFrom).not.toHaveBeenCalled();
   });
   it("does not disguise an activity read failure as an empty log", async () => {
-    mocks.range.mockResolvedValue({ data: null, error: { message: "unavailable" } });
+    mocks.range.mockResolvedValue({
+      data: null,
+      error: { message: "unavailable" },
+    });
     await expect(endpoints.listAdminActivity()).rejects.toThrow();
   });
   it("lists request photos without creating any reusable signed link", async () => {
@@ -310,7 +384,9 @@ describe("Verified admin reads", () => {
       data: [
         {
           id: "request-fixture",
-          attachments: [{ path: "request-fixture/image.png", name: "image.png", size: 20 }],
+          attachments: [
+            { path: "request-fixture/image.png", name: "image.png", size: 20 },
+          ],
         },
       ],
       error: null,
@@ -320,10 +396,15 @@ describe("Verified admin reads", () => {
     expect(rows[0]?.attachments[0]?.url).toBe("");
   });
 
-  const photo = { id: "725e1a8f-01cb-4cdd-a274-72a373480b31", path: "r/image.png" };
+  const photo = {
+    id: "725e1a8f-01cb-4cdd-a274-72a373480b31",
+    path: "r/image.png",
+  };
   const withRow = (attachments: unknown[]) => {
     mocks.select.mockReturnValue({
-      eq: () => ({ maybeSingle: async () => ({ data: { attachments }, error: null }) }),
+      eq: () => ({
+        maybeSingle: async () => ({ data: { attachments }, error: null }),
+      }),
     });
   };
 
@@ -342,13 +423,17 @@ describe("Verified admin reads", () => {
   it("refuses a removed admin without reading storage", async () => {
     withRow([{ path: photo.path, name: "image.png", size: 3 }]);
     mocks.role.mockResolvedValue({ data: false, error: null });
-    await expect(endpoints.getRequestAttachment({ data: photo })).rejects.toThrow();
+    await expect(
+      endpoints.getRequestAttachment({ data: photo }),
+    ).rejects.toThrow();
     expect(mocks.download).not.toHaveBeenCalled();
   });
 
   it("refuses a path that is not recorded on the request", async () => {
     withRow([{ path: "other/image.png", name: "x.png", size: 3 }]);
-    expect(await endpoints.getRequestAttachment({ data: photo })).toEqual({ ok: false });
+    expect(await endpoints.getRequestAttachment({ data: photo })).toEqual({
+      ok: false,
+    });
     expect(mocks.download).not.toHaveBeenCalled();
   });
 });
@@ -357,32 +442,44 @@ describe("Server-side admin image validation", () => {
   it.each(["image/svg+xml", "text/html", "application/octet-stream"])(
     "refuses unsupported %s without storage access",
     async (type) => {
-      expect((await endpoints.uploadAdminImage({ data: uploadData(undefined, type) })).ok).toBe(
-        false,
-      );
+      expect(
+        (
+          await endpoints.uploadAdminImage({
+            data: uploadData(undefined, type),
+          })
+        ).ok,
+      ).toBe(false);
       expect(mocks.storage).not.toHaveBeenCalled();
     },
   );
   it("rejects a spoofed PNG before uploading", async () => {
-    expect((await endpoints.uploadAdminImage({ data: uploadData() })).ok).toBe(false);
-    expect(mocks.storage).not.toHaveBeenCalled();
-  });
-  it("rejects empty images before uploading", async () => {
-    expect((await endpoints.uploadAdminImage({ data: uploadData(new Uint8Array()) })).ok).toBe(
+    expect((await endpoints.uploadAdminImage({ data: uploadData() })).ok).toBe(
       false,
     );
     expect(mocks.storage).not.toHaveBeenCalled();
   });
+  it("rejects empty images before uploading", async () => {
+    expect(
+      (await endpoints.uploadAdminImage({ data: uploadData(new Uint8Array()) }))
+        .ok,
+    ).toBe(false);
+    expect(mocks.storage).not.toHaveBeenCalled();
+  });
   it("rejects images exceeding 4 MiB before uploading", async () => {
     expect(
-      (await endpoints.uploadAdminImage({ data: uploadData(new Uint8Array(4 * 1024 * 1024 + 1)) }))
-        .ok,
+      (
+        await endpoints.uploadAdminImage({
+          data: uploadData(new Uint8Array(4 * 1024 * 1024 + 1)),
+        })
+      ).ok,
     ).toBe(false);
     expect(mocks.storage).not.toHaveBeenCalled();
   });
   it("rejects arbitrary destination folders", async () => {
     await expect(
-      endpoints.uploadAdminImage({ data: uploadData(undefined, "image/png", "../requests") }),
+      endpoints.uploadAdminImage({
+        data: uploadData(undefined, "image/png", "../requests"),
+      }),
     ).rejects.toThrow();
     expect(mocks.storage).not.toHaveBeenCalled();
   });
@@ -390,24 +487,31 @@ describe("Server-side admin image validation", () => {
 
 describe("Settings and password rules", () => {
   it("rejects activity pages above 200 rows", async () => {
-    await expect(endpoints.listAdminActivity({ data: { limit: 201 } })).rejects.toThrow();
+    await expect(
+      endpoints.listAdminActivity({ data: { limit: 201 } }),
+    ).rejects.toThrow();
   });
   it("rejects new passwords shorter than 10 characters", () => {
     expect(
-      endpoints.passwordChangeSchema.safeParse({ currentPassword: "x", password: "123456789" })
-        .success,
+      endpoints.passwordChangeSchema.safeParse({
+        currentPassword: "x",
+        password: "123456789",
+      }).success,
     ).toBe(false);
   });
   it("rejects new passwords longer than 200 characters", () => {
     expect(
-      endpoints.passwordChangeSchema.safeParse({ currentPassword: "x", password: "a".repeat(201) })
-        .success,
+      endpoints.passwordChangeSchema.safeParse({
+        currentPassword: "x",
+        password: "a".repeat(201),
+      }).success,
     ).toBe(false);
   });
   it("requires the current password", () => {
-    expect(endpoints.passwordChangeSchema.safeParse({ password: "long-enough-1" }).success).toBe(
-      false,
-    );
+    expect(
+      endpoints.passwordChangeSchema.safeParse({ password: "long-enough-1" })
+        .success,
+    ).toBe(false);
   });
   it("refuses a new password equal to the account email", async () => {
     mocks.privilegedRpc.mockResolvedValue({ data: true, error: null });
@@ -416,7 +520,10 @@ describe("Settings and password rules", () => {
       error: null,
     });
     const result = await endpoints.changeAdminPassword({
-      data: { currentPassword: "old-password-1", password: "Admin@Example.com" },
+      data: {
+        currentPassword: "old-password-1",
+        password: "Admin@Example.com",
+      },
     });
     expect(result.ok).toBe(false);
   });
@@ -431,13 +538,23 @@ describe("Settings and password rules", () => {
   it("feature flags accept exactly the known feature keys", () => {
     const all = Object.fromEntries(FEATURE_KEYS.map((k) => [k, true]));
     expect(endpoints.featureFlagsSchema.safeParse(all).success).toBe(true);
-    expect(endpoints.featureFlagsSchema.safeParse({ assistant: true }).success).toBe(false);
-    expect(endpoints.featureFlagsSchema.parse({ ...all, extra: true })).toEqual(all);
+    expect(
+      endpoints.featureFlagsSchema.safeParse({ assistant: true }).success,
+    ).toBe(false);
+    expect(endpoints.featureFlagsSchema.parse({ ...all, extra: true })).toEqual(
+      all,
+    );
   });
   it("affiliate delete uses the same id rule as save", async () => {
-    await expect(endpoints.deleteAffiliate({ data: { id: "Bad Id!" } })).rejects.toThrow();
+    await expect(
+      endpoints.deleteAffiliate({ data: { id: "Bad Id!" } }),
+    ).rejects.toThrow();
   });
   it("accepts the affiliates upload folder but no others", async () => {
-    expect((endpoints.ADMIN_UPLOAD_FOLDERS as readonly string[]).includes("affiliates")).toBe(true);
+    expect(
+      (endpoints.ADMIN_UPLOAD_FOLDERS as readonly string[]).includes(
+        "affiliates",
+      ),
+    ).toBe(true);
   });
 });

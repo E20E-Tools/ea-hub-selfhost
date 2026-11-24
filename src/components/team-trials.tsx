@@ -10,6 +10,7 @@ import {
   type Review,
 } from "@/lib/team-trials";
 import { trialFeedback } from "@/lib/trial-feedback.functions";
+import { dictionaries } from "@/lib/copy";
 
 export function TeamTrials({ ar }: { ar: boolean }) {
   const [list, setList] = useState<Trial[]>([]),
@@ -31,12 +32,13 @@ export function TeamTrials({ ar }: { ar: boolean }) {
     };
   }, []);
   return (
-    <section id="team-trials" aria-label={ar ? "تجارب الفريق" : "Team trials"}>
+    <section
+      id="team-trials"
+      aria-label={dictionaries[ar ? "ar" : "en"].teamTrialsTeamTrials}
+    >
       {error && (
         <p role="alert">
-          {ar
-            ? "تعذر قراءة تجارب هذا الجهاز."
-            : "Could not read trials from this device."}
+          {dictionaries[ar ? "ar" : "en"].teamTrialsCouldNotReadTrials}
         </p>
       )}
       {list.map((t) => (
@@ -108,13 +110,14 @@ function TrialCard({ t, ar }: { t: Trial; ar: boolean }) {
     no: label("لم ينجز المهمة", "Could not complete"),
   };
   return (
-    <article id={"trial-"+t.id} className="bx-panel ea-team-space">
+    <article id={"trial-" + t.id} className="bx-panel ea-team-space">
       <h2>
         {label("تجربة الفريق", "Team trial")} · {t.tool}
       </h2>
       <p>{t.goal}</p>
       <p>
-        {label("المسؤول", "Owner")} · {t.owner}　
+        {label("المسؤول", "Owner")} · {t.owner}
+        {"　"}
         {label("تاريخ المراجعة", "Review date")} ·{" "}
         <time dateTime={t.date}>{t.date}</time>
       </p>
@@ -138,7 +141,7 @@ function TrialCard({ t, ar }: { t: Trial; ar: boolean }) {
       <section>
         <h3>{label("سجل المحاولات", "Attempt log")}</h3>
         {t.attempts.map((a) => (
-          <div key={a.id} id={"attempt-"+a.id}>
+          <div key={a.id} id={"attempt-" + a.id}>
             <strong dir="auto">{a.task}</strong>
             <p dir="auto">{a.result}</p>
             {a.link && (
@@ -255,7 +258,7 @@ function TrialCard({ t, ar }: { t: Trial; ar: boolean }) {
             </Button>
             {t.feedback.length ? (
               t.feedback.map((r, i) => (
-                <blockquote key={i} id={"feedback-"+t.id+"-"+i}>
+                <blockquote key={i} id={"feedback-" + t.id + "-" + i}>
                   <strong>{outcomes[r.outcome]}</strong>
                   <p dir="auto">{r.note}</p>
                 </blockquote>
@@ -279,7 +282,7 @@ function TrialCard({ t, ar }: { t: Trial; ar: boolean }) {
           </strong>{" "}
           · {t.criterion}
         </p>
-        <TrialBrief t={t} ar={ar}/>
+        <TrialBrief t={t} ar={ar} />
         {t.reviews.map((r, i) => (
           <p key={i}>
             <strong>{verdicts[r.choice]}</strong> · {r.reason}

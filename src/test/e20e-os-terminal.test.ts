@@ -1,10 +1,23 @@
 import { describe, expect, it } from "vitest";
 import { dictionaries } from "@/lib/copy";
-import { completeCommand, findProduct, runCommand } from "@/themes/e20e-os/terminal";
-import { BOOT_STORAGE_KEY, appGradient, markBooted, shouldBoot } from "@/themes/e20e-os/boot";
+import {
+  completeCommand,
+  findProduct,
+  runCommand,
+} from "@/themes/e20e-os/terminal";
+import {
+  BOOT_STORAGE_KEY,
+  appGradient,
+  markBooted,
+  shouldBoot,
+} from "@/themes/e20e-os/boot";
 
 const products = [
-  { id: "landscape", name: "APM & App Landscape", label: "Technology Landscape" },
+  {
+    id: "landscape",
+    name: "APM & App Landscape",
+    label: "Technology Landscape",
+  },
   { id: "radar", name: "Tech Radar", label: "Technology Assessment" },
   {
     id: "archone",
@@ -13,7 +26,12 @@ const products = [
     comingSoon: true,
     publicationDate: "2026-11-22",
   },
-  { id: "innovation", name: "Innovation", label: "Innovation", comingSoon: true },
+  {
+    id: "innovation",
+    name: "Innovation",
+    label: "Innovation",
+    comingSoon: true,
+  },
   { id: "itfm", name: "ITFM", label: "Cost", comingSoon: true },
 ];
 const ctx = {
@@ -25,9 +43,18 @@ const ctx = {
 
 describe("terminal commands", () => {
   it("open by id or name returns an open action", () => {
-    expect(runCommand("open radar", ctx).action).toEqual({ type: "open", id: "radar" });
-    expect(runCommand("open tech radar", ctx).action).toEqual({ type: "open", id: "radar" });
-    expect(runCommand("OPEN arch", ctx).action).toEqual({ type: "open", id: "archone" });
+    expect(runCommand("open radar", ctx).action).toEqual({
+      type: "open",
+      id: "radar",
+    });
+    expect(runCommand("open tech radar", ctx).action).toEqual({
+      type: "open",
+      id: "radar",
+    });
+    expect(runCommand("OPEN arch", ctx).action).toEqual({
+      type: "open",
+      id: "archone",
+    });
   });
   it("open with an unknown or ambiguous name prints a message and no action", () => {
     const r = runCommand("open i", ctx);
@@ -42,10 +69,15 @@ describe("terminal commands", () => {
     expect(lines).toContain("22 Nov 2026");
   });
   it("unknown commands report command not found", () => {
-    expect(runCommand("sudo rm", ctx).lines).toEqual(["command not found: sudo"]);
+    expect(runCommand("sudo rm", ctx).lines).toEqual([
+      "command not found: sudo",
+    ]);
   });
   it("lang, whoami and clear", () => {
-    expect(runCommand("lang ar", ctx).action).toEqual({ type: "lang", language: "ar" });
+    expect(runCommand("lang ar", ctx).action).toEqual({
+      type: "lang",
+      language: "ar",
+    });
     expect(runCommand("whoami", ctx).lines).toEqual(["guest"]);
     expect(runCommand("clear", ctx).action).toEqual({ type: "clear" });
   });

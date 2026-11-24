@@ -13,21 +13,30 @@ vi.mock("@tanstack/react-start", () => ({
     let validate = (value: unknown) => value;
     const chain = {
       middleware: () => chain,
-      inputValidator: (validator: { parse?: (v: unknown) => unknown } | ((v: unknown) => unknown)) => {
+      inputValidator: (
+        validator:
+          { parse?: (v: unknown) => unknown } | ((v: unknown) => unknown),
+      ) => {
         validate =
           typeof validator === "function"
             ? validator
             : (v: unknown) => (validator.parse ? validator.parse(v) : v);
         return chain;
       },
-      handler: (handler: (args: unknown) => unknown) => async (args?: { data: unknown }) =>
-        handler({ data: validate(args?.data) }),
+      handler:
+        (handler: (args: unknown) => unknown) =>
+        async (args?: { data: unknown }) =>
+          handler({ data: validate(args?.data) }),
     };
     return chain;
   },
 }));
-vi.mock("@/integrations/supabase/auth-middleware", () => ({ requireSupabaseAuth: {} }));
-vi.mock("@tanstack/react-start/server", () => ({ getRequest: () => new Request("https://x.test") }));
+vi.mock("@/integrations/supabase/auth-middleware", () => ({
+  requireSupabaseAuth: {},
+}));
+vi.mock("@tanstack/react-start/server", () => ({
+  getRequest: () => new Request("https://x.test"),
+}));
 vi.mock("@/lib/site-features.server", () => ({
   serverFeatureEnabled: async (key: string) => state.enabled[key] !== false,
 }));
@@ -71,7 +80,14 @@ const NEW_KEYS: FeatureKey[] = [
   "search",
 ];
 
-beforeEach(() => Object.assign(state, { enabled: {}, limits: 0, subscribed: 0, waitlisted: 0 }));
+beforeEach(() =>
+  Object.assign(state, {
+    enabled: {},
+    limits: 0,
+    subscribed: 0,
+    waitlisted: 0,
+  }),
+);
 
 describe("new feature switches", () => {
   it("are registered, on by default and keep the original eleven first", () => {
@@ -82,20 +98,30 @@ describe("new feature switches", () => {
   });
 
   it("settings saved before the new switches still validate and keep them on", () => {
-    const legacy = Object.fromEntries(LEGACY_FEATURE_KEYS.map((k) => [k, true]));
+    const legacy = Object.fromEntries(
+      LEGACY_FEATURE_KEYS.map((k) => [k, true]),
+    );
     const parsed = featureFlagsSchema.parse(legacy);
     for (const key of NEW_KEYS) expect(parsed[key]).toBe(true);
   });
 
   it("a saved off state survives validation and a missing original switch is still refused", () => {
     const all = Object.fromEntries(FEATURE_KEYS.map((k) => [k, true]));
-    expect(featureFlagsSchema.parse({ ...all, compare: false }).compare).toBe(false);
+    expect(featureFlagsSchema.parse({ ...all, compare: false }).compare).toBe(
+      false,
+    );
     const { assistant: _omit, ...noAssistant } = all;
     expect(featureFlagsSchema.safeParse(noAssistant).success).toBe(false);
   });
 
   it("switching one page off hides only that page's links", () => {
-    const pages = ["discover", "compare", "myTools", "trials", "newsletter"] as const;
+    const pages = [
+      "discover",
+      "compare",
+      "myTools",
+      "trials",
+      "newsletter",
+    ] as const;
     for (const key of pages) {
       const flags = normalizeFeatureFlags({ [key]: false });
       const own = FEATURE_PATHS[key]!;
@@ -118,7 +144,12 @@ describe("new feature switches", () => {
 
 describe("server refuses switched-off sign-ups", () => {
   const signup = { email: "visitor@example.com", lang: "en" as const };
-  const waitlist = { productId: "platform", email: "visitor@example.com", lang: "en" as const, problem: "" };
+  const waitlist = {
+    productId: "platform",
+    email: "visitor@example.com",
+    lang: "en" as const,
+    problem: "",
+  };
 
   it("newsletter off: no quota spent, nothing subscribed", async () => {
     state.enabled["newsletter"] = false;

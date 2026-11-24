@@ -173,7 +173,8 @@
 
 @font-face {
   font-family: "Signifier";
-  src: url("/__l5e/assets-v1/d3116917-0885-4306-a28a-0f0850a8c616/signifier.otf") format("opentype");
+  src: url("/__l5e/assets-v1/d3116917-0885-4306-a28a-0f0850a8c616/signifier.otf")
+    format("opentype");
   font-weight: 400;
   font-display: swap;
 }
@@ -181,18 +182,28 @@
    font-src): real bold weights instead of faux-bold from the 400-only TTF, at about a third of the bytes. */
 @font-face {
   font-family: "Geist";
-  src: url("https://cdn.jsdelivr.net/npm/@fontsource-variable/geist@5.3.0/files/geist-latin-wght-normal.woff2") format("woff2-variations"),
-    url("https://cdn.jsdelivr.net/npm/@fontsource-variable/geist@5.3.0/files/geist-latin-wght-normal.woff2") format("woff2");
+  src:
+    url("https://cdn.jsdelivr.net/npm/@fontsource-variable/geist@5.3.0/files/geist-latin-wght-normal.woff2")
+      format("woff2-variations"),
+    url("https://cdn.jsdelivr.net/npm/@fontsource-variable/geist@5.3.0/files/geist-latin-wght-normal.woff2")
+      format("woff2");
   font-weight: 100 900;
   font-display: swap;
-  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC,
+    U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212,
+    U+2215, U+FEFF, U+FFFD;
 }
 @font-face {
   font-family: "Geist";
-  src: url("https://cdn.jsdelivr.net/npm/@fontsource-variable/geist@5.3.0/files/geist-latin-ext-wght-normal.woff2") format("woff2");
+  src: url("https://cdn.jsdelivr.net/npm/@fontsource-variable/geist@5.3.0/files/geist-latin-ext-wght-normal.woff2")
+    format("woff2");
   font-weight: 100 900;
   font-display: swap;
-  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
+  unicode-range:
+    U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304,
+    U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB,
+    U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF;
 }
 :root {
   --glass: oklch(0.93 0.002 106 / 67%);
@@ -202,7 +213,9 @@
   --network-yellow: oklch(0.68 0.135 103);
   --network-amber: oklch(0.76 0.155 80);
   --network-orange: oklch(0.72 0.177 45);
-  --status: oklch(0.48 0.13 151); /* 4.5:1+ for small status text on the light sheet */
+  --status: oklch(
+    0.48 0.13 151
+  ); /* 4.5:1+ for small status text on the light sheet */
   --panel-pad: 56px;
 }
 @theme inline {
@@ -814,7 +827,11 @@ footer {
 .product-card:focus-within {
   transform: translateY(-4px);
   box-shadow: var(--library-shadow);
-  border-color: color-mix(in oklab, var(--product-color) 45%, var(--glass-edge));
+  border-color: color-mix(
+    in oklab,
+    var(--product-color) 45%,
+    var(--glass-edge)
+  );
 }
 .product-card:hover::before,
 .product-card:focus-within::before {
@@ -1502,7 +1519,11 @@ footer {
 }
 .request-form,
 .request-success {
-  --request-surface: color-mix(in oklab, var(--library-surface) 55%, oklch(0.99 0.004 90));
+  --request-surface: color-mix(
+    in oklab,
+    var(--library-surface) 55%,
+    oklch(0.99 0.004 90)
+  );
   padding: 32px 34px;
   display: flex;
   flex-direction: column;
@@ -2045,7 +2066,12 @@ footer {
 .product-platform .product-motion i {
   height: 2px;
   width: 34%;
-  background: linear-gradient(90deg, transparent, var(--product-color), transparent);
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--product-color),
+    transparent
+  );
   animation: sweep-x 3.6s linear infinite;
 }
 .product-platform .product-motion i:nth-child(1) {
@@ -2095,7 +2121,11 @@ footer {
   border-radius: 50%;
   background: var(--product-gold, var(--product-color));
   box-shadow: 0 0 12px 3px
-    color-mix(in oklab, var(--product-gold, var(--product-color)) 55%, transparent);
+    color-mix(
+      in oklab,
+      var(--product-gold, var(--product-color)) 55%,
+      transparent
+    );
   animation: spark-rise 4s ease-in infinite;
   opacity: 0;
 }
@@ -3158,7 +3188,8 @@ html[data-design-theme="transformation-board"] .tb-readout {
 .archy-dock[data-archy-tour]:not([data-archy-tour="rewind"]) .archy-poster {
   pointer-events: none;
 }
-.archy-dock[data-archy-tour]:not([data-archy-tour="rewind"]) .archy-character::after {
+.archy-dock[data-archy-tour]:not([data-archy-tour="rewind"])
+  .archy-character::after {
   content: "";
   position: absolute;
   top: 25px;
@@ -3191,7 +3222,9 @@ html[data-design-theme="transformation-board"] .tb-readout {
   box-shadow: none;
   cursor: pointer;
   margin-left: auto;
-  filter: drop-shadow(0 10px 12px color-mix(in oklab, var(--foreground) 16%, transparent));
+  filter: drop-shadow(
+    0 10px 12px color-mix(in oklab, var(--foreground) 16%, transparent)
+  );
 }
 .archy-character:hover {
   background: transparent;
@@ -3236,7 +3269,8 @@ html[data-design-theme="transformation-board"] .tb-readout {
   border-radius: 1rem 1rem 0.25rem 1rem;
   background: var(--card);
   color: var(--card-foreground);
-  box-shadow: 0 14px 34px color-mix(in oklab, var(--foreground) 16%, transparent);
+  box-shadow: 0 14px 34px
+    color-mix(in oklab, var(--foreground) 16%, transparent);
   font-size: 13px;
   line-height: 1.8;
 }
@@ -3373,7 +3407,8 @@ html[data-design-theme="transformation-board"] .tb-readout {
   border: 1px solid var(--border);
   border-radius: 1rem;
   overflow: hidden;
-  box-shadow: 0 20px 50px color-mix(in oklab, var(--foreground) 20%, transparent);
+  box-shadow: 0 20px 50px
+    color-mix(in oklab, var(--foreground) 20%, transparent);
 }
 .assistant-head {
   display: flex;
@@ -3621,7 +3656,8 @@ html[data-design-theme="transformation-board"] .tb-readout {
   border-radius: 18px;
   background: var(--card);
   overflow: hidden;
-  box-shadow: 0 18px 40px -28px color-mix(in oklab, var(--foreground) 45%, transparent);
+  box-shadow: 0 18px 40px -28px
+    color-mix(in oklab, var(--foreground) 45%, transparent);
 }
 .about-film-poster {
   position: relative;
@@ -4204,7 +4240,10 @@ button:focus-visible,
   visibility: hidden;
   pointer-events: none;
   transform: translate(-50%, -2px);
-  transition: opacity 120ms ease, transform 120ms ease, visibility 120ms;
+  transition:
+    opacity 120ms ease,
+    transform 120ms ease,
+    visibility 120ms;
 }
 .site-journey-link:hover .site-journey-label,
 .site-journey-link:focus-visible .site-journey-label,
@@ -4219,7 +4258,9 @@ button:focus-visible,
   inset-inline-start: 0;
   transform: translateY(-2px);
 }
-.site-journey-links > :first-child:is(:hover, :focus-visible, :active) .site-journey-label {
+.site-journey-links
+  > :first-child:is(:hover, :focus-visible, :active)
+  .site-journey-label {
   transform: none;
 }
 @media (prefers-reduced-motion: reduce) {
@@ -4966,7 +5007,8 @@ footer.site-footer {
     color-mix(in oklab, var(--primary) 65%, var(--foreground))
   );
   color: var(--primary-foreground);
-  box-shadow: 0 6px 16px -8px color-mix(in oklab, var(--primary) 70%, transparent);
+  box-shadow: 0 6px 16px -8px
+    color-mix(in oklab, var(--primary) 70%, transparent);
 }
 /* tabs */
 .site-nav[data-style="tabs"] {
@@ -5106,7 +5148,8 @@ footer.site-footer {
   object-fit: cover;
 }
 :root[data-product-image-sharpen="on"] .product-card .product-thumbnail {
-  filter: var(--product-image-filter, none) contrast(1.08) drop-shadow(0 0 0.35px rgb(0 0 0 / 0.5));
+  filter: var(--product-image-filter, none) contrast(1.08)
+    drop-shadow(0 0 0.35px rgb(0 0 0 / 0.5));
   image-rendering: -webkit-optimize-contrast;
 }
 .product-soon .product-thumbnail {
@@ -5244,7 +5287,8 @@ footer.site-footer {
   border-radius: 1rem 1rem 0.25rem 1rem;
   background: var(--card);
   color: var(--card-foreground);
-  box-shadow: 0 18px 40px color-mix(in oklab, var(--foreground) 18%, transparent);
+  box-shadow: 0 18px 40px
+    color-mix(in oklab, var(--foreground) 18%, transparent);
   font-size: 13px;
   z-index: 2;
 }
@@ -5506,9 +5550,17 @@ footer.site-footer {
 }
 
 @media (max-width: 760px) {
-  body:has(.ea-discover[data-answer-selected]) .archy-dock:not([data-archy-tour]) {
-    .archy-bubble, .archy-toolbar, .archy-voice-status { display: none; }
-    .archy-character { width: 56px; height: 56px; }
+  body:has(.ea-discover[data-answer-selected])
+    .archy-dock:not([data-archy-tour]) {
+    .archy-bubble,
+    .archy-toolbar,
+    .archy-voice-status {
+      display: none;
+    }
+    .archy-character {
+      width: 56px;
+      height: 56px;
+    }
   }
 }
 

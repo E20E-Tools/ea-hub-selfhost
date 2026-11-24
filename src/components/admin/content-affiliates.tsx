@@ -7,7 +7,10 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useConfirm } from "@/components/confirm-dialog";
 import { deleteAffiliate, saveAffiliate } from "@/lib/admin.functions";
-import { affiliatesQueryOptions, type AffiliateRow } from "@/lib/affiliates.functions";
+import {
+  affiliatesQueryOptions,
+  type AffiliateRow,
+} from "@/lib/affiliates.functions";
 import { ImagePicker } from "./media";
 import {
   BilingualField,
@@ -21,7 +24,12 @@ import {
   useDraft,
 } from "./ui";
 
-type Draft = AffiliateRow & { imageUrl: string; sortOrder: number; isNew: boolean; key: string };
+type Draft = AffiliateRow & {
+  imageUrl: string;
+  sortOrder: number;
+  isNew: boolean;
+  key: string;
+};
 
 const slugId = (value: string) =>
   value
@@ -75,8 +83,10 @@ export function AffiliatesTab() {
   const submit = async () => {
     const found: Record<string, string> = {};
     for (const row of drafts) {
-      if (!row.titleAr.trim() || !row.descriptionAr.trim()) found[row.key] = t("required");
-      else if (!/^https:\/\/\S+$/i.test(row.url.trim())) found[row.key] = t("invalidUrl");
+      if (!row.titleAr.trim() || !row.descriptionAr.trim())
+        found[row.key] = t("required");
+      else if (!/^https:\/\/\S+$/i.test(row.url.trim()))
+        found[row.key] = t("invalidUrl");
     }
     setErrors(found);
     if (Object.keys(found).length) return void toast.error(t("saveFailed"));
@@ -118,7 +128,9 @@ export function AffiliatesTab() {
 
   const removeRow = async (row: Draft) => {
     const name =
-      (language === "ar" ? row.titleAr : row.titleEn) || row.titleAr || t("newAffiliate");
+      (language === "ar" ? row.titleAr : row.titleEn) ||
+      row.titleAr ||
+      t("newAffiliate");
     const ok = await confirm({
       title: t("deleteAffiliateTitle", { name }),
       body: t("cannotUndo"),
@@ -127,7 +139,10 @@ export function AffiliatesTab() {
       dir,
     });
     if (!ok) return;
-    if (row.isNew) return form.setValue((current) => current.filter((r) => r.key !== row.key));
+    if (row.isNew)
+      return form.setValue((current) =>
+        current.filter((r) => r.key !== row.key),
+      );
     try {
       const result = await remove({ data: { id: row.id } });
       if (!result.ok) return void toast.error(t(result.message));
@@ -177,7 +192,10 @@ export function AffiliatesTab() {
         {drafts.length === 0 ? <EmptyBlock text={t("noAffiliates")} /> : null}
         <div className="grid gap-4">
           {drafts.map((row) => (
-            <div key={row.key} className="grid gap-4 rounded-lg border border-border p-4">
+            <div
+              key={row.key}
+              className="grid gap-4 rounded-lg border border-border p-4"
+            >
               <div className="flex items-center gap-3">
                 <Preview path={row.imageUrl || row.image} />
                 <strong className="min-w-0 flex-1 truncate" dir="auto">
@@ -188,7 +206,9 @@ export function AffiliatesTab() {
                 <Button
                   variant="ghost"
                   size="icon"
-                  aria-label={t("deleteAffiliateTitle", { name: row.titleAr || row.titleEn || "" })}
+                  aria-label={t("deleteAffiliateTitle", {
+                    name: row.titleAr || row.titleEn || "",
+                  })}
                   onClick={() => void removeRow(row)}
                 >
                   <Trash2 className="size-4" aria-hidden="true" />
@@ -199,7 +219,9 @@ export function AffiliatesTab() {
                 ar={row.titleAr}
                 en={row.titleEn}
                 maxLength={120}
-                onChange={(v) => update(row.key, { titleAr: v.ar, titleEn: v.en })}
+                onChange={(v) =>
+                  update(row.key, { titleAr: v.ar, titleEn: v.en })
+                }
               />
               <BilingualField
                 label={t("affiliateDescription")}
@@ -208,7 +230,9 @@ export function AffiliatesTab() {
                 multiline
                 rows={2}
                 maxLength={600}
-                onChange={(v) => update(row.key, { descriptionAr: v.ar, descriptionEn: v.en })}
+                onChange={(v) =>
+                  update(row.key, { descriptionAr: v.ar, descriptionEn: v.en })
+                }
               />
               <div className="grid gap-4 md:grid-cols-[1fr_8rem]">
                 <Field label={t("affiliateUrl")} htmlFor={`aff-url-${row.key}`}>
@@ -221,7 +245,10 @@ export function AffiliatesTab() {
                     onChange={(e) => update(row.key, { url: e.target.value })}
                   />
                 </Field>
-                <Field label={t("affiliateOrder")} htmlFor={`aff-order-${row.key}`}>
+                <Field
+                  label={t("affiliateOrder")}
+                  htmlFor={`aff-order-${row.key}`}
+                >
                   <Input
                     id={`aff-order-${row.key}`}
                     type="number"
@@ -229,7 +256,11 @@ export function AffiliatesTab() {
                     min={0}
                     max={9999}
                     value={row.sortOrder}
-                    onChange={(e) => update(row.key, { sortOrder: Number(e.target.value) || 0 })}
+                    onChange={(e) =>
+                      update(row.key, {
+                        sortOrder: Number(e.target.value) || 0,
+                      })
+                    }
                   />
                 </Field>
               </div>
@@ -244,7 +275,10 @@ export function AffiliatesTab() {
                   {t("pickFromGallery")}
                 </Button>
                 {row.imageUrl ? (
-                  <span className="min-w-0 truncate text-xs text-muted-foreground" dir="ltr">
+                  <span
+                    className="min-w-0 truncate text-xs text-muted-foreground"
+                    dir="ltr"
+                  >
                     {row.imageUrl}
                   </span>
                 ) : null}

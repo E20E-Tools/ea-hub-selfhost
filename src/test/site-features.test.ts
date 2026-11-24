@@ -6,7 +6,10 @@ const mocks = vi.hoisted(() => ({
     userId: string;
     claims: unknown;
     supabase: {
-      rpc: (name: string, args: unknown) => PromiseLike<{ data: unknown; error: unknown }>;
+      rpc: (
+        name: string,
+        args: unknown,
+      ) => PromiseLike<{ data: unknown; error: unknown }>;
       from: (name: string) => unknown;
     };
   },
@@ -28,15 +31,23 @@ vi.mock("@tanstack/react-start", () => ({
         validate = validator;
         return builder;
       },
-      handler: (handler: (args: unknown) => unknown) => async (args?: { data?: unknown }) => {
-        if (protectedEndpoint && !mocks.context) throw new Error("Unauthorized");
-        return handler({ context: mocks.context, data: validate(args?.data) });
-      },
+      handler:
+        (handler: (args: unknown) => unknown) =>
+        async (args?: { data?: unknown }) => {
+          if (protectedEndpoint && !mocks.context)
+            throw new Error("Unauthorized");
+          return handler({
+            context: mocks.context,
+            data: validate(args?.data),
+          });
+        },
     };
     return builder;
   },
 }));
-vi.mock("@/integrations/supabase/auth-middleware", () => ({ requireSupabaseAuth: {} }));
+vi.mock("@/integrations/supabase/auth-middleware", () => ({
+  requireSupabaseAuth: {},
+}));
 
 import { saveFeatureFlags } from "@/lib/admin.functions";
 import { readNavigation } from "@/lib/navigation.shared";
@@ -52,7 +63,9 @@ beforeEach(() => {
   mocks.update.mockReset();
   mocks.update.mockReturnValue(Promise.resolve({ error: null }));
   mocks.from.mockReset();
-  mocks.from.mockReturnValue({ update: () => ({ eq: () => Promise.resolve({ error: null }) }) });
+  mocks.from.mockReturnValue({
+    update: () => ({ eq: () => Promise.resolve({ error: null }) }),
+  });
   mocks.context = {
     userId: "11111111-1111-1111-1111-111111111111",
     claims: { email: "admin@e20e.tools" },
@@ -68,17 +81,27 @@ beforeEach(() => {
 
 describe("site feature flags", () => {
   it("turns Archy off and on independently of support and other features", () => {
-    const off = normalizeFeatureFlags({ ...defaultFeatureFlags, assistant: false });
+    const off = normalizeFeatureFlags({
+      ...defaultFeatureFlags,
+      assistant: false,
+    });
     expect(featureEnabled(off, "assistant")).toBe(false);
     expect(featureEnabled(off, "support")).toBe(true);
-    expect(featureEnabled(normalizeFeatureFlags({ ...off, assistant: true }), "assistant")).toBe(
-      true,
-    );
+    expect(
+      featureEnabled(
+        normalizeFeatureFlags({ ...off, assistant: true }),
+        "assistant",
+      ),
+    ).toBe(true);
   });
   it("defaults every feature to on and keeps only explicit switches", () => {
     expect(normalizeFeatureFlags(null)).toEqual(defaultFeatureFlags);
     expect(
-      normalizeFeatureFlags({ support: false, nonsense: false, recommendations: "no" }),
+      normalizeFeatureFlags({
+        support: false,
+        nonsense: false,
+        recommendations: "no",
+      }),
     ).toEqual({ ...defaultFeatureFlags, support: false });
   });
 
@@ -95,7 +118,9 @@ describe("site feature flags", () => {
     expect(isDisabledFeaturePath(flags, "/affiliates")).toBe(true);
     expect(isDisabledFeaturePath(flags, "/support")).toBe(true);
     expect(isDisabledFeaturePath(flags, "/")).toBe(false);
-    expect(isDisabledFeaturePath(flags, "https://www.dt.guide/courses/")).toBe(false);
+    expect(isDisabledFeaturePath(flags, "https://www.dt.guide/courses/")).toBe(
+      false,
+    );
   });
 
   it("covers the newer pages: enterprise services, testimonials, terms and contact", () => {
@@ -107,7 +132,9 @@ describe("site feature flags", () => {
       contact: false,
     };
     expect(isDisabledFeaturePath(flags, "/enterprise-services")).toBe(true);
-    expect(isDisabledFeaturePath(flags, "/enterprise-services/request")).toBe(true);
+    expect(isDisabledFeaturePath(flags, "/enterprise-services/request")).toBe(
+      true,
+    );
     expect(isDisabledFeaturePath(flags, "/testimonials")).toBe(true);
     expect(isDisabledFeaturePath(flags, "/terms")).toBe(true);
     expect(isDisabledFeaturePath(flags, "/contact")).toBe(true);
@@ -128,7 +155,13 @@ describe("site feature flags", () => {
 describe("hidden menu items", () => {
   it("keeps hidden items in the saved list and marks them hidden", () => {
     const items = readNavigation([
-      { id: "home", labelAr: "الرئيسية", labelEn: "Home", url: "/", cta: false },
+      {
+        id: "home",
+        labelAr: "الرئيسية",
+        labelEn: "Home",
+        url: "/",
+        cta: false,
+      },
       {
         id: "blog",
         labelAr: "من نحن",
@@ -147,17 +180,24 @@ describe("hidden menu items", () => {
 describe("feature flags endpoint", () => {
   it("rejects anonymous callers", async () => {
     mocks.context = null;
-    await expect(saveFeatureFlags({ data: defaultFeatureFlags })).rejects.toThrow("Unauthorized");
+    await expect(
+      saveFeatureFlags({ data: defaultFeatureFlags }),
+    ).rejects.toThrow("Unauthorized");
   });
 
   it("rejects non-admin sessions", async () => {
-    mocks.context!.supabase.rpc = () => Promise.resolve({ data: false, error: null });
-    await expect(saveFeatureFlags({ data: defaultFeatureFlags })).rejects.toThrow("مخصّصة للإدارة");
+    mocks.context!.supabase.rpc = () =>
+      Promise.resolve({ data: false, error: null });
+    await expect(
+      saveFeatureFlags({ data: defaultFeatureFlags }),
+    ).rejects.toThrow("مخصّصة للإدارة");
   });
 
   it("requires every feature key and ignores unknown ones", async () => {
     // Unknown keys are stripped; every known key is required.
-    await expect(saveFeatureFlags({ data: { assistant: true } })).rejects.toThrow();
+    await expect(
+      saveFeatureFlags({ data: { assistant: true } }),
+    ).rejects.toThrow();
     const result = await saveFeatureFlags({
       data: { ...defaultFeatureFlags, extra: true } as Record<string, boolean>,
     });

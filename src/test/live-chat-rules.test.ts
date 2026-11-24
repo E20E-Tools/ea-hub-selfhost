@@ -1,5 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { cleanMessage, isWithPerson, retentionCutoff } from "@/lib/live-chat.shared";
+import {
+  cleanMessage,
+  isWithPerson,
+  retentionCutoff,
+} from "@/lib/live-chat.shared";
 
 describe("live chat rules", () => {
   it("keeps chats for three months (90 days)", () => {

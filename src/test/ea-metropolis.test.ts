@@ -11,12 +11,16 @@ import {
 describe("isometric placement", () => {
   for (const n of [1, 6, 12]) {
     const lots = layoutCity(n);
-    const fps = lots.map((l, i) => buildingFor(`p${i}`, i % 7, [l.cx, l.cy]).footprint);
+    const fps = lots.map(
+      (l, i) => buildingFor(`p${i}`, i % 7, [l.cx, l.cy]).footprint,
+    );
     it(`${n} products: one lot each, no overlapping footprints, clear of HQ`, () => {
       expect(lots).toHaveLength(n);
       fps.forEach((a, i) => {
         expect(footprintsOverlap(a, HQ)).toBe(false);
-        fps.slice(i + 1).forEach((b) => expect(footprintsOverlap(a, b)).toBe(false));
+        fps
+          .slice(i + 1)
+          .forEach((b) => expect(footprintsOverlap(a, b)).toBe(false));
         // building stays inside its own 2×2 lot
         const lot = lots[i]!.footprint;
         expect(a.x).toBeGreaterThanOrEqual(lot.x);
@@ -27,7 +31,9 @@ describe("isometric placement", () => {
       for (const l of lots) {
         const r = l.route;
         for (let i = 1; i < r.length; i++)
-          expect(r[i - 1]![0] === r[i]![0] || r[i - 1]![1] === r[i]![1]).toBe(true);
+          expect(r[i - 1]![0] === r[i]![0] || r[i - 1]![1] === r[i]![1]).toBe(
+            true,
+          );
         const [ex, ey] = r[r.length - 1]!;
         expect(Math.abs(ex) === 1.5 || Math.abs(ey) === 1.5).toBe(true);
         expect(Math.abs(ex)).toBeLessThanOrEqual(1.5);
@@ -40,13 +46,24 @@ describe("isometric placement", () => {
 
 describe("building generator", () => {
   it("is deterministic per product id", () => {
-    expect(buildingFor("archone", 5, [3, 3])).toEqual(buildingFor("archone", 5, [3, 3]));
+    expect(buildingFor("archone", 5, [3, 3])).toEqual(
+      buildingFor("archone", 5, [3, 3]),
+    );
   });
   it("varies silhouettes across ids and grows with features", () => {
     const kinds = new Set(
-      ["landscape", "radar", "archone", "itfm", "innovation", "platform", "a", "b", "c", "d"].map(
-        (id) => buildingFor(id, 3, [0, 3]).kind,
-      ),
+      [
+        "landscape",
+        "radar",
+        "archone",
+        "itfm",
+        "innovation",
+        "platform",
+        "a",
+        "b",
+        "c",
+        "d",
+      ].map((id) => buildingFor(id, 3, [0, 3]).kind),
     );
     expect(kinds.size).toBeGreaterThanOrEqual(3);
     expect(buildingFor("radar", 6, [3, 0]).height).toBeGreaterThan(

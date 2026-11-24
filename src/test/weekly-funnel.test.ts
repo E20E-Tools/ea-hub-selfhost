@@ -12,7 +12,9 @@ describe("weekly funnel", () => {
   });
 
   it("crosses month and year boundaries", () => {
-    expect(weekWindows(1, "2026-01-03")).toEqual([{ from: "2025-12-28", to: "2026-01-03" }]);
+    expect(weekWindows(1, "2026-01-03")).toEqual([
+      { from: "2025-12-28", to: "2026-01-03" },
+    ]);
   });
 
   it("gives waitlist answers per 100 product viewers, or null with no viewers", () => {
