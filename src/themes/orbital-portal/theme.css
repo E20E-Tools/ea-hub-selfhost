@@ -4,8 +4,10 @@
   --orb-glow: #3ee39a;
   --orb-soft: #b7d9c9;
   --orb-amber: #e6b25c;
-  --orb-sans: "Sora", "IBM Plex Sans Arabic", sans-serif;
-  --orb-mono: "JetBrains Mono", monospace;
+  --orb-sans:
+    "Cairo Variable", "Cairo", "IBM Plex Sans Arabic", Arial, sans-serif;
+  --orb-mono:
+    "Cairo Variable", "Cairo", "IBM Plex Sans Arabic", Arial, sans-serif;
 }
 
 .theme-stage[data-stage="orbital-portal"] {

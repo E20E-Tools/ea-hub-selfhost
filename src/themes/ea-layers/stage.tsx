@@ -97,7 +97,7 @@ export default function EaLayersStage({ products, settings }: StageProps) {
         ctx.fillStyle = "#0F1730";
         ctx.direction = rtl ? "rtl" : "ltr";
         ctx.textAlign = rtl ? "right" : "left";
-        ctx.font = `600 ${mobile ? 12 : 14}px "Sora", "IBM Plex Sans Arabic", sans-serif`;
+        ctx.font = `600 ${mobile ? 12 : 14}px "Cairo Variable", "Cairo", sans-serif`;
         ctx.fillText(
           t(LABEL_KEY[layer]),
           edge.x + (rtl ? -10 : 10),
@@ -129,7 +129,7 @@ export default function EaLayersStage({ products, settings }: StageProps) {
           ctx.fillStyle = "#FFFFFF";
           ctx.textAlign = "center";
           ctx.direction = "ltr";
-          ctx.font = `700 ${mobile ? 11 : 13}px "Sora", sans-serif`;
+          ctx.font = `700 ${mobile ? 11 : 13}px "Cairo Variable", "Cairo", sans-serif`;
           let label = p.name;
           while (label.length > 3 && ctx.measureText(label).width > w - 10)
             label = label.slice(0, -1);

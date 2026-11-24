@@ -5,8 +5,10 @@
   --mc-gold: #f4b860;
   --mc-teal: #39c5bb;
   --mc-text: oklch(0.95 0.015 260);
-  --mc-latin: "Space Grotesk", "Alexandria", sans-serif;
-  --mc-arabic: "Alexandria", "Space Grotesk", sans-serif;
+  --mc-latin:
+    "Cairo Variable", "Cairo", "IBM Plex Sans Arabic", Arial, sans-serif;
+  --mc-arabic:
+    "Cairo Variable", "Cairo", "IBM Plex Sans Arabic", Arial, sans-serif;
 
   color-scheme: dark;
   --background: oklch(0.2 0.05 270);

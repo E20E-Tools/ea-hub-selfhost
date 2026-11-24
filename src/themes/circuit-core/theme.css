@@ -8,8 +8,10 @@
   --cc-amber: oklch(0.806 0.147 79);
   --cc-green: oklch(0.8 0.19 140);
   --cc-text: oklch(0.946 0.017 164.7);
-  --cc-mono: "IBM Plex Mono", ui-monospace, monospace;
-  --cc-display: "Handjet", "IBM Plex Sans Arabic", sans-serif;
+  --cc-mono:
+    "Cairo Variable", "Cairo", "IBM Plex Sans Arabic", Arial, sans-serif;
+  --cc-display:
+    "Cairo Variable", "Cairo", "IBM Plex Sans Arabic", Arial, sans-serif;
 
   color-scheme: dark;
   --background: var(--cc-board);
@@ -52,7 +54,8 @@
 
 /* ---------- Visitor surface skin ---------- */
 :root[data-design-theme="circuit-core"] [data-surface="site"] {
-  --font-sans: "IBM Plex Sans Arabic", "Alexandria", sans-serif;
+  --font-sans:
+    "Cairo Variable", "Cairo", "IBM Plex Sans Arabic", Arial, sans-serif;
   --font-display: var(--cc-display);
   font-family: var(--font-sans);
   background-color: var(--cc-board);
@@ -649,7 +652,8 @@
   color: var(--cc-lime);
 }
 .cc-inspect-desc {
-  font-family: "IBM Plex Sans Arabic", sans-serif;
+  font-family:
+    "Cairo Variable", "Cairo", "IBM Plex Sans Arabic", Arial, sans-serif;
   line-height: 1.6;
   color: oklch(0.85 0.02 170);
 }

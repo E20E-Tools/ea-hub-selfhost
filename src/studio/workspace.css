@@ -524,7 +524,8 @@
   color: var(--ea-accent);
 }
 :root[data-studio="journal"] :is(.nx-card-copy h2, .s-enterprise h1) {
-  font-family: Georgia, "IBM Plex Sans Arabic", serif;
+  font-family:
+    "Cairo Variable", "Cairo", "IBM Plex Sans Arabic", Arial, sans-serif;
 }
 @media (max-width: 900px) {
   .nx-primary {

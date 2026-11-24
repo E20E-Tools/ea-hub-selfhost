@@ -10,8 +10,10 @@
   --os-edge: oklch(1 0 0 / 0.16);
   --os-shadow:
     0 30px 70px -24px oklch(0 0 0 / 0.75), 0 0 0 0.5px oklch(1 0 0 / 0.12);
-  --os-display: "Sora", "IBM Plex Sans Arabic", sans-serif;
-  --os-mono: "JetBrains Mono", ui-monospace, monospace;
+  --os-display:
+    "Cairo Variable", "Cairo", "IBM Plex Sans Arabic", Arial, sans-serif;
+  --os-mono:
+    "Cairo Variable", "Cairo", "IBM Plex Sans Arabic", Arial, sans-serif;
 
   color-scheme: dark;
   --background: var(--os-navy);
@@ -54,7 +56,8 @@
 
 /* ---------- Visitor surface skin ---------- */
 :root[data-design-theme="e20e-os"] [data-surface="site"] {
-  --font-sans: "IBM Plex Sans Arabic", "Sora", sans-serif;
+  --font-sans:
+    "Cairo Variable", "Cairo", "IBM Plex Sans Arabic", Arial, sans-serif;
   --font-display: var(--os-display);
   font-family: var(--font-sans);
   background:
@@ -217,7 +220,8 @@
   box-shadow: var(--os-shadow);
   color: var(--os-ink);
   isolation: isolate;
-  font-family: "IBM Plex Sans Arabic", "Sora", sans-serif;
+  font-family:
+    "Cairo Variable", "Cairo", "IBM Plex Sans Arabic", Arial, sans-serif;
   user-select: none;
 }
 .os-wallpaper {

@@ -636,7 +636,8 @@
   opacity: 0.85;
 }
 .sl-tiles strong {
-  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-family:
+    "Cairo Variable", "Cairo", "IBM Plex Sans Arabic", Arial, sans-serif;
   font-size: 30px;
   line-height: 1.1;
 }
@@ -697,7 +698,8 @@
   border-radius: 12px;
   background: var(--zone);
   color: #04110c;
-  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-family:
+    "Cairo Variable", "Cairo", "IBM Plex Sans Arabic", Arial, sans-serif;
   font-weight: 700;
 }
 .sl-zone > header h2 {
@@ -873,7 +875,8 @@
   color: var(--muted-foreground);
 }
 .sl-empty strong {
-  font-family: "JetBrains Mono", ui-monospace, monospace;
+  font-family:
+    "Cairo Variable", "Cairo", "IBM Plex Sans Arabic", Arial, sans-serif;
   font-size: 22px;
   color: #0f6b47;
 }

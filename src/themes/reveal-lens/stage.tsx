@@ -136,7 +136,7 @@ export default function RevealLensStage({ products, settings }: StageProps) {
         ctx.fillStyle = INK;
         ctx.textAlign = "center";
         ctx.direction = "ltr";
-        ctx.font = `15px "VT323", "IBM Plex Mono", monospace`;
+        ctx.font = `15px "Cairo Variable", "Cairo", sans-serif`;
         ctx.fillText(legacyFileName(product), f.x, f.y + 5, 136);
         ctx.direction = rtl ? "rtl" : "ltr";
       });
@@ -149,7 +149,7 @@ export default function RevealLensStage({ products, settings }: StageProps) {
       ctx.fillStyle = "#101814";
       ctx.fillRect(core.x - 98, core.y - 50, 196, 92);
       ctx.fillStyle = "#39FF6A";
-      ctx.font = `17px "VT323", "IBM Plex Mono", monospace`;
+      ctx.font = `17px "Cairo Variable", "Cairo", sans-serif`;
       ctx.fillText(t("ucCrt"), core.x, core.y, 186);
 
       // Digital world inside the lens.
@@ -210,7 +210,7 @@ export default function RevealLensStage({ products, settings }: StageProps) {
         ctx.fillStyle = "#FFFFFF";
         ctx.textAlign = "center";
         ctx.direction = "ltr";
-        ctx.font = `700 ${mobile ? 13 : 15}px "Sora", sans-serif`;
+        ctx.font = `700 ${mobile ? 13 : 15}px "Cairo Variable", "Cairo", sans-serif`;
         ctx.fillText(product.name, s.x, s.y + 5, chipW - 14);
         ctx.direction = rtl ? "rtl" : "ltr";
       });
@@ -229,7 +229,7 @@ export default function RevealLensStage({ products, settings }: StageProps) {
       ctx.roundRect(core.x - r, core.y - r, r * 2, r * 2, 16);
       ctx.fill();
       ctx.fillStyle = "#FFFFFF";
-      ctx.font = `700 20px "Sora", sans-serif`;
+      ctx.font = `700 20px "Cairo Variable", "Cairo", sans-serif`;
       ctx.fillText("E20E", core.x, core.y + 7);
       ctx.restore();
       if (radius < cover - 1) {

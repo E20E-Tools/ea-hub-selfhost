@@ -38,10 +38,10 @@ function titleTargets(
   const ctx = c.getContext("2d");
   if (!ctx) return [];
   let fontSize = mobile ? 56 : 120;
-  ctx.font = `800 ${fontSize}px "Sora", "IBM Plex Sans Arabic", sans-serif`;
+  ctx.font = `800 ${fontSize}px "Cairo Variable", "Cairo", sans-serif`;
   while (fontSize > 24 && ctx.measureText(text).width > w * 0.86) {
     fontSize -= 6;
-    ctx.font = `800 ${fontSize}px "Sora", "IBM Plex Sans Arabic", sans-serif`;
+    ctx.font = `800 ${fontSize}px "Cairo Variable", "Cairo", sans-serif`;
   }
   ctx.fillStyle = "#fff";
   ctx.textAlign = "center";
@@ -170,7 +170,7 @@ export default function ParticleForgeStage({ products, settings }: StageProps) {
         ctx.fillStyle = `rgba(255,255,255,${alpha})`;
         ctx.textAlign = "center";
         ctx.direction = "ltr";
-        ctx.font = `600 ${mobile ? 12 : 14}px "Sora", sans-serif`;
+        ctx.font = `600 ${mobile ? 12 : 14}px "Cairo Variable", "Cairo", sans-serif`;
         list.forEach((p, i) => {
           const cc = centres[i];
           if (cc)

@@ -21,8 +21,10 @@
   --library-highlight: oklch(0.8 0.14 210);
 }
 :root[data-design-theme="particle-forge"] [data-surface="site"] {
-  --font-sans: "Sora", "IBM Plex Sans Arabic", sans-serif;
-  font-family: "Sora", "IBM Plex Sans Arabic", sans-serif;
+  --font-sans:
+    "Cairo Variable", "Cairo", "IBM Plex Sans Arabic", Arial, sans-serif;
+  font-family:
+    "Cairo Variable", "Cairo", "IBM Plex Sans Arabic", Arial, sans-serif;
 }
 
 .pf-stage {
@@ -32,7 +34,8 @@
   border-radius: 22px;
   overflow: hidden;
   isolation: isolate;
-  font-family: "Sora", "IBM Plex Sans Arabic", sans-serif;
+  font-family:
+    "Cairo Variable", "Cairo", "IBM Plex Sans Arabic", Arial, sans-serif;
   border: 1px solid var(--border);
 }
 .pf-stage canvas {

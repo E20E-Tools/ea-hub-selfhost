@@ -9,7 +9,8 @@
   --console-ink: var(--ea-ink, oklch(29.9% 0.033 160));
   --console-muted: var(--ea-muted, oklch(49.1% 0.027 160));
   --console-accent: var(--ea-accent, oklch(49.3% 0.094 160));
-  font-family: "Geist", "IBM Plex Sans Arabic", system-ui, sans-serif;
+  font-family:
+    "Cairo Variable", "Cairo", "IBM Plex Sans Arabic", Arial, sans-serif;
 }
 .ea-console,
 .ea-auth,

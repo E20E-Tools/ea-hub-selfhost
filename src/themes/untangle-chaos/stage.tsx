@@ -282,10 +282,10 @@ export default function UntangleChaosStage({ products, settings }: StageProps) {
         );
         ctx.fill();
         ctx.fillStyle = "#39FF6A";
-        ctx.font = `${mobile ? 15 : 18}px "VT323", "IBM Plex Mono", monospace`;
+        ctx.font = `${mobile ? 15 : 18}px "Cairo Variable", "Cairo", sans-serif`;
         ctx.textAlign = "center";
         ctx.fillText(t("ucCrt"), core.x, core.y - coreH / 2 + 32);
-        ctx.font = `${mobile ? 13 : 15}px "VT323", "IBM Plex Mono", monospace`;
+        ctx.font = `${mobile ? 13 : 15}px "Cairo Variable", "Cairo", sans-serif`;
         log.current
           .slice(-3)
           .forEach((line, k) =>
@@ -332,10 +332,10 @@ export default function UntangleChaosStage({ products, settings }: StageProps) {
         ctx.setLineDash([]);
         ctx.fillStyle = "#FFFFFF";
         ctx.textAlign = "center";
-        ctx.font = `700 ${mobile ? 18 : 22}px "Sora", sans-serif`;
+        ctx.font = `700 ${mobile ? 18 : 22}px "Cairo Variable", "Cairo", sans-serif`;
         ctx.fillText("E20E", core.x, core.y + 4);
         ctx.fillStyle = "#0F1730";
-        ctx.font = `600 13px "Sora", "IBM Plex Sans Arabic", sans-serif`;
+        ctx.font = `600 13px "Cairo Variable", "Cairo", sans-serif`;
         ctx.fillText(t("ucRunning"), core.x, core.y + r + 38);
       }
 
@@ -369,7 +369,7 @@ export default function UntangleChaosStage({ products, settings }: StageProps) {
           ctx.setLineDash([]);
           ctx.fillStyle = INK;
           ctx.textAlign = "center";
-          ctx.font = `${mobile ? 14 : 16}px "VT323", "IBM Plex Mono", monospace`;
+          ctx.font = `${mobile ? 14 : 16}px "Cairo Variable", "Cairo", sans-serif`;
           ctx.direction = "ltr";
           const label = legacyFileName(product);
           ctx.fillText(
@@ -414,7 +414,7 @@ export default function UntangleChaosStage({ products, settings }: StageProps) {
           ctx.fillStyle = "#FFFFFF";
           ctx.textAlign = "center";
           ctx.direction = "ltr";
-          ctx.font = `700 ${mobile ? 14 : 16}px "Sora", sans-serif`;
+          ctx.font = `700 ${mobile ? 14 : 16}px "Cairo Variable", "Cairo", sans-serif`;
           ctx.fillText(
             product.name,
             0,
@@ -423,7 +423,7 @@ export default function UntangleChaosStage({ products, settings }: StageProps) {
           );
           if (product.comingSoon) {
             ctx.direction = rtl ? "rtl" : "ltr";
-            ctx.font = `500 11px "Sora", "IBM Plex Sans Arabic", sans-serif`;
+            ctx.font = `500 11px "Cairo Variable", "Cairo", sans-serif`;
             ctx.fillText(t("comingSoonBadge"), 0, 16, cardW - 16);
           }
           ctx.restore();

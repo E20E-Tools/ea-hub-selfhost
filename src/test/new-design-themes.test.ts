@@ -56,7 +56,7 @@ describe("six new designs are registered", () => {
       ).toBeTruthy();
       expect(THEME_STAGES[id]).toBeDefined();
       expect(THEME_THUMBS[id]).toBeTypeOf("function");
-      expect(THEME_FONT_FAMILIES[id]).toContain("Sora");
+      expect(THEME_FONT_FAMILIES[id]).toEqual([]);
     },
   );
   it("does not change the default design", () =>

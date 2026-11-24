@@ -246,12 +246,8 @@ describe("4) dedicated APP_ENCRYPTION_KEY with the old key as fallback", () => {
 });
 
 describe("5) only the active design's fonts are loaded", () => {
-  it("loads nothing extra for Classic and only its own families for each design", () => {
-    expect(themeFontsHref("classic")).toBe("");
-    const board = themeFontsHref("transformation-board");
-    expect(board).toContain("family=Sora");
-    expect(board).not.toContain("Orbitron");
-    expect(board).not.toContain("Handjet");
+  it("loads no extra web fonts for any design: every design uses the bundled Cairo", () => {
+    for (const id of DESIGN_THEME_IDS) expect(themeFontsHref(id), id).toBe("");
   });
   it("covers every font family each design's stylesheet uses", () => {
     const known = new Set(Object.values(THEME_FONT_FAMILIES).flat());

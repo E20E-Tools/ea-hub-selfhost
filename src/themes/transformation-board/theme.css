@@ -8,9 +8,11 @@
   --tb-ink: #4a4536;
   --tb-phosphor: #39ff6a;
   --tb-grad: linear-gradient(110deg, #2f6bff, #00d4ff 50%, #8b5cf6);
-  --tb-sans: "Sora", "IBM Plex Sans Arabic", sans-serif;
-  --tb-mono: "IBM Plex Mono", ui-monospace, monospace;
-  --tb-vt: "VT323", "IBM Plex Mono", monospace;
+  --tb-sans:
+    "Cairo Variable", "Cairo", "IBM Plex Sans Arabic", Arial, sans-serif;
+  --tb-mono:
+    "Cairo Variable", "Cairo", "IBM Plex Sans Arabic", Arial, sans-serif;
+  --tb-vt: "Cairo Variable", "Cairo", "IBM Plex Sans Arabic", Arial, sans-serif;
 
   color-scheme: light;
   --background: oklch(0.985 0.003 250);
