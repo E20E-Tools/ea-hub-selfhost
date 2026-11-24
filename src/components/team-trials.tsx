@@ -116,7 +116,8 @@ function TrialCard({ t, ar }: { t: Trial; ar: boolean }) {
       </h2>
       <p>{t.goal}</p>
       <p>
-        {label("المسؤول", "Owner")} · {t.owner}　
+        {label("المسؤول", "Owner")} · {t.owner}
+        {"　"}
         {label("تاريخ المراجعة", "Review date")} ·{" "}
         <time dateTime={t.date}>{t.date}</time>
       </p>

@@ -132,19 +132,15 @@ beforeEach(() => {
   mocks.tourSupport.mockReset();
   mocks.journey.mockReset().mockResolvedValue(true);
   mocks.uploads = [];
-  mocks.verifyVisitor
-    .mockReset()
-    .mockResolvedValue({
-      id: "guest-current",
-      name: "Khaled",
-      email: "ea@example.com",
-    });
-  mocks.openChatFor
-    .mockReset()
-    .mockResolvedValue({
-      id: "f8bcd11c-a841-40d4-a501-13b8f28d74ca",
-      status: "ai",
-    });
+  mocks.verifyVisitor.mockReset().mockResolvedValue({
+    id: "guest-current",
+    name: "Khaled",
+    email: "ea@example.com",
+  });
+  mocks.openChatFor.mockReset().mockResolvedValue({
+    id: "f8bcd11c-a841-40d4-a501-13b8f28d74ca",
+    status: "ai",
+  });
 });
 
 describe("unified request validation", () => {

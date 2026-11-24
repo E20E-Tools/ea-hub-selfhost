@@ -107,14 +107,12 @@ export const saveRegistrationPolicy = createServerFn({ method: "POST" })
       updated_by: actorEmail(context.claims),
     });
     if (error) throw Error("Registration policy could not be saved");
-    await supabaseAdmin
-      .from("admin_activity")
-      .insert({
-        actor_id: context.userId,
-        actor_email: actorEmail(context.claims),
-        action: "ai.registration-policy",
-        target: data.limit + " / " + data.minutes + " min",
-      });
+    await supabaseAdmin.from("admin_activity").insert({
+      actor_id: context.userId,
+      actor_email: actorEmail(context.claims),
+      action: "ai.registration-policy",
+      target: data.limit + " / " + data.minutes + " min",
+    });
     return { ok: true };
   });
 
@@ -292,16 +290,14 @@ export const testArchyChat = createServerFn({ method: "POST" })
       try {
         const { supabaseAdmin } =
           await import("@/integrations/supabase/client.server");
-        await supabaseAdmin
-          .from("archy_probe")
-          .upsert({
-            engine: data.engine ?? "saved",
-            succeeded,
-            source,
-            model,
-            elapsed_ms: Date.now() - started,
-            checked_at: new Date().toISOString(),
-          });
+        await supabaseAdmin.from("archy_probe").upsert({
+          engine: data.engine ?? "saved",
+          succeeded,
+          source,
+          model,
+          elapsed_ms: Date.now() - started,
+          checked_at: new Date().toISOString(),
+        });
       } catch {
         /* Monitoring does not block a reply. */
       }

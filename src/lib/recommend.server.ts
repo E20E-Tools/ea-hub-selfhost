@@ -287,7 +287,7 @@ function citeAnswer(
   );
   const links = sources.map((p) => {
     const path = "/product/" + encodeURIComponent(p.id);
-    const label = p.name.replace(/[\[\]]/g, "");
+    const label = p.name.replace(/[[\]]/g, "");
     return p.comingSoon
       ? `[${label} · ${ar ? "قريبًا · طريقة الحصول عليها" : "Coming soon · acquisition"}](${path}#access)`
       : `[${label} · ${ar ? "الإمكانات" : "Capabilities"}](${path}#capabilities) · [${ar ? "الملاءمة" : "Fit"}](${path}#fit)`;

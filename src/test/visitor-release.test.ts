@@ -106,13 +106,11 @@ it("registers a visitor, serves a reply and stores its model and the visitor rat
     const { supabaseAdmin } =
       await import("@/integrations/supabase/client.server");
     // Two different browsers use the same transport/IP. Only the first visitor should hit their quota.
-    const policy = await supabaseAdmin
-      .from("ai_assistant_settings")
-      .upsert({
-        id: true,
-        registration_limit: 2,
-        registration_wait_minutes: 3,
-      });
+    const policy = await supabaseAdmin.from("ai_assistant_settings").upsert({
+      id: true,
+      registration_limit: 2,
+      registration_wait_minutes: 3,
+    });
     expect(policy.error).toBeNull();
     async function registerAgain() {
       const c = await getAssistantChallenge();
