@@ -6,10 +6,14 @@
   --lb-white: #ffffff;
   --lb-red: #ff6b6b;
   --lb-ink: #0d3b78;
-  --lb-mono: "IBM Plex Mono", ui-monospace, monospace;
-  --lb-hand: "Architects Daughter", "Aref Ruqaa", cursive;
-  --lb-hand-ar: "Aref Ruqaa", "IBM Plex Sans Arabic", serif;
-  --lb-body: "IBM Plex Sans Arabic", "IBM Plex Mono", sans-serif;
+  --lb-mono:
+    "Cairo Variable", "Cairo", "IBM Plex Sans Arabic", Arial, sans-serif;
+  --lb-hand:
+    "Cairo Variable", "Cairo", "IBM Plex Sans Arabic", Arial, sans-serif;
+  --lb-hand-ar:
+    "Cairo Variable", "Cairo", "IBM Plex Sans Arabic", Arial, sans-serif;
+  --lb-body:
+    "Cairo Variable", "Cairo", "IBM Plex Sans Arabic", Arial, sans-serif;
 
   color-scheme: light;
   --background: oklch(0.99 0.004 250);

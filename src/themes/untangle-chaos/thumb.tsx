@@ -47,7 +47,7 @@ export function UntangleChaosThumb() {
         textAnchor="middle"
         fontSize="11"
         fill="#39FF6A"
-        fontFamily="monospace"
+        fontFamily='"Cairo Variable", "Cairo", sans-serif'
       >
         E20E.EXE
       </text>

@@ -7,8 +7,10 @@
   --tmig-paper: #f2f5f3;
   --tmig-line: #d5e1db;
   --tmig-amber: #ffbf5a;
-  --tmig-sans: "Sora", "IBM Plex Sans Arabic", sans-serif;
-  --tmig-mono: "JetBrains Mono", monospace;
+  --tmig-sans:
+    "Cairo Variable", "Cairo", "IBM Plex Sans Arabic", Arial, sans-serif;
+  --tmig-mono:
+    "Cairo Variable", "Cairo", "IBM Plex Sans Arabic", Arial, sans-serif;
 }
 
 .theme-stage[data-stage="terminal-migration"] {
@@ -64,7 +66,8 @@
 .tmig-crt pre {
   margin: 0;
   padding: 20px 22px;
-  font-family: "VT323", var(--tmig-mono);
+  font-family:
+    "Cairo Variable", "Cairo", "IBM Plex Sans Arabic", Arial, sans-serif;
   font-size: 20px;
   line-height: 1.45;
   color: var(--tmig-amber);

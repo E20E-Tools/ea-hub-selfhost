@@ -96,8 +96,8 @@ export const defaultSettings: SiteSettings = {
   ],
   logoUrl: "",
   logoPath: "",
-  headingFont: "Alexandria",
-  bodyFont: "Alexandria",
+  headingFont: "Cairo",
+  bodyFont: "Cairo",
   categories: {
     architecture: "البنية المؤسسية",
     technology: "إدارة التقنيات",
@@ -433,6 +433,7 @@ export type FontChoice = {
 };
 
 export const bundledFonts = [
+  "Cairo",
   "Geist",
   "Signifier",
   "IBM Plex Sans Arabic",
@@ -516,9 +517,12 @@ export function pickerFonts(local: boolean, saved: string): FontChoice[] {
 }
 
 export function siteFontStack(id: string): string {
-  const head = isKnownFont(id) ? id : "Geist";
+  const head = isKnownFont(id) ? id : "Cairo";
+  // Cairo is bundled as the variable font "Cairo Variable"; it is also the fallback for
+  // any other choice so missing glyphs never drop to a system font.
+  const faces = head === "Cairo" ? ["Cairo Variable", "Cairo"] : [head];
   return (
-    [...new Set([head, "IBM Plex Sans Arabic", "Geist"])]
+    [...new Set([...faces, "Cairo Variable", "Cairo", "IBM Plex Sans Arabic"])]
       .map((face) => `"${face}"`)
       .join(",") + ",Arial,sans-serif"
   );

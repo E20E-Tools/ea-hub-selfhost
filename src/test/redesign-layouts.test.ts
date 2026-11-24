@@ -27,7 +27,7 @@ describe("three new homepage designs", () => {
       expect(DESIGN_THEME_IDS).toContain(id);
       expect(THEME_STAGES[id]).toBeDefined();
       expect(THEME_THUMBS[id]).toBeTypeOf("function");
-      expect(THEME_FONT_FAMILIES[id]).toContain("IBM Plex Sans Arabic");
+      expect(THEME_FONT_FAMILIES[id]).toEqual([]);
     },
   );
   it("time scanner moves products across the beam in order, inside 20–80%", () => {

@@ -103,7 +103,7 @@ describe("Admin input safety", () => {
       bodyFont: "Tajawal",
       colors: { "--primary": "url(https://evil/x)", "--background": "#FFFFFF" },
     });
-    expect(css).toContain('--font-display:"Alexandria"');
+    expect(css).toContain('--font-display:"Cairo Variable","Cairo"');
     expect(css).toContain('--font-sans:"Tajawal"');
     expect(css).toContain("--background:#FFFFFF");
     expect(css).toContain('[data-surface="site"]{--ea-paper:#FFFFFF}');

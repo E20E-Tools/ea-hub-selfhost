@@ -6,8 +6,10 @@
   --tscan-soft: #a9cfbe;
   --tscan-paper: #e9e1cf;
   --tscan-amber: #e6b25c;
-  --tscan-sans: "Sora", "IBM Plex Sans Arabic", sans-serif;
-  --tscan-mono: "JetBrains Mono", monospace;
+  --tscan-sans:
+    "Cairo Variable", "Cairo", "IBM Plex Sans Arabic", Arial, sans-serif;
+  --tscan-mono:
+    "Cairo Variable", "Cairo", "IBM Plex Sans Arabic", Arial, sans-serif;
 }
 
 .theme-stage[data-stage="time-scanner"] {

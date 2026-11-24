@@ -8,8 +8,10 @@
   --gx-ink: oklch(0.95 0.01 260);
   --gx-ink-2: oklch(0.8 0.03 250);
   --gx-panel: oklch(0.19 0.05 270 / 0.88);
-  --gx-display: "Orbitron", "Alexandria", "Tajawal", sans-serif;
-  --gx-body: "Space Grotesk", "IBM Plex Sans Arabic", "Alexandria", sans-serif;
+  --gx-display:
+    "Cairo Variable", "Cairo", "IBM Plex Sans Arabic", Arial, sans-serif;
+  --gx-body:
+    "Cairo Variable", "Cairo", "IBM Plex Sans Arabic", Arial, sans-serif;
 
   color-scheme: dark;
   --background: var(--gx-void);
@@ -89,7 +91,8 @@
   }
   &[dir="rtl"] :is(h1, h2, h3, .home-section-title),
   & [dir="rtl"] :is(h2, .home-section-title) {
-    font-family: "Alexandria", "Tajawal", sans-serif;
+    font-family:
+      "Cairo Variable", "Cairo", "IBM Plex Sans Arabic", Arial, sans-serif;
   }
   & :is(.product-category, .home-section-title) {
     text-transform: uppercase;
@@ -728,7 +731,8 @@
   color: var(--gx-cyan);
 }
 [dir="rtl"] .gx-eyebrow {
-  font-family: "Alexandria", sans-serif;
+  font-family:
+    "Cairo Variable", "Cairo", "IBM Plex Sans Arabic", Arial, sans-serif;
   letter-spacing: 0.04em;
 }
 .gx-title {
@@ -828,7 +832,8 @@
   color: var(--gx-cyan);
 }
 [dir="rtl"] .gx-hud .inspector-title {
-  font-family: "Alexandria", sans-serif;
+  font-family:
+    "Cairo Variable", "Cairo", "IBM Plex Sans Arabic", Arial, sans-serif;
   letter-spacing: 0;
 }
 .gx-hud .inspector-close {
@@ -852,7 +857,8 @@
   color: var(--gx-ink-2);
 }
 [dir="rtl"] .gx-telemetry dt {
-  font-family: "Alexandria", sans-serif;
+  font-family:
+    "Cairo Variable", "Cairo", "IBM Plex Sans Arabic", Arial, sans-serif;
   letter-spacing: 0;
 }
 .gx-telemetry dd {

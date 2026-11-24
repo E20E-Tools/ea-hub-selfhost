@@ -326,55 +326,30 @@ const FONT_FAMILIES = {
 } as const;
 export type ThemeFontFamily = keyof typeof FONT_FAMILIES;
 
-/** Fonts each design actually uses; Classic uses only the site fonts, so it loads nothing extra. */
+/** Every design now uses the site font (Cairo, bundled), so no design loads extra web fonts. */
 export const THEME_FONT_FAMILIES: Record<
   DesignThemeId,
   readonly ThemeFontFamily[]
 > = {
   classic: [],
-  "circuit-core": ["Handjet", "IBM Plex Mono", "IBM Plex Sans Arabic"],
-  "e20e-os": ["Sora", "IBM Plex Sans Arabic", "JetBrains Mono"],
-  "transformation-metro": ["Readex Pro", "IBM Plex Sans Arabic"],
-  "e20e-galaxy": [
-    "Orbitron",
-    "Space Grotesk",
-    "IBM Plex Sans Arabic",
-    "Tajawal",
-  ],
-  "digital-mashrabiya": ["Reem Kufi", "IBM Plex Sans Arabic"],
-  "legacy-to-digital": [
-    "Sora",
-    "IBM Plex Sans Arabic",
-    "VT323",
-    "IBM Plex Mono",
-  ],
-  "living-blueprint": [
-    "IBM Plex Mono",
-    "Architects Daughter",
-    "Aref Ruqaa",
-    "IBM Plex Sans Arabic",
-  ],
-  "ea-metropolis": ["Space Grotesk", "IBM Plex Mono"],
-  "transformation-board": [
-    "Sora",
-    "IBM Plex Sans Arabic",
-    "IBM Plex Mono",
-    "VT323",
-  ],
-  "untangle-chaos": ["Sora", "IBM Plex Sans Arabic", "VT323", "IBM Plex Mono"],
-  "reveal-lens": ["Sora", "IBM Plex Sans Arabic", "VT323", "IBM Plex Mono"],
-  "problem-to-tool": ["Sora", "IBM Plex Sans Arabic", "VT323", "IBM Plex Mono"],
-  "particle-forge": ["Sora", "IBM Plex Sans Arabic", "VT323", "IBM Plex Mono"],
-  "flip-deck": ["Sora", "IBM Plex Sans Arabic", "VT323", "IBM Plex Mono"],
-  "ea-layers": ["Sora", "IBM Plex Sans Arabic", "VT323", "IBM Plex Mono"],
-  "time-scanner": ["Sora", "IBM Plex Sans Arabic", "JetBrains Mono"],
-  "orbital-portal": ["Sora", "IBM Plex Sans Arabic", "JetBrains Mono"],
-  "terminal-migration": [
-    "Sora",
-    "IBM Plex Sans Arabic",
-    "JetBrains Mono",
-    "VT323",
-  ],
+  "circuit-core": [],
+  "e20e-os": [],
+  "transformation-metro": [],
+  "e20e-galaxy": [],
+  "digital-mashrabiya": [],
+  "legacy-to-digital": [],
+  "living-blueprint": [],
+  "ea-metropolis": [],
+  "transformation-board": [],
+  "untangle-chaos": [],
+  "reveal-lens": [],
+  "problem-to-tool": [],
+  "particle-forge": [],
+  "flip-deck": [],
+  "ea-layers": [],
+  "time-scanner": [],
+  "orbital-portal": [],
+  "terminal-migration": [],
 };
 
 function fontsHrefFor(families: readonly ThemeFontFamily[]): string {

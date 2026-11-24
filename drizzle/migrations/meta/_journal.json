@@ -617,6 +617,13 @@
       "when": 1795040721109,
       "tag": "0087_team_trials_rls",
       "breakpoints": true
+    },
+    {
+      "idx": 88,
+      "version": "7",
+      "when": 1795040781109,
+      "tag": "0088_site_font_cairo",
+      "breakpoints": true
     }
   ]
 }

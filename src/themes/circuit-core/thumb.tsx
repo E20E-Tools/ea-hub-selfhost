@@ -88,7 +88,7 @@ export function CircuitCoreThumb() {
         x="160"
         y="95"
         textAnchor="middle"
-        fontFamily="monospace"
+        fontFamily='"Cairo Variable", "Cairo", sans-serif'
         fontSize="11"
         fill="oklch(0.946 0.017 164.7)"
       >

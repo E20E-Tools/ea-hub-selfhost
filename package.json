@@ -29,6 +29,7 @@
   },
   "dependencies": {
     "@ai-sdk/openai": "^4.0.91",
+    "@fontsource-variable/cairo": "^5.3.0",
     "@fontsource/ibm-plex-sans-arabic": "^5.3.0",
     "@radix-ui/react-alert-dialog": "^1.1.15",
     "@radix-ui/react-dialog": "^1.1.15",
