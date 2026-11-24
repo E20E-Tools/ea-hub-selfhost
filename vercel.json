@@ -4,6 +4,10 @@
     {
       "path": "/api/public/jobs/newsletter",
       "schedule": "0 6 * * *"
+    },
+    {
+      "path": "/api/public/jobs/daily-cleanup",
+      "schedule": "30 2 * * *"
     }
   ]
 }
