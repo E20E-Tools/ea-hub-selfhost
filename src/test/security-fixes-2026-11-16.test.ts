@@ -3,15 +3,22 @@ import { readFileSync, existsSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import {
   applySecurityHeaders,
+  contentSecurityPolicy,
   CSP_ENFORCED,
 } from "@/lib/security-headers";
 import { turnsFromMessages } from "@/lib/live-chat.server";
 
 const headersFor = () => {
   const h = new Headers();
-  applySecurityHeaders(h);
+  applySecurityHeaders(h, []);
   return h;
 };
+const directive = (policy: string, name: string) =>
+  policy
+    .split("; ")
+    .find((d) => d.startsWith(`${name} `))
+    ?.split(" ")
+    .slice(1) ?? [];
 const migration = (tag: string) => readFileSync(`drizzle/migrations/${tag}.sql`, "utf8");
 
 describe("anti-framing headers", () => {
@@ -38,6 +45,28 @@ describe("anti-framing headers", () => {
     expect(CSP_ENFORCED).toContain("wss://*.supabase.co");
     expect(CSP_ENFORCED).toMatch(/img-src [^;]*blob:/);
     expect(CSP_ENFORCED).toMatch(/connect-src [^;]*blob:/);
+  });
+  it("adds the configured backend origin (and its websocket) once, ignoring non-http values", () => {
+    const policy = contentSecurityPolicy([
+      "http://127.0.0.1:54365",
+      "http://127.0.0.1:54365/",
+      "not a url",
+      "javascript:alert(1)",
+    ]);
+    const connect = directive(policy, "connect-src");
+    expect(connect).toEqual(
+      expect.arrayContaining(["http://127.0.0.1:54365", "ws://127.0.0.1:54365"]),
+    );
+    expect(connect.filter((s) => s.includes("54365"))).toHaveLength(2);
+    expect(directive(policy, "img-src")).toContain("http://127.0.0.1:54365");
+    expect(directive(policy, "img-src")).not.toContain("ws://127.0.0.1:54365");
+    expect(policy).not.toContain("javascript:");
+    expect(contentSecurityPolicy([])).toBe(CSP_ENFORCED);
+  });
+  it("does not replace a policy a route already set", () => {
+    const h = new Headers({ "content-security-policy": "default-src 'none'" });
+    applySecurityHeaders(h, ["http://127.0.0.1:54365"]);
+    expect(h.get("content-security-policy")).toBe("default-src 'none'");
   });
 });
 
