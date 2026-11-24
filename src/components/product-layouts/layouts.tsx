@@ -299,27 +299,27 @@ export function MissionLayout({
     {
       v: String(product.features.length),
       t: dictionaries[ar ? "ar" : "en"].layoutsCoreCapabilities,
-      c: "#3ee39a",
+      c: "var(--pl-accent-text)",
     },
     beneficiary.prerequisites?.length
       ? {
           v: String(beneficiary.prerequisites.length),
           t: dictionaries[ar ? "ar" : "en"].layoutsThingsToHaveReady,
-          c: "#e9f7f0",
+          c: "var(--pl-text)",
         }
       : null,
     beneficiary.integrations?.length
       ? {
           v: String(beneficiary.integrations.length),
           t: dictionaries[ar ? "ar" : "en"].layoutsIntegrations,
-          c: "#7fd1ff",
+          c: "var(--pl-info)",
         }
       : null,
     reviewed
       ? {
           v: reviewed,
           t: dictionaries[ar ? "ar" : "en"].layoutsLastReviewed,
-          c: "#e6b25c",
+          c: "var(--pl-warn-ink)",
           small: true,
         }
       : null,
