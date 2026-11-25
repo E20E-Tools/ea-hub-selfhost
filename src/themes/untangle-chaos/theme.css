@@ -143,8 +143,9 @@
   background: rgba(255, 255, 255, 0.92);
   color: #4a4536;
   font:
-    600 13px "IBM Plex Mono",
-    monospace;
+    600 13px "Cairo Variable",
+    "Cairo",
+    sans-serif;
 }
 .uc-btn {
   display: inline-flex;

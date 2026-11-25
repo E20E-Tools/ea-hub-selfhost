@@ -14,6 +14,7 @@ import {
   FAN_MS,
   STACK_MS,
   accentFor,
+  onAccentFor,
   deckSettledAt,
   fanPose,
   flipAngle,
@@ -74,6 +75,7 @@ export default function FlipDeckStage({ products, settings }: StageProps) {
           const toolShown = m ?? (mobile ? false : true);
           const style = {
             "--fd-accent": accentFor(i),
+            "--fd-on-accent": onAccentFor(i),
             zIndex: list.length - i,
           } as CSSProperties;
           return (

@@ -237,7 +237,11 @@
   grid-template-columns: minmax(0, 0.75fr) minmax(0, 1.6fr);
   align-items: center;
   gap: clamp(20px, 3vw, 48px);
-  padding-block: 28px 12px;
+  padding: 28px clamp(16px, 2.5vw, 32px) 12px;
+  /* The studio direction paints the site surface light, so the stage carries its own dark
+     board: the intro's light text is otherwise drawn on light paper (1.1:1). */
+  background: var(--cc-board);
+  border-radius: 8px;
   color: var(--cc-text);
 }
 .cc-stage[data-mobile] {
@@ -373,7 +377,7 @@
 }
 .cc-core small {
   font-family: var(--cc-mono);
-  font-size: clamp(8px, 1.25cqw, 12px);
+  font-size: clamp(11px, 1.25cqw, 13px);
   color: oklch(0.712 0.032 172.4);
   padding-inline: 8px;
 }
@@ -486,12 +490,12 @@
 .cc-code {
   font-family: var(--cc-mono);
   font-weight: 600;
-  font-size: clamp(9px, 1.75cqw, 16px);
+  font-size: clamp(12px, 1.75cqw, 16px);
   letter-spacing: 0.06em;
   white-space: nowrap;
 }
 .cc-sub {
-  font-size: clamp(8px, 1.2cqw, 12px);
+  font-size: clamp(11px, 1.2cqw, 13px);
   color: oklch(0.712 0.032 172.4);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -506,7 +510,7 @@
   line-height: 1.35;
   background: var(--cc-board);
   font-family: var(--cc-mono);
-  font-size: clamp(7px, 0.95cqw, 10px);
+  font-size: clamp(10px, 0.95cqw, 11px);
   letter-spacing: 0.12em;
   color: var(--cc-amber);
   border: 1px solid oklch(0.806 0.147 79 / 0.7);
@@ -514,19 +518,19 @@
   transform: translateY(-62%) rotate(-4deg);
 }
 .cc-stage[data-mobile] .cc-code {
-  font-size: 4.2cqw;
+  font-size: max(12px, 4.2cqw);
 }
 .cc-stage[data-mobile] .cc-sub {
-  font-size: 3cqw;
+  font-size: max(11px, 3cqw);
 }
 .cc-stage[data-mobile] .cc-core strong {
   font-size: 7cqw;
 }
 .cc-stage[data-mobile] .cc-core small {
-  font-size: 2.8cqw;
+  font-size: max(11px, 2.8cqw);
 }
 .cc-stage[data-mobile] .cc-stamp {
-  font-size: 2.3cqw;
+  font-size: max(10px, 2.3cqw);
 }
 
 .cc-console {
@@ -550,7 +554,7 @@
   padding: 7px 10px;
   border-bottom: 1px solid oklch(0.844 0.159 114.1 / 0.2);
   color: oklch(0.712 0.032 172.4);
-  font-size: 11px;
+  font-size: 12px;
 }
 .cc-console-bar i {
   width: 9px;

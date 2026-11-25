@@ -519,9 +519,9 @@
   unicode-bidi: plaintext;
   fill: #fff;
   font:
-    600 11px "IBM Plex Mono",
-    ui-monospace,
-    monospace;
+    600 12px "Cairo Variable",
+    "Cairo",
+    sans-serif;
   letter-spacing: 0.1em;
   text-transform: uppercase;
   paint-order: stroke;

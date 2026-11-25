@@ -162,7 +162,7 @@
     inset-inline-end: 8px;
     z-index: 4;
     padding: 1px 6px;
-    font: 600 10px var(--lb-mono);
+    font: 600 12px var(--lb-mono);
     letter-spacing: 0.08em;
     color: var(--lb-ink);
     background: #fff;
@@ -256,7 +256,7 @@
     inset-inline-end: 8px;
     padding: 3px 8px;
     border: 1px solid var(--lb-ink);
-    font: 600 10px var(--lb-mono);
+    font: 600 12px var(--lb-mono);
     letter-spacing: 0.1em;
     color: var(--lb-ink);
     background: #fff;
@@ -503,7 +503,7 @@
 }
 .lb-cross-text {
   fill: #ffe58a;
-  font: 500 11px var(--lb-mono);
+  font: 500 12px var(--lb-mono);
 }
 .lb-setsquare {
   fill: oklch(0.9 0.05 240 / 0.12);
@@ -590,7 +590,7 @@
   text-shadow: 0 0 1px var(--lb-blue);
 }
 .lb-room-cat {
-  font: 500 clamp(9px, 0.8vw, 11px) / 1.2 var(--lb-mono);
+  font: 500 clamp(11px, 0.8vw, 12px) / 1.2 var(--lb-mono);
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: var(--lb-line);
@@ -608,7 +608,7 @@
   border: 1px solid var(--lb-red);
   color: #ffd2d2;
   background: oklch(0.3 0.1 258 / 0.85);
-  font: 600 clamp(8px, 0.7vw, 10px) / 1.3 var(--lb-mono);
+  font: 600 clamp(11px, 0.7vw, 12px) / 1.3 var(--lb-mono);
   letter-spacing: 0.05em;
 }
 
@@ -624,7 +624,7 @@
   grid-template-columns: 1fr 1fr;
   border: 1.5px solid var(--lb-line);
   background: oklch(0.3 0.1 258 / 0.6);
-  font: 500 clamp(9px, 0.85vw, 11px) / 1.25 var(--lb-mono);
+  font: 500 clamp(11px, 0.85vw, 12px) / 1.25 var(--lb-mono);
   color: #fff;
 }
 .lb-tb-row {
@@ -655,7 +655,7 @@
   z-index: 1;
   margin: 0 12px 14px;
   block-size: auto;
-  font-size: 11px;
+  font-size: 12px;
 }
 
 /* Spec sheet (inspector) */
@@ -698,7 +698,7 @@
   --lb-slide-x: -40px;
 }
 .lb-sheet-panel .inspector-title {
-  font: 600 11px var(--lb-mono);
+  font: 600 12px var(--lb-mono);
   letter-spacing: 0.14em;
 }
 .lb-sheet-panel .inspector-close {
@@ -718,7 +718,7 @@
   display: grid;
   grid-template-columns: 1.4fr 1fr 0.7fr;
   border: 1.5px solid var(--lb-ink);
-  font: 500 11px/1.3 var(--lb-mono);
+  font: 500 12px/1.3 var(--lb-mono);
 }
 .lb-spec-tb > div {
   padding: 4px 6px;
@@ -729,7 +729,7 @@
   border-inline-end: 0;
 }
 .lb-spec-tb dt {
-  font-size: 9px;
+  font-size: 12px;
   letter-spacing: 0.14em;
   text-transform: uppercase;
   opacity: 0.75;
@@ -777,7 +777,7 @@
 }
 .lb-note-h {
   margin: 4px 0 0;
-  font: 700 10px var(--lb-mono);
+  font: 700 12px var(--lb-mono);
   letter-spacing: 0.14em;
   text-transform: uppercase;
   border-bottom: 1px solid var(--lb-ink);
@@ -804,7 +804,7 @@
 }
 .lb-spec-status {
   margin: 0;
-  font: 500 11px var(--lb-mono);
+  font: 500 12px var(--lb-mono);
 }
 .lb-stamp {
   position: absolute;
@@ -830,7 +830,7 @@
   font-size: 13px;
 }
 .lb-stamp small {
-  font-size: 10px;
+  font-size: 12px;
   letter-spacing: 0.06em;
   margin-top: 3px;
 }

@@ -341,7 +341,7 @@
   position: absolute;
   inset-inline-end: -5px;
   color: oklch(1 0 0 / 0.4);
-  font-size: 8px;
+  font-size: 12px;
   top: 3px;
 }
 @keyframes tm-ticker {
@@ -415,6 +415,9 @@
   border-radius: 50%;
   background: var(--line);
   color: oklch(1 0 0);
+  /* White on the lighter lines (green, teal, orange, yellow) is under 4.5:1: lines from
+     L 0.56 up get near-black text instead. */
+  color: oklch(from var(--line) calc((0.56 - l) * 999) 0 0);
   font: 700 13px/1 var(--tm-font);
 }
 
@@ -497,7 +500,7 @@
   stroke-linejoin: round;
 }
 .tm-tag {
-  font: 700 10.5px var(--tm-font);
+  font: 700 12px var(--tm-font);
   fill: var(--tm-orange);
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -612,7 +615,7 @@
 }
 .tm-board-rows dt,
 .tm-board-key {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.12em;
   color: oklch(0.7 0 0);

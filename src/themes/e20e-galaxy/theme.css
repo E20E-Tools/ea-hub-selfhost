@@ -700,7 +700,7 @@
 }
 .gx-label small {
   color: var(--gx-ink-2);
-  font-size: 11px;
+  font-size: 12px;
 }
 .gx-label b {
   color: var(--gx-gold);
@@ -725,7 +725,7 @@
   pointer-events: none;
 }
 .gx-eyebrow {
-  font: 600 11px var(--gx-display);
+  font: 600 12px var(--gx-display);
   letter-spacing: 0.24em;
   text-transform: uppercase;
   color: var(--gx-cyan);
@@ -759,7 +759,7 @@
   clip-path: polygon(10px 0, 100% 0, 100% 100%, 0 100%, 0 10px);
 }
 .gx-key {
-  font: 600 10px var(--gx-display);
+  font: 600 12px var(--gx-display);
   letter-spacing: 0.22em;
   text-transform: uppercase;
   color: var(--gx-cyan);
@@ -771,7 +771,7 @@
 }
 .gx-clock small {
   color: var(--gx-ink-2);
-  font-size: 11px;
+  font-size: 12px;
 }
 .gx-count {
   font-size: 12px;
@@ -852,7 +852,7 @@
   align-items: baseline;
 }
 .gx-telemetry dt {
-  font: 600 10.5px var(--gx-display);
+  font: 600 12px var(--gx-display);
   letter-spacing: 0.2em;
   color: var(--gx-ink-2);
 }
@@ -906,7 +906,7 @@
   font-size: 13.5px;
 }
 .gx-mod-id {
-  font: 600 11px var(--gx-display);
+  font: 600 12px var(--gx-display);
   color: var(--gx-cyan);
   margin-inline-end: 6px;
 }
@@ -986,11 +986,11 @@
     font-size: 17px;
   }
   .gx-label {
-    font-size: 11px;
+    font-size: 12px;
     padding: 3px 7px;
   }
   .gx-label strong {
-    font-size: 11px;
+    font-size: 12px;
   }
   .product-inspector.gx-hud {
     position: fixed;

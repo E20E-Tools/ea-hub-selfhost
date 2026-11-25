@@ -160,7 +160,7 @@
       font-size: 23px;
     }
     & .site-brand-tagline {
-      font-size: 11px;
+      font-size: 12px;
     }
   }
   @media (max-width: 900px) {
@@ -171,7 +171,7 @@
       font-size: 20px;
     }
     & .site-brand-tagline {
-      font-size: 11px;
+      font-size: 12px;
     }
   }
   @media (max-width: 400px) {

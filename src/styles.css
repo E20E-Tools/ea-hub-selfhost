@@ -25,19 +25,19 @@
 @import "./themes/orbital-portal/theme.css";
 @import "./themes/terminal-migration/theme.css";
 
-@custom-variant dark (&:is(.dark *));
-
 /*
  * Design system definition.
  *
  * The @theme inline block maps CSS custom properties to Tailwind utility
  * classes (e.g. --color-primary -> bg-primary, text-primary).
  *
- * The :root and .dark blocks define the actual color values using oklch.
+ * The :root block defines the actual color values using oklch; the studio
+ * directions (Atlas / Signal / Journal) and design themes override them, so
+ * there is no separate .dark class.
  * All colors MUST use oklch format.
  *
  * To add a new semantic color:
- * 1. Add the variable to :root (light value) and .dark (dark value)
+ * 1. Add the variable to :root
  * 2. Register it in @theme inline as --color-<name>: var(--<name>)
  */
 
@@ -123,41 +123,6 @@
   --sidebar-primary-foreground: var(--primary-foreground);
   --sidebar-accent: var(--accent);
   --sidebar-accent-foreground: var(--accent-foreground);
-  --sidebar-border: var(--border);
-  --sidebar-ring: var(--ring);
-}
-
-.dark {
-  --background: oklch(0.11 0.015 160);
-  --foreground: oklch(0.93 0.07 160);
-  --card: oklch(0.15 0.02 160);
-  --card-foreground: oklch(0.93 0.07 160);
-  --popover: oklch(0.15 0.02 160);
-  --popover-foreground: oklch(0.93 0.07 160);
-  --primary: oklch(0.87 0.17 160);
-  --primary-foreground: oklch(0.12 0.02 160);
-  --secondary: oklch(0.22 0.03 160);
-  --secondary-foreground: oklch(0.92 0.07 160);
-  --muted: oklch(0.19 0.025 160);
-  --muted-foreground: oklch(0.75 0.07 160);
-  --accent: oklch(0.26 0.05 160);
-  --accent-foreground: oklch(0.92 0.1 160);
-  --destructive: oklch(0.68 0.21 18);
-  --destructive-foreground: oklch(0.12 0.02 160);
-  --border: oklch(0.85 0.17 160 / 0.24);
-  --input: oklch(0.85 0.17 160 / 0.46);
-  --ring: oklch(0.87 0.17 160);
-  --chart-1: oklch(0.8 0.17 160);
-  --chart-2: oklch(0.82 0.16 75);
-  --chart-3: oklch(0.78 0.11 190);
-  --chart-4: oklch(0.66 0.21 18);
-  --chart-5: oklch(0.6 0.1 160);
-  --sidebar: oklch(0.15 0.02 160);
-  --sidebar-foreground: var(--foreground);
-  --sidebar-primary: var(--primary);
-  --sidebar-primary-foreground: var(--primary-foreground);
-  --sidebar-accent: var(--accent);
-  --sidebar-accent-foreground: var(--foreground);
   --sidebar-border: var(--border);
   --sidebar-ring: var(--ring);
 }
@@ -3401,6 +3366,42 @@ html[data-design-theme="transformation-board"] .tb-readout {
     transform: none;
   }
 }
+/* Laptops and tablets: the 168px launcher sat over real content (the contact form's name
+   field at 1024px, product nodes in the homepage stages). Smaller below 1280px, and smaller
+   still on pages with a form, where it also keeps only the mute control. */
+@media (min-width: 601px) and (max-width: 1279px) {
+  .archy-character {
+    width: 120px;
+    height: 120px;
+  }
+}
+@media (min-width: 601px) and (max-width: 1439px) {
+  body:has(main form :is(textarea, input[type="email"])) .archy-character {
+    width: 88px;
+    height: 88px;
+  }
+  body:has(main form :is(textarea, input[type="email"]))
+    .archy-dock:not(:focus-within):not([data-archy-tour])
+    .archy-toolbar
+    > :not(.archy-mute-button, .sr-only) {
+    display: none;
+  }
+}
+/* While a visitor types in a page field, Archy steps back so it never covers the field. */
+body:has(
+    main
+      :is(input:not([type="checkbox"], [type="radio"]), select, textarea):focus
+  )
+  .assistant-chat:not([data-open="true"])
+  .archy-dock {
+  scale: 0.6;
+  transform-origin: bottom right;
+}
+@media (prefers-reduced-motion: no-preference) {
+  .archy-dock {
+    transition: scale 180ms ease;
+  }
+}
 .assistant-panel {
   width: min(380px, calc(100vw - 2.5rem));
   height: min(560px, calc(100dvh - 2.5rem));
@@ -5238,6 +5239,11 @@ footer.site-footer {
 .chat-history-item:focus-visible {
   border-color: var(--primary);
   outline: none;
+}
+/* Keyboard focus must differ from hover, not only recolour the border. */
+.chat-history-item:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
 }
 .chat-history-row {
   display: flex;

@@ -180,7 +180,7 @@
   -webkit-box-orient: vertical;
 }
 .fd-status {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
   color: #0a7a52;
 }
@@ -203,7 +203,7 @@
   border-radius: 999px;
   border: 0;
   background: var(--fd-accent);
-  color: #fff;
+  color: var(--fd-on-accent, #fff);
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
