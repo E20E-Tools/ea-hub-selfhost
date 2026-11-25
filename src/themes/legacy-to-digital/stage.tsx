@@ -43,6 +43,7 @@ import {
   tangle,
   type Pt,
 } from "./model";
+import { BrandLogo } from "@/components/brand-logo";
 
 const DEMO_KEY = "e20e-l2d-demo";
 const REST = 0.4; // handle at 40% from the start = 60% digital
@@ -888,15 +889,12 @@ export default function LegacyDigitalStage({ products, settings }: StageProps) {
       >
         <div className="ld-hub-face">
           {settings.logoUrl && (
-            <span className="ld-hub-emblem">
-              <img
-                src={settings.logoUrl}
-                alt=""
-                width={62}
-                height={46}
-                decoding="async"
-              />
-            </span>
+            <BrandLogo
+              src={settings.logoUrl}
+              className="ld-hub-emblem"
+              width={138}
+              height={40}
+            />
           )}
           <div className="ld-hub-copy">
             <h1 dir="auto">{settings.displayTitle}</h1>

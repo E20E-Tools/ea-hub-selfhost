@@ -12,6 +12,7 @@ import {
 } from "../product-inspector";
 import { formatLaunchDate } from "../launch";
 import { chipCode, circuitLayout } from "./layout";
+import { BrandLogo } from "@/components/brand-logo";
 
 function useMobile(): boolean {
   const [mobile, setMobile] = useState(false);
@@ -277,7 +278,7 @@ export default function CircuitCoreStage({ products, settings }: StageProps) {
             }}
           >
             {settings.logoUrl ? (
-              <img src={settings.logoUrl} alt="" className="cc-core-logo" />
+              <BrandLogo src={settings.logoUrl} className="cc-core-logo" />
             ) : null}
             <strong>{settings.displayTitle.toUpperCase()}</strong>
             {settings.tagline ? <small>{settings.tagline}</small> : null}

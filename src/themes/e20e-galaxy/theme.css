@@ -439,9 +439,9 @@
 }
 .gx-sun-logo {
   position: relative;
-  inline-size: 62%;
-  block-size: 62%;
-  object-fit: contain;
+  block-size: 34%;
+  max-inline-size: 78%;
+  --brand-logo-fill: linear-gradient(110deg, var(--gx-ink), var(--gx-gold));
   filter: drop-shadow(0 0 6px oklch(1 0.03 95));
 }
 @keyframes gx-spin {

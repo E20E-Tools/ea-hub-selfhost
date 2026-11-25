@@ -27,6 +27,7 @@ import { InspectorActions, useInspectorFacts } from "../product-inspector";
 import { countdownParts, launchInstant } from "../launch";
 import { appGradient, markBooted, shouldBoot } from "./boot";
 import { completeCommand, runCommand } from "./terminal";
+import { BrandLogo } from "@/components/brand-logo";
 
 const TERMINAL = "__terminal";
 const GLYPHS: Record<string, LucideIcon> = {
@@ -733,7 +734,7 @@ export default function E20eOsStage({ products, settings }: StageProps) {
         ) : (
           <div className="os-menubar">
             <span className="os-menu-brand">
-              {settings.logoUrl ? <img src={settings.logoUrl} alt="" /> : null}
+              {settings.logoUrl ? <BrandLogo src={settings.logoUrl} /> : null}
               <strong dir="ltr">{settings.displayTitle}</strong>
             </span>
             <button
@@ -898,7 +899,7 @@ export default function E20eOsStage({ products, settings }: StageProps) {
           {toast ? (
             <div className="os-toast" role="status">
               <span className="os-toast-icon" aria-hidden="true">
-                {settings.logoUrl ? <img src={settings.logoUrl} alt="" /> : "E"}
+                {settings.logoUrl ? <BrandLogo src={settings.logoUrl} /> : "E"}
               </span>
               <span className="os-toast-text">
                 <strong>E20E OS</strong>
@@ -980,7 +981,7 @@ export default function E20eOsStage({ products, settings }: StageProps) {
           onPointerDown={() => setBoot("done")}
         >
           {settings.logoUrl ? (
-            <img src={settings.logoUrl} alt="" className="os-boot-logo" />
+            <BrandLogo src={settings.logoUrl} className="os-boot-logo" />
           ) : (
             <strong className="os-boot-logo">E20E</strong>
           )}

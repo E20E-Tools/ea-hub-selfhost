@@ -1,0 +1,44 @@
+/* Site logo without a box: a mask over a fill taken from the design tokens (see brand-logo.tsx).
+   Each placement sets the height and --brand-logo-fill; the width follows the logo's own ratio. */
+.brand-logo {
+  position: relative;
+  display: inline-block;
+  flex: none;
+  line-height: 0;
+  /* Light accent on dark surfaces by default; placements on light surfaces override it. */
+  --brand-logo-fill: linear-gradient(
+    100deg,
+    var(--ea-light, currentColor),
+    color-mix(
+      in oklab,
+      var(--ea-light, currentColor) 50%,
+      var(--ea-on-panel, #fff)
+    )
+  );
+}
+.brand-logo img {
+  display: block;
+  inline-size: auto;
+  block-size: 100%;
+  max-inline-size: 100%;
+  object-fit: contain;
+}
+@supports (mask-image: url("x")) or (-webkit-mask-image: url("x")) {
+  .brand-logo[data-masked] img {
+    opacity: 0;
+  }
+  .brand-logo[data-masked]::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--brand-logo-fill);
+    -webkit-mask: var(--brand-logo-src) center / contain no-repeat;
+    mask: var(--brand-logo-src) center / contain no-repeat;
+    pointer-events: none;
+  }
+}
+@media (forced-colors: active) {
+  .brand-logo[data-masked]::after {
+    background: CanvasText;
+  }
+}

@@ -28,6 +28,7 @@ import {
   placeLabel,
   project,
 } from "./orbits";
+import { BrandLogo } from "@/components/brand-logo";
 
 function useMobile(): boolean {
   const [mobile, setMobile] = useState(false);
@@ -444,7 +445,7 @@ export default function GalaxyStage({ products, settings }: StageProps) {
           <span className="gx-corona" />
           <span className="gx-boil" />
           {settings.logoUrl ? (
-            <img src={settings.logoUrl} alt="" className="gx-sun-logo" />
+            <BrandLogo src={settings.logoUrl} className="gx-sun-logo" />
           ) : null}
         </div>
 

@@ -378,9 +378,9 @@
   padding-inline: 8px;
 }
 .cc-core-logo {
-  max-height: 28%;
-  max-width: 50%;
-  object-fit: contain;
+  block-size: 30%;
+  max-inline-size: 70%;
+  --brand-logo-fill: linear-gradient(100deg, var(--cc-lime), currentColor);
 }
 @keyframes cc-heart {
   0%,

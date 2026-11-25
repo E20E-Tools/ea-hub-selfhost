@@ -15,6 +15,7 @@ import {
 import { useLanguage } from "@/lib/language";
 import type { Copy } from "@/lib/copy";
 import { useThemeArt } from "@/themes/use-theme-art";
+import { BrandLogo } from "@/components/brand-logo";
 import {
   readNavigation,
   navigationLabel,
@@ -124,11 +125,10 @@ export function SiteHeader() {
             aria-label={settings.displayTitle}
           >
             {art.logo(settings.logoUrl) ? (
-              <img
+              <BrandLogo
                 src={art.logo(settings.logoUrl)}
-                alt=""
-                width={132}
-                height={78}
+                width={138}
+                height={40}
               />
             ) : null}
             <span className="site-brand-text">

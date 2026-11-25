@@ -27,6 +27,7 @@ import {
   type DirectionId,
 } from "./directions";
 import { dictionaries } from "@/lib/copy";
+import { BrandLogo } from "@/components/brand-logo";
 
 type NavLink = { to: string; label: string; cta?: boolean };
 function useNavigation() {
@@ -49,13 +50,18 @@ function Brand() {
   const { s } = useNavigation();
   return (
     <a className="nx-brand" href="/" aria-label={s.displayTitle || "EA-Hub"}>
-      <span className="nx-brand-mark">
-        {s.logoUrl ? (
-          <img src={s.logoUrl} alt="" width={62} height={46} />
-        ) : (
+      {s.logoUrl ? (
+        <BrandLogo
+          src={s.logoUrl}
+          className="nx-brand-mark"
+          width={138}
+          height={40}
+        />
+      ) : (
+        <span className="nx-brand-mark" data-icon="">
           <Layers3 aria-hidden="true" />
-        )}
-      </span>
+        </span>
+      )}
       <span className="nx-brand-type">
         <b dir="auto">{s.displayTitle || "EA-Hub"}</b>
         {s.tagline && <small dir="auto">{s.tagline}</small>}
