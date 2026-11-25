@@ -769,9 +769,9 @@ img[src*="archy-atlas"] {
   background: var(--ea-panel-muted);
   color: var(--ea-panel);
 }
-/* Below 1280px the links no longer fit beside the brand and actions (at 1024px two of
-   eight were hidden in an unmarked scroll): they take their own full-width row instead. */
-@media (max-width: 1279px) {
+/* Below 1366px the links no longer fit beside the brand and actions (two of eight were
+   hidden in an unmarked scroll at 1024px, one at 1280px): they take their own row instead. */
+@media (max-width: 1365px) {
   .nx-headrow {
     flex-wrap: wrap;
     row-gap: 0;
