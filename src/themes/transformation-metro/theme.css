@@ -414,10 +414,7 @@
   place-items: center;
   border-radius: 50%;
   background: var(--line);
-  color: oklch(1 0 0);
-  /* White on the lighter lines (green, teal, orange, yellow) is under 4.5:1: lines from
-     L 0.56 up get near-black text instead. */
-  color: oklch(from var(--line) calc((0.56 - l) * 999) 0 0);
+  color: var(--line-ink, oklch(1 0 0));
   font: 700 13px/1 var(--tm-font);
 }
 

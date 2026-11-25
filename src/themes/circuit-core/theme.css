@@ -274,7 +274,7 @@
   margin-top: 12px;
   font-family: var(--cc-mono);
   font-size: 14px;
-  color: oklch(0.712 0.032 172.4);
+  color: oklch(0.8 0.03 172);
 }
 .cc-board-wrap {
   min-width: 0;
@@ -377,8 +377,8 @@
 }
 .cc-core small {
   font-family: var(--cc-mono);
-  font-size: clamp(11px, 1.25cqw, 13px);
-  color: oklch(0.712 0.032 172.4);
+  font-size: clamp(12px, 1.25cqw, 13px);
+  color: oklch(0.8 0.03 172);
   padding-inline: 8px;
 }
 .cc-core-logo {
@@ -413,7 +413,8 @@
     border-color 0.3s,
     box-shadow 0.3s,
     opacity 0.3s;
-  opacity: 0.6;
+  /* Unpowered chips stay dim, but their subtitle keeps 4.5:1 (0.6 gave 4.3). */
+  opacity: 0.7;
 }
 .cc-chip::before,
 .cc-chip::after {
@@ -495,8 +496,8 @@
   white-space: nowrap;
 }
 .cc-sub {
-  font-size: clamp(11px, 1.2cqw, 13px);
-  color: oklch(0.712 0.032 172.4);
+  font-size: clamp(12px, 1.2cqw, 13px);
+  color: oklch(0.8 0.03 172);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -510,7 +511,7 @@
   line-height: 1.35;
   background: var(--cc-board);
   font-family: var(--cc-mono);
-  font-size: clamp(10px, 0.95cqw, 11px);
+  font-size: clamp(11px, 0.95cqw, 12px);
   letter-spacing: 0.12em;
   color: var(--cc-amber);
   border: 1px solid oklch(0.806 0.147 79 / 0.7);
@@ -521,16 +522,16 @@
   font-size: max(12px, 4.2cqw);
 }
 .cc-stage[data-mobile] .cc-sub {
-  font-size: max(11px, 3cqw);
+  font-size: max(12px, 3cqw);
 }
 .cc-stage[data-mobile] .cc-core strong {
   font-size: 7cqw;
 }
 .cc-stage[data-mobile] .cc-core small {
-  font-size: max(11px, 2.8cqw);
+  font-size: max(12px, 2.8cqw);
 }
 .cc-stage[data-mobile] .cc-stamp {
-  font-size: max(10px, 2.3cqw);
+  font-size: max(11px, 2.3cqw);
 }
 
 .cc-console {
@@ -553,7 +554,7 @@
   gap: 6px;
   padding: 7px 10px;
   border-bottom: 1px solid oklch(0.844 0.159 114.1 / 0.2);
-  color: oklch(0.712 0.032 172.4);
+  color: oklch(0.8 0.03 172);
   font-size: 12px;
 }
 .cc-console-bar i {

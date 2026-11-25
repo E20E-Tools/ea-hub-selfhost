@@ -25,7 +25,7 @@ import {
   type LayoutBranch,
   type Pt,
 } from "./layout";
-import { metroLines } from "./lines";
+import { metroInk, metroLines } from "./lines";
 import { flapGlyph, hasArabic, splitFlapUnits } from "./flap";
 
 function useMobile(): boolean {
@@ -176,7 +176,12 @@ function BoardBody({
           <dd>
             <span
               className="tm-roundel"
-              style={{ "--line": color } as CSSProperties}
+              style={
+                {
+                  "--line": color,
+                  "--line-ink": metroInk(color),
+                } as CSSProperties
+              }
               aria-hidden="true"
             >
               {badge}
@@ -498,7 +503,12 @@ export default function TransformationMetroStage({
               >
                 <span
                   className="tm-roundel"
-                  style={{ "--line": l.color } as CSSProperties}
+                  style={
+                    {
+                      "--line": l.color,
+                      "--line-ink": metroInk(l.color),
+                    } as CSSProperties
+                  }
                 >
                   {l.badge}
                 </span>
@@ -769,7 +779,10 @@ export default function TransformationMetroStage({
             <span
               className="tm-roundel"
               style={
-                { "--line": lineOf(hover.category)?.color } as CSSProperties
+                {
+                  "--line": lineOf(hover.category)?.color,
+                  "--line-ink": metroInk(lineOf(hover.category)?.color),
+                } as CSSProperties
               }
             >
               {lineOf(hover.category)?.badge}
