@@ -355,7 +355,7 @@ export default function TransformationMetroStage({
             };
           }),
       ),
-    [layout, mobile],
+    [layout],
   );
   const trainRefs = useRef<Array<SVGGElement | null>>([]);
   const markerRefs = useRef<Record<string, SVGCircleElement | null>>({});

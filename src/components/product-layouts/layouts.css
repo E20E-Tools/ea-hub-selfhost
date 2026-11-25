@@ -1251,6 +1251,10 @@
   border-bottom: 1px solid var(--pl-warn-line);
 }
 .pl-preview-bar a {
+  /* 24px pointer target (WCAG 2.5.8). */
+  display: inline-flex;
+  align-items: center;
+  min-block-size: 24px;
   color: var(--pl-warn-ink);
   font-weight: 700;
 }

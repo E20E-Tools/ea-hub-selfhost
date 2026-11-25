@@ -76,6 +76,9 @@ html.theme-transition *::after {
   white-space: nowrap;
 }
 .theme-preview-bar button {
+  /* 24px pointer target (WCAG 2.5.8); the bar itself stays slim. */
+  min-block-size: 24px;
+  padding-inline: 4px;
   font-weight: 600;
   text-decoration: underline;
   text-underline-offset: 3px;
