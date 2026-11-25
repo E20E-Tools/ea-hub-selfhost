@@ -453,7 +453,8 @@
   color: var(--ea-ink);
 }
 .nx-product-card :is(button, a):focus-visible {
-  outline: 2px solid currentColor;
+  /* The brand green (each direction's --ring), like the other focus rings on the page. */
+  outline: 2px solid var(--ring, var(--ea-accent));
   outline-offset: -2px;
 }
 .nx-card-grid[data-layout="signal"] .nx-product-card {
@@ -769,9 +770,10 @@ img[src*="archy-atlas"] {
   background: var(--ea-panel-muted);
   color: var(--ea-panel);
 }
-/* Below 1366px the links no longer fit beside the brand and actions (two of eight were
-   hidden in an unmarked scroll at 1024px, one at 1280px): they take their own row instead. */
-@media (max-width: 1365px) {
+/* Below 1400px the links no longer fit beside the brand and actions (two of eight were
+   hidden in an unmarked scroll at 1024px, one at 1280px; at 1366px a classic 15px scrollbar
+   leaves them 1px short): they take their own row instead. */
+@media (max-width: 1399px) {
   .nx-headrow {
     flex-wrap: wrap;
     row-gap: 0;
