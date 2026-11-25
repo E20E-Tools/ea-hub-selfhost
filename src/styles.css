@@ -3,6 +3,7 @@
 @source "../src";
 @import "tw-animate-css";
 @import "./beneficiary.css";
+@import "./components/brand-logo.css";
 @import "./studio/visitor-journeys.css";
 @import "./themes/shared.css";
 @import "./themes/circuit-core/theme.css";
@@ -4094,9 +4095,16 @@ button:focus-visible,
   font-weight: 600;
   color: var(--foreground);
 }
-.site-brand img {
-  height: 34px;
-  width: auto;
+.site-brand .brand-logo {
+  block-size: clamp(32px, 2.8vw, 42px);
+  max-inline-size: 180px;
+  /* Starts from the header text colour, so it always contrasts with the header, and leans
+     toward the brand colour. */
+  --brand-logo-fill: linear-gradient(
+    100deg,
+    currentColor,
+    color-mix(in oklab, currentColor 60%, var(--primary))
+  );
 }
 .site-nav {
   display: flex;

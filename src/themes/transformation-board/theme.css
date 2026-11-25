@@ -691,7 +691,7 @@
 .tb-core strong {
   font: 800 max(13px, calc(28 * var(--u)))/1 var(--tb-sans);
   letter-spacing: 0.04em;
-  background: linear-gradient(110deg, #2456e0, #0b8fc4 50%, #6d3fd8);
+  background: var(--tb-grad);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
@@ -702,9 +702,10 @@
   color: #3a4466;
 }
 .tb-core-logo {
-  max-block-size: calc(34 * var(--u));
-  max-inline-size: 50%;
-  object-fit: contain;
+  /* Same gradient as the board title under it, so the mark follows the design colours. */
+  block-size: max(22px, calc(46 * var(--u)));
+  max-inline-size: 72%;
+  --brand-logo-fill: var(--tb-grad);
 }
 @keyframes tb-heart {
   0%,

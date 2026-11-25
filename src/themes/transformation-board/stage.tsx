@@ -40,6 +40,7 @@ import {
   transformPercent,
   type Box,
 } from "./model";
+import { BrandLogo } from "@/components/brand-logo";
 
 const DEMO_KEY = "e20e-tb-demo";
 /** The board builds itself once per session, then sweeps on its own if nothing is touched. */
@@ -835,9 +836,8 @@ export default function TransformationBoardStage({
           >
             <span className="tb-core-ring" />
             {settings.logoUrl ? (
-              <img
+              <BrandLogo
                 src={themedLogo("transformation-board", settings.logoUrl)}
-                alt=""
                 className="tb-core-logo"
               />
             ) : null}

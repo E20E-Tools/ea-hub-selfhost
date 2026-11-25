@@ -415,20 +415,13 @@
   box-shadow: 0 0 5px #63e9c8;
 }
 .ld-hub-emblem {
-  display: grid;
-  place-items: center;
-  flex-shrink: 0;
-  width: clamp(45px, 4.2cqw, 66px);
-  aspect-ratio: 1;
-  padding: 4px;
-  background: linear-gradient(145deg, #fffdf2, #ece8d9);
-  border: 1px solid #c7bc9c;
-  border-radius: 9px;
-  box-shadow:
-    0 1px 5px #020c16a8,
-    inset 0 1px 0 #fff;
+  /* Frameless logo, tinted from the hub's text colour toward its signal green. */
+  block-size: clamp(30px, 3.4cqw, 52px);
+  max-inline-size: 45%;
+  --brand-logo-fill: linear-gradient(100deg, #f4ffff, #85f6d4);
+  filter: drop-shadow(0 0 6px rgb(99 233 200 / 0.35));
 }
-.ld-hub img {
+.ld-hub img:not(.brand-logo img) {
   width: 100%;
   height: 100%;
   object-fit: contain;
@@ -474,7 +467,8 @@
   box-shadow: none;
 }
 .ld-hub[data-legacy] .ld-hub-emblem {
-  border-radius: 2px;
+  --brand-logo-fill: linear-gradient(100deg, #e5e1ca, #e8b75d);
+  filter: none;
 }
 .ld-hub[data-legacy] .ld-hub-copy p {
   color: #e5e1ca;

@@ -332,9 +332,10 @@
   padding-inline-end: 10px;
   font-family: var(--os-display);
 }
-.os-menu-brand img {
-  height: 18px;
-  width: auto;
+.os-menu-brand .brand-logo {
+  block-size: 22px;
+  max-inline-size: 96px;
+  --brand-logo-fill: linear-gradient(100deg, var(--os-ink), var(--os-gold));
 }
 .os-menu-item,
 .os-menu-lang {
@@ -812,10 +813,10 @@
   color: var(--os-navy);
   font-weight: 700;
 }
-.os-toast-icon img {
-  width: 28px;
-  height: 28px;
-  object-fit: contain;
+.os-toast-icon .brand-logo {
+  block-size: 24px;
+  max-inline-size: 44px;
+  --brand-logo-fill: var(--os-gold);
 }
 .os-toast-text {
   display: grid;
@@ -866,6 +867,7 @@
 .os-boot-logo {
   height: 76px;
   width: auto;
+  --brand-logo-fill: linear-gradient(100deg, var(--os-ink), var(--os-gold));
   animation: os-fade 0.5s ease-out backwards;
   font: 700 40px var(--os-display);
 }
