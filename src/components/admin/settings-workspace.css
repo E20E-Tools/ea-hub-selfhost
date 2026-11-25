@@ -66,6 +66,10 @@
 .settings-finder:focus-within {
   border-color: var(--settings-teal);
 }
+.settings-finder:has(input:focus-visible) {
+  outline: 2px solid var(--settings-teal);
+  outline-offset: 2px;
+}
 .settings-finder input {
   flex: 1;
   width: 100%;

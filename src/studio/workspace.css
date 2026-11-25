@@ -71,7 +71,8 @@
   --accent: var(--ea-wash);
   --accent-foreground: var(--ea-ink);
   --border: var(--ea-line);
-  --input: var(--ea-line);
+  /* Field edges need 3:1 against the page (WCAG 1.4.11); --ea-line alone gave 1.5:1. */
+  --input: color-mix(in oklab, var(--ea-muted) 62%, var(--ea-line));
   --ring: var(--ea-accent);
   --library-rule: var(--ea-line);
   --library-art: var(--ea-wash);
@@ -90,8 +91,8 @@
 }
 .nx-head {
   background: var(--ea-panel);
-  color: #f5fcf8;
-  border-bottom: 1px solid #77938655;
+  color: var(--ea-on-panel);
+  border-bottom: 1px solid var(--ea-panel-edge);
 }
 .nx-headrow {
   display: flex;
@@ -767,6 +768,33 @@ img[src*="archy-atlas"] {
 .nx-primary .nx-nav-highlight:is(:hover, [aria-current]) {
   background: var(--ea-panel-muted);
   color: var(--ea-panel);
+}
+/* Below 1280px the links no longer fit beside the brand and actions (at 1024px two of
+   eight were hidden in an unmarked scroll): they take their own full-width row instead. */
+@media (max-width: 1279px) {
+  .nx-headrow {
+    flex-wrap: wrap;
+    row-gap: 0;
+  }
+  .nx-head .nx-primary:not(:empty) {
+    order: 3;
+    flex-basis: 100%;
+  }
+}
+/* When the row still overflows (phones), fade its far edge so the scroll is visible. */
+@media (max-width: 900px) {
+  .nx-head .nx-primary {
+    padding-inline-end: 28px;
+    mask-image: linear-gradient(
+      to var(--nx-fade-side, left),
+      #000 calc(100% - 32px),
+      transparent
+    );
+  }
+  [dir="ltr"] .nx-head .nx-primary,
+  .nx-head[dir="ltr"] .nx-primary {
+    --nx-fade-side: right;
+  }
 }
 @media (max-width: 900px) {
   .nx-headrow {

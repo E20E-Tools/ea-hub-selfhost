@@ -40,7 +40,7 @@
   margin: 0;
 }
 .pl-source {
-  font-size: 13px;
+  font-size: 14px;
   opacity: 0.8;
 }
 
@@ -94,7 +94,7 @@
   border-radius: 9px;
   text-decoration: none;
   color: var(--pl-text) !important;
-  font-size: 13px;
+  font-size: 14px;
 }
 .plm-jumps a:hover,
 .plm-jumps a:focus-visible {
@@ -120,7 +120,7 @@
   gap: 8px;
 }
 .plm-badges > span {
-  font-size: 13px;
+  font-size: 14px;
   padding: 5px 10px;
   border-radius: 6px;
   border: 1px solid var(--pl-line);
@@ -234,11 +234,11 @@
   line-height: 1;
 }
 .plm-kpis strong[data-small] {
-  font-size: 22px;
+  font-size: 24px;
   line-height: 1.6;
 }
 .plm-kpis span {
-  font-size: 15px;
+  font-size: 16px;
   color: var(--pl-muted);
 }
 .plm-fit {
@@ -265,7 +265,7 @@
 }
 .plm-fit h2 {
   margin: 10px 0 0;
-  font-size: 30px;
+  font-size: 32px;
   color: var(--pl-text);
 }
 .plm-fit-cards {
@@ -289,12 +289,12 @@
   align-items: center;
   gap: 8px;
   margin: 0;
-  font-size: 17px;
+  font-size: 18px;
   color: var(--pl-text);
 }
 .plm-fit-cards p {
   margin: 10px 0 0;
-  font-size: 15px;
+  font-size: 16px;
   line-height: 1.8;
 }
 .plm-bento {
@@ -320,7 +320,7 @@
   font-size: 28px;
 }
 .plm-card h3 {
-  font-size: 21px;
+  font-size: 20px;
 }
 .plm-card ul {
   margin: 0;
@@ -353,7 +353,7 @@
   gap: 12px;
 }
 .plm-card dt {
-  font-size: 13px;
+  font-size: 14px;
   color: var(--pl-muted);
 }
 .plm-card dd {
@@ -408,7 +408,7 @@
 }
 .plm-practice h2 {
   margin: 0 0 16px;
-  font-size: 26px;
+  font-size: 24px;
 }
 .plm-practice ol,
 .plj-practice ol {
@@ -573,7 +573,7 @@
   gap: 16px;
   margin: 0;
   font-family: var(--pl-mono);
-  font-size: 13px;
+  font-size: 14px;
   color: var(--pl-muted);
 }
 .pls-meta [data-live] {
@@ -594,7 +594,7 @@
 .pls-lead {
   flex: 0 1 440px;
   margin: 0;
-  font-size: 22px;
+  font-size: 24px;
   line-height: 1.6;
   font-weight: 600;
 }
@@ -672,7 +672,7 @@
   margin: 0 0 20px;
   padding-bottom: 12px;
   border-bottom: 1px solid var(--pl-dark-text);
-  font-size: 30px;
+  font-size: 32px;
 }
 .pls-sec > h2 b {
   font-family: var(--pl-mono);
@@ -701,7 +701,7 @@
 }
 .pls-fit h3 {
   margin: 0;
-  font-size: 15px;
+  font-size: 16px;
   color: var(--pl-accent-text);
 }
 .pls-fit [data-kind="no"] h3 {
@@ -937,7 +937,7 @@
   flex: 1 1 520px;
 }
 .plj-tag {
-  font-size: 13px;
+  font-size: 14px;
   padding: 4px 10px;
   border-radius: 6px;
   background: color-mix(in srgb, var(--pl-on-strong) 14%, transparent);
@@ -950,7 +950,7 @@
 }
 .plj-hero p {
   margin: 8px 0 0;
-  font-size: 19px;
+  font-size: 20px;
   line-height: 1.7;
   color: color-mix(in srgb, var(--pl-on-strong) 85%, transparent);
 }
@@ -1024,10 +1024,10 @@
   opacity: 0.75;
 }
 .plj-steps strong {
-  font-size: 19px;
+  font-size: 20px;
 }
 .plj-steps span {
-  font-size: 13px;
+  font-size: 14px;
   opacity: 0.8;
 }
 .plj-steps button:focus-visible {
@@ -1114,7 +1114,7 @@
 .plj-check legend {
   float: inline-start;
   inline-size: 100%;
-  font-size: 22px;
+  font-size: 24px;
   font-weight: 700;
 }
 .plj-check > p {
@@ -1178,7 +1178,7 @@
 }
 .plj-practice h2 {
   margin: 0 0 14px;
-  font-size: 22px;
+  font-size: 24px;
 }
 .plj-practice li {
   padding: 16px;
@@ -1273,4 +1273,16 @@
   .plm-status i {
     animation: none;
   }
+}
+
+/* Type rhythm for every product layout: one scale (12 14 16 18 20 24 28 32 40 52), bold
+   headings so they separate from body copy, and a readable measure for running text. */
+:where(.pl-mission, .pl-spec, .pl-journey) :is(h2, h3) {
+  font-weight: 700;
+}
+:where(.pl-mission, .pl-spec, .pl-journey) h3 {
+  font-weight: 650;
+}
+:where(.pl-mission, .pl-spec, .pl-journey) p {
+  max-inline-size: 70ch;
 }

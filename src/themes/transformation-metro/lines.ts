@@ -10,6 +10,22 @@ export const METRO_PALETTE = [
   "oklch(0.6 0.25 355)", // pink #E5007D
 ] as const;
 
+/** Text on each line colour, picked for at least 4.5:1: white on the deep lines, black on
+ *  the light ones (white on green, orange, teal and yellow is under 4.5:1). */
+const METRO_INK: Record<string, string> = {
+  "oklch(0.58 0.21 26)": "#fff",
+  "oklch(0.52 0.14 248)": "#fff",
+  "oklch(0.58 0.14 160)": "#000",
+  "oklch(0.74 0.17 60)": "#000",
+  "oklch(0.52 0.18 310)": "#fff",
+  "oklch(0.64 0.11 205)": "#000",
+  "oklch(0.84 0.17 92)": "#000",
+  "oklch(0.6 0.25 355)": "#000",
+};
+export function metroInk(color: string | undefined): string {
+  return (color && METRO_INK[color]) || "#fff";
+}
+
 export type MetroLineInfo = {
   category: string;
   color: string;

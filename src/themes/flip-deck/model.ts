@@ -40,7 +40,16 @@ export function wave(i: number, ms: number, settled: number, amp = 6): number {
 }
 
 /** Stable hue-ish accent per product, from the brand palette. */
-export const ACCENTS = ["#2F6BFF", "#00D4FF", "#8B5CF6"] as const;
+export const ACCENTS = ["#2563EB", "#00D4FF", "#7C3AED"] as const;
 export function accentFor(i: number): string {
   return ACCENTS[i % ACCENTS.length]!;
+}
+/** Text drawn on each accent, chosen for at least 4.5:1 (white on cyan is only 1.8:1). */
+const ON_ACCENT: Record<(typeof ACCENTS)[number], string> = {
+  "#2563EB": "#FFFFFF",
+  "#00D4FF": "#04232B",
+  "#7C3AED": "#FFFFFF",
+};
+export function onAccentFor(i: number): string {
+  return ON_ACCENT[ACCENTS[i % ACCENTS.length]!];
 }

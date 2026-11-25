@@ -543,12 +543,12 @@
   pointer-events: none;
 }
 .dm-tile-text strong {
-  font: 600 clamp(10px, 11cqi, 16px)/1.15 var(--dm-display);
+  font: 600 clamp(12px, 11cqi, 16px)/1.15 var(--dm-display);
   color: var(--dm-gold-2);
   overflow-wrap: anywhere;
 }
 .dm-tile-text small {
-  font-size: clamp(8.5px, 7.6cqi, 11px);
+  font-size: clamp(11px, 7.6cqi, 12px);
   line-height: 1.2;
   color: oklch(0.85 0.04 88);
 }
@@ -566,7 +566,7 @@
   background: var(--dm-ink);
   border: 1px solid var(--dm-gold);
   color: var(--dm-gold-2);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 600;
 }
 .dm-crescent::before {
