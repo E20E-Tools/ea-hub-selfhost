@@ -343,7 +343,12 @@ export async function runAssistantChat(
           : result.answer;
       return { ...result, answer: citeAnswer(answer, catalog, language) };
     }
-    const approved = await approvedAnswers();
+    const lastQuestion =
+      [...turns].reverse().find((turn) => turn.role === "user")?.content ?? "";
+    const [approved, related] = await Promise.all([
+      approvedAnswers(),
+      relatedPassages(lastQuestion, language),
+    ]);
     const result = await logAiFailure(() =>
       generateText({
         model: groq.model,
@@ -369,7 +374,9 @@ export async function runAssistantChat(
                 )
                 .join("\n"),
             language,
-          ) + approved,
+          ) +
+          approved +
+          related,
         messages: turns as ModelMessage[],
         maxRetries: 0,
         output: Output.object({ schema: chatSchema }),
@@ -413,6 +420,16 @@ async function logAiFailure<T>(run: () => Promise<T>): Promise<T> {
       throw second;
     }
   }
+}
+
+/** Release notes and approved answers closest in meaning to the question; "" when search is off. */
+async function relatedPassages(
+  question: string,
+  language: ReplyLanguage,
+): Promise<string> {
+  const { semanticContext } = await import("./semantic.server");
+  const { contextBlock } = await import("./semantic.shared");
+  return contextBlock(await semanticContext(question, language), language);
 }
 
 /** Admin-approved answers for common questions; best effort so the guide still answers without them. */

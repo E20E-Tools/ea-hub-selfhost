@@ -8,6 +8,10 @@
     {
       "path": "/api/public/jobs/daily-cleanup",
       "schedule": "30 2 * * *"
+    },
+    {
+      "path": "/api/public/jobs/semantic-index",
+      "schedule": "15 3 * * *"
     }
   ]
 }

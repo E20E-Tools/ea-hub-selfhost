@@ -624,6 +624,13 @@
       "when": 1795040781109,
       "tag": "0088_site_font_cairo",
       "breakpoints": true
+    },
+    {
+      "idx": 89,
+      "version": "7",
+      "when": 1795040841109,
+      "tag": "0089_semantic_search",
+      "breakpoints": true
     }
   ]
 }

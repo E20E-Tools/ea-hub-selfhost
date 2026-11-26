@@ -43,6 +43,7 @@ import { Route as ReleasesProductIdRouteImport } from './routes/releases_.$produ
 import { Route as TryProductIdRouteImport } from './routes/try.$productId'
 import { Route as ApiPublicJobsDailyCleanupRouteImport } from './routes/api/public/jobs/daily-cleanup'
 import { Route as ApiPublicJobsNewsletterRouteImport } from './routes/api/public/jobs/newsletter'
+import { Route as ApiPublicJobsSemanticIndexRouteImport } from './routes/api/public/jobs/semantic-index'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -216,6 +217,12 @@ const ApiPublicJobsNewsletterRoute = ApiPublicJobsNewsletterRouteImport.update({
   path: '/api/public/jobs/newsletter',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiPublicJobsSemanticIndexRoute =
+  ApiPublicJobsSemanticIndexRouteImport.update({
+    id: '/api/public/jobs/semantic-index',
+    path: '/api/public/jobs/semantic-index',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -252,6 +259,7 @@ export interface FileRoutesByFullPath {
   '/try/$productId': typeof TryProductIdRoute
   '/api/public/jobs/daily-cleanup': typeof ApiPublicJobsDailyCleanupRoute
   '/api/public/jobs/newsletter': typeof ApiPublicJobsNewsletterRoute
+  '/api/public/jobs/semantic-index': typeof ApiPublicJobsSemanticIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -288,6 +296,7 @@ export interface FileRoutesByTo {
   '/try/$productId': typeof TryProductIdRoute
   '/api/public/jobs/daily-cleanup': typeof ApiPublicJobsDailyCleanupRoute
   '/api/public/jobs/newsletter': typeof ApiPublicJobsNewsletterRoute
+  '/api/public/jobs/semantic-index': typeof ApiPublicJobsSemanticIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -325,6 +334,7 @@ export interface FileRoutesById {
   '/try/$productId': typeof TryProductIdRoute
   '/api/public/jobs/daily-cleanup': typeof ApiPublicJobsDailyCleanupRoute
   '/api/public/jobs/newsletter': typeof ApiPublicJobsNewsletterRoute
+  '/api/public/jobs/semantic-index': typeof ApiPublicJobsSemanticIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -363,6 +373,7 @@ export interface FileRouteTypes {
     | '/try/$productId'
     | '/api/public/jobs/daily-cleanup'
     | '/api/public/jobs/newsletter'
+    | '/api/public/jobs/semantic-index'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -399,6 +410,7 @@ export interface FileRouteTypes {
     | '/try/$productId'
     | '/api/public/jobs/daily-cleanup'
     | '/api/public/jobs/newsletter'
+    | '/api/public/jobs/semantic-index'
   id:
     | '__root__'
     | '/'
@@ -435,6 +447,7 @@ export interface FileRouteTypes {
     | '/try/$productId'
     | '/api/public/jobs/daily-cleanup'
     | '/api/public/jobs/newsletter'
+    | '/api/public/jobs/semantic-index'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -472,6 +485,7 @@ export interface RootRouteChildren {
   TryProductIdRoute: typeof TryProductIdRoute
   ApiPublicJobsDailyCleanupRoute: typeof ApiPublicJobsDailyCleanupRoute
   ApiPublicJobsNewsletterRoute: typeof ApiPublicJobsNewsletterRoute
+  ApiPublicJobsSemanticIndexRoute: typeof ApiPublicJobsSemanticIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -714,6 +728,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiPublicJobsNewsletterRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/public/jobs/semantic-index': {
+      id: '/api/public/jobs/semantic-index'
+      path: '/api/public/jobs/semantic-index'
+      fullPath: '/api/public/jobs/semantic-index'
+      preLoaderRoute: typeof ApiPublicJobsSemanticIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -752,6 +773,7 @@ const rootRouteChildren: RootRouteChildren = {
   TryProductIdRoute: TryProductIdRoute,
   ApiPublicJobsDailyCleanupRoute: ApiPublicJobsDailyCleanupRoute,
   ApiPublicJobsNewsletterRoute: ApiPublicJobsNewsletterRoute,
+  ApiPublicJobsSemanticIndexRoute: ApiPublicJobsSemanticIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

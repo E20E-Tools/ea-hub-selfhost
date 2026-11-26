@@ -712,6 +712,45 @@ feedback_reason?: string | null
         }
         Relationships: []
       }
+      semantic_documents: {
+        Row: {
+          body: string
+          content_hash: string
+          embedding: number[]
+          id: string
+          kind: string
+          language: string
+          model: string
+          title: string
+          updated_at: string
+          url: string
+        }
+        Insert: {
+          body: string
+          content_hash: string
+          embedding: number[]
+          id: string
+          kind: string
+          language: string
+          model: string
+          title: string
+          updated_at?: string
+          url: string
+        }
+        Update: {
+          body?: string
+          content_hash?: string
+          embedding?: number[]
+          id?: string
+          kind?: string
+          language?: string
+          model?: string
+          title?: string
+          updated_at?: string
+          url?: string
+        }
+        Relationships: []
+      }
       settings_versions: {
         Row: {
           actor_id: string | null

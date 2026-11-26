@@ -612,6 +612,9 @@ const ar = {
   searchPages: "الصفحات",
   searchProducts: "المنتجات",
   searchEmpty: "لا توجد نتائج",
+  searchRelated: "قريب من المعنى",
+  searchRelatedRelease: "ملاحظات الإصدار",
+  searchSearching: "جارٍ البحث…",
 
   // Live progress notice
   liveStatus: "حالة مباشرة",
@@ -1962,6 +1965,9 @@ const en: Copy = {
   searchPages: "Pages",
   searchProducts: "Products",
   searchEmpty: "No results",
+  searchRelated: "Close in meaning",
+  searchRelatedRelease: "Release notes",
+  searchSearching: "Searching…",
 
   // Live progress notice
   liveStatus: "Live status",
