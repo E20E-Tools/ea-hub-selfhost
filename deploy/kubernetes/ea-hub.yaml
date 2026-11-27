@@ -1,7 +1,7 @@
 # GENERATED from deploy/helm/ea-hub by deploy/kubernetes/render.sh — do not edit by hand.
 # Apply:  kubectl apply -f deploy/kubernetes/namespace.yaml
 #         kubectl apply -f my-secret.yaml        (copy of secret.example.yaml with your values)
-#         kubectl apply -f deploy/kubernetes/ea-hub.yaml
+#         kubectl apply -n ea-hub -f deploy/kubernetes/ea-hub.yaml   (resources carry no namespace: use -n)
 # Then edit APP_URL / the Ingress host below, or better: use Helm (docs/helm.md).
 ---
 # Source: ea-hub/templates/backup.yaml

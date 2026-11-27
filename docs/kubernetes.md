@@ -22,7 +22,7 @@
 
 4. **طبّق باقي الموارد:**
    ```bash
-   kubectl apply -f deploy/kubernetes/ea-hub.yaml
+   kubectl apply -n ea-hub -f deploy/kubernetes/ea-hub.yaml
    kubectl -n ea-hub rollout status deploy/ea-hub
    ```
 
@@ -38,7 +38,7 @@
 
 ```bash
 git pull
-kubectl apply -f deploy/kubernetes/ea-hub.yaml
+kubectl apply -n ea-hub -f deploy/kubernetes/ea-hub.yaml
 ```
 
 بعدها أعد تعديلات العنوان من الخطوة 3. لهذا السبب Helm أريح على المدى الطويل: انظر [helm.md](helm.md).

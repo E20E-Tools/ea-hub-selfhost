@@ -8,7 +8,7 @@ cd "$(dirname "$0")/../.."
   echo "# GENERATED from deploy/helm/ea-hub by deploy/kubernetes/render.sh — do not edit by hand."
   echo "# Apply:  kubectl apply -f deploy/kubernetes/namespace.yaml"
   echo "#         kubectl apply -f my-secret.yaml        (copy of secret.example.yaml with your values)"
-  echo "#         kubectl apply -f deploy/kubernetes/ea-hub.yaml"
+  echo "#         kubectl apply -n ea-hub -f deploy/kubernetes/ea-hub.yaml   (resources carry no namespace: use -n)"
   echo "# Then edit APP_URL / the Ingress host below, or better: use Helm (docs/helm.md)."
   helm template ea-hub deploy/helm/ea-hub \
     --namespace ea-hub \
