@@ -370,6 +370,11 @@ export const registerAssistantVisitor = createServerFn({ method: "POST" })
           turnstile,
           data.turnstile,
           clientIp(request),
+          fetch,
+          {
+            hostname: new URL(request.url).hostname,
+            action: turnstileServer.TURNSTILE_REGISTER_ACTION,
+          },
         ))
       )
         return { ok: false, message: text.failed };

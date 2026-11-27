@@ -325,6 +325,8 @@ describe("7) daily scheduled cleanup", () => {
 });
 
 describe("8) assistant_replies is retired", () => {
+  // The first import of the server-function module loads TanStack Start cold; under a
+  // full-suite run that alone can pass the default 5 s.
   it("admin reads AI replies from live_chat_messages", async () => {
     const { toAssistantReplyRow } =
       await import("@/lib/admin-monitor.functions");
@@ -355,7 +357,7 @@ describe("8) assistant_replies is retired", () => {
         /from\("assistant_replies"\)/,
       );
     }
-  });
+  }, 20_000);
 });
 
 describe("9) sitemap leaves out switched-off, hidden and empty pages", () => {

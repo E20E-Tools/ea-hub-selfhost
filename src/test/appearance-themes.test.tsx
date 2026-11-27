@@ -21,7 +21,19 @@ import { AppearanceSettings } from "@/components/admin/settings-appearance";
 afterEach(() => {
   cleanup();
   transport.save.mockReset();
+  // A test that stops midway must not leave its preview theme for the next one.
+  delete document.documentElement.dataset["designTheme"];
 });
+
+// The settings panel is a large tree, and role queries compute visibility for every node.
+// Skipping that check (hidden: true) keeps these interaction tests well inside their time
+// budget on a loaded machine; the controls queried here are always visible.
+const radio = (name: string) =>
+  screen.getByRole("radio", { name, hidden: true });
+const button = (name: RegExp) =>
+  screen.getByRole("button", { name, hidden: true });
+/** Render, preview, discard, save and reload: allow for a full-suite run on a slow machine. */
+const INTERACTION_TIMEOUT_MS = 20_000;
 
 const newIds: DesignThemeId[] = ["circuit-core", "transformation-board"];
 it.each(newIds)(
@@ -49,13 +61,13 @@ it.each(newIds)(
     const view = mount();
     const meta = DESIGN_THEMES.find((item) => item.id === theme);
     if (!meta) throw new Error("missing theme");
-    fireEvent.click(screen.getByRole("radio", { name: meta.name.en }));
+    fireEvent.click(radio(meta.name.en));
     expect(document.documentElement.dataset["designTheme"]).toBe(theme);
     expect(transport.save).not.toHaveBeenCalled();
-    fireEvent.click(screen.getByRole("button", { name: /discard/i }));
+    fireEvent.click(button(/discard/i));
     expect(document.documentElement.dataset["designTheme"]).toBe("classic");
-    fireEvent.click(screen.getByRole("radio", { name: meta.name.en }));
-    fireEvent.click(screen.getByRole("button", { name: /^save$/i }));
+    fireEvent.click(radio(meta.name.en));
+    fireEvent.click(button(/^save$/i));
     await waitFor(() => expect(transport.save).toHaveBeenCalledTimes(1));
     expect(stored.designTheme).toEqual({
       theme,
@@ -66,31 +78,37 @@ it.each(newIds)(
     expect(stored.headingFont).toBe(original.headingFont);
     view.unmount();
     mount();
-    expect(
-      screen
-        .getByRole("radio", { name: meta.name.en })
-        .getAttribute("aria-checked"),
-    ).toBe("true");
+    expect(radio(meta.name.en).getAttribute("aria-checked")).toBe("true");
     expect(document.documentElement.dataset["designTheme"]).toBe(theme);
   },
+  INTERACTION_TIMEOUT_MS,
 );
 
-it("failed saves keep the draft without replacing the saved theme", async () => {
-  transport.save.mockResolvedValue({ ok: false, message: "errSaveAppearance" });
-  const view = render(
-    <QueryClientProvider client={new QueryClient()}>
-      <AppearanceSettings
-        catalog={{ settings: defaultSettings, products: [] }}
-      />
-    </QueryClientProvider>,
-  );
-  fireEvent.click(screen.getByRole("radio", { name: "Circuit Core" }));
-  fireEvent.click(screen.getByRole("button", { name: /^save$/i }));
-  await waitFor(() => expect(transport.save).toHaveBeenCalled());
-  expect(document.documentElement.dataset["designTheme"]).toBe("circuit-core");
-  view.unmount();
-  expect(document.documentElement.dataset["designTheme"]).toBe("classic");
-});
+it(
+  "failed saves keep the draft without replacing the saved theme",
+  async () => {
+    transport.save.mockResolvedValue({
+      ok: false,
+      message: "errSaveAppearance",
+    });
+    const view = render(
+      <QueryClientProvider client={new QueryClient()}>
+        <AppearanceSettings
+          catalog={{ settings: defaultSettings, products: [] }}
+        />
+      </QueryClientProvider>,
+    );
+    fireEvent.click(radio("Circuit Core"));
+    fireEvent.click(button(/^save$/i));
+    await waitFor(() => expect(transport.save).toHaveBeenCalled());
+    expect(document.documentElement.dataset["designTheme"]).toBe(
+      "circuit-core",
+    );
+    view.unmount();
+    expect(document.documentElement.dataset["designTheme"]).toBe("classic");
+  },
+  INTERACTION_TIMEOUT_MS,
+);
 
 it("lists Classic plus nine experience themes, each previewing its own homepage", () => {
   render(

@@ -5,6 +5,7 @@ type TurnstileApi = {
     el: HTMLElement,
     options: {
       sitekey: string;
+      action?: string;
       language?: string;
       callback: (token: string) => void;
       "expired-callback": () => void;
@@ -66,6 +67,8 @@ export function TurnstileWidget({
         api = loaded;
         id = loaded.render(ref.current, {
           sitekey: siteKey,
+          // Must match TURNSTILE_REGISTER_ACTION, which the server checks in siteverify.
+          action: "archy-register",
           language,
           callback: (token) => handlers.current.onToken(token),
           "expired-callback": () => handlers.current.onToken(""),

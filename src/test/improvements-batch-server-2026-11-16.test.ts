@@ -164,7 +164,13 @@ describe("2) registration challenge", () => {
   it("uses Turnstile with server-side siteverify when both keys are set", async () => {
     vi.stubEnv("TURNSTILE_SITE_KEY", "site-key");
     vi.stubEnv("TURNSTILE_SECRET_KEY", "secret-key");
-    const fetcher = vi.fn(async () => Response.json({ success: true }));
+    const fetcher = vi.fn(async () =>
+      Response.json({
+        success: true,
+        hostname: "www.e20e.tools",
+        action: "archy-register",
+      }),
+    );
     vi.stubGlobal("fetch", fetcher);
     expect(await getAssistantChallenge()).toEqual({
       mode: "turnstile",
@@ -176,6 +182,23 @@ describe("2) registration challenge", () => {
     fetcher.mockResolvedValueOnce(Response.json({ success: false }));
     expect((await register({ turnstile: "cf-token" })).ok).toBe(false);
     expect((await register({ turnstile: "" })).ok).toBe(false);
+    // A token solved on another site that reuses the key, or for another widget, is refused.
+    fetcher.mockResolvedValueOnce(
+      Response.json({
+        success: true,
+        hostname: "attacker.example",
+        action: "archy-register",
+      }),
+    );
+    expect((await register({ turnstile: "cf-token" })).ok).toBe(false);
+    fetcher.mockResolvedValueOnce(
+      Response.json({
+        success: true,
+        hostname: "www.e20e.tools",
+        action: "other-form",
+      }),
+    );
+    expect((await register({ turnstile: "cf-token" })).ok).toBe(false);
   });
 });
 

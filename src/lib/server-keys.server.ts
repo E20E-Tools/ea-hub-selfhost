@@ -7,10 +7,25 @@
 const encoder = new TextEncoder();
 const PREFIX = "enc:v1:";
 
-/** Root secrets, current first. With APP_ENCRYPTION_KEY set, the service key is the previous one. */
+/**
+ * Root secrets, current first. With APP_ENCRYPTION_KEY set, the service key is the previous
+ * one, so tokens and saved values from before the switch-over keep working.
+ *
+ * Once the switch-over is complete, APP_ENCRYPTION_RETIRE_LEGACY=true drops the service key
+ * as a root: tokens signed with it stop verifying and nothing derived from it is accepted.
+ * It only takes effect while APP_ENCRYPTION_KEY is set (otherwise there would be no root).
+ * Before enabling it, open the admin AI settings once so the saved provider key is
+ * re-encrypted with the new root; guest passes (24 h) and tour links signed earlier expire.
+ */
 export function rootSecrets(): string[] {
   const dedicated = process.env["APP_ENCRYPTION_KEY"]?.trim();
-  const legacy = process.env["SUPABASE_SERVICE_ROLE_KEY"];
+  const retireLegacy =
+    Boolean(dedicated) &&
+    process.env["APP_ENCRYPTION_RETIRE_LEGACY"]?.trim().toLowerCase() ===
+      "true";
+  const legacy = retireLegacy
+    ? undefined
+    : process.env["SUPABASE_SERVICE_ROLE_KEY"];
   const roots = [dedicated, legacy].filter((v): v is string => Boolean(v));
   if (roots.length === 0) throw new Error("Server secret not configured");
   return [...new Set(roots)];
