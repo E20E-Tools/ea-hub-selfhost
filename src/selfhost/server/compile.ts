@@ -174,7 +174,10 @@ export function parseSelect(columns: string | undefined): SelectItem[] {
     let cast: string | undefined;
     const castAt = name.indexOf("::");
     if (castAt > 0) {
-      cast = name.slice(castAt + 2).trim().toLowerCase();
+      cast = name
+        .slice(castAt + 2)
+        .trim()
+        .toLowerCase();
       name = name.slice(0, castAt).trim();
       if (!SELECT_CASTS.has(cast))
         throw new CompileError(`Unsupported cast: ${cast.slice(0, 32)}`);
