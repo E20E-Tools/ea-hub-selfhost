@@ -53,7 +53,7 @@ cd ea-hub-selfhost
 | Docker Compose | خادم واحد، الأسهل للجميع | [docs/install-docker.md](docs/install-docker.md) |
 | Helm | من لديه Kubernetes (k3s، أو AKS/EKS/GKE…) | [docs/helm.md](docs/helm.md) |
 | ملفات Kubernetes خام | Kubernetes بدون Helm | [docs/kubernetes.md](docs/kubernetes.md) |
-| **English guide** (Helm or YAML, with requirements and screenshots) | for new teams | [docs/en/deploy-kubernetes.md](docs/en/deploy-kubernetes.md) |
+| **English guides**: Docker, local Kubernetes, Kubernetes (Helm/YAML), OpenShift, Rancher, Azure Container Apps, AWS ECS Fargate, Google Cloud Run | for new teams | [docs/en/README.md](docs/en/README.md) |
 
 ## إدارة التشغيل اليومي
 

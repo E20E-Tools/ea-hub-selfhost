@@ -2,7 +2,7 @@
 
 This guide is for someone **new to EA-Hub** who wants to run it on their own Kubernetes cluster, using either the **Helm chart** (recommended) or the **plain YAML file** (no Helm). It starts with what you need to have, then walks through every step until you are signed in to the admin console.
 
-> Prefer a single server without Kubernetes? Docker Compose is simpler: see [docs/install-docker.md](../install-docker.md) (Arabic) or just run `./setup.sh`.
+> Other platforms (Docker, local Kubernetes, OpenShift, Rancher, Azure, AWS, Google Cloud): see the [guide index](README.md).
 
 **Contents**
 
