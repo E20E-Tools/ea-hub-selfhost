@@ -33,9 +33,11 @@ spec:
       {{- end }}
       securityContext:
         runAsNonRoot: true
+        {{- if not .Values.openshift.enabled }}
         runAsUser: 1000
         runAsGroup: 1000
         fsGroup: 1000
+        {{- end }}
         seccompProfile:
           type: RuntimeDefault
       {{- if .Values.migrate.initContainer }}

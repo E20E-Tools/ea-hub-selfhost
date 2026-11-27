@@ -51,6 +51,44 @@ jobs:
           SELFHOST_TEST_DATABASE_URL: postgres://eahub_app:ci-app-password@localhost:5432/eahub
         run: npx vitest run
 
+  # Managed PostgreSQL (RDS, Azure, Cloud SQL…): the admin account is not a superuser and
+  # cannot grant BYPASSRLS. The setup must fall back to "owner mode" and still pass.
+  managed-db:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_PASSWORD: ci-postgres-password
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 5s --health-timeout 5s --health-retries 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: oven-sh/setup-bun@v2
+      - run: bun install --frozen-lockfile
+      - name: Create a non-superuser owner, like a cloud database admin
+        env:
+          PGPASSWORD: ci-postgres-password
+        run: |
+          psql -h localhost -U postgres -v ON_ERROR_STOP=1 \
+            -c "create role cloudadmin login createrole createdb password 'cloud-admin-password'" \
+            -c "create database eahub_cloud owner cloudadmin"
+      - name: Prepare database as that owner (expects owner mode)
+        env:
+          DATABASE_ADMIN_URL: postgres://cloudadmin:cloud-admin-password@localhost:5432/eahub_cloud
+        run: |
+          node selfhost/scripts/migrate.mjs | tee /tmp/migrate.log
+          grep -q "owner mode" /tmp/migrate.log
+          node selfhost/scripts/migrate.mjs
+      - name: Adapter integration tests as the owner
+        env:
+          SELFHOST_TEST_DATABASE_URL: postgres://cloudadmin:cloud-admin-password@localhost:5432/eahub_cloud
+        run: npx vitest run src/selfhost/test
+
   helm:
     runs-on: ubuntu-latest
     permissions:
@@ -74,6 +112,13 @@ jobs:
           grep -q "kind: StatefulSet" /tmp/default.yaml
           if grep -q "kind: StatefulSet" /tmp/external.yaml; then exit 1; fi
           grep -q "kind: Ingress" /tmp/ingress.yaml
+      - name: OpenShift mode (no fixed UIDs, Debian postgres, Route)
+        run: |
+          helm lint deploy/helm/ea-hub --strict --set appUrl=https://hub.apps.example.com --set openshift.enabled=true
+          helm template ea-hub deploy/helm/ea-hub --set appUrl=https://hub.apps.example.com --set openshift.enabled=true > /tmp/os.yaml
+          if grep -qE "runAsUser|fsGroup" /tmp/os.yaml; then echo "fixed UID in OpenShift mode"; exit 1; fi
+          grep -q "kind: Route" /tmp/os.yaml
+          grep -q "image: postgres:16$" /tmp/os.yaml
       - name: Schema rejects bad values
         run: |
           if helm template x deploy/helm/ea-hub --set appUrl=not-a-url >/dev/null 2>&1; then exit 1; fi
@@ -150,6 +195,10 @@ jobs:
           sleep 6
           cat /tmp/sse.txt | cut -c1-200
           grep -q 'sse-e2e@example.com' /tmp/sse.txt
+      - name: Image runs under a random UID (OpenShift)
+        run: |
+          docker run --rm --user 1000770000:0 --entrypoint node ea-hub-selfhost:ci -e \
+            "require('fs').writeFileSync('/data/storage/probe','ok'); require('fs').accessSync('/app/.output/server/index.mjs'); console.log('random uid ok')"
       - name: Scheduled job and backup
         run: |
           docker compose exec -T cron node selfhost/scripts/run-job.mjs daily-cleanup
@@ -186,7 +235,11 @@ jobs:
             --set image.repository=ea-hub-selfhost --set image.tag=ci --set image.pullPolicy=Never \
             --set appUrl=http://localhost:8080 \
             --set admin.email=kind-admin@example.com --set admin.password=kind-admin-password \
-            --wait --timeout 10m
+            --timeout 10m
+          # Not --wait: with WaitForFirstConsumer storage (kind, k3s local-path, many CSI) the
+          # backups PVC stays Pending until the first backup runs. Wait for the workloads.
+          kubectl -n ea-hub rollout status statefulset/ea-hub-postgres --timeout=10m
+          kubectl -n ea-hub rollout status deploy/ea-hub --timeout=10m
           kubectl -n ea-hub get pods
       - name: Health and sign-in through the Service
         run: |
@@ -204,7 +257,8 @@ jobs:
       - name: Upgrade keeps generated secrets
         run: |
           before=$(kubectl -n ea-hub get secret ea-hub -o jsonpath='{.data.app-encryption-key}')
-          helm upgrade ea-hub deploy/helm/ea-hub -n ea-hub --reuse-values --wait --timeout 10m
+          helm upgrade ea-hub deploy/helm/ea-hub -n ea-hub --reuse-values --timeout 10m
+          kubectl -n ea-hub rollout status deploy/ea-hub --timeout=10m
           after=$(kubectl -n ea-hub get secret ea-hub -o jsonpath='{.data.app-encryption-key}')
           test "$before" = "$after"
       - name: Diagnostics on failure

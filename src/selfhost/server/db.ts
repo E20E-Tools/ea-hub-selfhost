@@ -37,15 +37,44 @@ type Tx = postgres.TransactionSql<Record<string, never>>;
  * `role` and `request.jwt.claims` are transaction-local, so RLS policies, auth.uid() and
  * auth.role() see the same values they saw on Supabase.
  */
+let ownerMode: Promise<boolean> | undefined;
+
+/**
+ * Managed PostgreSQL (RDS, Azure, Cloud SQL…) cannot give service_role BYPASSRLS. Then
+ * service requests keep the login role, which must own the tables (owners are not
+ * restricted by RLS); migrate.mjs explains the setup. Detected once per process.
+ */
+function serviceRunsAsOwner(): Promise<boolean> {
+  if (!ownerMode) {
+    ownerMode = db()
+      .unsafe<{ bypass: boolean }[]>(
+        "select rolbypassrls as bypass from pg_roles where rolname = 'service_role'",
+      )
+      .then((rows) => rows[0]?.bypass === false)
+      .catch((error) => {
+        ownerMode = undefined;
+        throw error;
+      });
+  }
+  return ownerMode;
+}
+
 export async function asRole<T>(
   auth: RequestAuth,
   work: (tx: Tx) => Promise<T>,
 ): Promise<T> {
+  const keepLoginRole =
+    auth.role === "service_role" && (await serviceRunsAsOwner());
   return (await db().begin(async (tx) => {
-    await tx.unsafe(
-      "select set_config('role', $1, true), set_config('request.jwt.claims', $2, true)",
-      [auth.role, JSON.stringify(auth.claims)],
-    );
+    if (keepLoginRole)
+      await tx.unsafe("select set_config('request.jwt.claims', $1, true)", [
+        JSON.stringify(auth.claims),
+      ]);
+    else
+      await tx.unsafe(
+        "select set_config('role', $1, true), set_config('request.jwt.claims', $2, true)",
+        [auth.role, JSON.stringify(auth.claims)],
+      );
     return work(tx as unknown as Tx);
   })) as T;
 }

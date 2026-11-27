@@ -90,7 +90,22 @@
       "if": { "properties": { "enabled": { "const": true } } },
       "then": { "properties": { "host": { "minLength": 1 } } }
     },
-    "trustProxyHops": { "type": "integer", "minimum": 0, "maximum": 5 },
+    "openshift": {
+      "type": "object",
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "route": {
+          "type": "object",
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "host": { "type": "string" },
+            "tls": { "type": "boolean" },
+            "annotations": { "type": "object" }
+          }
+        }
+      }
+    },
+    "trustProxyHops":{ "type": "integer", "minimum": 0, "maximum": 5 },
     "storage": {
       "type": "object",
       "properties": {

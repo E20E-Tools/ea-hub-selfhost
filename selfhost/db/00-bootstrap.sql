@@ -17,7 +17,13 @@ begin
     create role authenticated nologin noinherit;
   end if;
   if not exists (select from pg_roles where rolname = 'service_role') then
-    create role service_role nologin noinherit bypassrls;
+    begin
+      create role service_role nologin noinherit bypassrls;
+    exception when insufficient_privilege then
+      -- Managed PostgreSQL (RDS, Azure, Cloud SQL…) does not allow BYPASSRLS. The app then
+      -- runs service requests as the table owner, which RLS does not restrict ("owner mode").
+      create role service_role nologin noinherit;
+    end;
   end if;
 end
 $$;

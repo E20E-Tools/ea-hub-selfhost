@@ -131,3 +131,9 @@ capabilities:
 {{- define "ea-hub.keep" -}}
 {{- if .value -}}{{ .value | b64enc }}{{- else if hasKey .old .key -}}{{ index .old .key }}{{- else -}}{{ randAlphaNum .length | b64enc }}{{- end -}}
 {{- end -}}
+
+{{/* OpenShift runs pods under a random user ID: the Debian postgres image supports that
+     (nss_wrapper); the Alpine default is swapped for it in OpenShift mode. */}}
+{{- define "ea-hub.postgresImage" -}}
+{{- if and .Values.openshift.enabled (eq .Values.postgres.image "postgres:16-alpine") -}}postgres:16{{- else -}}{{ .Values.postgres.image }}{{- end -}}
+{{- end -}}

@@ -6,7 +6,11 @@ EA-Hub is being installed in namespace "{{ .Release.Namespace }}".
    kubectl -n {{ .Release.Namespace }} rollout status deploy/{{ include "ea-hub.fullname" . }} --timeout=10m
 
 2) Open the site / افتح الموقع:
-{{- if .Values.ingress.enabled }}
+{{- if and .Values.openshift.enabled .Values.openshift.route.enabled }}
+
+   oc -n {{ .Release.Namespace }} get route {{ include "ea-hub.fullname" . }} -o jsonpath='{.spec.host}'
+   appUrl must be https://<that host>; if it differs from "{{ .Values.appUrl }}", run helm upgrade with --set appUrl=…
+{{- else if .Values.ingress.enabled }}
 
    {{ .Values.appUrl }}
    (DNS for {{ .Values.ingress.host }} must point to your ingress controller.)

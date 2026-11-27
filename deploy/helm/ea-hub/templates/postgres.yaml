@@ -36,13 +36,15 @@ spec:
         app.kubernetes.io/component: database
     spec:
       securityContext:
+        {{- if not .Values.openshift.enabled }}
         # postgres:16-alpine runs as uid/gid 70
         fsGroup: 70
+        {{- end }}
         seccompProfile:
           type: RuntimeDefault
       containers:
         - name: postgres
-          image: {{ .Values.postgres.image }}
+          image: {{ include "ea-hub.postgresImage" . }}
           ports:
             - name: postgres
               containerPort: 5432

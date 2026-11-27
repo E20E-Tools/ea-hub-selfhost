@@ -63,7 +63,7 @@ spec:
           {{- end }}
           containers:
             - name: backup
-              image: {{ .Values.postgres.image }}
+              image: {{ include "ea-hub.postgresImage" . }}
               command: ["/bin/sh", "/backup/backup.sh", "now"]
               env:
                 - name: PGHOST

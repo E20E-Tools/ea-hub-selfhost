@@ -85,6 +85,19 @@ ingress:
     # cert-manager.io/cluster-issuer: letsencrypt
     # nginx.ingress.kubernetes.io/proxy-body-size: 12m
 
+openshift:
+  # -- Red Hat OpenShift / OKD: let the restricted SCC choose user and group IDs (no fixed
+  # UIDs in the pods), use the Debian postgres image (works with random UIDs), and publish
+  # the site with a Route. Leave ingress.enabled=false when you use the Route.
+  enabled: false
+  route:
+    enabled: true
+    # -- Empty = OpenShift generates <release>-<namespace>.<apps domain>.
+    host: ""
+    # -- Edge TLS with the router certificate; HTTP redirects to HTTPS.
+    tls: true
+    annotations: {}
+
 # -- Number of trusted reverse-proxy hops in front of the app (the ingress controller = 1).
 # Used to read the visitor IP from X-Forwarded-For for rate limiting.
 trustProxyHops: 1

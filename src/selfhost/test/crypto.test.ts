@@ -7,7 +7,6 @@ import {
   verifyPassword,
 } from "../server/crypto";
 // The migrate/admin scripts are plain Node; they must write hashes the app can verify.
-// @ts-expect-error untyped .mjs helper
 import {
   hashPassword as scriptHash,
   passwordMatches,
@@ -16,7 +15,7 @@ import { safeObjectPath } from "../server/storage";
 
 describe("self-host crypto", () => {
   it("app and setup scripts share one password format", async () => {
-    const fromScript = (await scriptHash("correct horse battery")) as string;
+    const fromScript = await scriptHash("correct horse battery");
     expect(await verifyPassword("correct horse battery", fromScript)).toBe(
       true,
     );

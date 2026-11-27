@@ -56,7 +56,17 @@ try {
   const appUser = process.env.APP_DB_USER || "eahub_app";
   const appPassword = process.env.APP_DB_PASSWORD;
   const [{ current_user: owner }] = await sql`select current_user`;
-  if (appPassword && appUser !== owner) {
+  const [{ bypass }] =
+    await sql`select rolbypassrls as bypass from pg_roles where rolname = 'service_role'`;
+  if (!bypass) {
+    // Owner mode (managed PostgreSQL without BYPASSRLS): the app must log in as the owner
+    // of the tables, which RLS does not restrict. The owner needs the API roles to switch to.
+    await sql.unsafe(`grant anon, authenticated, service_role to ${ident(owner)}`);
+    log(
+      `owner mode: this database does not allow BYPASSRLS (normal for managed PostgreSQL). ` +
+        `Run the app with APP_DB_USER=${owner} and that account's password (see docs/en/deploy-cloud-containers.md).`,
+    );
+  } else if (appPassword && appUser !== owner) {
     const role = ident(appUser);
     const [exists] = await sql`select 1 from pg_roles where rolname = ${appUser}`;
     // The password goes in as a literal (ALTER ROLE does not take parameters); quote it safely.

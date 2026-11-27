@@ -61,15 +61,16 @@ ENV NODE_ENV=production \
     EA_HUB_VERSION=${VERSION} \
     NODE_OPTIONS=--enable-source-maps
 
-COPY --from=build --chown=node:node /app/.output ./.output
-COPY --from=build --chown=node:node /runtime/node_modules ./node_modules
-COPY --from=build --chown=node:node /app/drizzle/migrations ./drizzle/migrations
-COPY --from=build --chown=node:node /app/selfhost ./selfhost
-COPY --from=build --chown=node:node /app/local-backend/semantic.mjs ./local-backend/semantic.mjs
-COPY --from=build --chown=node:node /app/local-backend/node_modules ./local-backend/node_modules
-COPY --from=build --chown=node:node /app/.local/models ./.local/models
+COPY --from=build --chown=node:0 /app/.output ./.output
+COPY --from=build --chown=node:0 /runtime/node_modules ./node_modules
+COPY --from=build --chown=node:0 /app/drizzle/migrations ./drizzle/migrations
+COPY --from=build --chown=node:0 /app/selfhost ./selfhost
+COPY --from=build --chown=node:0 /app/local-backend/semantic.mjs ./local-backend/semantic.mjs
+COPY --from=build --chown=node:0 /app/local-backend/node_modules ./local-backend/node_modules
+COPY --from=build --chown=node:0 /app/.local/models ./.local/models
 
-RUN mkdir -p /data/storage && chown -R node:node /data
+# Group 0 + group-writable: also runs under OpenShift's random user IDs (always in group 0).
+RUN mkdir -p /data/storage && chown -R node:0 /data && chmod -R g+rwX /data
 VOLUME ["/data/storage"]
 
 USER node

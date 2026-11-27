@@ -1,0 +1,30 @@
+{{- if and .Values.openshift.enabled .Values.openshift.route.enabled }}
+# OpenShift Route: the router serves the site, with edge TLS using its default certificate
+# (or the one you configure on the router / via cert-manager's openshift-routes).
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: {{ include "ea-hub.fullname" . }}
+  labels:
+    {{- include "ea-hub.labels" . | nindent 4 }}
+  {{- with .Values.openshift.route.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- with .Values.openshift.route.host }}
+  host: {{ . | quote }}
+  {{- end }}
+  to:
+    kind: Service
+    name: {{ include "ea-hub.fullname" . }}
+    weight: 100
+  port:
+    targetPort: http
+  {{- if .Values.openshift.route.tls }}
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+  {{- end }}
+  wildcardPolicy: None
+{{- end }}
