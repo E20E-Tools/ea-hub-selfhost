@@ -20,3 +20,7 @@ export function budgetAlertThreshold(limit: number): number {
 export function ipEmailSubject(ip: string, email: string): string {
   return `${ip}|${email.trim().toLowerCase()}`;
 }
+
+/** Site-wide daily cap on visitor work-assistant completions (paid OpenAI calls). */
+export const WORK_AI_GLOBAL_DAY_LIMIT = 200;
+export const WORK_AI_GLOBAL_BUCKET = "archy-work-ai:global-day";

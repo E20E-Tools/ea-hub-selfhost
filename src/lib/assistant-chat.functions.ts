@@ -265,6 +265,13 @@ export function validateRegistration(value: unknown): {
   return assistantRegistrationSchema.parse(value);
 }
 
+/**
+ * Per-IP hourly ceilings for the registration gate. Generous on purpose: many visitors can
+ * share one corporate IP, while a script that re-mints browser cookies is still bounded.
+ */
+export const CHALLENGE_IP_HOURLY_LIMIT = 60;
+export const REGISTRATION_IP_HOURLY_LIMIT = 20;
+
 export type AssistantChallenge =
   | { mode: "math"; a: number; b: number; token: string }
   | { mode: "turnstile"; siteKey: string; token: "" };
@@ -279,8 +286,23 @@ export const getAssistantChallenge = createServerFn({ method: "GET" }).handler(
     if (!(await serverFeatureEnabled("assistant")))
       throw new Error(TEXT.ar.failed);
     const { registrationBrowser } = await import("./assistant-gate.server");
-    const { setResponseHeader } = await import("@tanstack/react-start/server");
+    const { setResponseHeader, getRequest } =
+      await import("@tanstack/react-start/server");
     setResponseHeader("Cache-Control", "private, no-store");
+    // Each challenge mints a fresh registration cookie, so the per-browser registration quota
+    // alone can be reset at will; the client IP bounds how many a script can collect.
+    const { consumeLimits, clientIp } = await import("./rate-limit.server");
+    if (
+      !(await consumeLimits([
+        {
+          bucket: "assistant-challenge:ip",
+          subject: clientIp(getRequest()),
+          limit: CHALLENGE_IP_HOURLY_LIMIT,
+          windowSeconds: 3600,
+        },
+      ]))
+    )
+      throw new Error(TEXT.ar.limit);
     await registrationBrowser(true);
     const turnstile = (await import("./turnstile.server")).turnstileConfig();
     if (turnstile)
@@ -314,7 +336,21 @@ export const registerAssistantVisitor = createServerFn({ method: "POST" })
     const { serverFeatureEnabled } = await import("./site-features.server");
     if (!(await serverFeatureEnabled("assistant")))
       return { ok: false, message: text.failed };
-    const { clientIp, hashSubject } = await import("./rate-limit.server");
+    const { clientIp, hashSubject, consumeLimits } =
+      await import("./rate-limit.server");
+    // Per-IP ceiling on top of the per-browser quota: the browser cookie is free to re-mint,
+    // so without this a script could register without limit (always when Turnstile is off).
+    if (
+      !(await consumeLimits([
+        {
+          bucket: "assistant-register:ip",
+          subject: clientIp(request),
+          limit: REGISTRATION_IP_HOURLY_LIMIT,
+          windowSeconds: 3600,
+        },
+      ]))
+    )
+      return { ok: false, message: text.limit };
     const gate = await import("./assistant-gate.server");
     const browser = await gate.registrationBrowser(false);
     if (!browser)

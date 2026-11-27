@@ -61,6 +61,10 @@ export const inputSchema = z.object({
   content: z.string().max(8000),
 });
 export type WorkInput = z.infer<typeof inputSchema>;
+/** Visitor requests also carry the signed Archy pass; the server verifies it. */
+export const visitorInputSchema = inputSchema.extend({
+  access: z.string().max(4096).default(""),
+});
 export function permittedFields(input: WorkInput, policy: Policy) {
   const rule = policy[input.feature];
   if (!rule.enabled) return {};

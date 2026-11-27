@@ -16,6 +16,7 @@ import {
   issueCompletion,
 } from "@/lib/work-assistant.functions";
 import { dictionaries } from "@/lib/copy";
+import { currentVisitorAccess } from "@/lib/current-visitor-access";
 
 export function useWorkPolicy() {
   return useQuery({
@@ -142,14 +143,17 @@ export function CloudOption({
           set("");
           setModel("");
           try {
-            const fn = feature === "issue" ? issueCompletion : workCompletion;
-            const res = await fn({
-              data: {
-                ...input,
-                context: fields.context ?? "",
-                content: fields.content ?? "",
-              },
-            });
+            const payload = {
+              ...input,
+              context: fields.context ?? "",
+              content: fields.content ?? "",
+            };
+            const res =
+              feature === "issue"
+                ? await issueCompletion({ data: payload })
+                : await workCompletion({
+                    data: { ...payload, access: await currentVisitorAccess() },
+                  });
             set(res.body);
             setModel(res.model);
           } catch {
