@@ -631,6 +631,13 @@
       "when": 1795040841109,
       "tag": "0089_semantic_search",
       "breakpoints": true
+    },
+    {
+      "idx": 90,
+      "version": "7",
+      "when": 1795040901109,
+      "tag": "0090_open_chat_unique_and_registration_retention",
+      "breakpoints": true
     }
   ]
 }

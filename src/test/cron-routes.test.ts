@@ -48,13 +48,25 @@ describe("scheduled job routes", () => {
     );
   });
 
-  it("Vercel schedules both jobs", () => {
+  it("Vercel schedules every job", () => {
     const vercel = JSON.parse(readFileSync("vercel.json", "utf8")) as {
       crons: { path: string }[];
     };
     expect(vercel.crons.map((c) => c.path).sort()).toEqual([
       "/api/public/jobs/daily-cleanup",
       "/api/public/jobs/newsletter",
+      "/api/public/jobs/semantic-index",
     ]);
+  });
+
+  it("the semantic index job is GET/POST behind the cron secret", () => {
+    const job = readFileSync(
+      "src/routes/api/public/jobs/semantic-index.ts",
+      "utf8",
+    );
+    expect(job).toContain("authenticateCronRequest(request)");
+    expect(job).toMatch(
+      /GET:\s*\(\{ request \}\) => runSemanticIndex\(request\)/,
+    );
   });
 });

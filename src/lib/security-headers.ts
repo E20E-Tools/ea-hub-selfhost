@@ -37,16 +37,35 @@ function backendOrigins(value: string | undefined): string[] {
   }
 }
 
+/** Base64 nonce characters only, so a value can never break out of the header. */
+const NONCE_PATTERN = /^[A-Za-z0-9+/]{16,64}={0,2}$/;
+
+/** Fresh per-response script nonce (128 random bits, base64). */
+export function createCspNonce(): string {
+  const bytes = crypto.getRandomValues(new Uint8Array(16));
+  let binary = "";
+  for (const byte of bytes) binary += String.fromCharCode(byte);
+  return btoa(binary);
+}
+
 /**
  * CSP_ENFORCED plus the configured Supabase origin in connect-src (with its websocket) and
  * img-src. Needed for the local backend (http://127.0.0.1:54365) and custom Supabase
  * domains, which *.supabase.co does not cover.
+ *
+ * With a nonce, script-src also lists 'nonce-…'. Browsers that understand nonces then
+ * ignore 'unsafe-inline', so only the server-rendered scripts that carry the nonce run and an
+ * injected inline script is blocked; 'unsafe-inline' stays only as the fallback for
+ * browsers without nonce support.
  */
 export function contentSecurityPolicy(
   backendUrls: (string | undefined)[] = [],
+  nonce?: string,
 ): string {
   const origins = [...new Set(backendUrls.flatMap(backendOrigins))];
-  if (!origins.length) return CSP_ENFORCED;
+  const scriptNonce =
+    nonce && NONCE_PATTERN.test(nonce) ? `'nonce-${nonce}'` : "";
+  if (!origins.length && !scriptNonce) return CSP_ENFORCED;
   return CSP_ENFORCED.split("; ")
     .map((directive) => {
       const [name] = directive.split(" ");
@@ -55,7 +74,9 @@ export function contentSecurityPolicy(
           ? origins
           : name === "img-src"
             ? origins.filter((o) => o.startsWith("http"))
-            : [];
+            : name === "script-src" && scriptNonce
+              ? [scriptNonce]
+              : [];
       const missing = extra.filter((o) => !directive.split(" ").includes(o));
       return missing.length ? `${directive} ${missing.join(" ")}` : directive;
     })
@@ -70,6 +91,7 @@ function configuredBackendUrls(): (string | undefined)[] {
 export function applySecurityHeaders(
   h: Headers,
   backendUrls: (string | undefined)[] = configuredBackendUrls(),
+  nonce?: string,
 ): void {
   if (!h.has("x-content-type-options"))
     h.set("x-content-type-options", "nosniff");
@@ -80,6 +102,6 @@ export function applySecurityHeaders(
   if (!h.has("strict-transport-security"))
     h.set("strict-transport-security", "max-age=31536000; includeSubDomains");
   if (!h.has("content-security-policy"))
-    h.set("content-security-policy", contentSecurityPolicy(backendUrls));
+    h.set("content-security-policy", contentSecurityPolicy(backendUrls, nonce));
   if (!h.has("x-frame-options")) h.set("x-frame-options", "DENY");
 }

@@ -184,6 +184,8 @@ function RootShell({ children }: { children: ReactNode }) {
   const onAdmin = useRouterState({
     select: (state) => state.location.pathname.startsWith("/admin"),
   });
+  // Same per-request nonce the CSP header allows; undefined in the browser.
+  const nonce = useRouter().options.ssr?.nonce;
   // The cookie's language (masked by the Arabic switch) is sent from the first byte.
   const lang = effectiveLanguage(saved, arabicEnabled, onAdmin);
   return (
@@ -196,12 +198,19 @@ function RootShell({ children }: { children: ReactNode }) {
       suppressHydrationWarning
     >
       <head>
-        <script dangerouslySetInnerHTML={{ __html: directionBootstrap }} />
         <script
+          nonce={nonce}
+          dangerouslySetInnerHTML={{ __html: directionBootstrap }}
+        />
+        <script
+          nonce={nonce}
           dangerouslySetInnerHTML={{ __html: languageBootstrap(arabicEnabled) }}
         />
         {assistantEnabled ? (
-          <script dangerouslySetInnerHTML={{ __html: archyTourBootstrap }} />
+          <script
+            nonce={nonce}
+            dangerouslySetInnerHTML={{ __html: archyTourBootstrap }}
+          />
         ) : null}
         <HeadContent />
       </head>

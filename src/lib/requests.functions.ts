@@ -290,6 +290,33 @@ export const submitRequest = createServerFn({ method: "POST" })
         return replay ?? { ok: false, message: "rqErrReceipt" };
       }
       if (error) throw error;
+      // The count above and this insert are not atomic: two different submissions for the
+      // same email can both pass it. After inserting, only the earliest one in the window
+      // stays; a later concurrent one is removed and gets the usual "recent" answer.
+      // Best effort: if this check itself fails, the request is kept as before.
+      const first = await (async () => {
+        try {
+          const { data: row, error: firstError } = await supabaseAdmin
+            .from("suggestion_requests")
+            .select("id")
+            .eq("email", data.email)
+            .gte("created_at", since)
+            .order("created_at", { ascending: true })
+            .order("id", { ascending: true })
+            .limit(1)
+            .maybeSingle();
+          return firstError ? null : row;
+        } catch {
+          return null;
+        }
+      })();
+      if (first && first.id !== data.requestId) {
+        await supabaseAdmin
+          .from("suggestion_requests")
+          .delete()
+          .eq("id", data.requestId);
+        return { ok: false, message: "rqErrRecent" };
+      }
       saved = true;
       if (identity) {
         const ownership = await supabaseAdmin

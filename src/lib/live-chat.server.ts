@@ -16,15 +16,19 @@ export async function openChatFor(
   db: Admin,
   visitor: { id: string; email: string; name: string; language: string },
 ): Promise<{ id: string; status: string }> {
-  const { data: existing, error } = await db
-    .from("live_chats")
-    .select("id, status")
-    .eq("visitor_id", visitor.id)
-    .neq("status", "closed")
-    .order("last_message_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
-  if (error) throw error;
+  const findOpen = async () => {
+    const { data, error } = await db
+      .from("live_chats")
+      .select("id, status")
+      .eq("visitor_id", visitor.id)
+      .neq("status", "closed")
+      .order("last_message_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+    if (error) throw error;
+    return data;
+  };
+  const existing = await findOpen();
   if (existing) return existing;
   // Expired chats are purged by the daily cleanup job (/api/public/jobs/daily-cleanup), so
   // starting a chat never takes the purge's lock on support requests.
@@ -40,6 +44,12 @@ export async function openChatFor(
     })
     .select("id, status")
     .single();
+  // A simultaneous request already opened this visitor's chat (one open chat per visitor is
+  // enforced by a unique index): continue in that conversation instead of failing.
+  if (insertError?.code === "23505") {
+    const winner = await findOpen();
+    if (winner) return winner;
+  }
   if (insertError) throw insertError;
   return data;
 }

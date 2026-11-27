@@ -5,7 +5,7 @@ import {
 } from "@tanstack/react-start";
 
 import { renderErrorPage } from "./lib/error-page";
-import { applySecurityHeaders } from "./lib/security-headers";
+import { applySecurityHeaders, createCspNonce } from "./lib/security-headers";
 import { attachSupabaseAuth } from "@/integrations/supabase/auth-attacher";
 
 const errorMiddleware = createMiddleware().server(async ({ next }) => {
@@ -23,11 +23,14 @@ const errorMiddleware = createMiddleware().server(async ({ next }) => {
   }
 });
 
+// One nonce per request: the router reads it (src/router.tsx) to stamp every server-rendered
+// script, and the same value goes into this response's script-src.
 const securityHeaders = createMiddleware().server(async ({ next }) => {
-  const result = await next();
+  const nonce = createCspNonce();
+  const result = await next({ context: { nonce } });
   const response = (result as { response?: Response }).response;
   if (response instanceof Response) {
-    applySecurityHeaders(response.headers);
+    applySecurityHeaders(response.headers, undefined, nonce);
   }
   return result;
 });

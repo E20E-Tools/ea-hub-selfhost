@@ -160,6 +160,11 @@ async function indexedDocs(now = Date.now()): Promise<IndexedDocument[]> {
   return docs;
 }
 
+/** True when this query's embedding is already cached, so answering it costs nothing. */
+export function queryCached(query: string): boolean {
+  return queryCache.has(query.toLowerCase());
+}
+
 async function queryVector(
   model: NonNullable<Awaited<ReturnType<typeof embeddingModel>>>,
   query: string,

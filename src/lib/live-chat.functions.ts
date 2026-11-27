@@ -186,10 +186,23 @@ export const adminSendLiveMessage = createServerFn({ method: "POST" })
     const db = await live.adminClient();
     const { data: chat, error } = await db
       .from("live_chats")
-      .select("id, status")
+      .select("id, status, visitor_id")
       .eq("id", data.chatId)
       .maybeSingle();
     if (error || !chat) throw new Error("not found");
+    // Replying reopens a closed chat, but a visitor has at most one open chat (unique index):
+    // when they already started a newer conversation, the reply belongs there instead.
+    if (chat.status === "closed") {
+      const { data: newer, error: newerError } = await db
+        .from("live_chats")
+        .select("id")
+        .eq("visitor_id", chat.visitor_id)
+        .neq("status", "closed")
+        .limit(1)
+        .maybeSingle();
+      if (newerError) throw new Error("not found");
+      if (newer) throw new Error("newer chat open");
+    }
     const joining = chat.status !== "active";
     await live.appendMessages(
       db,
