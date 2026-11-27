@@ -32,3 +32,7 @@ Thumbs.db
 
 # Generated code graph
 graphify-out/
+
+# Self-host: secrets and data written by setup.sh / setup.ps1 / docker compose
+ea-hub-values.yaml
+backups/

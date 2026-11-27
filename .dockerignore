@@ -1,0 +1,28 @@
+# Never send local data, secrets or build output into the image build context.
+.git
+.github
+node_modules
+local-backend/node_modules
+local-backend/media
+.local
+.output
+.vercel
+.nitro
+.tanstack
+.vinxi
+dist
+graphify-out
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.log
+.vscode
+.idea
+Start-EA-Hub.cmd
+design-lab.html
+# Self-host: local secrets and data written by setup.sh / setup.ps1 and compose
+backups
+data
+deploy/compose/caddy-data

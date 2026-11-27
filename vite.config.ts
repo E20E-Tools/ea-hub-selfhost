@@ -4,6 +4,11 @@ import react from "@vitejs/plugin-react";
 import tailwind from "@tailwindcss/vite";
 import tsconfigPaths from "vite-tsconfig-paths";
 import { nitro } from "nitro/vite";
+import { fileURLToPath } from "node:url";
+
+// Self-host: the browser talks to this app only (see src/selfhost); these are placeholders.
+process.env["VITE_SUPABASE_URL"] ||= "selfhost";
+process.env["VITE_SUPABASE_PUBLISHABLE_KEY"] ||= "selfhost-anon";
 
 export default defineConfig(({ command }) => ({
   server: {
@@ -21,7 +26,15 @@ export default defineConfig(({ command }) => ({
       ],
     },
   },
-  resolve: { dedupe: ["react", "react-dom"] },
+  resolve: {
+    dedupe: ["react", "react-dom"],
+    // Self-host: supabase-js is replaced by the Postgres adapter in src/selfhost.
+    alias: {
+      "@supabase/supabase-js": fileURLToPath(
+        new URL("./src/selfhost/supabase-js/index.ts", import.meta.url),
+      ),
+    },
+  },
   plugins: [
     tsconfigPaths(),
     tailwind(),
