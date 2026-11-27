@@ -111,6 +111,19 @@ describe("self-host SQL compiler", () => {
     ).rejects.toThrow(/schema cache/);
   });
 
+  it("never lets a select string inject SQL through casts", async () => {
+    const attack =
+      "id::text from public.chats _t0 union all select rolname from pg_roles union all select _t0.id";
+    await expect(
+      new Compiler(lookup).compile(spec((b) => b.select(attack))),
+    ).rejects.toThrow(/Unsupported cast/);
+    const ok = await new Compiler(lookup).compile(
+      spec((b) => b.select("id::text, label:body")),
+    );
+    expect(ok.text).toContain('_t0."id"::text as "id"');
+    expect(ok.text).toContain('_t0."body" as "label"');
+  });
+
   it("parses PostgREST or() strings with nesting and wildcards", async () => {
     const c = await new Compiler(lookup).compile(
       spec((b) =>

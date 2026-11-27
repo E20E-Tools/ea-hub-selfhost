@@ -1,12 +1,13 @@
 # Publishes the app image (and, on version tags, the Helm chart) to GitHub Container Registry.
-#   push to main  → ghcr.io/<owner>/ea-hub-selfhost:latest + :sha-<short>   (linux/amd64)
-#   tag v1.2.3    → :1.2.3, :1.2, :latest                                    (linux/amd64 + arm64)
-#                   and oci://ghcr.io/<owner>/charts/ea-hub:1.2.3
+#   tag v1.2.3      → ghcr.io/<owner>/ea-hub-selfhost:1.2.3, :1.2, :latest  (linux/amd64 + arm64)
+#                     and oci://ghcr.io/<owner>/charts/ea-hub:1.2.3
+#   manual run      → :sha-<short> (+ :latest when run on main)            (linux/amd64)
+# Images are published on version tags only, not on every push: a private package on the
+# GitHub Free plan has 500 MB of storage and 1 GB/month of transfer.
 name: Publish
 
 on:
   push:
-    branches: [main]
     tags: ["v*"]
   workflow_dispatch:
 

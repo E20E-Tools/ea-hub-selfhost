@@ -20,15 +20,14 @@ random_secret() {
 
 # Existing answers become defaults, and existing secrets are kept: the database was
 # created with them, and a new APP_ENCRYPTION_KEY would sign everyone out.
-declare -A OLD=()
-if [ -f .env ]; then
-  while IFS= read -r line; do
-    [[ "$line" =~ ^([A-Z_][A-Z0-9_]*)=(.*)$ ]] || continue
-    v="${BASH_REMATCH[2]}"; v="${v#\'}"; v="${v%\'}"; v="${v#\"}"; v="${v%\"}"
-    OLD["${BASH_REMATCH[1]}"]="$v"
-  done < .env
-fi
-old() { printf '%s' "${OLD[$1]:-${2:-}}"; }
+# Read once (.env is rewritten at the end). Plain functions: works on macOS's bash 3.2 too.
+ENV_SNAPSHOT=$(cat .env 2>/dev/null || true)
+old() { # old KEY [default]
+  local v
+  v=$(printf '%s\n' "$ENV_SNAPSHOT" | grep -E "^$1=" | tail -n 1 | cut -d= -f2-)
+  v="${v#\'}"; v="${v%\'}"; v="${v#\"}"; v="${v%\"}"
+  printf '%s' "${v:-${2:-}}"
+}
 
 ask() { # ask VAR "question" default
   local __var=$1 __q=$2 __def=${3:-} __ans
@@ -98,7 +97,8 @@ while :; do
   [[ "$ADMIN_EMAIL" =~ ^[^[:space:]@]+@[^[:space:]@]+\.[^[:space:]@]+$ ]] && break
   warn "بريد غير صالح. Invalid e-mail."
 done
-ADMIN_PASSWORD=$(old ADMIN_PASSWORD)
+PREV_ADMIN_PASSWORD=$(old ADMIN_PASSWORD)
+ADMIN_PASSWORD=$PREV_ADMIN_PASSWORD
 GENERATED_ADMIN=""
 if [ -n "$ADMIN_PASSWORD" ] && ! yes_no "تغيير كلمة مرور المدير المحفوظة؟ / Change the saved admin password?" n; then :; else
   while :; do
@@ -207,7 +207,7 @@ HTTPS_PORT=$HTTPS_PORT
 
 ADMIN_EMAIL=$(q "$ADMIN_EMAIL")
 ADMIN_PASSWORD=$(q "$ADMIN_PASSWORD")
-ADMIN_RESET_PASSWORD=$( [ -n "${OLD[ADMIN_PASSWORD]:-}" ] && [ "${OLD[ADMIN_PASSWORD]}" != "$ADMIN_PASSWORD" ] && echo true || echo false)
+ADMIN_RESET_PASSWORD=$( [ -n "$PREV_ADMIN_PASSWORD" ] && [ "$PREV_ADMIN_PASSWORD" != "$ADMIN_PASSWORD" ] && echo true || echo false)
 
 POSTGRES_PASSWORD=$(q "$POSTGRES_PASSWORD")
 APP_DB_PASSWORD=$(q "$APP_DB_PASSWORD")
@@ -242,7 +242,8 @@ echo
 
 if yes_no "تشغيل EA-Hub الآن؟ / Start EA-Hub now?" y; then
   info "تنزيل الصور أو بناؤها (قد يستغرق دقائق في أول مرة)… Getting images (first time takes a few minutes)…"
-  if ! docker compose pull --quiet --ignore-buildable 2>/dev/null || ! docker image inspect "$(old EA_HUB_IMAGE ghcr.io/e20e-tools/ea-hub-selfhost:latest)" >/dev/null 2>&1; then
+  IMAGE=$(old EA_HUB_IMAGE ghcr.io/e20e-tools/ea-hub-selfhost:latest)
+  if ! docker pull "$IMAGE"; then
     info "لا يمكن تنزيل صورة التطبيق، سيتم بناؤها محلياً. Building the app image locally…"
     docker compose build
   fi

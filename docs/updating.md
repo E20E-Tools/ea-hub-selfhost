@@ -41,7 +41,9 @@ helm upgrade ea-hub ./deploy/helm/ea-hub -n ea-hub --reuse-values
 2. يدمجه في الفرع `upstream-sync`.
 3. يفتح طلب دمج (PR) إلى `main`، أو يحدّث الطلب المفتوح.
 
-لا يُدمج أي شيء تلقائياً. راجع الطلب، وانتظر نجاح CI (الاختبارات وCompose وkind)، ثم ادمجه. بعد الدمج تُبنى صورة جديدة وتُنشر.
+لا يُدمج أي شيء تلقائياً. راجع الطلب، وانتظر نجاح CI (الاختبارات وCompose وkind)، ثم ادمجه.
+
+لنشر صورة جديدة على GHCR أنشئ وسماً (tag) برقم الإصدار، مثل `git tag v1.0.0 && git push origin v1.0.0`. النشر يكون مع الوسوم فقط، توفيراً لحصة التخزين المجانية.
 
 ### إعداد مرة واحدة: صلاحية قراءة المستودع الأصلي
 
@@ -57,7 +59,7 @@ helm upgrade ea-hub ./deploy/helm/ea-hub -n ea-hub --reuse-values
 
 ### إذا ظهر تعارض (conflict)
 
-الملفات الخاصة بهذه النسخة، مثل `README.md` و`.env.example` و`Dockerfile` و`docker-compose.yml`، تُحفظ تلقائياً بنسختنا عبر `.gitattributes`. إذا تعارض ملف آخر، يفتح سير العمل الطلب بعلامة ⚠️، وتحله يدوياً:
+الملفات الخاصة بهذه النسخة، مثل `README.md` و`.env.example` و`Dockerfile` و`docker-compose.yml`، تُحفظ تلقائياً بنسختنا عبر `.gitattributes`. إذا تعارض ملف آخر، يفتح سير العمل طلباً **مسودّة (draft)** عنوانه `DO NOT MERGE` من الفرع `upstream-sync-conflicts`. **لا تدمج هذا الطلب أبداً**، فدمجه يحذف طبقة الاستضافة الذاتية. بدلاً من ذلك، حُلّ التعارض يدوياً ثم أغلق المسودّة:
 
 ```bash
 git fetch origin
@@ -68,6 +70,7 @@ git fetch upstream main
 git merge upstream/main          # حُلّ التعارضات ثم:
 git commit
 git push --force origin upstream-sync
+gh pr create --head upstream-sync --base main --title "Sync with upstream"   # أو من واجهة GitHub
 ```
 
 أكثر ما قد يتعارض هو `src/server.ts` و`vite.config.ts` و`package.json`، وفيها سطور قليلة مضافة لهذه النسخة ومعلّمة بكلمة `Self-host`. أبقِ تلك السطور، وخذ الباقي من الأصل.

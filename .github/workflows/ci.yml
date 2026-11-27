@@ -136,6 +136,20 @@ jobs:
             -d '{"email":"e2e-admin@example.com","password":"nope-nope-nope"}' \
             'http://localhost:8080/api/selfhost/auth/token?grant_type=password')
           test "$code" = 400
+      - name: Realtime (LISTEN/NOTIFY → SSE) through Caddy
+        run: |
+          TOKEN=$(curl -fsS -X POST -H 'content-type: application/json' \
+            -d '{"email":"e2e-admin@example.com","password":"e2e-admin-password"}' \
+            "http://localhost:8080/api/selfhost/auth/token?grant_type=password" | jq -r .access_token)
+          curl -sN -m 20 -X POST -H "authorization: Bearer $TOKEN" -H 'content-type: application/json' \
+            -d '{"subscriptions":[{"id":1,"event":"INSERT","schema":"public","table":"live_chats"}]}' \
+            http://localhost:8080/api/selfhost/realtime > /tmp/sse.txt &
+          sleep 4
+          docker compose exec -T db psql -U postgres -d eahub -c \
+            "insert into public.live_chats (visitor_id, visitor_email) values (gen_random_uuid(), 'sse-e2e@example.com')"
+          sleep 6
+          cat /tmp/sse.txt | cut -c1-200
+          grep -q 'sse-e2e@example.com' /tmp/sse.txt
       - name: Scheduled job and backup
         run: |
           docker compose exec -T cron node selfhost/scripts/run-job.mjs daily-cleanup

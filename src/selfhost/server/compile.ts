@@ -82,6 +82,24 @@ function castType(type: string): string {
   return type;
 }
 
+// Casts a client may request in a select list (`col::text`). A fixed list, never free text:
+// the select string comes from browsers via /api/selfhost/rest.
+const SELECT_CASTS = new Set([
+  "text",
+  "uuid",
+  "int4",
+  "int8",
+  "integer",
+  "bigint",
+  "numeric",
+  "float8",
+  "boolean",
+  "json",
+  "jsonb",
+  "date",
+  "timestamptz",
+]);
+
 // ---------- select list ----------
 type SelectItem =
   | { kind: "star" }
@@ -156,8 +174,10 @@ export function parseSelect(columns: string | undefined): SelectItem[] {
     let cast: string | undefined;
     const castAt = name.indexOf("::");
     if (castAt > 0) {
-      cast = name.slice(castAt + 2).trim();
+      cast = name.slice(castAt + 2).trim().toLowerCase();
       name = name.slice(0, castAt).trim();
+      if (!SELECT_CASTS.has(cast))
+        throw new CompileError(`Unsupported cast: ${cast.slice(0, 32)}`);
     }
     const colon = name.indexOf(":");
     if (colon > 0) {
@@ -273,7 +293,8 @@ export class Compiler {
       } else if (item.kind === "column") {
         this.columnType(scope.table, item.name);
         const expr = `${scope.alias}.${ident(item.name)}`;
-        const cast = item.cast ? `::${castType(item.cast)}` : "";
+        const cast =
+          item.cast && SELECT_CASTS.has(item.cast) ? `::${item.cast}` : "";
         parts.push(`${expr}${cast} as ${ident(item.alias ?? item.name)}`);
       } else {
         const { rel, toOne, target } = await this.relation(

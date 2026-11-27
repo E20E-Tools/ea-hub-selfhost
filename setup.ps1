@@ -240,8 +240,7 @@ if ($generatedAdmin) {
 
 if (Yes "تشغيل EA-Hub الآن؟ / Start EA-Hub now?" $true) {
   Say "تنزيل الصور أو بناؤها (قد يستغرق دقائق في أول مرة)… Getting images (first time takes a few minutes)…"
-  docker compose pull --quiet --ignore-buildable 2>$null
-  docker image inspect $image *> $null
+  docker pull $image
   if ($LASTEXITCODE -ne 0) {
     Say "لا يمكن تنزيل صورة التطبيق، سيتم بناؤها محلياً. Building the app image locally…"
     docker compose build
