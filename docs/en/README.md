@@ -2,6 +2,8 @@
 
 EA-Hub runs anywhere that can run a Linux container and a PostgreSQL 16 database. Pick the guide that matches where you want to run it. **Each guide is self-contained**, from requirements to a signed-in admin.
 
+**All guides in one document:** [PDF](EA-Hub-Deployment-Guide.pdf) · [Word](EA-Hub-Deployment-Guide.docx)
+
 | Where you want to run it | Best for | Guide |
 |---|---|---|
 | **Docker on one machine** (laptop, office server, cloud VM) | Trying it out, small teams, simplest operations | [deploy-docker.md](deploy-docker.md) |
