@@ -70,6 +70,27 @@ kubectl -n ea-hub scale deploy/ea-hub --replicas=1
 
 لنسخ ملف النسخة إلى جهازك، استخدم `kubectl cp` من حاوية تربط القرص `ea-hub-backups`.
 
+## تشفير النسخ الاحتياطية
+
+يمكن تشفير كل نسخة احتياطية بمفتاح عام، فلا يقرؤها إلا من يملك المفتاح الخاص، حتى لو تسرّب الخادم أو التخزين الخارجي.
+
+1. **أنشئ زوج مفاتيح مرة واحدة:**
+   ```bash
+   docker compose run --rm --no-deps migrate node selfhost/scripts/backup-crypt.mjs keygen
+   ```
+   احفظ `BACKUP_PRIVATE_KEY` خارج الخادم، في مدير كلمات المرور أو في خزنة، لأنه لازم للاستعادة ولا يُستعاد إن ضاع.
+2. **فعّل التشفير:**
+   - **Docker Compose:** ضع `BACKUP_PUBLIC_KEY=…` في `.env`، وأضف `encrypt` إلى `COMPOSE_PROFILES`، مثل `COMPOSE_PROFILES=offsite,encrypt`، ثم `docker compose up -d`. تشفّر خدمة `backup-crypt` كل نسخة جديدة خلال دقيقة، وتحذف الملفات غير المشفرة. ولا يُنسخ إلى الخارج إلا الملفات المشفرة.
+   - **Helm:** اضبط `backup.encryption.publicKey`، فتُضاف خطوة تشفير بعد النسخ وقبل النسخ الخارجي.
+3. **للاستعادة:** فك تشفير النسخة أولاً، ثم استعدها كالمعتاد:
+   ```bash
+   docker compose --profile encrypt run --rm -e BACKUP_PRIVATE_KEY='…' backup-crypt \
+     node selfhost/scripts/backup-crypt.mjs decrypt-dir /backups/<اسم-النسخة>
+   docker compose exec backup sh /backup/backup.sh restore <اسم-النسخة>
+   ```
+
+يستخدم التشفير X25519 وAES-256-GCM، ويكشف أي تعديل على الملف أو اقتطاع منه.
+
 ## نسخ احتياطي خارج الخادم (موصى به)
 
 النسخ المحفوظة على الخادم نفسه تضيع إذا ضاع الخادم. لذلك يمكن نسخ كل نسخة تلقائياً إلى تخزين كائنات خارجي، مثل S3 أو MinIO أو Azure Blob أو Google Cloud Storage، باستخدام أداة rclone.

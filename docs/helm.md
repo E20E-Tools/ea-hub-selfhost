@@ -130,7 +130,7 @@ ingress:
 ```bash
 kubectl -n ea-hub create secret docker-registry ghcr-pull \
   --docker-server=ghcr.io --docker-username=<github-user> --docker-password=<token-read:packages>
-helm upgrade ea-hub ./deploy/helm/ea-hub -n ea-hub --reuse-values --set 'imagePullSecrets[0].name=ghcr-pull'
+helm upgrade ea-hub ./deploy/helm/ea-hub -n ea-hub --reset-then-reuse-values --set 'imagePullSecrets[0].name=ghcr-pull'
 ```
 
 ### مفاتيح الـ Secret إن أدرته بنفسك
@@ -141,7 +141,7 @@ helm upgrade ea-hub ./deploy/helm/ea-hub -n ea-hub --reuse-values --set 'imagePu
 
 ```bash
 git pull
-helm upgrade ea-hub ./deploy/helm/ea-hub -n ea-hub --reuse-values
+helm upgrade ea-hub ./deploy/helm/ea-hub -n ea-hub --reset-then-reuse-values
 ```
 
 تعمل تهيئة القاعدة تلقائياً قبل أن يبدأ الإصدار الجديد.

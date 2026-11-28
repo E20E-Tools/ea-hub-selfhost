@@ -501,6 +501,8 @@ backup:
     # Azure: config: { type: azureblob, account: mystorage }, credentials: { key: "…" }
 ```
 
+**Encrypt the backups.** Create a key pair once with `docker run --rm ghcr.io/e20e-tools/ea-hub-selfhost node selfhost/scripts/backup-crypt.mjs keygen`, keep the private key offline, and set `backup.encryption.publicKey`. Each backup is then encrypted (X25519 and AES-256-GCM, with tampering detected) before it is stored or copied offsite. To restore, first run `backup-crypt.mjs decrypt-dir <folder>` with `BACKUP_PRIVATE_KEY`.
+
 Old copies are never deleted from the bucket: set a lifecycle rule there (e.g. delete after 90 days). To restore from the bucket, copy one folder back with `rclone copy <remote>:my-bucket/ea-hub/<name> ./<name>`, put it on the `ea-hub-backups` volume, and follow the restore steps.
 
 ### Several app replicas (uploads in S3)

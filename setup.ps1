@@ -240,8 +240,12 @@ if ($generatedAdmin) {
 
 if (Yes "تشغيل EA-Hub الآن؟ / Start EA-Hub now?" $true) {
   Say "تنزيل الصور أو بناؤها (قد يستغرق دقائق في أول مرة)… Getting images (first time takes a few minutes)…"
+  docker image inspect $image *> $null
+  $haveLocal = ($LASTEXITCODE -eq 0)
   docker pull $image
-  if ($LASTEXITCODE -ne 0) {
+  if ($LASTEXITCODE -ne 0 -and $haveLocal) {
+    Say "استخدام الصورة الموجودة محلياً (تثبيت دون إنترنت). Using the local image (offline install)."
+  } elseif ($LASTEXITCODE -ne 0) {
     Say "لا يمكن تنزيل صورة التطبيق، سيتم بناؤها محلياً. Building the app image locally…"
     docker compose build
     if ($LASTEXITCODE -ne 0) { Warn "فشل البناء. Build failed."; exit 1 }

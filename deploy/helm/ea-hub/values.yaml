@@ -210,6 +210,12 @@ cron:
 # Daily database + uploads backup to its own volume (built-in PostgreSQL or external).
 backup:
   enabled: true
+  # Encrypt every backup (database dump and files) with a public key before it is stored or
+  # copied offsite. Create the key pair with:
+  #   docker run --rm ghcr.io/e20e-tools/ea-hub-selfhost node selfhost/scripts/backup-crypt.mjs keygen
+  # Only the PUBLIC key goes here; keep the private key offline (it is needed to restore).
+  encryption:
+    publicKey: ""
   # -- Take a backup before every helm upgrade (a pre-upgrade hook), so a failed upgrade can
   # be rolled back with the data as it was.
   beforeUpgrade: true

@@ -21,6 +21,13 @@ EA-Hub runs anywhere that can run a Linux container and a PostgreSQL 16 database
 
 **Server status:** the admin console's **Settings → Application health** page shows the version, database, migrations, storage, e-mail, SSO, jobs, metrics and search status.
 
+**No internet access?** Every release includes offline bundles (`ea-hub-airgap-<version>-<arch>.tar.gz`) with all images, the chart and the Compose files: [selfhost/airgap](../../selfhost/airgap/README.md).
+
+**Verify a release:**
+- The image is signed with cosign.
+- It has SLSA build provenance: `gh attestation verify oci://ghcr.io/e20e-tools/ea-hub-selfhost:<version> --repo E20E-Tools/ea-hub-selfhost`.
+- An SPDX SBOM is attached to every GitHub Release.
+
 **Single sign-on** (Microsoft Entra ID, Keycloak, Okta, Google…) works on every platform: see [single-sign-on.md](single-sign-on.md).
 
 ## What every installation is made of

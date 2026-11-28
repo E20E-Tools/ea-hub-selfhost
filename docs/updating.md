@@ -28,8 +28,10 @@ docker compose up -d          # إعادة التشغيل بالنسخة الج�
 
 ```bash
 git pull
-helm upgrade ea-hub ./deploy/helm/ea-hub -n ea-hub --reuse-values
+helm upgrade ea-hub ./deploy/helm/ea-hub -n ea-hub --reset-then-reuse-values
 ```
+
+استخدم `--reset-then-reuse-values` (Helm 3.14 أو أحدث) بدل `--reuse-values`: الأول يحتفظ بإعداداتك ويضيف إليها القيم الافتراضية للإعدادات الجديدة في الإصدار الجديد.
 
 ---
 

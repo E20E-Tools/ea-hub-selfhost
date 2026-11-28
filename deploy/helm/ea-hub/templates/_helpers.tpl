@@ -198,6 +198,8 @@ capabilities:
 {{/* Pod spec of a backup run: shared by the daily CronJob and the pre-upgrade hook. */}}
 {{- define "ea-hub.backupJobSpec" -}}
 {{- $offsite := .Values.backup.offsite }}
+{{- /* dig: values saved by an older release (helm upgrade --reuse-values) lack this key. */}}
+{{- $encrypt := dig "encryption" "publicKey" "" .Values.backup }}
 backoffLimit: 1
 template:
   metadata:
@@ -217,8 +219,8 @@ template:
                 {{- include "ea-hub.selector" . | nindent 16 }}
                 app.kubernetes.io/component: web
     {{- end }}
-    {{- if $offsite.enabled }}
-    # The backup runs first; the rclone container then copies it off the cluster.
+    {{- if or $offsite.enabled $encrypt }}
+    # Steps run in order: backup, then encryption (optional), then the offsite copy (optional).
     initContainers:
     {{- else }}
     containers:
@@ -252,6 +254,32 @@ template:
             mountPath: /data/storage
             readOnly: true
           {{- end }}
+    {{- if $encrypt }}
+    {{- if not $offsite.enabled }}
+    containers:
+    {{- end }}
+      - name: encrypt
+        image: {{ include "ea-hub.image" . }}
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        command: ["node", "selfhost/scripts/backup-crypt.mjs", "encrypt-dir", "/backups"]
+        env:
+          - name: BACKUP_PUBLIC_KEY
+            value: {{ $encrypt | quote }}
+        volumeMounts:
+          - name: backups
+            mountPath: /backups
+        securityContext:
+          {{- if not .Values.openshift.enabled }}
+          # Same user as the backup step (the postgres image runs as root), so it can replace
+          # the plain files. On OpenShift every container of the pod gets the same random UID.
+          runAsUser: 0
+          runAsNonRoot: false
+          {{- end }}
+          {{- include "ea-hub.containerSecurity" . | nindent 10 }}
+        resources:
+          requests: { cpu: 10m, memory: 64Mi }
+          limits: { memory: 512Mi }
+    {{- end }}
     {{- if $offsite.enabled }}
     containers:
       - name: offsite

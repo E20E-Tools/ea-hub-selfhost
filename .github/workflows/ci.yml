@@ -310,6 +310,24 @@ jobs:
           test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/metrics)" = 401
           curl -fsS -H 'authorization: Bearer e2e-metrics-token' http://localhost:8080/metrics | tee /tmp/metrics.txt
           grep -q '^eahub_database_up 1' /tmp/metrics.txt
+      - name: Encrypted backups (public key; restore needs the private key)
+        run: |
+          KEYS=$(docker compose run --rm --no-deps migrate node selfhost/scripts/backup-crypt.mjs keygen)
+          PUB=$(echo "$KEYS" | sed -n 's/^BACKUP_PUBLIC_KEY=//p' | tr -d '\r')
+          PRIV=$(echo "$KEYS" | sed -n 's/^BACKUP_PRIVATE_KEY=//p' | tr -d '\r')
+          echo "BACKUP_PUBLIC_KEY=$PUB" >> .env
+          sleep 61
+          docker compose exec -T backup sh /backup/backup.sh now
+          NAME=$(docker compose exec -T backup sh /backup/backup.sh list | grep -E '^20' | tail -1 | tr -d '\r')
+          docker compose --profile encrypt up -d backup-crypt
+          for i in $(seq 1 30); do ls "backups/$NAME" | grep -q 'database.dump.enc' && break; sleep 3; done
+          ls -l "backups/$NAME"
+          test -f "backups/$NAME/database.dump.enc" && test ! -f "backups/$NAME/database.dump"
+          # Restore refuses encrypted files, then works after decryption with the private key.
+          if docker compose exec -T backup sh /backup/backup.sh restore "$NAME"; then exit 1; fi
+          docker compose --profile encrypt run --rm -e BACKUP_PRIVATE_KEY="$PRIV" backup-crypt             node selfhost/scripts/backup-crypt.mjs decrypt-dir "/backups/$NAME"
+          test -f "backups/$NAME/database.dump"
+          docker compose --profile encrypt stop backup-crypt
       - name: Offsite copy of the backups (rclone → a test S3 server)
         run: |
           # A throwaway S3 server ("rclone serve s3") on the compose network, reachable as "s3test".
@@ -509,6 +527,140 @@ jobs:
           git commit -m "chore: regenerate deploy/cloud/azure/azuredeploy.json from main.bicep"
           git push
 
+  # Upgrade path: install the latest published release with data, upgrade to this code,
+  # and check that nothing was lost (compose and Helm).
+  upgrade-compose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Previous release
+        id: prev
+        run: echo "version=$(git tag -l 'v*' --sort=-v:refname | head -1 | sed 's/^v//')" >> "$GITHUB_OUTPUT"
+      - name: Start the previous release
+        run: |
+          echo "upgrading from ${{ steps.prev.outputs.version }}"
+          {
+            echo "APP_URL=http://localhost:8080"
+            echo "SITE_ADDRESS=:80"
+            echo "HTTP_PORT=8080"
+            echo "HTTPS_PORT=8443"
+            echo "ADMIN_EMAIL=up-admin@example.com"
+            echo "ADMIN_PASSWORD=up-admin-password"
+            echo "POSTGRES_PASSWORD=$(openssl rand -hex 16)"
+            echo "APP_DB_PASSWORD=$(openssl rand -hex 16)"
+            echo "APP_ENCRYPTION_KEY=$(openssl rand -hex 32)"
+            echo "CRON_SECRET=$(openssl rand -hex 24)"
+            echo "EA_HUB_IMAGE=ghcr.io/e20e-tools/ea-hub-selfhost:${{ steps.prev.outputs.version }}"
+          } > .env
+          docker compose pull app
+          docker compose up -d
+          for i in $(seq 1 60); do curl -fsS http://localhost:8080/healthz && break; sleep 5; done
+          curl -fsS http://localhost:8080/healthz | grep '"ok":true'
+      - name: Create data
+        run: |
+          docker compose exec -T db psql -U postgres -d eahub -c \
+            "create table public.ci_upgrade_marker (v text); insert into public.ci_upgrade_marker values ('kept');"
+          docker compose exec -T backup sh -c 'echo kept > /data/storage/ci-upgrade-file.txt'
+          docker compose exec -T db psql -U postgres -d eahub -tAc "select count(*) from drizzle.__drizzle_migrations" > /tmp/before.txt
+      - name: Upgrade to this commit
+        run: |
+          sed -i 's#^EA_HUB_IMAGE=.*#EA_HUB_IMAGE=ea-hub-selfhost:ci#' .env
+          echo "WITH_LOCAL_MODEL=0" >> .env
+          docker compose build app
+          docker compose up -d
+          for i in $(seq 1 60); do curl -fsS http://localhost:8080/healthz && break; sleep 5; done
+          curl -fsS http://localhost:8080/healthz | grep '"ok":true'
+      - name: Data, files and sign-in survived; a backup was taken first
+        run: |
+          test "$(docker compose exec -T db psql -U postgres -d eahub -tAc 'select v from public.ci_upgrade_marker')" = kept
+          test "$(docker compose exec -T backup cat /data/storage/ci-upgrade-file.txt | tr -d '\r')" = kept
+          echo "migrations before: $(cat /tmp/before.txt) after: $(docker compose exec -T db psql -U postgres -d eahub -tAc 'select count(*) from drizzle.__drizzle_migrations')"
+          docker compose logs backup-before-migrate | grep '\[backup\].*saved'
+          curl -fsS -X POST -H 'content-type: application/json' \
+            -d '{"email":"up-admin@example.com","password":"up-admin-password"}' \
+            "http://localhost:8080/api/selfhost/auth/token?grant_type=password" | jq -e '.access_token | length > 20'
+      - name: Logs on failure
+        if: failure()
+        run: docker compose logs --tail=80
+
+  upgrade-helm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - uses: azure/setup-helm@2f5e7bc67f1f9972ab16657bb795f36d8f04de0e # v5.1.0
+      - uses: helm/kind-action@ea822c7bf1874f08e5a491df991c228edffc3376 # v1.15.2
+        with:
+          cluster_name: ea-hub
+      - name: Install the previous release from the published chart
+        id: prev
+        run: |
+          PREV=$(git tag -l 'v*' --sort=-v:refname | head -1 | sed 's/^v//')
+          echo "version=$PREV" >> "$GITHUB_OUTPUT"
+          helm install ea-hub oci://ghcr.io/e20e-tools/charts/ea-hub --version "$PREV" -n ea-hub --create-namespace \
+            --set appUrl=http://localhost:8080 \
+            --set admin.email=up-admin@example.com --set admin.password=up-admin-password --timeout 10m
+          kubectl -n ea-hub rollout status statefulset/ea-hub-postgres --timeout=10m
+          kubectl -n ea-hub rollout status deploy/ea-hub --timeout=10m
+          kubectl -n ea-hub exec ea-hub-postgres-0 -- psql -U postgres -d eahub -c \
+            "create table public.ci_upgrade_marker (v text); insert into public.ci_upgrade_marker values ('kept');"
+          kubectl -n ea-hub get secret ea-hub -o jsonpath='{.data.app-encryption-key}' > /tmp/key-before
+      - name: Build this commit and helm upgrade to it
+        run: |
+          docker build --build-arg WITH_LOCAL_MODEL=0 -t ea-hub-selfhost:ci .
+          kind load docker-image ea-hub-selfhost:ci --name ea-hub
+          helm upgrade ea-hub deploy/helm/ea-hub -n ea-hub --reuse-values \
+            --set image.repository=ea-hub-selfhost --set image.tag=ci --set image.pullPolicy=Never --timeout 10m
+          kubectl -n ea-hub rollout status deploy/ea-hub --timeout=10m
+      - name: Data, secrets and sign-in survived; the pre-upgrade backup ran
+        run: |
+          test "$(kubectl -n ea-hub exec ea-hub-postgres-0 -- psql -U postgres -d eahub -tAc 'select v from public.ci_upgrade_marker')" = kept
+          test "$(kubectl -n ea-hub get secret ea-hub -o jsonpath='{.data.app-encryption-key}')" = "$(cat /tmp/key-before)"
+          test "$(kubectl -n ea-hub get job ea-hub-backup-before-upgrade -o jsonpath='{.status.succeeded}')" = 1
+          kubectl -n ea-hub port-forward svc/ea-hub 8080:80 >/dev/null 2>&1 &
+          sleep 5
+          curl -fsS -X POST -H 'content-type: application/json' \
+            -d '{"email":"up-admin@example.com","password":"up-admin-password"}' \
+            "http://localhost:8080/api/selfhost/auth/token?grant_type=password" | jq -e '.access_token | length > 20'
+      - name: Diagnostics on failure
+        if: failure()
+        run: |
+          kubectl -n ea-hub get all || true
+          kubectl -n ea-hub logs deploy/ea-hub -c migrate --tail=50 || true
+
+  # Offline bundle: build it for the latest release, drop the images, load them from the
+  # bundle and start the stack from the bundle folder without pulling anything.
+  airgap-bundle:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - uses: azure/setup-helm@2f5e7bc67f1f9972ab16657bb795f36d8f04de0e # v5.1.0
+      - name: Build the bundle (latest release, amd64)
+        run: |
+          PREV=$(git tag -l 'v*' --sort=-v:refname | head -1 | sed 's/^v//')
+          echo "PREV=$PREV" >> "$GITHUB_ENV"
+          bash selfhost/airgap/build-bundle.sh "$PREV" amd64 dist
+          ls -lh dist
+      - name: Load it on a "clean" machine and start without pulling
+        run: |
+          docker image rm -f $(docker images -q) >/dev/null 2>&1 || true
+          cd dist && sha256sum -c "ea-hub-airgap-${PREV}-amd64.tar.gz.sha256"
+          tar xzf "ea-hub-airgap-${PREV}-amd64.tar.gz" && cd "ea-hub-airgap-${PREV}-amd64"
+          ./load.sh
+          cp .env.example .env
+          sed -i "s#^APP_URL=.*#APP_URL=http://localhost:8080#; s#^SITE_ADDRESS=.*#SITE_ADDRESS=:80#; s#^HTTP_PORT=.*#HTTP_PORT=8080#; s#^HTTPS_PORT=.*#HTTPS_PORT=8443#" .env
+          for k in POSTGRES_PASSWORD APP_DB_PASSWORD CRON_SECRET; do sed -i "s#^$k=.*#$k=$(openssl rand -hex 16)#" .env; done
+          sed -i "s#^APP_ENCRYPTION_KEY=.*#APP_ENCRYPTION_KEY=$(openssl rand -hex 32)#" .env
+          docker compose up -d --pull never
+          for i in $(seq 1 60); do curl -fsS http://localhost:8080/healthz && break; sleep 5; done
+          curl -fsS http://localhost:8080/healthz | grep '"ok":true'
+          helm lint "ea-hub-${PREV}.tgz" --set appUrl=https://hub.example.com
+
   # The release image (with the local search model) on the distroless base: the native
   # libraries of the model must load, and the image must stay free of fixable criticals/highs.
   image-full:
@@ -556,6 +708,7 @@ jobs:
             --set appUrl=http://localhost:8080 \
             --set admin.email=kind-admin@example.com --set admin.password=kind-admin-password \
             --set metrics.enabled=true --set networkPolicy.enabled=true \
+            --set backup.encryption.publicKey=ea-hub-backup-pub:Jn9HS6xMgJNzvTrPxwfZxLXlnE1QSNMRgN0oZXV6Vjk \
             --timeout 10m
           # Not --wait: with WaitForFirstConsumer storage (kind, k3s local-path, many CSI) the
           # backups PVC stays Pending until the first backup runs. Wait for the workloads.
@@ -579,6 +732,7 @@ jobs:
           kubectl -n ea-hub create job --from=cronjob/ea-hub-daily-cleanup cleanup-now
           kubectl -n ea-hub create job --from=cronjob/ea-hub-backup backup-now
           kubectl -n ea-hub wait --for=condition=complete job/cleanup-now job/backup-now --timeout=5m
+          kubectl -n ea-hub logs job/backup-now -c encrypt | grep 'encrypted 2 file'   # dump + uploads
       - name: Upgrade keeps generated secrets
         run: |
           before=$(kubectl -n ea-hub get secret ea-hub -o jsonpath='{.data.app-encryption-key}')
@@ -588,7 +742,7 @@ jobs:
           test "$before" = "$after"
           # The pre-upgrade hook took a backup.
           test "$(kubectl -n ea-hub get job ea-hub-backup-before-upgrade -o jsonpath='{.status.succeeded}')" = 1
-          kubectl -n ea-hub logs job/ea-hub-backup-before-upgrade | grep '\[backup\].*saved'
+          kubectl -n ea-hub logs job/ea-hub-backup-before-upgrade -c backup | grep '\[backup\].*saved'
       - name: Diagnostics on failure
         if: failure()
         run: |
