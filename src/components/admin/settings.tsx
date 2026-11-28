@@ -50,6 +50,7 @@ import { CustomizeSettings } from "./settings-customize";
 import { TermsSettings } from "./settings-terms";
 import { FeatureSettings } from "./settings-features";
 import { FeatureStatus } from "./settings-feature-status";
+import { SelfhostStatus } from "@/selfhost/ui/selfhost-status";
 import { GeneralSettings } from "./settings-general";
 import { NavigationSettings } from "./settings-navigation";
 import { TestimonialsSettings } from "./settings-testimonials";
@@ -228,6 +229,7 @@ export function SettingsSection({
       {current === "ai" ? <AiSettings /> : null}
       {current === "archy" ? <ArchySettings catalog={catalog} /> : null}
       {current === "health" ? <ApplicationHealth /> : null}
+      {current === "health" ? <SelfhostStatus /> : null}
       {current === "history" ? <SettingsHistory /> : null}
       {current === "retention" ? <RetentionManagement /> : null}
       {current === "journey" ? <JourneyOverview /> : null}

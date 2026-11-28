@@ -1,0 +1,9 @@
+# Rancher Fleet bundle: EA-Hub production. Point a GitRepo at this folder (in your config repo).
+defaultNamespace: ea-hub-production
+helm:
+  releaseName: ea-hub
+  repo: https://e20e-tools.github.io/ea-hub-selfhost
+  chart: ea-hub
+  version: 1.1.0
+  valuesFiles:
+    - ../../values/production.yaml

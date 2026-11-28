@@ -1,0 +1,25 @@
+# Argo CD Application: EA-Hub staging from the published chart, values from your Git repo.
+# Copy deploy/gitops/values/staging.yaml into your config repository first.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: ea-hub-staging
+  namespace: argocd
+spec:
+  project: default
+  sources:
+    - repoURL: ghcr.io/e20e-tools/charts        # OCI Helm repository
+      chart: ea-hub
+      targetRevision: 1.1.0                     # pin; Renovate/Dependabot can raise it
+      helm:
+        valueFiles:
+          - $config/ea-hub/values/staging.yaml
+    - repoURL: https://github.com/<your-org>/<your-config-repo>.git
+      targetRevision: main
+      ref: config
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: ea-hub-staging
+  syncPolicy:
+    automated: { prune: true, selfHeal: true }
+    syncOptions: [CreateNamespace=true, ServerSideApply=true]

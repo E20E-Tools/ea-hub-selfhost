@@ -6,6 +6,7 @@ import * as auth from "./auth";
 import { serveObject, StorageBucket } from "./storage";
 import { realtimeStream, type Subscription } from "./realtime";
 import { metricsResponse } from "./metrics";
+import { statusResponse } from "./status";
 import {
   COOKIE as OIDC_COOKIE,
   cookieHeader as oidcCookieHeader,
@@ -218,6 +219,7 @@ export async function handleSelfhost(
         sso: s ? { enabled: true, label: s.label } : { enabled: false },
       });
     }
+    if (method === "GET" && route === "status") return statusResponse(request);
     if (method === "GET" && route === "auth/oidc/start") return oidcStart(url);
     if (method === "GET" && route === "auth/oidc/callback")
       return oidcCallback(request, url);

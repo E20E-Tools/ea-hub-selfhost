@@ -1,0 +1,43 @@
+# Production: 2 app pods (uploads in S3), PostgreSQL with failover (CloudNativePG),
+# offsite backups, alerts and SSO.
+appUrl: https://hub.example.com
+replicaCount: 2
+admin:
+  email: admin@example.com
+secrets:
+  create: false
+  existingSecret: ea-hub-secrets    # keys listed in docs/helm.md (+ s3-*, oidc-client-secret)
+ingress:
+  enabled: true
+  host: hub.example.com
+  tls: true
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+storage:
+  backend: s3
+  s3:
+    bucket: acme-ea-hub-uploads
+    region: eu-central-1
+postgres:
+  cloudnativepg:
+    enabled: true
+    instances: 3
+backup:
+  offsite:
+    enabled: true
+    path: acme-ea-hub-backups/production
+    config: { type: s3, provider: AWS, region: eu-central-1 }
+    existingSecret: ea-hub-offsite   # keys ACCESS_KEY_ID, SECRET_ACCESS_KEY
+sso:
+  oidc:
+    issuer: https://login.microsoftonline.com/<tenant-id>/v2.0
+    clientId: <client-id>
+    allowedDomains: example.com
+    adminGroups: <entra-group-object-id>
+metrics:
+  enabled: true
+  serviceMonitor: { enabled: true }
+  prometheusRule: { enabled: true }
+  grafanaDashboard: { enabled: true }
+networkPolicy:
+  enabled: true
