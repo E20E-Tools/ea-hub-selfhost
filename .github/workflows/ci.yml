@@ -685,11 +685,23 @@ jobs:
           } > .env
           docker compose build app
           docker compose up -d
-          docker run -d --name otel --network ea-hub_default otel/opentelemetry-collector:latest \
-            --config=yaml:receivers::otlp::protocols::http::endpoint:0.0.0.0:4318 \
-            --config=yaml:exporters::debug::verbosity:detailed \
-            --config=yaml:service::pipelines::traces::receivers:[otlp] \
-            --config=yaml:service::pipelines::traces::exporters:[debug]
+          cat > /tmp/otel.yaml <<'EOF'
+          receivers:
+            otlp:
+              protocols:
+                http:
+                  endpoint: 0.0.0.0:4318
+          exporters:
+            debug:
+              verbosity: detailed
+          service:
+            pipelines:
+              traces:
+                receivers: [otlp]
+                exporters: [debug]
+          EOF
+          docker run -d --name otel --network ea-hub_default -v /tmp/otel.yaml:/etc/otelcol/config.yaml:ro \
+            otel/opentelemetry-collector:0.115.0
           for i in $(seq 1 60); do curl -fsS http://localhost:8080/healthz && break; sleep 5; done
           curl -fsS http://localhost:8080/healthz | grep '"ok":true'
       - name: Traces reach the collector
@@ -697,7 +709,8 @@ jobs:
           for i in $(seq 1 10); do curl -fsS http://localhost:8080/admin >/dev/null; done
           sleep 8
           docker logs otel 2>&1 | grep -E 'Name +: GET /admin' | head -2
-          docker logs otel 2>&1 | grep -qE 'Name +: GET /admin'
+          docker logs otel 2>&1 | grep -qE 'Name +: GET /admin' || {
+            docker logs otel 2>&1 | tail -40; docker compose logs app | tail -20; exit 1; }
       - name: OWASP ZAP baseline scan
         run: |
           mkdir -p zap && chmod 777 zap
