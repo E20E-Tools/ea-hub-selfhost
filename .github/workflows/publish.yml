@@ -1,7 +1,8 @@
 # Publishes the app image (and, on version tags, the Helm chart) to GitHub Container Registry.
 #   tag v1.2.3      → ghcr.io/<owner>/ea-hub-selfhost:1.2.3, :1.2, :latest  (linux/amd64 + arm64)
 #                     and oci://ghcr.io/<owner>/charts/ea-hub:1.2.3
-#   manual run      → :sha-<short> (+ :latest when run on main)            (linux/amd64)
+#   manual run      → :sha-<short> (+ :latest when run on main)            (linux/amd64 + arm64)
+# amd64 and arm64 are built on native runners (ubuntu-24.04-arm is free for public repos).
 # Images are published on version tags only, not on every push: a private package on the
 # GitHub Free plan has 500 MB of storage and 1 GB/month of transfer.
 name: Publish
@@ -20,15 +21,70 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  image:
-    runs-on: ubuntu-latest
+  # One native runner per architecture (no QEMU emulation: arm64 under emulation took hours).
+  # Each pushes its image by digest; the "image" job then publishes one multi-arch tag list.
+  build:
+    strategy:
+      fail-fast: true
+      matrix:
+        include:
+          - platform: linux/amd64
+            runner: ubuntu-latest
+          - platform: linux/arm64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
     steps:
       - uses: actions/checkout@v4
+      - name: Names
+        id: name
+        run: |
+          echo "image=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
+          p="${{ matrix.platform }}"; echo "pair=${p//\//-}" >> "$GITHUB_OUTPUT"
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ steps.name.outputs.image }}
+      - id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          platforms: ${{ matrix.platform }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            VERSION=${{ github.ref_name }}
+          outputs: type=image,name=${{ steps.name.outputs.image }},push-by-digest=true,name-canonical=true,push=true
+          cache-from: type=gha,scope=${{ steps.name.outputs.pair }}
+          cache-to: type=gha,mode=max,scope=${{ steps.name.outputs.pair }}
+      - name: Export digest
+        run: |
+          mkdir -p "${{ runner.temp }}/digests"
+          d="${{ steps.build.outputs.digest }}"
+          touch "${{ runner.temp }}/digests/${d#sha256:}"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: digests-${{ steps.name.outputs.pair }}
+          path: ${{ runner.temp }}/digests/*
+          if-no-files-found: error
+          retention-days: 1
+
+  image:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: ${{ runner.temp }}/digests
+          pattern: digests-*
+          merge-multiple: true
       - name: Lower-case image name
         id: name
         run: echo "image=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
-      - uses: docker/setup-qemu-action@v3
-        if: startsWith(github.ref, 'refs/tags/')
       - uses: docker/setup-buildx-action@v3
       - uses: docker/login-action@v3
         with:
@@ -44,17 +100,14 @@ jobs:
             type=sha,prefix=sha-
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
-      - uses: docker/build-push-action@v6
-        with:
-          context: .
-          push: true
-          platforms: ${{ startsWith(github.ref, 'refs/tags/') && 'linux/amd64,linux/arm64' || 'linux/amd64' }}
-          tags: ${{ steps.meta.outputs.tags }}
-          labels: ${{ steps.meta.outputs.labels }}
-          build-args: |
-            VERSION=${{ github.ref_name }}
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
+      - name: Create the multi-arch tags
+        working-directory: ${{ runner.temp }}/digests
+        run: |
+          docker buildx imagetools create \
+            $(jq -cr '.tags | map("-t " + .) | join(" ")' <<< "$DOCKER_METADATA_OUTPUT_JSON") \
+            $(printf '${{ steps.name.outputs.image }}@sha256:%s ' *)
+      - name: Inspect
+        run: docker buildx imagetools inspect "$(jq -r '.tags[0]' <<< "$DOCKER_METADATA_OUTPUT_JSON")"
 
   chart:
     if: startsWith(github.ref, 'refs/tags/v')
