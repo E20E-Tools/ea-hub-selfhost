@@ -184,6 +184,35 @@ Health check: `curl https://ea-hub.apps.cluster.example.com/healthz` returns `{"
 
 Your own certificate on the Route: install the cert-manager Operator plus the *openshift-routes* add-on, and set `openshift.route.annotations: {cert-manager.io/issuer-name: …}`. Or ask your cluster administrator for the router's wildcard certificate, which is used automatically.
 
+## Alternative: the EA-Hub operator
+
+Instead of Helm you can install the **EA-Hub operator** (Operator Lifecycle Manager). It runs the same chart: each `EAHub` resource is one installation and its `spec` holds the chart values from step 6.
+
+Until the operator is listed in OperatorHub, install it from the bundle image of a release (needs `operator-sdk`):
+
+```bash
+operator-sdk run bundle ghcr.io/e20e-tools/ea-hub-operator-bundle:<version> -n ea-hub-operator
+```
+
+Then create the installation (no passwords in the spec: they are generated into the Secret `ea-hub`):
+
+```bash
+cat <<'EOF' | oc apply -n ea-hub -f -
+apiVersion: ea-hub.e20e-tools.github.io/v1alpha1
+kind: EAHub
+metadata:
+  name: ea-hub
+spec:
+  appUrl: https://ea-hub.apps.example.com
+  admin: { email: admin@example.com }
+  openshift: { enabled: true }
+EOF
+oc -n ea-hub get eahub                      # DEPLOYED True
+oc -n ea-hub get secret ea-hub -o jsonpath='{.data.admin-password}' | base64 -d
+```
+
+Change a setting with `oc -n ea-hub edit eahub ea-hub`; the operator upgrades the release. Deleting the `EAHub` removes the installation; the Secret with the generated passwords is kept.
+
 ## Troubleshooting
 
 | Symptom | Cause / fix |

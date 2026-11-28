@@ -506,6 +506,116 @@ jobs:
           kubectl -n ea-hub logs ea-hub-pg-1 --tail=30 || true
           kubectl -n ea-hub logs deploy/ea-hub --tail=100 || true
 
+  # The OperatorHub operator (Helm-based): the bundle validates, the operator installs EA-Hub
+  # from an EAHub resource, and reconciles do not upgrade the release (or regenerate secrets)
+  # when nothing changed.
+  operator:
+    runs-on: ubuntu-latest
+    env:
+      CSV: deploy/operator/bundle/manifests/ea-hub.clusterserviceversion.yaml
+      SDK_VERSION: v1.42.3
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: operator-sdk bundle validate
+        run: |
+          base=https://github.com/operator-framework/operator-sdk/releases/download/$SDK_VERSION
+          curl -fsSLO "$base/operator-sdk_linux_amd64" && curl -fsSLO "$base/checksums.txt"
+          grep ' operator-sdk_linux_amd64$' checksums.txt | sha256sum -c -
+          chmod +x operator-sdk_linux_amd64
+          ./operator-sdk_linux_amd64 bundle validate ./deploy/operator/bundle --select-optional suite=operatorframework
+          rm operator-sdk_linux_amd64 checksums.txt
+      - uses: helm/kind-action@ea822c7bf1874f08e5a491df991c228edffc3376 # v1.15.2
+        with:
+          cluster_name: ea-hub
+      - name: Build the app and operator images and load them into kind
+        run: |
+          docker build --build-arg WITH_LOCAL_MODEL=0 -t ea-hub-selfhost:ci .
+          docker build -f deploy/operator/Dockerfile -t ea-hub-operator:ci .
+          kind load docker-image ea-hub-selfhost:ci ea-hub-operator:ci --name ea-hub
+      - name: Deploy the operator from the CSV (CRD, RBAC, Deployment)
+        run: |
+          kubectl apply -f deploy/operator/bundle/manifests/ea-hub.e20e-tools.github.io_eahubs.yaml
+          kubectl create namespace ea-hub-operator
+          kubectl -n ea-hub-operator create serviceaccount ea-hub-operator
+          {
+            echo "apiVersion: rbac.authorization.k8s.io/v1"
+            echo "kind: ClusterRole"
+            echo "metadata: {name: ea-hub-operator}"
+            echo "rules:"
+            yq '.spec.install.spec.clusterPermissions[0].rules' "$CSV"
+          } | kubectl apply -f -
+          kubectl create clusterrolebinding ea-hub-operator --clusterrole=ea-hub-operator \
+            --serviceaccount=ea-hub-operator:ea-hub-operator
+          yq '.spec.install.spec.deployments[0] | {"apiVersion": "apps/v1", "kind": "Deployment",
+              "metadata": {"name": .name, "namespace": "ea-hub-operator"}, "spec": .spec}
+              | .spec.template.spec.containers[0].image = "ea-hub-operator:ci"
+              | .spec.template.spec.containers[0].imagePullPolicy = "Never"' "$CSV" | kubectl apply -f -
+          kubectl -n ea-hub-operator rollout status deploy/ea-hub-operator --timeout=5m
+      - name: An EAHub resource installs EA-Hub
+        run: |
+          kubectl create namespace ea-hub
+          cat <<'EOF' | kubectl -n ea-hub apply -f -
+          apiVersion: ea-hub.e20e-tools.github.io/v1alpha1
+          kind: EAHub
+          metadata:
+            name: ea-hub
+          spec:
+            appUrl: http://localhost:8080
+            admin: { email: op-admin@example.com }
+            image: { repository: ea-hub-selfhost, tag: ci, pullPolicy: Never }
+            backup: { storage: { size: 1Gi } }
+            storage: { size: 1Gi }
+            postgres: { storage: { size: 1Gi } }
+          EOF
+          kubectl -n ea-hub wait eahub/ea-hub --for=condition=Deployed --timeout=10m
+          for i in $(seq 1 60); do kubectl -n ea-hub get deploy/ea-hub >/dev/null 2>&1 && break; sleep 5; done
+          kubectl -n ea-hub rollout status statefulset/ea-hub-postgres --timeout=10m
+          kubectl -n ea-hub rollout status deploy/ea-hub --timeout=10m
+          kubectl -n ea-hub get eahub,pods
+      - name: Reconciles without changes keep the release and its secrets
+        run: |
+          revisions() { kubectl -n ea-hub get secret -l owner=helm,name=ea-hub,status=deployed -o jsonpath='{.items[0].metadata.labels.version}'; }
+          secrets() { kubectl -n ea-hub get secret ea-hub -o jsonpath='{.data}' | sha256sum; }
+          r0=$(revisions); s0=$(secrets)
+          for i in 1 2 3; do
+            kubectl -n ea-hub annotate eahub/ea-hub "ci/poke=$i" --overwrite
+            sleep 20
+          done
+          kubectl -n ea-hub-operator rollout restart deploy/ea-hub-operator
+          kubectl -n ea-hub-operator rollout status deploy/ea-hub-operator --timeout=5m
+          sleep 60
+          echo "revisions: $r0 -> $(revisions)"
+          test "$(revisions)" = "$r0"
+          test "$(secrets)" = "$s0"
+      - name: A spec change upgrades once and keeps the secrets
+        run: |
+          revisions() { kubectl -n ea-hub get secret -l owner=helm,name=ea-hub,status=deployed -o jsonpath='{.items[0].metadata.labels.version}'; }
+          secrets() { kubectl -n ea-hub get secret ea-hub -o jsonpath='{.data}' | sha256sum; }
+          r0=$(revisions); s0=$(secrets)
+          kubectl -n ea-hub patch eahub/ea-hub --type merge -p '{"spec":{"backup":{"keepDays":7}}}'
+          for i in $(seq 1 60); do [ "$(revisions)" -gt "$r0" ] && break; sleep 5; done
+          sleep 30
+          echo "revisions: $r0 -> $(revisions)"
+          test "$(revisions)" = "$((r0 + 1))"
+          test "$(secrets)" = "$s0"
+          kubectl -n ea-hub rollout status deploy/ea-hub --timeout=10m
+      - name: Sign in with the generated admin password
+        run: |
+          kubectl -n ea-hub port-forward svc/ea-hub 8080:80 >/dev/null 2>&1 &
+          sleep 5
+          curl -fsS http://localhost:8080/healthz | grep '"ok":true'
+          pw=$(kubectl -n ea-hub get secret ea-hub -o jsonpath='{.data.admin-password}' | base64 -d)
+          jq -n --arg p "$pw" '{email: "op-admin@example.com", password: $p}' \
+            | curl -fsS -X POST -H 'content-type: application/json' -d @- \
+              "http://localhost:8080/api/selfhost/auth/token?grant_type=password" | jq -e '.access_token | length > 20'
+      - name: Diagnostics on failure
+        if: failure()
+        run: |
+          kubectl -n ea-hub get eahub -o yaml | tail -40 || true
+          kubectl -n ea-hub get all || true
+          kubectl -n ea-hub-operator logs deploy/ea-hub-operator --tail=150 || true
+          kubectl -n ea-hub logs deploy/ea-hub -c migrate --tail=50 || true
+
   # One-click cloud templates: Bicep compiles (and the ARM file for the "Deploy to Azure"
   # button is regenerated on main), CloudFormation passes cfn-lint, Terraform validates.
   cloud-templates:

@@ -1,0 +1,9 @@
+# One EAHub resource = one Helm release of deploy/helm/ea-hub (spec = chart values).
+- group: ea-hub.e20e-tools.github.io
+  version: v1alpha1
+  kind: EAHub
+  chart: helm-charts/ea-hub
+  # Server-side dry runs evaluate lookup(), so the drift check sees the generated passwords
+  # that are already in the cluster and does not upgrade the release on every reconcile.
+  dryRunOption: server
+  watchDependentResources: true

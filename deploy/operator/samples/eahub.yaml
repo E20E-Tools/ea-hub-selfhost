@@ -1,0 +1,15 @@
+# Minimal EA-Hub. The spec holds the Helm chart values (deploy/helm/ea-hub/values.yaml).
+# Do not put passwords here: they are generated into the Secret "<name>" (read the first admin
+# password with: kubectl get secret ea-hub -o jsonpath='{.data.admin-password}' | base64 -d),
+# or use secrets.create=false with secrets.existingSecret for a Secret you manage yourself.
+apiVersion: ea-hub.e20e-tools.github.io/v1alpha1
+kind: EAHub
+metadata:
+  name: ea-hub
+spec:
+  appUrl: https://hub.example.com
+  admin:
+    email: admin@example.com
+  # On OpenShift: random UIDs, Debian postgres image and a Route.
+  openshift:
+    enabled: false

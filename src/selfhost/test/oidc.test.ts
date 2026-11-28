@@ -196,7 +196,9 @@ describe("state cookie", () => {
       }),
     ).toString("base64url");
     expect(openPending(`${forged}.${mac}`)).toBeNull();
-    expect(openPending(`${body}.x${mac!.slice(1)}`)).toBeNull();
+    // Change the first MAC character to a different one (a fixed "x" is a no-op 1 in 64 times).
+    const flipped = (mac![0] === "A" ? "B" : "A") + mac!.slice(1);
+    expect(openPending(`${body}.${flipped}`)).toBeNull();
     expect(
       openPending(
         sealPending({
