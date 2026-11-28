@@ -1,0 +1,124 @@
+# Rancher Apps & Marketplace install form.
+questions:
+  - variable: appUrl
+    label: Site address
+    description: "Address people open in the browser, e.g. https://hub.example.com (no trailing slash)"
+    type: string
+    required: true
+    default: "https://hub.example.com"
+    group: General
+  - variable: admin.email
+    label: Admin e-mail
+    description: First admin account (created on first install)
+    type: string
+    required: true
+    default: ""
+    group: General
+  - variable: admin.password
+    label: Admin password
+    description: At least 10 characters. Leave empty to generate one (see the release notes).
+    type: password
+    required: false
+    default: ""
+    group: General
+
+  - variable: ingress.enabled
+    label: Expose with an Ingress
+    type: boolean
+    default: false
+    show_subquestion_if: true
+    group: Access
+    subquestions:
+      - variable: ingress.host
+        label: Host name
+        description: Must match the site address, e.g. hub.example.com
+        type: hostname
+        default: ""
+      - variable: ingress.className
+        label: Ingress class
+        description: Empty = the cluster default (RKE2 ships nginx)
+        type: string
+        default: ""
+      - variable: ingress.tls
+        label: HTTPS
+        type: boolean
+        default: false
+      - variable: ingress.annotations.cert-manager\.io/cluster-issuer
+        label: cert-manager ClusterIssuer
+        description: Optional, e.g. letsencrypt
+        type: string
+        default: ""
+
+  - variable: storage.size
+    label: Uploads volume size
+    type: string
+    default: 5Gi
+    group: Storage
+  - variable: postgres.storage.size
+    label: Database volume size
+    type: string
+    default: 10Gi
+    group: Storage
+  - variable: backup.storage.size
+    label: Backups volume size
+    type: string
+    default: 20Gi
+    group: Storage
+  - variable: storage.storageClass
+    label: Storage class (uploads)
+    description: Empty = the cluster default
+    type: storageclass
+    default: ""
+    group: Storage
+  - variable: postgres.storage.storageClass
+    label: Storage class (database)
+    type: storageclass
+    default: ""
+    group: Storage
+
+  - variable: smtp.host
+    label: SMTP server
+    description: Optional. Needed for password-reset and notification e-mails.
+    type: string
+    default: ""
+    group: E-mail
+  - variable: smtp.port
+    label: SMTP port
+    type: int
+    default: 587
+    show_if: "smtp.host!="
+    group: E-mail
+  - variable: smtp.user
+    label: SMTP user
+    type: string
+    default: ""
+    show_if: "smtp.host!="
+    group: E-mail
+  - variable: smtp.password
+    label: SMTP password
+    type: password
+    default: ""
+    show_if: "smtp.host!="
+    group: E-mail
+  - variable: smtp.from
+    label: From address
+    type: string
+    default: ""
+    show_if: "smtp.host!="
+    group: E-mail
+
+  - variable: features.openaiApiKey
+    label: OpenAI API key (search by meaning)
+    type: password
+    default: ""
+    group: Optional features
+  - variable: features.turnstileSiteKey
+    label: Cloudflare Turnstile site key
+    type: string
+    default: ""
+    group: Optional features
+  - variable: features.turnstileSecretKey
+    label: Cloudflare Turnstile secret key
+    type: password
+    default: ""
+    group: Optional features

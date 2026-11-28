@@ -23,7 +23,13 @@ EA-Hub is being installed in namespace "{{ .Release.Namespace }}".
 
 3) Sign in / سجّل الدخول:  {{ .Values.appUrl }}/admin
 {{- if .Values.admin.email }}
-   e-mail: {{ .Values.admin.email }}  (password: the one you set in admin.password)
+   e-mail: {{ .Values.admin.email }}
+{{- if .Values.admin.password }}
+   password: the one you set in admin.password
+{{- else }}
+   password (generated) / كلمة المرور المولّدة:
+   kubectl -n {{ .Release.Namespace }} get secret {{ include "ea-hub.secretName" . }} -o jsonpath='{.data.admin-password}' | base64 -d; echo
+{{- end }}
 {{- else }}
    ! No admin account yet. Set admin.email and admin.password, then run `helm upgrade` again.
    ! لا يوجد حساب مدير بعد: اضبط admin.email و admin.password ثم أعد تشغيل helm upgrade.

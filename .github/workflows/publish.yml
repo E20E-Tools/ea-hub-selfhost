@@ -69,3 +69,57 @@ jobs:
           echo "${{ secrets.GITHUB_TOKEN }}" | helm registry login ghcr.io -u "${{ github.actor }}" --password-stdin
           helm package deploy/helm/ea-hub --version "$version" --app-version "$version"
           helm push "ea-hub-$version.tgz" "oci://ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/charts"
+      - name: Artifact Hub metadata for the OCI repository
+        uses: oras-project/setup-oras@v1
+      - run: |
+          echo "${{ secrets.GITHUB_TOKEN }}" | oras login ghcr.io -u "${{ github.actor }}" --password-stdin
+          cd deploy/helm
+          oras push "ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/charts/ea-hub:artifacthub.io"             --config /dev/null:application/vnd.cncf.artifacthub.config.v1+yaml             artifacthub-repo.yml:application/vnd.cncf.artifacthub.repository-metadata.layer.v1.yaml
+      - uses: actions/upload-artifact@v4
+        with:
+          name: chart
+          path: ea-hub-*.tgz
+
+  # Classic Helm repository (index.yaml) on the gh-pages branch, for Rancher, OpenShift
+  # HelmChartRepository and `helm repo add`: https://<owner>.github.io/<repo>
+  helm-repo:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: chart
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          path: src
+      - uses: actions/checkout@v4
+        with:
+          ref: gh-pages
+          path: pages
+        continue-on-error: true # first release: the branch does not exist yet
+      - uses: actions/download-artifact@v4
+        with:
+          name: chart
+          path: new
+      - uses: azure/setup-helm@v4
+      - name: Update index.yaml
+        run: |
+          owner="${GITHUB_REPOSITORY_OWNER,,}"; repo="${GITHUB_REPOSITORY#*/}"
+          url="https://${owner}.github.io/${repo}"
+          if [ ! -d pages/.git ]; then
+            rm -rf pages && mkdir pages && cd pages && git init -q -b gh-pages && cd ..
+            git -C pages remote add origin "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git"
+          fi
+          mkdir -p pages/charts
+          cp new/*.tgz pages/charts/
+          cp src/deploy/helm/artifacthub-repo.yml pages/artifacthub-repo.yml
+          touch pages/.nojekyll
+          printf '# EA-Hub Helm repository\n\n    helm repo add ea-hub %s\n    helm install ea-hub ea-hub/ea-hub -n ea-hub --create-namespace --set appUrl=https://hub.example.com --set admin.email=you@example.com\n' "$url" > pages/README.md
+          if [ -f pages/index.yaml ]; then merge="--merge pages/index.yaml"; else merge=""; fi
+          helm repo index pages --url "$url" $merge
+          cd pages
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Release ${GITHUB_REF_NAME}"
+          git push origin gh-pages
