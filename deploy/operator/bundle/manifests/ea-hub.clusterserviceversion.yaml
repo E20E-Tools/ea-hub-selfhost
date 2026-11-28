@@ -158,7 +158,7 @@ spec:
           - eahubs
           - eahubs/status
           - eahubs/finalizers
-          verbs: &id001
+          verbs:
           - create
           - delete
           - get
@@ -175,7 +175,14 @@ spec:
           - persistentvolumeclaims
           - pods
           - serviceaccounts
-          verbs: *id001
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
         - apiGroups:
           - ''
           resources:
@@ -194,62 +201,127 @@ spec:
           resources:
           - deployments
           - statefulsets
-          verbs: *id001
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
         - apiGroups:
           - batch
           resources:
           - jobs
           - cronjobs
-          verbs: *id001
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
         - apiGroups:
           - networking.k8s.io
           resources:
           - ingresses
           - networkpolicies
-          verbs: *id001
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
         - apiGroups:
           - policy
           resources:
           - poddisruptionbudgets
-          verbs: *id001
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
         - apiGroups:
           - autoscaling
           resources:
           - horizontalpodautoscalers
-          verbs: *id001
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
         - apiGroups:
           - route.openshift.io
           resources:
           - routes
           - routes/custom-host
-          verbs: *id001
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
         - apiGroups:
           - monitoring.coreos.com
           resources:
           - servicemonitors
           - prometheusrules
-          verbs: *id001
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
         - apiGroups:
           - postgresql.cnpg.io
           resources:
           - clusters
-          verbs: *id001
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
         - apiGroups:
           - coordination.k8s.io
           resources:
           - leases
-          verbs: *id001
+          verbs:
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
       deployments:
       - name: ea-hub-operator
-        label: &id002
+        label:
           app.kubernetes.io/name: ea-hub-operator
         spec:
           replicas: 1
           selector:
-            matchLabels: *id002
+            matchLabels:
+              app.kubernetes.io/name: ea-hub-operator
           template:
             metadata:
-              labels: *id002
+              labels:
+                app.kubernetes.io/name: ea-hub-operator
             spec:
               serviceAccountName: ea-hub-operator
               securityContext:
