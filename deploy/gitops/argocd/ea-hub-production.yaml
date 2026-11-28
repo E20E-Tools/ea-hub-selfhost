@@ -10,7 +10,7 @@ spec:
   sources:
     - repoURL: ghcr.io/e20e-tools/charts        # OCI Helm repository
       chart: ea-hub
-      targetRevision: 1.1.0                     # pin; Renovate/Dependabot can raise it
+      targetRevision: 1.2.0                     # pin; Renovate/Dependabot can raise it
       helm:
         valueFiles:
           - $config/ea-hub/values/production.yaml
