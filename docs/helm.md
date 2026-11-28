@@ -105,6 +105,11 @@ kubectl -n ea-hub rollout status deploy/ea-hub
 
 في لوحة الإدارة، تعرض صفحة **Settings ← Application health** حالة الخادم: الإصدار، وقاعدة البيانات، والتحديثات المطبقة، والتخزين، والبريد، والدخول الموحد، والمهام المجدولة، والمقاييس، والبحث.
 
+### التوسع التلقائي والتتبع
+
+- **`autoscaling.enabled=true`:** يزيد عدد نسخ التطبيق وينقصه حسب استهلاك المعالج. يحتاج حفظ الملفات على S3 (`storage.backend=s3`) أو قرصاً من نوع ReadWriteMany.
+- **`tracing.otlpEndpoint`:** يرسل تتبع كل طلب بمعيار OpenTelemetry إلى Jaeger أو Tempo أو Datadog أو Azure Monitor عبر collector.
+
 ### المراقبة والتنبيهات
 
 - **`metrics.enabled=true`:** يفعّل مقاييس Prometheus.

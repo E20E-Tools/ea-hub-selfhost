@@ -33,6 +33,8 @@ if (process.env.MIGRATE_ON_START === "true") {
 const model = fileURLToPath(new URL("../../.local/models/minilm/config.json", import.meta.url));
 if (!process.env.EA_LOCAL_SEMANTIC && existsSync(model))
   process.env.EA_LOCAL_SEMANTIC = new URL("../../local-backend/semantic.mjs", import.meta.url).href;
+// Security headers for the static files Nitro serves itself (the app sets its own on pages).
+(await import("./http-defaults.mjs")).install();
 process.env.HOST ||= "0.0.0.0";
 process.env.PORT ||= "3000";
 await import(new URL("../../.output/server/index.mjs", import.meta.url).href);

@@ -264,6 +264,23 @@ metrics:
   grafanaDashboard:
     enabled: false
 
+# Scale the app with the CPU load (HorizontalPodAutoscaler). Needs uploads that every pod
+# can reach: storage.backend=s3 or storage.accessMode=ReadWriteMany.
+autoscaling:
+  enabled: false
+  minReplicas: 2
+  maxReplicas: 6
+  targetCPUUtilizationPercentage: 70
+
+# OpenTelemetry traces (one span per request) to an OTLP/HTTP collector.
+tracing:
+  # -- e.g. http://otel-collector.observability:4318 (empty = off)
+  otlpEndpoint: ""
+  # -- Share of new traces to keep (0..1).
+  samplingRatio: 1
+  # -- Extra exporter headers ("key=value,…", e.g. an API key) are read from the release
+  # Secret key otel-headers, if present.
+
 # -- Keep at least one app pod during node drains. Only rendered when replicaCount > 1.
 podDisruptionBudget:
   enabled: true
