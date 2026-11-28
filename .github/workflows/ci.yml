@@ -69,8 +69,9 @@ jobs:
           docker run -d --name s3test -p 9000:9000 rclone/rclone:1.76.0 \
             serve s3 /data --addr :9000 --auth-key ci-s3,ci-s3-password
           for i in $(seq 1 30); do curl -s -o /dev/null http://localhost:9000/ && break; sleep 2; done
-          # s3.test.ts creates the bucket; the adapter test then stores files through it.
-          npx vitest run --no-file-parallelism src/selfhost/test/s3.test.ts src/selfhost/test/adapter.integration.test.ts
+          # A bucket of "rclone serve s3" is a top-level folder.
+          docker exec s3test mkdir -p /data/ea-hub-test
+          npx vitest run src/selfhost/test/s3.test.ts src/selfhost/test/adapter.integration.test.ts
 
   # Managed PostgreSQL (RDS, Azure, Cloud SQL…): the admin account is not a superuser and
   # cannot grant BYPASSRLS. The setup must fall back to "owner mode" and still pass.

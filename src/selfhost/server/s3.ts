@@ -127,7 +127,12 @@ async function call(
     body ? sha256(body) : EMPTY_SHA256,
     extra,
   );
-  const init: RequestInit = { method, headers };
+  // Uploads run inside a database transaction: never wait on a hung endpoint for long.
+  const init: RequestInit = {
+    method,
+    headers,
+    signal: AbortSignal.timeout(method === "PUT" ? 60_000 : 30_000),
+  };
   if (body) init.body = new Uint8Array(body);
   return fetch(url, init);
 }

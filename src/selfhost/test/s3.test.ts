@@ -104,5 +104,11 @@ describe.skipIf(!endpoint)("S3 blob store against a real server", () => {
     await store.remove("public-assets", "logos/a b.txt");
     expect(await store.get("public-assets", "logos/a b.txt")).toBeNull();
     expect(await store.open("public-assets", "missing.txt")).toBeNull();
+
+    // The server really checks signatures: a wrong secret is refused.
+    const wrong = s3Store({ ...settings, secretAccessKey: "not-the-secret" });
+    await expect(
+      wrong.put("public-assets", "x.txt", data, "text/plain"),
+    ).rejects.toThrow(/HTTP 403/);
   });
 });
