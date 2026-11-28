@@ -614,6 +614,12 @@ jobs:
           kubectl -n ea-hub get eahub -o yaml | tail -40 || true
           kubectl -n ea-hub get all || true
           kubectl -n ea-hub-operator logs deploy/ea-hub-operator --tail=150 || true
+          # What changed between the release revisions (helm-operator upgrades only on a diff).
+          rel() { kubectl -n ea-hub get secret "sh.helm.release.v1.ea-hub.v$1" -o jsonpath='{.data.release}' | base64 -d | base64 -d | gunzip; }
+          for v in 1 2 3; do rel $v > /tmp/rel$v.json 2>/dev/null && jq -r .manifest /tmp/rel$v.json > /tmp/man$v.yaml || true; done
+          diff /tmp/man1.yaml /tmp/man2.yaml | head -80 || true
+          diff <(jq -S .config /tmp/rel1.json) <(jq -S .config /tmp/rel2.json) | head -40 || true
+          kubectl -n ea-hub get secret -l owner=helm --show-labels || true
           kubectl -n ea-hub logs deploy/ea-hub -c migrate --tail=50 || true
 
   # One-click cloud templates: Bicep compiles (and the ARM file for the "Deploy to Azure"
