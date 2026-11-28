@@ -34,24 +34,24 @@ jobs:
             runner: ubuntu-24.04-arm
     runs-on: ${{ matrix.runner }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Names
         id: name
         run: |
           echo "image=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
           p="${{ matrix.platform }}"; echo "pair=${p//\//-}" >> "$GITHUB_OUTPUT"
-      - uses: docker/setup-buildx-action@v3
-      - uses: docker/login-action@v3
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+      - uses: docker/login-action@8aa5831fb8d48d8f76594c7ddde61ae58019f550 # v4.8.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
         with:
           images: ${{ steps.name.outputs.image }}
       - id: build
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
           context: .
           platforms: ${{ matrix.platform }}
@@ -66,7 +66,7 @@ jobs:
           mkdir -p "${{ runner.temp }}/digests"
           d="${{ steps.build.outputs.digest }}"
           touch "${{ runner.temp }}/digests/${d#sha256:}"
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: digests-${{ steps.name.outputs.pair }}
           path: ${{ runner.temp }}/digests/*
@@ -76,8 +76,12 @@ jobs:
   image:
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write # keyless cosign signature (Sigstore)
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           path: ${{ runner.temp }}/digests
           pattern: digests-*
@@ -85,14 +89,14 @@ jobs:
       - name: Lower-case image name
         id: name
         run: echo "image=ghcr.io/${GITHUB_REPOSITORY,,}" >> "$GITHUB_OUTPUT"
-      - uses: docker/setup-buildx-action@v3
-      - uses: docker/login-action@v3
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+      - uses: docker/login-action@8aa5831fb8d48d8f76594c7ddde61ae58019f550 # v4.8.0
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - id: meta
-        uses: docker/metadata-action@v5
+        uses: docker/metadata-action@dc802804100637a589fabce1cb79ff13a1411302 # v6.2.0
         with:
           images: ${{ steps.name.outputs.image }}
           tags: |
@@ -108,14 +112,45 @@ jobs:
             $(printf '${{ steps.name.outputs.image }}@sha256:%s ' *)
       - name: Inspect
         run: docker buildx imagetools inspect "$(jq -r '.tags[0]' <<< "$DOCKER_METADATA_OUTPUT_JSON")"
+      - uses: sigstore/cosign-installer@881c63bd87e38389154debd8331404ce7ca8a3ab # v4.1.4
+      - name: Sign the image (keyless, by digest)
+        run: |
+          ref="$(jq -r '.tags[0]' <<< "$DOCKER_METADATA_OUTPUT_JSON")"
+          digest="$(docker buildx imagetools inspect "$ref" --format '{{json .Manifest}}' | jq -r .digest)"
+          cosign sign --yes "${{ steps.name.outputs.image }}@${digest}"
 
   chart:
     if: startsWith(github.ref, 'refs/tags/v')
     needs: image
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write # keyless cosign signature (Sigstore)
     steps:
-      - uses: actions/checkout@v4
-      - uses: azure/setup-helm@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0 # tags and history for the change log
+      - uses: azure/setup-helm@2f5e7bc67f1f9972ab16657bb795f36d8f04de0e # v5.1.0
+      - uses: sigstore/cosign-installer@881c63bd87e38389154debd8331404ce7ca8a3ab # v4.1.4
+      - name: Change log for Artifact Hub (self-host commits since the previous tag)
+        run: |
+          prev="$(git describe --tags --abbrev=0 "${GITHUB_REF_NAME}^" 2>/dev/null || true)"
+          range="${prev:+$prev..}${GITHUB_REF_NAME}"
+          git log --no-merges --format=%s "$range" -- selfhost src/selfhost deploy Dockerfile \
+            docker-compose.yml setup.sh setup.ps1 .github docs \
+            | grep -vE '^(chore|Merge)' | head -25 > /tmp/changes || true
+          # JSON strings are valid YAML double-quoted scalars, so quotes and backslashes are safe.
+          python3 - <<'PY'
+          import json
+          lines = [l.strip() for l in open("/tmp/changes", encoding="utf-8") if l.strip()]
+          if lines:
+              with open("deploy/helm/ea-hub/Chart.yaml", "a", encoding="utf-8") as f:
+                  f.write("  artifacthub.io/changes: |\n")
+                  for l in lines:
+                      f.write(f"    - kind: changed\n      description: {json.dumps(l)}\n")
+          PY
+          tail -n 30 deploy/helm/ea-hub/Chart.yaml
       - name: Package and push the chart
         run: |
           version="${GITHUB_REF_NAME#v}"
@@ -123,14 +158,19 @@ jobs:
           # Keep the Artifact Hub image list on the released image tag.
           sed -i "s|ghcr.io/e20e-tools/ea-hub-selfhost:[0-9][0-9.]*|ghcr.io/e20e-tools/ea-hub-selfhost:$version|" deploy/helm/ea-hub/Chart.yaml
           helm package deploy/helm/ea-hub --version "$version" --app-version "$version"
-          helm push "ea-hub-$version.tgz" "oci://ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/charts"
+          helm push "ea-hub-$version.tgz" "oci://ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/charts" 2>&1 | tee /tmp/push.log
+          digest="$(grep -o 'sha256:[0-9a-f]*' /tmp/push.log | head -1)"
+          echo "${{ secrets.GITHUB_TOKEN }}" | cosign login ghcr.io -u "${{ github.actor }}" --password-stdin
+          cosign sign --yes "ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/charts/ea-hub@${digest}"
       - name: Artifact Hub metadata for the OCI repository
-        uses: oras-project/setup-oras@v1
+        uses: oras-project/setup-oras@ac735097e22fe643015b0d19645f7c9a69942128 # v2.0.4
       - run: |
           echo "${{ secrets.GITHUB_TOKEN }}" | oras login ghcr.io -u "${{ github.actor }}" --password-stdin
           cd deploy/helm
-          oras push "ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/charts/ea-hub:artifacthub.io"             --config /dev/null:application/vnd.cncf.artifacthub.config.v1+yaml             artifacthub-repo.yml:application/vnd.cncf.artifacthub.repository-metadata.layer.v1.yaml
-      - uses: actions/upload-artifact@v4
+          oras push "ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/charts/ea-hub:artifacthub.io" \
+            --config /dev/null:application/vnd.cncf.artifacthub.config.v1+yaml \
+            artifacthub-repo.yml:application/vnd.cncf.artifacthub.repository-metadata.layer.v1.yaml
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: chart
           path: ea-hub-*.tgz
@@ -144,20 +184,20 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           path: src
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         id: pages
         with:
           ref: gh-pages
           path: pages
         continue-on-error: true # first release: the branch does not exist yet
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: chart
           path: new
-      - uses: azure/setup-helm@v4
+      - uses: azure/setup-helm@2f5e7bc67f1f9972ab16657bb795f36d8f04de0e # v5.1.0
       - name: Update index.yaml
         run: |
           owner="${GITHUB_REPOSITORY_OWNER,,}"; repo="${GITHUB_REPOSITORY#*/}"
@@ -179,3 +219,36 @@ jobs:
           git add -A
           git commit -m "Release ${GITHUB_REF_NAME}"
           git push "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git" HEAD:refs/heads/gh-pages
+
+  # GitHub Release with generated notes and the packaged chart attached.
+  release:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [chart, helm-repo]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: chart
+      - name: Create the release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          image="ghcr.io/${GITHUB_REPOSITORY,,}"
+          chart="oci://ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/charts/ea-hub"
+          {
+            echo "## Install or upgrade"
+            echo
+            echo '```bash'
+            echo "helm upgrade --install ea-hub ${chart} --version ${version} -n ea-hub --create-namespace --reuse-values"
+            echo '```'
+            echo
+            echo "- Image: \`${image}:${version}\` (linux/amd64, linux/arm64), signed with cosign (keyless)."
+            echo "- Docker Compose: set \`EA_HUB_IMAGE=${image}:${version}\` in \`.env\`, then \`docker compose pull && docker compose up -d\`."
+            echo "- Verify the signature: \`cosign verify ${image}:${version} --certificate-identity-regexp 'https://github.com/${GITHUB_REPOSITORY}/' --certificate-oidc-issuer https://token.actions.githubusercontent.com\`"
+          } > notes.md
+          gh release create "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --verify-tag \
+            --title "EA-Hub self-hosted ${GITHUB_REF_NAME}" --notes-file notes.md --generate-notes \
+            ea-hub-*.tgz

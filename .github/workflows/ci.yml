@@ -4,7 +4,9 @@ name: CI
 on:
   push:
     branches: [main]
+    paths-ignore: ["docs/**", "*.md"] # documentation-only changes do not need the full CI
   pull_request:
+    paths-ignore: ["docs/**", "*.md"]
   workflow_dispatch:
 
 permissions:
@@ -27,11 +29,11 @@ jobs:
         options: >-
           --health-cmd "pg_isready -U postgres" --health-interval 5s --health-timeout 5s --health-retries 20
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 22
-      - uses: oven-sh/setup-bun@v2
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
       - run: bun install --frozen-lockfile
       - name: Type check
         run: node node_modules/typescript/bin/tsc --noEmit
@@ -64,11 +66,11 @@ jobs:
         options: >-
           --health-cmd "pg_isready -U postgres" --health-interval 5s --health-timeout 5s --health-retries 20
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
         with:
           node-version: 22
-      - uses: oven-sh/setup-bun@v2
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
       - run: bun install --frozen-lockfile
       - name: Create a non-superuser owner, like a cloud database admin
         env:
@@ -94,8 +96,8 @@ jobs:
     permissions:
       contents: write # commits regenerated deploy/kubernetes on main
     steps:
-      - uses: actions/checkout@v4
-      - uses: azure/setup-helm@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: azure/setup-helm@2f5e7bc67f1f9972ab16657bb795f36d8f04de0e # v5.1.0
       - name: Backup script copies match
         run: cmp selfhost/backup/backup.sh deploy/helm/ea-hub/files/backup.sh
       - name: helm lint
@@ -174,7 +176,7 @@ jobs:
   compose-e2e:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - name: Write a test .env (what setup.sh writes)
         run: |
           {
@@ -200,6 +202,14 @@ jobs:
             sleep 5
           done
           curl -fsS http://localhost:8080/healthz | grep '"ok":true'
+      - name: Vulnerability scan of the app image (critical, fixable)
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          image-ref: ea-hub-selfhost:ci
+          severity: CRITICAL
+          ignore-unfixed: true
+          exit-code: "1"
+          format: table
       - name: Site, admin sign-in and admin API
         run: |
           curl -fsSL -o /dev/null -w "home %{http_code}\n" http://localhost:8080/
@@ -253,9 +263,9 @@ jobs:
   kind:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: azure/setup-helm@v4
-      - uses: helm/kind-action@v1
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: azure/setup-helm@2f5e7bc67f1f9972ab16657bb795f36d8f04de0e # v5.1.0
+      - uses: helm/kind-action@ea822c7bf1874f08e5a491df991c228edffc3376 # v1.15.2
         with:
           cluster_name: ea-hub
       - name: Build image and load it into kind
