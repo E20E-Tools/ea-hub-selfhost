@@ -127,6 +127,7 @@ const banned = (row: UserRow) =>
 async function issueSession(
   row: UserRow,
   sessionId: string = randomUUID(),
+  method: "password" | "oidc" = "password",
 ): Promise<Session> {
   const cfg = selfhostConfig();
   const now = Math.floor(Date.now() / 1000);
@@ -139,7 +140,7 @@ async function issueSession(
     phone: "",
     role: "authenticated",
     aal: "aal1",
-    amr: [{ method: "password", timestamp: now }],
+    amr: [{ method, timestamp: now }],
     session_id: sessionId,
     is_anonymous: false,
     app_metadata: user.app_metadata,
@@ -274,6 +275,61 @@ export async function signInWithPassword(
   return { session, user: session.user, error: null };
 }
 
+/**
+ * Single sign-on: the identity provider has already proven who this is (oidc.ts verified the
+ * ID token). Links to an existing account by e-mail; creates one only when allowed; grants the
+ * admin role only when the e-mail or a group is listed in the configuration.
+ */
+export async function ssoSignIn(params: {
+  email: string;
+  name: string | undefined;
+  isAdmin: boolean;
+  autoCreate: boolean;
+}): Promise<{ session: Session } | { error: "not_allowed" | "banned" }> {
+  const email = params.email.trim().toLowerCase();
+  let row = await userByEmail(email);
+  if (!row) {
+    if (!params.isAdmin && !params.autoCreate) return { error: "not_allowed" };
+    const rows = await db().unsafe<UserRow[]>(
+      `insert into auth.users (email, encrypted_password, email_confirmed_at, raw_user_meta_data, raw_app_meta_data)
+       values ($1, null, now(), $2::jsonb, $3::jsonb)
+       on conflict do nothing
+       returning ${USER_COLUMNS}`,
+      [
+        email,
+        JSON.stringify(params.name ? { full_name: params.name } : {}),
+        JSON.stringify({ provider: "oidc", providers: ["oidc"] }),
+      ],
+    );
+    row = rows[0] ?? (await userByEmail(email));
+    if (!row) return { error: "not_allowed" };
+  }
+  if (banned(row)) return { error: "banned" };
+  if (params.isAdmin)
+    await db().unsafe(
+      "insert into public.user_roles (user_id, role) values ($1, 'admin') on conflict do nothing",
+      [row.id],
+    );
+  await db().unsafe(
+    "update auth.users set last_sign_in_at = now(), email_confirmed_at = coalesce(email_confirmed_at, now()) where id = $1",
+    [row.id],
+  );
+  row.last_sign_in_at = new Date();
+  return { session: await issueSession(row, undefined, "oidc") };
+}
+
+/** Puts a session in a URL fragment, the way the browser client reads it after a redirect. */
+export function sessionFragment(s: Session, type: string): string {
+  return new URLSearchParams({
+    access_token: s.access_token,
+    expires_at: String(s.expires_at),
+    expires_in: String(s.expires_in),
+    refresh_token: s.refresh_token,
+    token_type: "bearer",
+    type,
+  }).toString();
+}
+
 export async function refreshSession(
   refreshToken: string,
 ): Promise<{ session: Session | null; error: AuthError | null }> {
@@ -355,7 +411,7 @@ export async function updateOwnUser(
 }
 
 // ---------- password recovery ----------
-function safeRedirect(redirectTo: string | undefined): string {
+export function safeRedirect(redirectTo: string | undefined): string {
   const { appUrl } = selfhostConfig();
   try {
     const target = new URL(redirectTo || `${appUrl}/reset-password`, appUrl);

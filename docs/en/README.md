@@ -15,6 +15,8 @@ EA-Hub runs anywhere that can run a Linux container and a PostgreSQL 16 database
 | **AWS ECS on Fargate** | Serverless containers on AWS | [deploy-aws-ecs-fargate.md](deploy-aws-ecs-fargate.md) |
 | **Google Cloud Run** | Serverless containers on Google Cloud | [deploy-google-cloud-run.md](deploy-google-cloud-run.md) |
 
+**Single sign-on** (Microsoft Entra ID, Keycloak, Okta, Google…) works on every platform: see [single-sign-on.md](single-sign-on.md).
+
 ## What every installation is made of
 
 ![What gets deployed](images/architecture.svg)
@@ -58,5 +60,8 @@ All guides use the same settings, under two names: environment variables (Docker
 | `TRUST_PROXY_HOPS` | `trustProxyHops` | Proxies in front of the app that append to `X-Forwarded-For` (default 1) |
 | `SMTP_HOST`, `SMTP_PORT`, `SMTP_SECURE`, `SMTP_USER`, `SMTP_PASSWORD`, `SMTP_FROM` | `smtp.*` | Outgoing e-mail |
 | `OPENAI_API_KEY`, `TURNSTILE_SITE_KEY`, `TURNSTILE_SECRET_KEY`, `GROQ_API_KEY` | `features.*` | Optional features |
+| `OIDC_*` | `sso.oidc.*` | Single sign-on, see [single-sign-on.md](single-sign-on.md) |
+| `STORAGE_BACKEND`, `S3_*` | `storage.backend`, `storage.s3.*` | Uploads on a volume (default) or in an S3-compatible bucket |
+| `METRICS_TOKEN` | `metrics.enabled` | Prometheus metrics at `/metrics` |
 
 Health check for any platform: `GET /healthz` returns `{"ok":true,"database":"ok"}`.

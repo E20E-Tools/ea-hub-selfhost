@@ -253,6 +253,29 @@ class BrowserAuth {
     }
   }
 
+  /**
+   * Single sign-on: every provider name maps to the one OpenID Connect provider configured on
+   * the server (OIDC_*). The browser leaves for the provider and comes back with a session.
+   */
+  async signInWithOAuth(credentials: {
+    provider?: string;
+    options?: { redirectTo?: string; skipBrowserRedirect?: boolean };
+  }) {
+    const redirectTo =
+      credentials.options?.redirectTo ??
+      (typeof window !== "undefined" ? window.location.href : "");
+    const url = `${BASE}/auth/oidc/start?redirect_to=${encodeURIComponent(redirectTo)}`;
+    if (
+      typeof window !== "undefined" &&
+      !credentials.options?.skipBrowserRedirect
+    )
+      window.location.assign(url);
+    return {
+      data: { provider: credentials.provider ?? "oidc", url },
+      error: null,
+    };
+  }
+
   async signInWithPassword(credentials: { email: string; password: string }) {
     try {
       const res = await call("auth/token?grant_type=password", {

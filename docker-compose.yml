@@ -28,6 +28,17 @@ x-app-env: &app-env
   STORAGE_MAX_UPLOAD_MB: ${STORAGE_MAX_UPLOAD_MB:-10}
   # Uploads: "filesystem" (the storage-data volume) or "s3" (an S3-compatible bucket).
   STORAGE_BACKEND: ${STORAGE_BACKEND:-filesystem}
+  # Single sign-on (OpenID Connect). Off unless OIDC_ISSUER, OIDC_CLIENT_ID and OIDC_CLIENT_SECRET are set.
+  OIDC_ISSUER: ${OIDC_ISSUER:-}
+  OIDC_CLIENT_ID: ${OIDC_CLIENT_ID:-}
+  OIDC_CLIENT_SECRET: ${OIDC_CLIENT_SECRET:-}
+  OIDC_SCOPES: ${OIDC_SCOPES:-openid email profile}
+  OIDC_BUTTON_LABEL: ${OIDC_BUTTON_LABEL:-Sign in with your organisation account}
+  OIDC_ADMIN_EMAILS: ${OIDC_ADMIN_EMAILS:-}
+  OIDC_ADMIN_GROUPS: ${OIDC_ADMIN_GROUPS:-}
+  OIDC_GROUPS_CLAIM: ${OIDC_GROUPS_CLAIM:-groups}
+  OIDC_AUTO_CREATE: ${OIDC_AUTO_CREATE:-false}
+  OIDC_REQUIRE_VERIFIED_EMAIL: ${OIDC_REQUIRE_VERIFIED_EMAIL:-true}
   S3_BUCKET: ${S3_BUCKET:-}
   S3_REGION: ${S3_REGION:-}
   S3_ENDPOINT: ${S3_ENDPOINT:-}

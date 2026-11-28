@@ -43,6 +43,28 @@ secrets:
   appEncryptionKey: ""
   cronSecret: ""
 
+# Single sign-on with OpenID Connect (Microsoft Entra ID, Keycloak, Okta, Google, Authentik…).
+# Off until issuer, clientId and clientSecret are set. Register this redirect URI at the
+# provider: <appUrl>/api/selfhost/auth/oidc/callback. See docs/en/single-sign-on.md.
+sso:
+  oidc:
+    # -- e.g. https://login.microsoftonline.com/<tenant-id>/v2.0 or https://kc.example.com/realms/acme
+    issuer: ""
+    clientId: ""
+    # -- Stored in the release Secret (key oidc-client-secret).
+    clientSecret: ""
+    scopes: "openid email profile"
+    buttonLabel: "Sign in with your organisation account"
+    # -- E-mails that become EA-Hub admins when they sign in (comma-separated).
+    adminEmails: ""
+    # -- Group names/IDs (from groupsClaim) whose members become admins (comma-separated).
+    adminGroups: ""
+    groupsClaim: groups
+    # -- false: only people with an existing account (or listed admins) may sign in.
+    autoCreate: false
+    # -- Microsoft Entra ID does not send email_verified: set false there.
+    requireVerifiedEmail: true
+
 # Outgoing e-mail (password reset, notifications, newsletter). Optional.
 smtp:
   host: ""

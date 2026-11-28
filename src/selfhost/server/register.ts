@@ -52,7 +52,10 @@ export async function selfhostFetch(
     }
   }
   countRequest(request.method.toUpperCase());
-  const response = await handleSelfhost(request);
+  // Translate X-Forwarded-For first: the self-host auth routes rate-limit by client IP too,
+  // and must never trust a cf-connecting-ip header sent by the client itself.
+  const trusted = withClientIp(request);
+  const response = await handleSelfhost(trusted);
   if (response) return { response };
-  return { request: withClientIp(request) };
+  return { request: trusted };
 }

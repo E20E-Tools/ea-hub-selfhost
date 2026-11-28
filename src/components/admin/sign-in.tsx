@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { FieldError, useAdminCopy } from "./ui";
+import { SelfhostSsoSignIn } from "@/selfhost/ui/sso-sign-in";
 
 export const SIGN_IN_MAX_FAILURES = 5;
 export const SIGN_IN_COOLDOWN_MS = 60_000;
@@ -245,6 +246,7 @@ export function SignInScreen({
           {t("signIn")}
         </Button>
       </form>
+      <SelfhostSsoSignIn />
     </Frame>
   );
 }

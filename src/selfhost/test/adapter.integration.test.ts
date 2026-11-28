@@ -201,6 +201,68 @@ suite("self-host adapter (live database)", () => {
     expect(after.data.user).toBeNull();
   });
 
+  it("single sign-on links, creates and promotes accounts only as configured", async () => {
+    const { ssoSignIn } = await import("../server/auth");
+    const { userFromToken } = await import("../server/auth");
+    const stranger = `sso-stranger-${Date.now()}@example.com`;
+    // Unknown person, not listed as admin, no auto-create: refused, nothing created.
+    expect(
+      await ssoSignIn({
+        email: stranger,
+        name: undefined,
+        isAdmin: false,
+        autoCreate: false,
+      }),
+    ).toEqual({ error: "not_allowed" });
+    const none = await admin.from("user_roles").select("user_id");
+    expect(none.error).toBeNull();
+
+    // Existing account (the password admin): linked by e-mail, any case.
+    const linked = await ssoSignIn({
+      email: email.toUpperCase(),
+      name: undefined,
+      isAdmin: false,
+      autoCreate: false,
+    });
+    expect("session" in linked && linked.session.user.id).toBe(adminId);
+    if ("session" in linked) {
+      const who = await userFromToken(linked.session.access_token);
+      expect(who.user?.id).toBe(adminId);
+    }
+
+    // Listed admin without an account: created with the admin role.
+    const boss = `sso-admin-${Date.now()}@example.com`;
+    const created = await ssoSignIn({
+      email: boss,
+      name: "SSO Admin",
+      isAdmin: true,
+      autoCreate: false,
+    });
+    expect("session" in created).toBe(true);
+    const bossId = "session" in created ? created.session.user.id : "";
+    const roles = await admin
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", bossId);
+    expect(roles.data).toEqual([{ role: "admin" }]);
+    // Created without a password: password sign-in stays impossible.
+    const pw = await handleSelfhost(
+      new Request(
+        "http://app.test/api/selfhost/auth/token?grant_type=password",
+        {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+            origin: "http://app.test",
+          },
+          body: JSON.stringify({ email: boss, password: "anything-at-all" }),
+        },
+      ),
+    );
+    expect(pw!.status).toBe(400);
+    await admin.auth.admin.deleteUser(bossId);
+  });
+
   it("stores files with signed URLs", async () => {
     const bucket = admin.storage.from("library-assets");
     const up = await bucket.upload(
