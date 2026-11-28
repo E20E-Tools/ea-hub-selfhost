@@ -26,7 +26,7 @@ for img in "${IMAGES[@]}"; do
   docker pull --platform "linux/$ARCH" "$img" >/dev/null
 done
 echo "[bundle] saving images"
-docker save "${IMAGES[@]}" | gzip -1 > "$WORK/images/images.tar.gz"
+docker save --platform "linux/$ARCH" "${IMAGES[@]}" | gzip -1 > "$WORK/images/images.tar.gz"
 printf '%s\n' "${IMAGES[@]}" > "$WORK/images/list.txt"
 
 echo "[bundle] chart and files"
