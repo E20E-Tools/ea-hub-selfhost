@@ -65,7 +65,7 @@ spec:
             app.kubernetes.io/component: backup
         spec:
           restartPolicy: Never
-          {{- if eq .Values.storage.accessMode "ReadWriteOnce" }}
+          {{- if and (include "ea-hub.fileStorage" .) (eq .Values.storage.accessMode "ReadWriteOnce") }}
           # The uploads volume is ReadWriteOnce: run next to the web pod to read it.
           affinity:
             podAffinity:
@@ -106,9 +106,11 @@ spec:
                   mountPath: /backup
                 - name: backups
                   mountPath: /backups
+                {{- if include "ea-hub.fileStorage" . }}
                 - name: storage
                   mountPath: /data/storage
                   readOnly: true
+                {{- end }}
           {{- if $offsite.enabled }}
           containers:
             - name: offsite
@@ -150,7 +152,9 @@ spec:
             - name: backups
               persistentVolumeClaim:
                 claimName: {{ include "ea-hub.fullname" . }}-backups
+            {{- if include "ea-hub.fileStorage" . }}
             - name: storage
               persistentVolumeClaim:
                 claimName: {{ .Values.storage.existingClaim | default (printf "%s-storage" (include "ea-hub.fullname" .)) }}
+            {{- end }}
 {{- end }}

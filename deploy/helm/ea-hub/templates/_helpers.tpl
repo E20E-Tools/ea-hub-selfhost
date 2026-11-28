@@ -106,6 +106,22 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- if .Values.metrics.enabled }}
 {{ include "ea-hub.secretEnv" (dict "root" . "name" "METRICS_TOKEN" "key" "metrics-token" "optional" true) }}
 {{- end }}
+- name: STORAGE_BACKEND
+  value: {{ .Values.storage.backend | quote }}
+{{- if eq .Values.storage.backend "s3" }}
+- name: S3_BUCKET
+  value: {{ required "storage.s3.bucket is required when storage.backend=s3" .Values.storage.s3.bucket | quote }}
+- name: S3_REGION
+  value: {{ .Values.storage.s3.region | quote }}
+- name: S3_ENDPOINT
+  value: {{ .Values.storage.s3.endpoint | quote }}
+- name: S3_FORCE_PATH_STYLE
+  value: {{ .Values.storage.s3.forcePathStyle | quote }}
+- name: S3_PREFIX
+  value: {{ .Values.storage.s3.prefix | quote }}
+{{ include "ea-hub.secretEnv" (dict "root" . "name" "S3_ACCESS_KEY_ID" "key" "s3-access-key-id") }}
+{{ include "ea-hub.secretEnv" (dict "root" . "name" "S3_SECRET_ACCESS_KEY" "key" "s3-secret-access-key") }}
+{{- end }}
 {{- end -}}
 
 {{/* Environment of the migration step. */}}
@@ -139,4 +155,9 @@ capabilities:
      (nss_wrapper); the Alpine default is swapped for it in OpenShift mode. */}}
 {{- define "ea-hub.postgresImage" -}}
 {{- if and .Values.openshift.enabled (eq .Values.postgres.image "postgres:16-alpine") -}}postgres:16{{- else -}}{{ .Values.postgres.image }}{{- end -}}
+{{- end -}}
+
+{{/* Uploads live on a volume ("true") or in an S3 bucket (empty). */}}
+{{- define "ea-hub.fileStorage" -}}
+{{- if ne .Values.storage.backend "s3" -}}true{{- end -}}
 {{- end -}}

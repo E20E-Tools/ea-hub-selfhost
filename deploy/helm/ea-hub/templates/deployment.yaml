@@ -7,7 +7,7 @@ metadata:
     app.kubernetes.io/component: web
 spec:
   replicas: {{ .Values.replicaCount }}
-  {{- if eq .Values.storage.accessMode "ReadWriteOnce" }}
+  {{- if and (include "ea-hub.fileStorage" .) (eq .Values.storage.accessMode "ReadWriteOnce") }}
   # A ReadWriteOnce upload volume can only be mounted by one pod at a time.
   strategy:
     type: Recreate
@@ -63,9 +63,11 @@ spec:
               containerPort: 3000
           env:
             {{- include "ea-hub.appEnv" . | nindent 12 }}
+          {{- if include "ea-hub.fileStorage" . }}
           volumeMounts:
             - name: storage
               mountPath: /data/storage
+          {{- end }}
           startupProbe:
             httpGet: { path: /healthz, port: http }
             periodSeconds: 5
@@ -83,10 +85,12 @@ spec:
             {{- include "ea-hub.containerSecurity" . | nindent 12 }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
+      {{- if include "ea-hub.fileStorage" . }}
       volumes:
         - name: storage
           persistentVolumeClaim:
             claimName: {{ .Values.storage.existingClaim | default (printf "%s-storage" (include "ea-hub.fullname" .)) }}
+      {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

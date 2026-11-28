@@ -503,6 +503,24 @@ backup:
 
 Old copies are never deleted from the bucket: set a lifecycle rule there (e.g. delete after 90 days). To restore from the bucket, copy one folder back with `rclone copy <remote>:my-bucket/ea-hub/<name> ./<name>`, put it on the `ea-hub-backups` volume, and follow the restore steps.
 
+### Several app replicas (uploads in S3)
+
+By default, uploads live on a ReadWriteOnce volume, so one app pod runs. To run more replicas, keep uploads in an S3-compatible bucket (AWS S3, MinIO, Ceph RGW, Cloudflare R2…):
+
+```yaml
+replicaCount: 2
+storage:
+  backend: s3
+  s3:
+    bucket: ea-hub-uploads
+    region: eu-central-1
+    endpoint: ""                  # e.g. https://minio.example.com for non-AWS services
+    accessKeyId: "…"
+    secretAccessKey: "…"
+```
+
+Files are still served by the app, so access rules and signed links work exactly as before. The bucket can stay private. With S3, the nightly backup contains the database only: turn on bucket versioning or replication to protect the files. Database migrations are safe with several replicas, because each pod waits for a lock.
+
 ### Monitoring and network policies
 
 | Value | What it does |

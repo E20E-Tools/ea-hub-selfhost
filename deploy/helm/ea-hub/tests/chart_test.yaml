@@ -114,3 +114,33 @@ tests:
       backup.offsite.enabled: true
     asserts:
       - failedTemplate: {}
+
+  - it: S3 uploads need no storage volume
+    template: templates/deployment.yaml
+    set:
+      storage.backend: s3
+      storage.s3.bucket: uploads
+      replicaCount: 2
+    asserts:
+      - notExists: { path: spec.template.spec.volumes }
+      - notExists: { path: spec.strategy }
+      - contains:
+          path: "spec.template.spec.containers[0].env"
+          content: { name: S3_BUCKET, value: uploads }
+
+  - it: S3 uploads remove the uploads PVC
+    template: templates/service-ingress-pvc.yaml
+    set:
+      storage.backend: s3
+      storage.s3.bucket: uploads
+    asserts:
+      - hasDocuments: { count: 1 }
+      - isKind: { of: Service }
+
+  - it: S3 mode requires a bucket
+    template: templates/deployment.yaml
+    set:
+      storage.backend: s3
+    asserts:
+      - failedTemplate:
+          errorMessage: storage.s3.bucket is required when storage.backend=s3

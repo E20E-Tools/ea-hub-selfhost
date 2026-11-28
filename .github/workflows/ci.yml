@@ -52,6 +52,26 @@ jobs:
           # The app's least-privilege login role, exactly as in production.
           SELFHOST_TEST_DATABASE_URL: postgres://eahub_app:ci-app-password@localhost:5432/eahub
         run: npx vitest run
+      - name: Uploads on S3 (test S3 server) — signer, blob store and the storage API
+        env:
+          SELFHOST_TEST_DATABASE_URL: postgres://eahub_app:ci-app-password@localhost:5432/eahub
+          SELFHOST_TEST_S3_ENDPOINT: http://localhost:9000
+          SELFHOST_TEST_S3_ACCESS_KEY_ID: ci-s3
+          SELFHOST_TEST_S3_SECRET_ACCESS_KEY: ci-s3-password
+          STORAGE_BACKEND: s3
+          S3_BUCKET: ea-hub-test
+          S3_ENDPOINT: http://localhost:9000
+          S3_ACCESS_KEY_ID: ci-s3
+          S3_SECRET_ACCESS_KEY: ci-s3-password
+          S3_PREFIX: adapter
+        run: |
+          # "rclone serve s3" is a small S3-compatible server (SigV4 auth, path-style buckets).
+          docker run -d --name s3test -p 9000:9000 rclone/rclone:1.76.0 \
+            serve s3 /data --addr :9000 --auth-key ci-s3,ci-s3-password
+          for i in $(seq 1 30); do curl -s -o /dev/null http://localhost:9000/ && break; sleep 2; done
+          # A bucket of "rclone serve s3" is a top-level folder.
+          docker exec s3test mkdir -p /data/ea-hub-test
+          npx vitest run src/selfhost/test/s3.test.ts src/selfhost/test/adapter.integration.test.ts
 
   # Managed PostgreSQL (RDS, Azure, Cloud SQL…): the admin account is not a superuser and
   # cannot grant BYPASSRLS. The setup must fall back to "owner mode" and still pass.

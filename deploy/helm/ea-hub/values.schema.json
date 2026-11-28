@@ -109,6 +109,19 @@
     "storage": {
       "type": "object",
       "properties": {
+        "backend": { "type": "string", "enum": ["filesystem", "s3"] },
+        "s3": {
+          "type": "object",
+          "properties": {
+            "bucket": { "type": "string" },
+            "region": { "type": "string" },
+            "endpoint": { "type": "string", "pattern": "^$|^https?://" },
+            "forcePathStyle": { "type": "string", "enum": ["", "true", "false"] },
+            "prefix": { "type": "string" },
+            "accessKeyId": { "type": "string" },
+            "secretAccessKey": { "type": "string" }
+          }
+        },
         "size": { "type": "string" },
         "storageClass": { "type": "string" },
         "accessMode": { "type": "string", "enum": ["ReadWriteOnce", "ReadWriteMany", "ReadWriteOncePod"] },
