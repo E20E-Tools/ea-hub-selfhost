@@ -1,0 +1,57 @@
+# Builds the documentation site (MkDocs) on every change to docs/, and on main publishes it
+# to GitHub Pages under /docs/ on the gh-pages branch (the Helm repository there is untouched).
+name: Docs
+
+on:
+  push:
+    branches: [main]
+    paths: ["docs/**", "mkdocs.yml", "selfhost/docs-site/**", ".github/workflows/docs.yml"]
+  pull_request:
+    paths: ["docs/**", "mkdocs.yml", "selfhost/docs-site/**", ".github/workflows/docs.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - run: |
+          python3 -m venv /tmp/mk && /tmp/mk/bin/pip install -q -r selfhost/docs-site/requirements.txt
+          /tmp/mk/bin/mkdocs build
+      - run: test -f site/index.html && test -f site/en/deploy-kubernetes/index.html
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: docs-site
+          path: site
+
+  publish:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    needs: build
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    concurrency:
+      group: gh-pages
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: gh-pages
+          path: pages
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: docs-site
+          path: site
+      - name: Replace /docs on gh-pages
+        run: |
+          rm -rf pages/docs && cp -r site pages/docs
+          cd pages
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A docs
+          git diff --cached --quiet && { echo "no changes"; exit 0; }
+          git commit -m "Docs site ${GITHUB_SHA::7}"
+          git push "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git" HEAD:refs/heads/gh-pages

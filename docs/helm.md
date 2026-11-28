@@ -142,6 +142,27 @@ helm upgrade ea-hub ./deploy/helm/ea-hub -n ea-hub --reset-then-reuse-values --s
 
 `postgres-password` و`app-db-password` و`app-encryption-key` (32 حرفاً على الأقل) و`cron-secret` إلزامية. أما `admin-password` و`smtp-password` و`resend-api-key` و`openai-api-key` و`groq-api-key` و`turnstile-secret-key` فاختيارية. يوجد مثال كامل في [`deploy/kubernetes/secret.example.yaml`](../deploy/kubernetes/secret.example.yaml).
 
+### تدوير الأسرار
+
+كلمات المرور المولَّدة محفوظة في الـ Secret (`ea-hub`) وتبقى عند الترقية، فتُدوَّر بتعديل الـ Secret ثم إعادة التشغيل. لا تدوّر `app-encryption-key` أبداً، فالجلسات والروابط الموقَّعة والمفاتيح المحفوظة تعتمد عليه.
+
+```bash
+new() { openssl rand -hex 24; }
+# كلمة مرور قاعدة التطبيق: حاوية migrate تضبطها في PostgreSQL عند البدء
+kubectl -n ea-hub patch secret ea-hub -p "{\"stringData\":{\"app-db-password\":\"$(new)\"}}"
+# سر المهام المجدولة ورمز /metrics
+kubectl -n ea-hub patch secret ea-hub -p "{\"stringData\":{\"cron-secret\":\"$(new)\",\"metrics-token\":\"$(new)\"}}"
+kubectl -n ea-hub rollout restart deploy/ea-hub && kubectl -n ea-hub rollout status deploy/ea-hub
+
+# المستخدم الرئيسي لـ PostgreSQL (القاعدة المدمجة): غيّره في القاعدة أولاً ثم في الـ Secret
+P=$(new)
+kubectl -n ea-hub exec ea-hub-postgres-0 -- psql -U postgres -qc "alter role postgres with password '$P'"
+kubectl -n ea-hub patch secret ea-hub -p "{\"stringData\":{\"postgres-password\":\"$P\"}}"
+unset P
+```
+
+مهام CronJob (النسخ الاحتياطي والتنظيف) تقرأ الـ Secret عند كل تشغيل، فلا تحتاج إعادة تشغيل. إن كنت تضع `secrets.*` في ملف القيم فغيّرها هناك ثم شغّل `helm upgrade`. ومع `secrets.existingSecret` حدّث الـ Secret الخاص بك ثم أعد تشغيل الـ deployment.
+
 ## الترقية
 
 ```bash

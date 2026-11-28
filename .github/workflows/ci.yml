@@ -351,6 +351,19 @@ jobs:
           done
           docker compose logs offsite | tail -5
           docker compose run --rm --no-deps --entrypoint rclone offsite ls offsite:eahub-backups/ci | grep database.dump
+      - name: Rotate all secrets (database passwords, cron secret, metrics token)
+        run: |
+          bash selfhost/scripts/rotate-secrets.sh all
+          curl -fsS http://localhost:8080/healthz | grep '"ok":true'
+          curl -fsS -X POST -H 'content-type: application/json' \
+            -d '{"email":"e2e-admin@example.com","password":"e2e-admin-password"}' \
+            "http://localhost:8080/api/selfhost/auth/token?grant_type=password" | jq -e '.access_token | length > 20'
+          docker compose exec -T cron node selfhost/scripts/run-job.mjs daily-cleanup
+          sleep 61
+          docker compose exec -T backup sh /backup/backup.sh now
+          TOKEN=$(grep '^METRICS_TOKEN=' .env | cut -d= -f2)
+          curl -fsS -H "authorization: Bearer $TOKEN" http://localhost:8080/metrics | grep -q '^eahub_database_up 1'
+          test "$(curl -s -o /dev/null -w '%{http_code}' -H 'authorization: Bearer e2e-metrics-token' http://localhost:8080/metrics)" = 401
       - name: PostgreSQL major upgrade 16 -> 17 keeps the data
         run: |
           bash selfhost/scripts/pg-major-upgrade.sh 17 --yes

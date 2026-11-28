@@ -1,0 +1,3 @@
+/* Arabic pages of the documentation site read right to left. */
+.md-content[dir="rtl"] { text-align: right; }
+.md-content[dir="rtl"] pre, .md-content[dir="rtl"] code { direction: ltr; text-align: left; }

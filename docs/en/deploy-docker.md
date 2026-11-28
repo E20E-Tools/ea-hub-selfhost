@@ -155,6 +155,14 @@ Backups are written to `./backups` every day at `BACKUP_HOUR_UTC` (01:00 by defa
 
 > **Never change** `APP_ENCRYPTION_KEY` or `POSTGRES_PASSWORD` after the first start.
 
+### Rotate secrets
+
+```bash
+selfhost/scripts/rotate-secrets.sh all        # or: app-db | postgres | cron | metrics
+```
+
+The script writes new random values to `.env` (the old file is kept as `.env.bak-<time>`), changes the database passwords in PostgreSQL, and recreates the containers that use them. Nothing is printed. After rotating `metrics`, copy the new `METRICS_TOKEN` from `.env` into your Prometheus scrape config. `APP_ENCRYPTION_KEY` is never rotated.
+
 ## 8. Troubleshooting
 
 | Symptom | Fix |
