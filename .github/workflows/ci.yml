@@ -464,6 +464,8 @@ jobs:
           kubectl -n ea-hub get all,cluster || true
           kubectl -n ea-hub describe cluster ea-hub-pg | tail -40 || true
           kubectl -n ea-hub logs deploy/ea-hub -c migrate --tail=50 || true
+          kubectl -n ea-hub logs deploy/ea-hub -c migrate --previous --tail=50 || true
+          kubectl -n ea-hub logs ea-hub-pg-1 --tail=30 || true
           kubectl -n ea-hub logs deploy/ea-hub --tail=100 || true
 
   # The release image (with the local search model) on the distroless base: the native
