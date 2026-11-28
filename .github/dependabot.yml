@@ -16,3 +16,8 @@ updates:
     directory: /
     schedule: { interval: weekly }
     commit-message: { prefix: "deps(compose)" }
+    ignore:
+      # A PostgreSQL major upgrade needs pg_upgrade or dump/restore of existing data:
+      # never as an automatic image bump. Minor/patch updates of 16.x are still proposed.
+      - dependency-name: postgres
+        update-types: ["version-update:semver-major"]
