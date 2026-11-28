@@ -38,11 +38,15 @@ aws cloudformation deploy --stack-name ea-hub --template-file deploy/cloud/aws/e
   --capabilities CAPABILITY_IAM --parameter-overrides \
   VpcId=vpc-… PublicSubnets=subnet-a,subnet-b PrivateSubnets=subnet-c,subnet-d \
   CertificateArn=arn:aws:acm:… DomainName=hub.example.com \
-  AdminEmail=you@example.com AdminPassword='choose-a-long-password' DbPassword="$(openssl rand -hex 20)"
+  AdminEmail=you@example.com
 aws cloudformation describe-stacks --stack-name ea-hub --query 'Stacks[0].Outputs'
 ```
 
-Point `hub.example.com` to the `LoadBalancerDns` output.
+Next:
+- Point `hub.example.com` to the `LoadBalancerDns` output.
+- Read the generated first admin password: `aws secretsmanager get-secret-value --secret-id <AdminPassword output> --query SecretString --output text`.
+
+The database runs RDS PostgreSQL 17, and RDS manages its password in Secrets Manager.
 
 ## Google Cloud
 
