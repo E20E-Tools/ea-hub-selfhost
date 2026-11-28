@@ -120,6 +120,8 @@ jobs:
         run: |
           version="${GITHUB_REF_NAME#v}"
           echo "${{ secrets.GITHUB_TOKEN }}" | helm registry login ghcr.io -u "${{ github.actor }}" --password-stdin
+          # Keep the Artifact Hub image list on the released image tag.
+          sed -i "s|ghcr.io/e20e-tools/ea-hub-selfhost:[0-9][0-9.]*|ghcr.io/e20e-tools/ea-hub-selfhost:$version|" deploy/helm/ea-hub/Chart.yaml
           helm package deploy/helm/ea-hub --version "$version" --app-version "$version"
           helm push "ea-hub-$version.tgz" "oci://ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/charts"
       - name: Artifact Hub metadata for the OCI repository
@@ -146,6 +148,7 @@ jobs:
         with:
           path: src
       - uses: actions/checkout@v4
+        id: pages
         with:
           ref: gh-pages
           path: pages
@@ -159,9 +162,9 @@ jobs:
         run: |
           owner="${GITHUB_REPOSITORY_OWNER,,}"; repo="${GITHUB_REPOSITORY#*/}"
           url="https://${owner}.github.io/${repo}"
-          if [ ! -d pages/.git ]; then
-            rm -rf pages && mkdir pages && cd pages && git init -q -b gh-pages && cd ..
-            git -C pages remote add origin "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git"
+          if [ "${{ steps.pages.outcome }}" != "success" ]; then
+            # A failed checkout can leave an empty repository behind: start clean on gh-pages.
+            rm -rf pages && git init -q -b gh-pages pages
           fi
           mkdir -p pages/charts
           cp new/*.tgz pages/charts/
@@ -175,4 +178,4 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
           git commit -m "Release ${GITHUB_REF_NAME}"
-          git push origin gh-pages
+          git push "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git" HEAD:refs/heads/gh-pages
