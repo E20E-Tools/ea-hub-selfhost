@@ -57,104 +57,22 @@ spec:
   failedJobsHistoryLimit: 3
   jobTemplate:
     spec:
-      backoffLimit: 1
-      template:
-        metadata:
-          labels:
-            {{- include "ea-hub.selector" . | nindent 12 }}
-            app.kubernetes.io/component: backup
-        spec:
-          restartPolicy: Never
-          {{- if and (include "ea-hub.fileStorage" .) (eq .Values.storage.accessMode "ReadWriteOnce") }}
-          # The uploads volume is ReadWriteOnce: run next to the web pod to read it.
-          affinity:
-            podAffinity:
-              requiredDuringSchedulingIgnoredDuringExecution:
-                - topologyKey: kubernetes.io/hostname
-                  labelSelector:
-                    matchLabels:
-                      {{- include "ea-hub.selector" . | nindent 22 }}
-                      app.kubernetes.io/component: web
-          {{- end }}
-          {{- if $offsite.enabled }}
-          # The backup runs first; the rclone container then copies it off the cluster.
-          initContainers:
-          {{- else }}
-          containers:
-          {{- end }}
-            - name: backup
-              image: {{ include "ea-hub.postgresImage" . }}
-              command: ["/bin/sh", "/backup/backup.sh", "now"]
-              env:
-                - name: PGHOST
-                  value: {{ include "ea-hub.dbHost" . | quote }}
-                - name: PGPORT
-                  value: {{ include "ea-hub.dbPort" . | quote }}
-                - name: PGDATABASE
-                  value: {{ include "ea-hub.dbName" . | quote }}
-                - name: PGUSER
-                  value: {{ include "ea-hub.dbAdminUser" . | quote }}
-                {{- include "ea-hub.secretEnv" (dict "root" . "name" "PGPASSWORD" "key" "postgres-password") | nindent 16 }}
-                {{- if and (not .Values.postgres.enabled) .Values.externalDatabase.sslmode }}
-                - name: PGSSLMODE
-                  value: {{ .Values.externalDatabase.sslmode | quote }}
-                {{- end }}
-                - name: BACKUP_KEEP_DAYS
-                  value: {{ .Values.backup.keepDays | quote }}
-              volumeMounts:
-                - name: script
-                  mountPath: /backup
-                - name: backups
-                  mountPath: /backups
-                {{- if include "ea-hub.fileStorage" . }}
-                - name: storage
-                  mountPath: /data/storage
-                  readOnly: true
-                {{- end }}
-          {{- if $offsite.enabled }}
-          containers:
-            - name: offsite
-              image: {{ $offsite.image }}
-              command: ["rclone"]
-              args:
-                - copy
-                - /backups
-                - "offsite:{{ required "backup.offsite.path is required (bucket/folder)" $offsite.path }}"
-                - --exclude=*.partial/**
-                - --max-age=48h
-                - --stats-one-line
-                - -v
-              env:
-                - name: HOME
-                  value: /tmp
-                {{- range $k, $v := $offsite.config }}
-                - name: RCLONE_CONFIG_OFFSITE_{{ $k | upper }}
-                  value: {{ $v | toString | quote }}
-                {{- end }}
-              {{- if or $offsite.existingSecret $offsite.credentials }}
-              envFrom:
-                - prefix: RCLONE_CONFIG_OFFSITE_
-                  secretRef:
-                    name: {{ $offsite.existingSecret | default (printf "%s-offsite" (include "ea-hub.fullname" .)) }}
-              {{- end }}
-              volumeMounts:
-                - name: backups
-                  mountPath: /backups
-                  readOnly: true
-              resources:
-                requests: { cpu: 10m, memory: 64Mi }
-                limits: { memory: 512Mi }
-          {{- end }}
-          volumes:
-            - name: script
-              configMap:
-                name: {{ include "ea-hub.fullname" . }}-backup
-            - name: backups
-              persistentVolumeClaim:
-                claimName: {{ include "ea-hub.fullname" . }}-backups
-            {{- if include "ea-hub.fileStorage" . }}
-            - name: storage
-              persistentVolumeClaim:
-                claimName: {{ .Values.storage.existingClaim | default (printf "%s-storage" (include "ea-hub.fullname" .)) }}
-            {{- end }}
+      {{- include "ea-hub.backupJobSpec" . | nindent 6 }}
+{{- if .Values.backup.beforeUpgrade }}
+---
+# A backup right before every helm upgrade (database migrations run during the upgrade).
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "ea-hub.fullname" . }}-backup-before-upgrade
+  labels:
+    {{- include "ea-hub.labels" . | nindent 4 }}
+    app.kubernetes.io/component: backup
+  annotations:
+    "helm.sh/hook": pre-upgrade
+    "helm.sh/hook-weight": "-10"
+    "helm.sh/hook-delete-policy": before-hook-creation
+spec:
+  {{- include "ea-hub.backupJobSpec" . | nindent 2 }}
+{{- end }}
 {{- end }}

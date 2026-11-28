@@ -33,6 +33,17 @@ helm upgrade ea-hub ./deploy/helm/ea-hub -n ea-hub --reuse-values
 
 ---
 
+### نسخة احتياطية تلقائية قبل كل ترقية
+
+قبل تطبيق تحديثات قاعدة البيانات تؤخذ نسخة احتياطية تلقائياً، فإن فشلت الترقية تعود إلى ما كنت عليه:
+
+- **Docker Compose:** في كل `docker compose up` تحفظ الخدمة `backup-before-migrate` نسخة في `./backups` قبل خدمة `migrate`. لإيقافها اضبط `BACKUP_BEFORE_MIGRATE=0` في `.env`.
+- **Helm:** في كل `helm upgrade` تأخذ مهمة `ea-hub-backup-before-upgrade` نسخة قبل الترقية. لإيقافها اضبط `backup.beforeUpgrade=false`.
+
+**للتراجع عن ترقية فاشلة:**
+1. أعد الصورة إلى وسمها السابق (`EA_HUB_IMAGE` في `.env`، أو `helm rollback ea-hub`).
+2. استعد آخر نسخة كما في [backup.md](backup.md): `backup.sh list` ثم `backup.sh restore <اسم-النسخة>`.
+
 ## لمشرفي هذا المستودع: متابعة المشروع الأصلي
 
 المستودع الأصلي `E20E-Tools/ea-hub-v2` هو المصدر (upstream). سير العمل [`upstream-sync.yml`](../.github/workflows/upstream-sync.yml) يعمل يومياً كالتالي:

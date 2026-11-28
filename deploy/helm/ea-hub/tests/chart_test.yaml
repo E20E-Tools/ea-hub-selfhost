@@ -144,3 +144,18 @@ tests:
     asserts:
       - failedTemplate:
           errorMessage: storage.s3.bucket is required when storage.backend=s3
+
+  - it: takes a backup before every upgrade
+    template: templates/backup.yaml
+    documentSelector: { path: metadata.name, value: ea-hub-backup-before-upgrade }
+    asserts:
+      - isKind: { of: Job }
+      - equal: { path: 'metadata.annotations["helm.sh/hook"]', value: pre-upgrade }
+      - equal: { path: "spec.template.spec.containers[0].name", value: backup }
+
+  - it: the pre-upgrade backup can be turned off
+    template: templates/backup.yaml
+    set:
+      backup.beforeUpgrade: false
+    asserts:
+      - hasDocuments: { count: 3 }   # ConfigMap, PVC and CronJob only

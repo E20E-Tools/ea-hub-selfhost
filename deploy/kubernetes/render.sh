@@ -15,6 +15,7 @@ cd "$(dirname "$0")/../.."
     --set appUrl=http://ea-hub.local \
     --set ingress.enabled=true --set ingress.host=ea-hub.local \
     --set admin.email=admin@example.com \
-    --set secrets.create=false --set secrets.existingSecret=ea-hub
+    --set secrets.create=false --set secrets.existingSecret=ea-hub \
+    --set backup.beforeUpgrade=false
 } > deploy/kubernetes/ea-hub.yaml
 echo "wrote deploy/kubernetes/ea-hub.yaml"

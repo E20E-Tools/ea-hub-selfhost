@@ -195,6 +195,9 @@ cron:
 # Daily database + uploads backup to its own volume (built-in PostgreSQL or external).
 backup:
   enabled: true
+  # -- Take a backup before every helm upgrade (a pre-upgrade hook), so a failed upgrade can
+  # be rolled back with the data as it was.
+  beforeUpgrade: true
   schedule: "0 1 * * *"
   keepDays: 14
   storage:

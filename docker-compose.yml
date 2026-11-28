@@ -104,6 +104,31 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      backup-before-migrate:
+        condition: service_completed_successfully
+
+  # A backup into ./backups right before the database migrations of every start/upgrade, so a
+  # failed upgrade can be undone (backup.sh restore). BACKUP_BEFORE_MIGRATE=0 turns it off.
+  backup-before-migrate:
+    image: postgres:16-alpine
+    restart: "no"
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - '[ "$$BACKUP_BEFORE_MIGRATE" = "0" ] && echo "[backup] skipped" || sh /backup/backup.sh now'
+    environment:
+      PGHOST: db
+      PGUSER: postgres
+      PGPASSWORD: ${POSTGRES_PASSWORD}
+      PGDATABASE: ${POSTGRES_DB:-eahub}
+      BACKUP_KEEP_DAYS: ${BACKUP_KEEP_DAYS:-14}
+      BACKUP_BEFORE_MIGRATE: ${BACKUP_BEFORE_MIGRATE:-1}
+    volumes:
+      - ./selfhost/backup:/backup:ro
+      - ./backups:/backups
+      - storage-data:/data/storage:ro
+    depends_on:
+      db:
+        condition: service_healthy
 
   app:
     <<: *image
