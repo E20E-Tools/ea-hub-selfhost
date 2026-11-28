@@ -201,6 +201,197 @@ suite("self-host adapter (live database)", () => {
     expect(after.data.user).toBeNull();
   });
 
+  it("single sign-on links, creates and promotes accounts only as configured", async () => {
+    const { ssoSignIn, userFromToken } = await import("../server/auth");
+    const base = {
+      name: undefined,
+      emailVerified: true,
+      isAdmin: false,
+      autoCreate: false,
+    };
+    const stranger = `sso-stranger-${Date.now()}@example.com`;
+    // Unknown person, not listed as admin, no auto-create: refused, nothing created.
+    expect(await ssoSignIn({ ...base, email: stranger })).toEqual({
+      error: "not_allowed",
+    });
+    const missing = await admin.auth.admin.listUsers();
+    expect(missing.data.users.some((u) => u.email === stranger)).toBe(false);
+
+    // Existing account (the password admin): linked by verified e-mail, any case.
+    const linked = await ssoSignIn({ ...base, email: email.toUpperCase() });
+    expect("session" in linked && linked.session.user.id).toBe(adminId);
+    if ("session" in linked)
+      expect((await userFromToken(linked.session.access_token)).user?.id).toBe(
+        adminId,
+      );
+
+    // An unverified e-mail is never linked to an existing account, even for "admins".
+    expect(
+      await ssoSignIn({ ...base, email, emailVerified: false, isAdmin: true }),
+    ).toEqual({ error: "unverified_email" });
+
+    // Listed admin without an account: created with the admin role.
+    const boss = `sso-admin-${Date.now()}@example.com`;
+    const created = await ssoSignIn({
+      ...base,
+      email: boss,
+      name: "SSO Admin",
+      isAdmin: true,
+    });
+    expect("session" in created).toBe(true);
+    const bossId = "session" in created ? created.session.user.id : "";
+    const roles = await admin
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", bossId);
+    expect(roles.data).toEqual([{ role: "admin" }]);
+    // Created without a password: password sign-in stays impossible.
+    const pw = await handleSelfhost(
+      new Request(
+        "http://app.test/api/selfhost/auth/token?grant_type=password",
+        {
+          method: "POST",
+          headers: {
+            "content-type": "application/json",
+            origin: "http://app.test",
+          },
+          body: JSON.stringify({ email: boss, password: "anything-at-all" }),
+        },
+      ),
+    );
+    expect(pw!.status).toBe(400);
+    await admin.auth.admin.deleteUser(bossId);
+  });
+
+  it("single sign-on works end to end through the HTTP routes (mock provider)", async () => {
+    const { generateKeyPairSync, sign } = await import("node:crypto");
+    const { openPending, resetOidcCaches } = await import("../server/oidc");
+    const { userFromToken } = await import("../server/auth");
+    const ISSUER = "https://idp.test/realms/acme";
+    const { privateKey, publicKey } = generateKeyPairSync("rsa", {
+      modulusLength: 2048,
+    });
+    const jwk = {
+      ...publicKey.export({ format: "jwk" }),
+      kid: "k",
+      alg: "RS256",
+    };
+    let idToken = "";
+    const realFetch = globalThis.fetch;
+    globalThis.fetch = (async (
+      input: string | URL | Request,
+      init?: RequestInit,
+    ) => {
+      const u = String(input instanceof Request ? input.url : input);
+      if (u === `${ISSUER}/.well-known/openid-configuration`)
+        return Response.json({
+          issuer: ISSUER,
+          authorization_endpoint: `${ISSUER}/auth`,
+          token_endpoint: `${ISSUER}/token`,
+          jwks_uri: `${ISSUER}/certs`,
+        });
+      if (u === `${ISSUER}/certs`) return Response.json({ keys: [jwk] });
+      if (u === `${ISSUER}/token`) return Response.json({ id_token: idToken });
+      return realFetch(input as string, init);
+    }) as typeof fetch;
+    Object.assign(process.env, {
+      OIDC_ISSUER: ISSUER,
+      OIDC_CLIENT_ID: "ea-hub",
+      OIDC_CLIENT_SECRET: "secret",
+      OIDC_ADMIN_GROUPS: "ea-admins",
+      OIDC_BUTTON_LABEL: "Acme SSO",
+    });
+    resetOidcCaches();
+    const signToken = (claims: Record<string, unknown>) => {
+      const enc = (o: unknown) =>
+        Buffer.from(JSON.stringify(o)).toString("base64url");
+      const head = enc({ alg: "RS256", kid: "k" });
+      const body = enc(claims);
+      return `${head}.${body}.${sign("sha256", Buffer.from(`${head}.${body}`), privateKey).toString("base64url")}`;
+    };
+    const go = (path: string, cookie?: string) =>
+      handleSelfhost(
+        new Request(
+          `http://app.test${path}`,
+          cookie ? { headers: { cookie } } : {},
+        ),
+      );
+    try {
+      const settings = await (await go("/api/selfhost/auth/settings"))!.json();
+      expect(settings).toEqual({ sso: { enabled: true, label: "Acme SSO" } });
+
+      const start = await go(
+        `/api/selfhost/auth/oidc/start?redirect_to=${encodeURIComponent("http://app.test/admin")}`,
+      );
+      expect(start!.status).toBe(303);
+      const to = new URL(start!.headers.get("location")!);
+      expect(to.origin + to.pathname).toBe(`${ISSUER}/auth`);
+      const cookie = start!.headers.get("set-cookie")!.split(";")[0]!;
+      const pending = openPending(cookie.split("=").slice(1).join("="))!;
+      expect(pending.state).toBe(to.searchParams.get("state"));
+
+      const ssoEmail = `sso-e2e-${Date.now()}@example.com`;
+      const now = Math.floor(Date.now() / 1000);
+      idToken = signToken({
+        iss: ISSUER,
+        aud: "ea-hub",
+        sub: "u1",
+        iat: now,
+        exp: now + 300,
+        nonce: pending.nonce,
+        email: ssoEmail,
+        email_verified: true,
+        groups: ["ea-admins"],
+      });
+      const back = await go(
+        `/api/selfhost/auth/oidc/callback?code=c1&state=${pending.state}`,
+        cookie,
+      );
+      expect(back!.status).toBe(303);
+      expect(back!.headers.get("set-cookie")).toMatch(/Max-Age=0/);
+      const landed = new URL(back!.headers.get("location")!);
+      expect(landed.origin + landed.pathname).toBe("http://app.test/admin");
+      const frag = new URLSearchParams(landed.hash.slice(1));
+      expect(frag.get("type")).toBe("sso");
+      const who = await userFromToken(frag.get("access_token")!);
+      expect(who.user?.email).toBe(ssoEmail);
+      const roles = await admin
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", who.user!.id);
+      expect(roles.data).toEqual([{ role: "admin" }]);
+
+      // Replaying the callback with a wrong state is refused.
+      const bad = await go(
+        `/api/selfhost/auth/oidc/callback?code=c1&state=forged`,
+        cookie,
+      );
+      expect(bad!.headers.get("location")).toBe(
+        "http://app.test/admin?sso_error=failed",
+      );
+      // A post-login redirect to another site is not allowed: it falls back to APP_URL.
+      const off = await go(
+        `/api/selfhost/auth/oidc/start?redirect_to=${encodeURIComponent("https://evil.example/x")}`,
+      );
+      const offCookie = off!.headers.get("set-cookie")!.split(";")[0]!;
+      expect(
+        openPending(offCookie.split("=").slice(1).join("="))!.redirect,
+      ).toMatch(/^http:\/\/app\.test\//);
+      await admin.auth.admin.deleteUser(who.user!.id);
+    } finally {
+      globalThis.fetch = realFetch;
+      for (const k of [
+        "OIDC_ISSUER",
+        "OIDC_CLIENT_ID",
+        "OIDC_CLIENT_SECRET",
+        "OIDC_ADMIN_GROUPS",
+        "OIDC_BUTTON_LABEL",
+      ])
+        delete process.env[k];
+      resetOidcCaches();
+    }
+  });
+
   it("stores files with signed URLs", async () => {
     const bucket = admin.storage.from("library-assets");
     const up = await bucket.upload(

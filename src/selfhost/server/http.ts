@@ -6,6 +6,15 @@ import * as auth from "./auth";
 import { serveObject, StorageBucket } from "./storage";
 import { realtimeStream, type Subscription } from "./realtime";
 import { metricsResponse } from "./metrics";
+import {
+  COOKIE as OIDC_COOKIE,
+  cookieHeader as oidcCookieHeader,
+  finish as oidcFinish,
+  oidcSettings,
+  readCookie as oidcReadCookie,
+  SsoRefused,
+  startUrl as oidcStartUrl,
+} from "./oidc";
 
 /**
  * HTTP endpoints of the self-hosted backend, served by the app itself under /api/selfhost/*.
@@ -86,6 +95,71 @@ export function withClientIp(request: Request): Request {
   });
 }
 
+const redirect = (location: string, cookie?: string): Response => {
+  const headers = new Headers({
+    location,
+    "cache-control": "no-store",
+    "referrer-policy": "no-referrer",
+  });
+  if (cookie) headers.append("set-cookie", cookie);
+  return new Response(null, { status: 303, headers });
+};
+
+async function oidcStart(url: URL): Promise<Response> {
+  const s = oidcSettings();
+  if (!s) return json({ message: "Single sign-on is not configured" }, 404);
+  const { appUrl } = selfhostConfig();
+  const target = auth.safeRedirect(
+    url.searchParams.get("redirect_to") || `${appUrl}/admin`,
+  );
+  try {
+    const { url: to, cookie } = await oidcStartUrl(s, target);
+    return redirect(to, cookie);
+  } catch (e) {
+    console.error("[selfhost] SSO start failed:", (e as Error).message);
+    return redirect(`${appUrl}/admin?sso_error=unavailable`);
+  }
+}
+
+async function oidcCallback(request: Request, url: URL): Promise<Response> {
+  const s = oidcSettings();
+  if (!s) return json({ message: "Single sign-on is not configured" }, 404);
+  const { appUrl } = selfhostConfig();
+  const clear = oidcCookieHeader("", 0);
+  try {
+    const who = await oidcFinish(
+      s,
+      url,
+      oidcReadCookie(request.headers.get("cookie"), OIDC_COOKIE),
+    );
+    const result = await auth.ssoSignIn({
+      email: who.email,
+      name: who.name,
+      emailVerified: who.emailVerified,
+      isAdmin: who.isAdmin,
+      // Creating accounts for anyone is only safe when the domains are limited.
+      autoCreate: s.autoCreate && s.allowedDomains.length > 0,
+    });
+    if ("error" in result) {
+      console.warn(
+        `[selfhost] SSO sign-in refused (${result.error}) for a user without an account`,
+      );
+      return redirect(`${appUrl}/admin?sso_error=${result.error}`, clear);
+    }
+    return redirect(
+      `${who.redirect.split("#")[0]}#${auth.sessionFragment(result.session, "sso")}`,
+      clear,
+    );
+  } catch (e) {
+    if (e instanceof SsoRefused) {
+      console.warn(`[selfhost] SSO sign-in refused (${e.code})`);
+      return redirect(`${appUrl}/admin?sso_error=${e.code}`, clear);
+    }
+    console.error("[selfhost] SSO sign-in failed:", (e as Error).message);
+    return redirect(`${appUrl}/admin?sso_error=failed`, clear);
+  }
+}
+
 async function health(): Promise<Response> {
   try {
     await db()`select 1`;
@@ -136,6 +210,17 @@ export async function handleSelfhost(
         },
       });
     }
+
+    // ---------- single sign-on (OpenID Connect) ----------
+    if (method === "GET" && route === "auth/settings") {
+      const s = oidcSettings();
+      return json({
+        sso: s ? { enabled: true, label: s.label } : { enabled: false },
+      });
+    }
+    if (method === "GET" && route === "auth/oidc/start") return oidcStart(url);
+    if (method === "GET" && route === "auth/oidc/callback")
+      return oidcCallback(request, url);
 
     if (
       method !== "POST" &&

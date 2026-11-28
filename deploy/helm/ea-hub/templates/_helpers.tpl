@@ -108,6 +108,34 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 - name: STORAGE_BACKEND
   value: {{ .Values.storage.backend | quote }}
+{{- with .Values.sso.oidc }}
+{{- if and .issuer .clientId }}
+{{- if and $.Values.secrets.create (not .clientSecret) }}
+{{- fail "sso.oidc.clientSecret is required when sso.oidc.issuer and clientId are set" }}
+{{- end }}
+- name: OIDC_ISSUER
+  value: {{ .issuer | quote }}
+- name: OIDC_CLIENT_ID
+  value: {{ .clientId | quote }}
+- name: OIDC_SCOPES
+  value: {{ .scopes | quote }}
+- name: OIDC_BUTTON_LABEL
+  value: {{ .buttonLabel | quote }}
+- name: OIDC_ADMIN_EMAILS
+  value: {{ .adminEmails | quote }}
+- name: OIDC_ADMIN_GROUPS
+  value: {{ .adminGroups | quote }}
+- name: OIDC_GROUPS_CLAIM
+  value: {{ .groupsClaim | quote }}
+- name: OIDC_ALLOWED_DOMAINS
+  value: {{ .allowedDomains | quote }}
+- name: OIDC_AUTO_CREATE
+  value: {{ .autoCreate | quote }}
+- name: OIDC_REQUIRE_VERIFIED_EMAIL
+  value: {{ .requireVerifiedEmail | quote }}
+{{ include "ea-hub.secretEnv" (dict "root" $ "name" "OIDC_CLIENT_SECRET" "key" "oidc-client-secret") }}
+{{- end }}
+{{- end }}
 {{- if eq .Values.storage.backend "s3" }}
 - name: S3_BUCKET
   value: {{ required "storage.s3.bucket is required when storage.backend=s3" .Values.storage.s3.bucket | quote }}

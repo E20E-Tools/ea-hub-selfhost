@@ -42,6 +42,27 @@
         "cronSecret": { "type": "string", "anyOf": [{ "maxLength": 0 }, { "minLength": 16 }] }
       }
     },
+    "sso": {
+      "type": "object",
+      "properties": {
+        "oidc": {
+          "type": "object",
+          "properties": {
+            "issuer": { "type": "string", "pattern": "^$|^https?://" },
+            "clientId": { "type": "string" },
+            "clientSecret": { "type": "string" },
+            "scopes": { "type": "string" },
+            "buttonLabel": { "type": "string" },
+            "adminEmails": { "type": "string" },
+            "adminGroups": { "type": "string" },
+            "groupsClaim": { "type": "string" },
+            "allowedDomains": { "type": "string" },
+            "autoCreate": { "type": "boolean" },
+            "requireVerifiedEmail": { "type": "boolean" }
+          }
+        }
+      }
+    },
     "smtp": {
       "type": "object",
       "properties": {
