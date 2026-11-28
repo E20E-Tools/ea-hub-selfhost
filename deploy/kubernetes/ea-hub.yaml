@@ -12,9 +12,9 @@ metadata:
   labels:
     app.kubernetes.io/name: ea-hub
     app.kubernetes.io/instance: ea-hub
-    app.kubernetes.io/version: "latest"
+    app.kubernetes.io/version: "1.0.0"
     app.kubernetes.io/managed-by: Helm
-    helm.sh/chart: ea-hub-0.1.0
+    helm.sh/chart: ea-hub-1.0.0
 data:
   # Same file as selfhost/backup/backup.sh (CI checks they match).
   backup.sh: |
@@ -108,9 +108,9 @@ metadata:
   labels:
     app.kubernetes.io/name: ea-hub
     app.kubernetes.io/instance: ea-hub
-    app.kubernetes.io/version: "latest"
+    app.kubernetes.io/version: "1.0.0"
     app.kubernetes.io/managed-by: Helm
-    helm.sh/chart: ea-hub-0.1.0
+    helm.sh/chart: ea-hub-1.0.0
   annotations:
     helm.sh/resource-policy: keep
 spec:
@@ -128,9 +128,9 @@ metadata:
   labels:
     app.kubernetes.io/name: ea-hub
     app.kubernetes.io/instance: ea-hub
-    app.kubernetes.io/version: "latest"
+    app.kubernetes.io/version: "1.0.0"
     app.kubernetes.io/managed-by: Helm
-    helm.sh/chart: ea-hub-0.1.0
+    helm.sh/chart: ea-hub-1.0.0
   annotations:
     helm.sh/resource-policy: keep
 spec:
@@ -148,9 +148,9 @@ metadata:
   labels:
     app.kubernetes.io/name: ea-hub
     app.kubernetes.io/instance: ea-hub
-    app.kubernetes.io/version: "latest"
+    app.kubernetes.io/version: "1.0.0"
     app.kubernetes.io/managed-by: Helm
-    helm.sh/chart: ea-hub-0.1.0
+    helm.sh/chart: ea-hub-1.0.0
     app.kubernetes.io/component: database
 spec:
   selector:
@@ -171,9 +171,9 @@ metadata:
   labels:
     app.kubernetes.io/name: ea-hub
     app.kubernetes.io/instance: ea-hub
-    app.kubernetes.io/version: "latest"
+    app.kubernetes.io/version: "1.0.0"
     app.kubernetes.io/managed-by: Helm
-    helm.sh/chart: ea-hub-0.1.0
+    helm.sh/chart: ea-hub-1.0.0
 spec:
   type: ClusterIP
   selector:
@@ -194,9 +194,9 @@ metadata:
   labels:
     app.kubernetes.io/name: ea-hub
     app.kubernetes.io/instance: ea-hub
-    app.kubernetes.io/version: "latest"
+    app.kubernetes.io/version: "1.0.0"
     app.kubernetes.io/managed-by: Helm
-    helm.sh/chart: ea-hub-0.1.0
+    helm.sh/chart: ea-hub-1.0.0
     app.kubernetes.io/component: web
 spec:
   replicas: 1
@@ -215,7 +215,7 @@ spec:
         app.kubernetes.io/instance: ea-hub
         app.kubernetes.io/component: web
       annotations:
-        checksum/secret: 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b
+        checksum/secret: 7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6
     spec:
       securityContext:
         runAsNonRoot: true
@@ -226,7 +226,7 @@ spec:
           type: RuntimeDefault
       initContainers:
         - name: migrate
-          image: ghcr.io/e20e-tools/ea-hub-selfhost:latest
+          image: ghcr.io/e20e-tools/ea-hub-selfhost:1.0.0
           imagePullPolicy: IfNotPresent
           command: ["node", "selfhost/scripts/migrate.mjs"]
           env:
@@ -269,7 +269,7 @@ spec:
             limits: { memory: 512Mi }
       containers:
         - name: app
-          image: ghcr.io/e20e-tools/ea-hub-selfhost:latest
+          image: ghcr.io/e20e-tools/ea-hub-selfhost:1.0.0
           imagePullPolicy: IfNotPresent
           ports:
             - name: http
@@ -390,9 +390,9 @@ metadata:
   labels:
     app.kubernetes.io/name: ea-hub
     app.kubernetes.io/instance: ea-hub
-    app.kubernetes.io/version: "latest"
+    app.kubernetes.io/version: "1.0.0"
     app.kubernetes.io/managed-by: Helm
-    helm.sh/chart: ea-hub-0.1.0
+    helm.sh/chart: ea-hub-1.0.0
     app.kubernetes.io/component: database
 spec:
   serviceName: ea-hub-postgres
@@ -468,9 +468,9 @@ metadata:
   labels:
     app.kubernetes.io/name: ea-hub
     app.kubernetes.io/instance: ea-hub
-    app.kubernetes.io/version: "latest"
+    app.kubernetes.io/version: "1.0.0"
     app.kubernetes.io/managed-by: Helm
-    helm.sh/chart: ea-hub-0.1.0
+    helm.sh/chart: ea-hub-1.0.0
     app.kubernetes.io/component: backup
 spec:
   schedule: "0 1 * * *"
@@ -547,9 +547,9 @@ metadata:
   labels:
     app.kubernetes.io/name: ea-hub
     app.kubernetes.io/instance: ea-hub
-    app.kubernetes.io/version: "latest"
+    app.kubernetes.io/version: "1.0.0"
     app.kubernetes.io/managed-by: Helm
-    helm.sh/chart: ea-hub-0.1.0
+    helm.sh/chart: ea-hub-1.0.0
     app.kubernetes.io/component: cron
 spec:
   schedule: "30 2 * * *"
@@ -576,7 +576,7 @@ spec:
               type: RuntimeDefault
           containers:
             - name: job
-              image: ghcr.io/e20e-tools/ea-hub-selfhost:latest
+              image: ghcr.io/e20e-tools/ea-hub-selfhost:1.0.0
               imagePullPolicy: IfNotPresent
               command: ["node", "selfhost/scripts/run-job.mjs", "daily-cleanup"]
               env:
@@ -604,9 +604,9 @@ metadata:
   labels:
     app.kubernetes.io/name: ea-hub
     app.kubernetes.io/instance: ea-hub
-    app.kubernetes.io/version: "latest"
+    app.kubernetes.io/version: "1.0.0"
     app.kubernetes.io/managed-by: Helm
-    helm.sh/chart: ea-hub-0.1.0
+    helm.sh/chart: ea-hub-1.0.0
     app.kubernetes.io/component: cron
 spec:
   schedule: "0 6 * * *"
@@ -633,7 +633,7 @@ spec:
               type: RuntimeDefault
           containers:
             - name: job
-              image: ghcr.io/e20e-tools/ea-hub-selfhost:latest
+              image: ghcr.io/e20e-tools/ea-hub-selfhost:1.0.0
               imagePullPolicy: IfNotPresent
               command: ["node", "selfhost/scripts/run-job.mjs", "newsletter"]
               env:
@@ -661,9 +661,9 @@ metadata:
   labels:
     app.kubernetes.io/name: ea-hub
     app.kubernetes.io/instance: ea-hub
-    app.kubernetes.io/version: "latest"
+    app.kubernetes.io/version: "1.0.0"
     app.kubernetes.io/managed-by: Helm
-    helm.sh/chart: ea-hub-0.1.0
+    helm.sh/chart: ea-hub-1.0.0
     app.kubernetes.io/component: cron
 spec:
   schedule: "15 3 * * *"
@@ -690,7 +690,7 @@ spec:
               type: RuntimeDefault
           containers:
             - name: job
-              image: ghcr.io/e20e-tools/ea-hub-selfhost:latest
+              image: ghcr.io/e20e-tools/ea-hub-selfhost:1.0.0
               imagePullPolicy: IfNotPresent
               command: ["node", "selfhost/scripts/run-job.mjs", "semantic-index"]
               env:
@@ -718,9 +718,9 @@ metadata:
   labels:
     app.kubernetes.io/name: ea-hub
     app.kubernetes.io/instance: ea-hub
-    app.kubernetes.io/version: "latest"
+    app.kubernetes.io/version: "1.0.0"
     app.kubernetes.io/managed-by: Helm
-    helm.sh/chart: ea-hub-0.1.0
+    helm.sh/chart: ea-hub-1.0.0
 spec:
   rules:
     - host: "ea-hub.local"

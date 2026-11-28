@@ -1,0 +1,37 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ include "ea-hub.fullname" . }}-test-health
+  labels:
+    {{- include "ea-hub.labels" . | nindent 4 }}
+  annotations:
+    "helm.sh/hook": test
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  restartPolicy: Never
+  securityContext:
+    runAsNonRoot: true
+    {{- if not .Values.openshift.enabled }}
+    runAsUser: 1000
+    {{- end }}
+  {{- with .Values.imagePullSecrets }}
+  imagePullSecrets:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  containers:
+    - name: health
+      # The app image has Node; no extra image to pull.
+      image: {{ include "ea-hub.image" . }}
+      imagePullPolicy: {{ .Values.image.pullPolicy }}
+      command:
+        - node
+        - -e
+        - |
+          fetch("http://{{ include "ea-hub.fullname" . }}:{{ .Values.service.port }}/healthz")
+            .then(async (r) => { const t = await r.text(); console.log(r.status, t); process.exit(r.ok && t.includes('"ok":true') ? 0 : 1); })
+            .catch((e) => { console.error(e); process.exit(1); });
+      securityContext:
+        {{- include "ea-hub.containerSecurity" . | nindent 8 }}
+      resources:
+        requests: { cpu: 10m, memory: 64Mi }
+        limits: { memory: 256Mi }

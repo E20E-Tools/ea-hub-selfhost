@@ -123,6 +123,39 @@ jobs:
         run: |
           if helm template x deploy/helm/ea-hub --set appUrl=not-a-url >/dev/null 2>&1; then exit 1; fi
           if helm template x deploy/helm/ea-hub --set appUrl=https://a.b --set admin.password=short >/dev/null 2>&1; then exit 1; fi
+      - name: Catalog metadata (Artifact Hub, Rancher, OpenShift)
+        run: |
+          for f in README.md app-readme.md questions.yaml; do test -s deploy/helm/ea-hub/$f; done
+          grep -q '^kubeVersion:' deploy/helm/ea-hub/Chart.yaml
+          grep -q 'charts.openshift.io/name' deploy/helm/ea-hub/Chart.yaml
+          # Every Rancher question must be a real value.
+          python3 - <<'PY'
+          import yaml
+          v = yaml.safe_load(open("deploy/helm/ea-hub/values.yaml"))
+          q = yaml.safe_load(open("deploy/helm/ea-hub/questions.yaml"))["questions"]
+          def walk(qs):
+              for x in qs:
+                  yield x["variable"]; yield from walk(x.get("subquestions", []))
+          bad = []
+          for name in walk(q):
+              if chr(92) in name: continue  # escaped dots = annotation keys
+              cur = v
+              for part in name.split("."):
+                  if not isinstance(cur, dict) or part not in cur: bad.append(name); break
+                  cur = cur[part]
+          assert not bad, f"questions.yaml variables not in values.yaml: {bad}"
+          PY
+      - name: Red Hat chart-verifier (community profile)
+        run: |
+          docker run --rm -v "$PWD/deploy/helm:/charts:z" quay.io/redhat-certification/chart-verifier:latest             verify --set profile.vendortype=community -x chart-testing /charts/ea-hub > /tmp/report.yaml || true
+          cat /tmp/report.yaml
+          python3 - <<'PY'
+          import yaml
+          r = yaml.safe_load(open("/tmp/report.yaml"))
+          fails = [x for x in r["results"] if x["outcome"] == "FAIL" and x.get("type") == "Mandatory"]
+          for x in fails: print("::error::", x["check"], "-", x.get("reason"))
+          assert not fails
+          PY
       - name: Render raw Kubernetes manifests from the chart
         run: bash deploy/kubernetes/render.sh
       - name: Commit regenerated manifests (main only)
@@ -249,6 +282,8 @@ jobs:
           curl -fsS -X POST -H 'content-type: application/json' \
             -d '{"email":"kind-admin@example.com","password":"kind-admin-password"}' \
             "http://localhost:8080/api/selfhost/auth/token?grant_type=password" | jq -e '.access_token | length > 20'
+      - name: helm test
+        run: helm test ea-hub -n ea-hub --logs --timeout 3m
       - name: CronJob and backup run
         run: |
           kubectl -n ea-hub create job --from=cronjob/ea-hub-daily-cleanup cleanup-now

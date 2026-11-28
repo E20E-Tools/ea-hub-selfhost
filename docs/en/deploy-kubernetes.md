@@ -159,9 +159,19 @@ deploy/kubernetes/         ← the plain YAML files (Path B)
 
 Pick **one** option.
 
-### Option 1 — Use the published image (needs access to the private package)
+### Option 1 — Use the published image (simplest)
 
-Images are published for each release tag, e.g. `ghcr.io/e20e-tools/ea-hub-selfhost:1.0.0`. Create a pull secret so Kubernetes can download it:
+Images are published for each release tag, e.g. `ghcr.io/e20e-tools/ea-hub-selfhost:1.0.0`, for both amd64 and arm64. They are public, so nothing needs to be set up and you can go to Step 4.
+
+> **Quickest install, no clone at all.** The chart is published as well, so this one command installs everything:
+>
+> ```bash
+> helm install ea-hub oci://ghcr.io/e20e-tools/charts/ea-hub -n ea-hub --create-namespace >   --set appUrl=https://hub.example.com --set ingress.enabled=true --set ingress.host=hub.example.com >   --set admin.email=you@example.com
+> ```
+>
+> The classic repository works too: `helm repo add ea-hub https://e20e-tools.github.io/ea-hub-selfhost`. The chart is also listed on [Artifact Hub](https://artifacthub.io/packages/search?ts_query_web=ea-hub).
+
+If your organisation mirrors the image into a private registry, create a pull secret so Kubernetes can download it:
 
 ```bash
 kubectl create namespace ea-hub

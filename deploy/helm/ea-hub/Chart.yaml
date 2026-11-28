@@ -1,11 +1,43 @@
 apiVersion: v2
 name: ea-hub
-description: EA-Hub (self-hosted) — web app + PostgreSQL, no Supabase or Vercel needed
+description: EA-Hub (self-hosted) — enterprise architecture hub with its own PostgreSQL, no Supabase or Vercel needed
 type: application
-# Chart version: bump on every chart change.
-version: 0.1.0
+# Chart version. The publish workflow overrides it with the git tag (v1.2.3 → 1.2.3).
+version: 1.0.0
 # Default image tag (ghcr.io/e20e-tools/ea-hub-selfhost:<appVersion>).
-appVersion: "latest"
-keywords: [ea-hub, enterprise-architecture, postgres]
+appVersion: "1.0.0"
+# The "-0" suffix lets pre-release Kubernetes builds (e.g. v1.30.4-k3s1, OpenShift) match.
+kubeVersion: ">=1.25.0-0"
+icon: https://raw.githubusercontent.com/E20E-Tools/ea-hub-selfhost/main/docs/assets/ea-hub-icon.png
+keywords: [ea-hub, enterprise-architecture, architecture, postgres, self-hosted]
 home: https://github.com/E20E-Tools/ea-hub-selfhost
 sources: [https://github.com/E20E-Tools/ea-hub-selfhost]
+maintainers:
+  - name: E20E-Tools
+    url: https://github.com/E20E-Tools
+annotations:
+  # Artifact Hub (https://artifacthub.io/docs/topics/annotations/helm/)
+  artifacthub.io/category: integration-delivery
+  artifacthub.io/prerelease: "false"
+  artifacthub.io/containsSecurityUpdates: "false"
+  artifacthub.io/images: |
+    - name: ea-hub-selfhost
+      image: ghcr.io/e20e-tools/ea-hub-selfhost:1.0.0
+      platforms: [linux/amd64, linux/arm64]
+    - name: postgres
+      image: postgres:16-alpine
+  artifacthub.io/links: |
+    - name: Deployment guides
+      url: https://github.com/E20E-Tools/ea-hub-selfhost/tree/main/docs/en
+    - name: Source
+      url: https://github.com/E20E-Tools/ea-hub-selfhost
+  # Rancher Apps & Marketplace
+  catalog.cattle.io/display-name: EA-Hub
+  catalog.cattle.io/kube-version: ">=1.25.0-0"
+  catalog.cattle.io/release-name: ea-hub
+  catalog.cattle.io/namespace: ea-hub
+  catalog.cattle.io/os: linux
+  # OpenShift Helm catalog
+  charts.openshift.io/name: EA-Hub
+  charts.openshift.io/provider: E20E-Tools
+  charts.openshift.io/supportURL: https://github.com/E20E-Tools/ea-hub-selfhost/issues

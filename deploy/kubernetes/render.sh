@@ -10,7 +10,7 @@ cd "$(dirname "$0")/../.."
   echo "#         kubectl apply -f my-secret.yaml        (copy of secret.example.yaml with your values)"
   echo "#         kubectl apply -n ea-hub -f deploy/kubernetes/ea-hub.yaml   (resources carry no namespace: use -n)"
   echo "# Then edit APP_URL / the Ingress host below, or better: use Helm (docs/helm.md)."
-  helm template ea-hub deploy/helm/ea-hub \
+  helm template ea-hub deploy/helm/ea-hub --skip-tests \
     --namespace ea-hub \
     --set appUrl=http://ea-hub.local \
     --set ingress.enabled=true --set ingress.host=ea-hub.local \

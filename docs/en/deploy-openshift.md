@@ -45,7 +45,7 @@ cd ea-hub-selfhost
 
 Use **one** of these options.
 
-**a) Published image (private package):**
+**a) Published image (default):** `ghcr.io/e20e-tools/ea-hub-selfhost` is public, so there is nothing to do. You need a pull secret only if your cluster reaches GHCR through an authenticated proxy:
 
 ```bash
 oc create secret docker-registry ghcr-pull \
@@ -140,8 +140,24 @@ oc -n ea-hub logs deploy/ea-hub -c migrate -f
 
 ### Alternative: the web console (no Helm CLI)
 
-1. **Developer** perspective → project `ea-hub` → **+Add → Helm Chart**. This needs the chart published as a repository: after a release tag, add `oci://ghcr.io/e20e-tools/charts` as a *HelmChartRepository*.
-2. Or **+Add → Import YAML** and paste the output of
+1. **Add the EA-Hub chart repository once.** For the whole cluster (cluster-admin):
+
+   ```bash
+   cat <<'EOF' | oc apply -f -
+   apiVersion: helm.openshift.io/v1beta1
+   kind: HelmChartRepository
+   metadata:
+     name: ea-hub
+   spec:
+     name: EA-Hub
+     connectionConfig:
+       url: https://e20e-tools.github.io/ea-hub-selfhost
+   EOF
+   ```
+
+   For one project only, without cluster-admin, use `kind: ProjectHelmChartRepository` with `metadata.namespace: ea-hub`.
+2. **Install it.** Open the **Developer** perspective, choose project `ea-hub`, then **+Add → Helm Chart** and select **EA-Hub** → **Create**. The form is built from the chart's schema. Set `appUrl`, `admin.email` and **`openshift.enabled: true`**. The chart page also has a **Test** action that runs `helm test` and calls `/healthz`.
+3. Or **+Add → Import YAML** and paste the output of
    `helm template ea-hub deploy/helm/ea-hub -n ea-hub -f my-values.yaml`.
    This has no upgrade tracking; the Helm CLI is preferred.
 

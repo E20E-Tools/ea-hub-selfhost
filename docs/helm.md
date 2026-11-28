@@ -30,7 +30,20 @@ helm upgrade --install ea-hub ./deploy/helm/ea-hub -n ea-hub --create-namespace 
 
 يكتب المعالج ملف `ea-hub-values.yaml` وفيه كل الإجابات والأسرار. احفظه في مكان آمن ولا ترفعه إلى أي مستودع.
 
-## أو بأمر واحد مباشرة
+## من مستودع Helm مباشرة (دون نسخ المستودع)
+
+الـ chart منشور مع كل إصدار، فيكفي هذا الأمر دون نسخ الكود:
+
+```bash
+helm install ea-hub oci://ghcr.io/e20e-tools/charts/ea-hub -n ea-hub --create-namespace   --set appUrl=https://hub.example.com --set ingress.enabled=true --set ingress.host=hub.example.com   --set admin.email=admin@example.com
+```
+
+- **بلا كلمة مرور للمدير:** إن لم تحدد `admin.password` تُولَّد كلمة مرور تلقائياً، ويطبع Helm بعد التثبيت أمر قراءتها.
+- **المستودع التقليدي:** يمكنك أيضاً استخدام `helm repo add ea-hub https://e20e-tools.github.io/ea-hub-selfhost`.
+- **Rancher:** أضف هذا الرابط من Apps ← Repositories، فيظهر EA-Hub في قائمة Charts مع نموذج إعداد بالواجهة.
+- **OpenShift:** أضفه كـ `HelmChartRepository`، فيظهر في Developer Catalog.
+
+## أو بأمر واحد من نسخة الكود
 
 ```bash
 helm upgrade --install ea-hub ./deploy/helm/ea-hub -n ea-hub --create-namespace \
@@ -77,7 +90,7 @@ ingress:
     cert-manager.io/cluster-issuer: letsencrypt
 ```
 
-### صورة خاصة (المستودع خاص)
+### صورة خاصة (إن نسختها إلى سجل خاص)
 
 ```bash
 kubectl -n ea-hub create secret docker-registry ghcr-pull \
