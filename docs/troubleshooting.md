@@ -78,3 +78,14 @@ kubectl -n ea-hub logs deploy/ea-hub
 ---
 
 لا تزال المشكلة قائمة؟ افتح Issue في المستودع، وأرفق ناتج `docker compose ps` و`docker compose logs --tail=200 app migrate`. **احذف أي كلمة مرور قبل النشر.**
+
+## لا يوجد shell داخل حاوية التطبيق
+
+منذ الإصدار 1.2 تُبنى صورة التطبيق على صورة distroless، وهي لا تحتوي shell ولا npm، وهذا يقلل الثغرات كثيراً. لذلك لا يعمل الأمر `docker compose exec app sh`. بدله شغّل Node مباشرة:
+
+```bash
+docker compose exec app node -e "console.log(process.version)"
+docker compose run --rm migrate node selfhost/scripts/migrate.mjs
+```
+
+أما أوامر النسخ الاحتياطي وأوامر psql فتُشغَّل في حاويتي `backup` و`db`، وفيهما shell كالمعتاد.

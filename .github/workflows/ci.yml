@@ -275,6 +275,24 @@ jobs:
           docker compose exec -T cron node selfhost/scripts/run-job.mjs daily-cleanup
           docker compose exec -T backup sh /backup/backup.sh now
           docker compose exec -T backup sh /backup/backup.sh list | grep -E '^20'
+      - name: Restore drill (backup → delete → restore → verify)
+        run: |
+          psql() { docker compose exec -T db psql -U postgres -d eahub -tAc "$1"; }
+          psql "create table if not exists public.ci_restore_marker (v text); insert into public.ci_restore_marker values ('before-backup');"
+          docker compose exec -T backup sh -c 'echo restore-me > /data/storage/ci-restore-marker.txt'
+          sleep 61   # backup folder names are per minute: make this one new
+          docker compose exec -T backup sh /backup/backup.sh now
+          NAME=$(docker compose exec -T backup sh /backup/backup.sh list | grep -E '^20' | tail -1 | tr -d '\r')
+          echo "restoring $NAME"
+          psql "drop table public.ci_restore_marker;"
+          docker compose exec -T backup rm /data/storage/ci-restore-marker.txt
+          docker compose stop app cron
+          docker compose exec -T backup sh /backup/backup.sh restore "$NAME"
+          test "$(psql 'select v from public.ci_restore_marker')" = "before-backup"
+          test "$(docker compose exec -T backup cat /data/storage/ci-restore-marker.txt | tr -d '\r')" = "restore-me"
+          docker compose start app cron
+          for i in $(seq 1 30); do curl -fsS http://localhost:8080/healthz && break; sleep 3; done
+          curl -fsS http://localhost:8080/healthz | grep '"ok":true'
       - name: Metrics endpoint (token required)
         run: |
           test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/metrics)" = 401
@@ -315,6 +333,34 @@ jobs:
         if: failure()
         run: docker compose logs --no-color | tail -300
       - run: docker compose down -v
+
+  # The release image (with the local search model) on the distroless base: the native
+  # libraries of the model must load, and the image must stay free of fixable criticals/highs.
+  image-full:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Build the release image
+        run: docker build -t ea-hub-selfhost:full .
+      - name: Local semantic search runs (onnxruntime + sharp on distroless)
+        run: |
+          docker run --rm --entrypoint node ea-hub-selfhost:full -e '
+            import("/app/local-backend/semantic.mjs").then((m) => m.suggest("cloud architecture review",
+              [{ name: "Cloud", description: "cloud architecture" }, { name: "Food", description: "restaurant menu" }], "en"))
+            .then((r) => { console.log(JSON.stringify(r).slice(0, 300)); process.exit(0); })
+            .catch((e) => { console.error(e); process.exit(1); });'
+      - name: No shell, runs as uid 1000
+        run: |
+          if docker run --rm --entrypoint sh ea-hub-selfhost:full -c true 2>/dev/null; then echo "shell present"; exit 1; fi
+          test "$(docker inspect -f '{{.Config.User}}' ea-hub-selfhost:full)" = "1000:0"
+      - name: Vulnerability scan (critical and high, fixable)
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          image-ref: ea-hub-selfhost:full
+          severity: CRITICAL,HIGH
+          ignore-unfixed: true
+          exit-code: "1"
+          format: table
 
   kind:
     runs-on: ubuntu-latest
@@ -365,6 +411,9 @@ jobs:
           kubectl -n ea-hub rollout status deploy/ea-hub --timeout=10m
           after=$(kubectl -n ea-hub get secret ea-hub -o jsonpath='{.data.app-encryption-key}')
           test "$before" = "$after"
+          # The pre-upgrade hook took a backup.
+          test "$(kubectl -n ea-hub get job ea-hub-backup-before-upgrade -o jsonpath='{.status.succeeded}')" = 1
+          kubectl -n ea-hub logs job/ea-hub-backup-before-upgrade | grep '\[backup\].*saved'
       - name: Diagnostics on failure
         if: failure()
         run: |
