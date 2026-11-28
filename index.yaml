@@ -1,0 +1,52 @@
+apiVersion: v1
+entries:
+  ea-hub:
+  - annotations:
+      artifacthub.io/category: integration-delivery
+      artifacthub.io/containsSecurityUpdates: "false"
+      artifacthub.io/images: |
+        - name: ea-hub-selfhost
+          image: ghcr.io/e20e-tools/ea-hub-selfhost:1.0.0
+          platforms: [linux/amd64, linux/arm64]
+        - name: postgres
+          image: postgres:16-alpine
+      artifacthub.io/links: |
+        - name: Deployment guides
+          url: https://github.com/E20E-Tools/ea-hub-selfhost/tree/main/docs/en
+        - name: Source
+          url: https://github.com/E20E-Tools/ea-hub-selfhost
+      artifacthub.io/prerelease: "false"
+      catalog.cattle.io/display-name: EA-Hub
+      catalog.cattle.io/kube-version: '>=1.25.0-0'
+      catalog.cattle.io/namespace: ea-hub
+      catalog.cattle.io/os: linux
+      catalog.cattle.io/release-name: ea-hub
+      charts.openshift.io/name: EA-Hub
+      charts.openshift.io/provider: E20E-Tools
+      charts.openshift.io/supportURL: https://github.com/E20E-Tools/ea-hub-selfhost/issues
+    apiVersion: v2
+    appVersion: 1.0.1
+    created: "2026-11-28T13:13:56.4776214+03:00"
+    description: EA-Hub (self-hosted) — enterprise architecture hub with its own PostgreSQL,
+      no Supabase or Vercel needed
+    digest: 2881182553db77f5241aed0edf5471c1b54fe96734bebcf26406cde514253e3c
+    home: https://github.com/E20E-Tools/ea-hub-selfhost
+    icon: https://raw.githubusercontent.com/E20E-Tools/ea-hub-selfhost/main/docs/assets/ea-hub-icon.png
+    keywords:
+    - ea-hub
+    - enterprise-architecture
+    - architecture
+    - postgres
+    - self-hosted
+    kubeVersion: '>=1.25.0-0'
+    maintainers:
+    - name: E20E-Tools
+      url: https://github.com/E20E-Tools
+    name: ea-hub
+    sources:
+    - https://github.com/E20E-Tools/ea-hub-selfhost
+    type: application
+    urls:
+    - https://e20e-tools.github.io/ea-hub-selfhost/charts/ea-hub-1.0.1.tgz
+    version: 1.0.1
+generated: "2026-11-28T13:13:56.4603048+03:00"
