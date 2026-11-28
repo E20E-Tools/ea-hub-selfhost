@@ -19,7 +19,7 @@ ARG BUN_VERSION=1
 FROM oven/bun:${BUN_VERSION} AS bun
 
 # ---------- build ----------
-FROM node:${NODE_VERSION}-bookworm-slim AS build
+FROM node:${NODE_VERSION}-trixie-slim AS build
 COPY --from=bun /usr/local/bin/bun /usr/local/bin/bun
 WORKDIR /app
 ENV CI=1
@@ -51,7 +51,7 @@ RUN mkdir -p /out/data/storage && chmod -R 775 /out/data
 # ---------- runtime ----------
 # Distroless: Node.js plus the C/C++ runtime libraries only. No shell, package manager or npm,
 # so far fewer packages that can carry vulnerabilities.
-FROM gcr.io/distroless/nodejs${NODE_VERSION}-debian12:nonroot AS runtime
+FROM gcr.io/distroless/nodejs${NODE_VERSION}-debian13:nonroot AS runtime
 WORKDIR /app
 ARG WITH_LOCAL_MODEL=1
 ARG VERSION=dev
