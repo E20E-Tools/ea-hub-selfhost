@@ -27,9 +27,8 @@ metadata:
     app.kubernetes.io/component: database
 spec:
   instances: {{ .Values.postgres.cloudnativepg.instances }}
-  {{- with .Values.postgres.cloudnativepg.imageName }}
-  imageName: {{ . }}
-  {{- end }}
+  # Same major version as the backup tools (postgres.image): pg_dump cannot dump a newer server.
+  imageName: {{ .Values.postgres.cloudnativepg.imageName | default "ghcr.io/cloudnative-pg/postgresql:16" }}
   enableSuperuserAccess: true
   superuserSecret:
     name: {{ if .Values.secrets.create }}{{ $name }}-pg-superuser{{ else }}{{ .Values.secrets.existingSecret }}-pg-superuser{{ end }}

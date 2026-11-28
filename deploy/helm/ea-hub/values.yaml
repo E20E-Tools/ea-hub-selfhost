@@ -164,7 +164,8 @@ postgres:
   cloudnativepg:
     enabled: false
     instances: 3
-    # -- Empty = the operator's default PostgreSQL image for its version.
+    # -- Empty = ghcr.io/cloudnative-pg/postgresql:16, the same major version as postgres.image
+    # (used by the backup jobs: pg_dump cannot dump a newer server). Change both together.
     imageName: ""
     # -- Raw CloudNativePG "backup" section (barmanObjectStore etc.) for continuous WAL
     # archiving and point-in-time recovery; see the CloudNativePG documentation.
