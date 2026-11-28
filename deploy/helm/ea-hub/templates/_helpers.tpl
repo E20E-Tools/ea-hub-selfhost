@@ -188,9 +188,17 @@ capabilities:
   drop: ["ALL"]
 {{- end -}}
 
-{{/* Secret value: from values.yaml, else the one already in the cluster, else random. */}}
+{{/* Secret value: from values.yaml, else the one already in the cluster, else random.
+A random value is generated once per render and reused (cache = .Values.secrets), so the
+checksum/secret annotation, which renders secret.yaml again, sees the same values. */}}
 {{- define "ea-hub.keep" -}}
-{{- if .value -}}{{ .value | b64enc }}{{- else if hasKey .old .key -}}{{ index .old .key }}{{- else -}}{{ randAlphaNum .length | b64enc }}{{- end -}}
+{{- if .value -}}{{ .value | b64enc }}
+{{- else if hasKey .old .key -}}{{ index .old .key }}
+{{- else -}}
+{{- $k := printf "generated-%s" .key -}}
+{{- if not (hasKey .cache $k) -}}{{- $_ := set .cache $k (randAlphaNum .length) -}}{{- end -}}
+{{ index .cache $k | b64enc }}
+{{- end -}}
 {{- end -}}
 
 {{/* OpenShift runs pods under a random user ID: the Debian postgres image supports that
