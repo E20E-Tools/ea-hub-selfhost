@@ -1,0 +1,1572 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://e20e-tools.github.io/ea-hub-selfhost/docs/en/deploy-openshift/">
+      
+      
+        <link rel="prev" href="../deploy-kubernetes-local/">
+      
+      
+        <link rel="next" href="../deploy-rancher/">
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.49">
+    
+    
+      
+        <title>OpenShift - EA-Hub self-host</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.6f8fc17f.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/site-rtl.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#deploying-ea-hub-on-red-hat-openshift-or-okd" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="EA-Hub self-host" class="md-header__button md-logo" aria-label="EA-Hub self-host" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            EA-Hub self-host
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              OpenShift
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/E20E-Tools/ea-hub-selfhost" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="EA-Hub self-host" class="md-nav__button md-logo" aria-label="EA-Hub self-host" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    EA-Hub self-host
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/E20E-Tools/ea-hub-selfhost" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Home
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    English
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            English
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deploy-docker/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Docker
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deploy-kubernetes/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Kubernetes
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deploy-kubernetes-local/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Kubernetes (local)
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    OpenShift
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    OpenShift
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. Requirements
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Requirements">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cluster-capacity" class="md-nav__link">
+    <span class="md-ellipsis">
+      Cluster capacity
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#software-and-access" class="md-nav__link">
+    <span class="md-ellipsis">
+      Software and access
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-log-in-and-create-a-project" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Log in and create a project
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-get-the-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. Get the code
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-make-the-image-available" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. Make the image available
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-choose-the-address" class="md-nav__link">
+    <span class="md-ellipsis">
+      5. Choose the address
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-write-your-values-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      6. Write your values file
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-install" class="md-nav__link">
+    <span class="md-ellipsis">
+      7. Install
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. Install">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#alternative-the-web-console-no-helm-cli" class="md-nav__link">
+    <span class="md-ellipsis">
+      Alternative: the web console (no Helm CLI)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-open-the-site-and-sign-in" class="md-nav__link">
+    <span class="md-ellipsis">
+      8. Open the site and sign in
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-operations" class="md-nav__link">
+    <span class="md-ellipsis">
+      9. Operations
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      Troubleshooting
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deploy-rancher/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Rancher
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deploy-aws-ecs-fargate/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    AWS ECS Fargate
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deploy-azure-container-apps/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Azure Container Apps
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deploy-google-cloud-run/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Google Cloud Run
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../single-sign-on/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Single sign-on
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    العربية
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            العربية
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../install-docker/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Docker
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../helm/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Helm
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../kubernetes/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Kubernetes
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../kubernetes-local/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Kubernetes محلي
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../openshift/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    OpenShift
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../rancher/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Rancher
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../gitops/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    GitOps
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../aws-ecs-fargate/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    AWS ECS Fargate
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../azure-container-apps/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Azure Container Apps
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../google-cloud-run/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Google Cloud Run
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cloud-templates/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    قوالب السحابة
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../single-sign-on/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    الدخول الموحد
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../backup/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    النسخ الاحتياطي
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../updating/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    التحديث
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    البنية
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../troubleshooting/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    حل المشكلات
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. Requirements
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Requirements">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cluster-capacity" class="md-nav__link">
+    <span class="md-ellipsis">
+      Cluster capacity
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#software-and-access" class="md-nav__link">
+    <span class="md-ellipsis">
+      Software and access
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-log-in-and-create-a-project" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Log in and create a project
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-get-the-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. Get the code
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-make-the-image-available" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. Make the image available
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-choose-the-address" class="md-nav__link">
+    <span class="md-ellipsis">
+      5. Choose the address
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-write-your-values-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      6. Write your values file
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-install" class="md-nav__link">
+    <span class="md-ellipsis">
+      7. Install
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="7. Install">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#alternative-the-web-console-no-helm-cli" class="md-nav__link">
+    <span class="md-ellipsis">
+      Alternative: the web console (no Helm CLI)
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-open-the-site-and-sign-in" class="md-nav__link">
+    <span class="md-ellipsis">
+      8. Open the site and sign in
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-operations" class="md-nav__link">
+    <span class="md-ellipsis">
+      9. Operations
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      Troubleshooting
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+<h1 id="deploying-ea-hub-on-red-hat-openshift-or-okd">Deploying EA-Hub on Red Hat OpenShift (or OKD)<a class="headerlink" href="#deploying-ea-hub-on-red-hat-openshift-or-okd" title="Permanent link">&para;</a></h1>
+<p>OpenShift runs every pod under a <strong>random user ID</strong> and publishes sites with <strong>Routes</strong>. The Helm chart has an OpenShift mode that handles both: set <code>openshift.enabled=true</code>.</p>
+<h2 id="1-requirements">1. Requirements<a class="headerlink" href="#1-requirements" title="Permanent link">&para;</a></h2>
+<h3 id="cluster-capacity">Cluster capacity<a class="headerlink" href="#cluster-capacity" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Minimum</th>
+<th>Recommended</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CPU (requests across the project)</td>
+<td>2 vCPU</td>
+<td>4 vCPU</td>
+</tr>
+<tr>
+<td>Memory</td>
+<td>4 GiB</td>
+<td>8 GiB</td>
+</tr>
+<tr>
+<td>Persistent storage</td>
+<td>35 GiB (<code>ReadWriteOnce</code>): 5 uploads + 10 database + 20 backups</td>
+<td>60 GiB</td>
+</tr>
+</tbody>
+</table>
+<p>If your project has a <strong>ResourceQuota</strong>, it must allow at least 4 pods, 3 PVCs and the memory above.</p>
+<h3 id="software-and-access">Software and access<a class="headerlink" href="#software-and-access" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Need</th>
+<th>Version / detail</th>
+<th>Check</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>OpenShift Container Platform or OKD</td>
+<td><strong>4.14+</strong> (Kubernetes 1.27+)</td>
+<td><code>oc version</code></td>
+</tr>
+<tr>
+<td><code>oc</code> CLI</td>
+<td>matching your cluster</td>
+<td><code>oc version --client</code></td>
+</tr>
+<tr>
+<td>Helm</td>
+<td>3.8+ or 4.x (or use the Developer console, see below)</td>
+<td><code>helm version</code></td>
+</tr>
+<tr>
+<td>Permission</td>
+<td>create a project, or <em>admin</em> on an existing one</td>
+<td><code>oc auth can-i create deployments -n &lt;project&gt;</code></td>
+</tr>
+<tr>
+<td>Default StorageClass</td>
+<td>any <code>ReadWriteOnce</code> (e.g. <code>gp3-csi</code>, <code>thin-csi</code>, ODF <code>ocs-storagecluster-ceph-rbd</code>)</td>
+<td><code>oc get storageclass</code></td>
+</tr>
+<tr>
+<td>Security context</td>
+<td>the default <strong>restricted-v2</strong> SCC is enough; no <code>anyuid</code> or privileged access needed</td>
+<td></td>
+</tr>
+<tr>
+<td>Image access</td>
+<td>the cluster must be able to pull <code>ghcr.io/e20e-tools/ea-hub-selfhost</code> and <code>docker.io/library/postgres:16</code>. In disconnected clusters, mirror both to your internal registry</td>
+<td></td>
+</tr>
+<tr>
+<td>Domain</td>
+<td>the cluster's apps domain (e.g. <code>*.apps.cluster.example.com</code>) or your own host name</td>
+<td><code>oc get ingresses.config cluster -o jsonpath='{.spec.domain}'</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="2-log-in-and-create-a-project">2. Log in and create a project<a class="headerlink" href="#2-log-in-and-create-a-project" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code>oc<span class="w"> </span>login<span class="w"> </span>--token<span class="o">=</span>&lt;token&gt;<span class="w"> </span>--server<span class="o">=</span>https://api.cluster.example.com:6443<span class="w">   </span><span class="c1"># "Copy login command" in the web console</span>
+oc<span class="w"> </span>new-project<span class="w"> </span>ea-hub
+</code></pre></div>
+<h2 id="3-get-the-code">3. Get the code<a class="headerlink" href="#3-get-the-code" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/E20E-Tools/ea-hub-selfhost.git
+<span class="nb">cd</span><span class="w"> </span>ea-hub-selfhost
+</code></pre></div>
+<h2 id="4-make-the-image-available">4. Make the image available<a class="headerlink" href="#4-make-the-image-available" title="Permanent link">&para;</a></h2>
+<p>Use <strong>one</strong> of these options.</p>
+<p><strong>a) Published image (default):</strong> <code>ghcr.io/e20e-tools/ea-hub-selfhost</code> is public, so there is nothing to do. You need a pull secret only if your cluster reaches GHCR through an authenticated proxy:</p>
+<div class="highlight"><pre><span></span><code>oc<span class="w"> </span>create<span class="w"> </span>secret<span class="w"> </span>docker-registry<span class="w"> </span>ghcr-pull<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--docker-server<span class="o">=</span>ghcr.io<span class="w"> </span>--docker-username<span class="o">=</span>&lt;github-user&gt;<span class="w"> </span>--docker-password<span class="o">=</span>&lt;token-with-read:packages&gt;
+oc<span class="w"> </span>secrets<span class="w"> </span>link<span class="w"> </span>default<span class="w"> </span>ghcr-pull<span class="w"> </span>--for<span class="o">=</span>pull
+</code></pre></div>
+<p><strong>b) Mirror to your own registry</strong> (disconnected clusters):</p>
+<div class="highlight"><pre><span></span><code>skopeo<span class="w"> </span>copy<span class="w"> </span>docker://ghcr.io/e20e-tools/ea-hub-selfhost:&lt;version&gt;<span class="w"> </span>docker://registry.internal/ea-hub/ea-hub-selfhost:&lt;version&gt;
+skopeo<span class="w"> </span>copy<span class="w"> </span>docker://docker.io/library/postgres:16<span class="w"> </span>docker://registry.internal/ea-hub/postgres:16
+</code></pre></div>
+<p>Then use <code>image.repository=registry.internal/ea-hub/ea-hub-selfhost</code> and <code>postgres.image=registry.internal/ea-hub/postgres:16</code> below.</p>
+<p><strong>c) Build inside OpenShift</strong> from this repository:</p>
+<div class="highlight"><pre><span></span><code>oc<span class="w"> </span>new-build<span class="w"> </span>--name<span class="w"> </span>ea-hub<span class="w"> </span>--strategy<span class="w"> </span>docker<span class="w"> </span>--binary
+oc<span class="w"> </span>start-build<span class="w"> </span>ea-hub<span class="w"> </span>--from-dir<span class="o">=</span>.<span class="w"> </span>--follow
+<span class="c1"># image: image-registry.openshift-image-registry.svc:5000/ea-hub/ea-hub:latest</span>
+</code></pre></div>
+<h2 id="5-choose-the-address">5. Choose the address<a class="headerlink" href="#5-choose-the-address" title="Permanent link">&para;</a></h2>
+<p>Use the default Route host, or your own name:</p>
+<div class="highlight"><pre><span></span><code><span class="nv">APPS</span><span class="o">=</span><span class="k">$(</span>oc<span class="w"> </span>get<span class="w"> </span>ingresses.config<span class="w"> </span>cluster<span class="w"> </span>-o<span class="w"> </span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">'{.spec.domain}'</span><span class="k">)</span>
+<span class="nb">echo</span><span class="w"> </span><span class="s2">"https://ea-hub.</span><span class="nv">$APPS</span><span class="s2">"</span><span class="w">        </span><span class="c1"># e.g. https://ea-hub.apps.cluster.example.com</span>
+</code></pre></div>
+<h2 id="6-write-your-values-file">6. Write your values file<a class="headerlink" href="#6-write-your-values-file" title="Permanent link">&para;</a></h2>
+<p><code>my-values.yaml</code>. Keep it outside the repository, because it holds a password:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">appUrl</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://ea-hub.apps.cluster.example.com</span>
+
+<span class="nt">openshift</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w">              </span><span class="c1"># random UIDs, Debian postgres image, Route</span>
+<span class="w">  </span><span class="nt">route</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">    </span><span class="nt">host</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ea-hub.apps.cluster.example.com</span>
+<span class="w">    </span><span class="nt">tls</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w">                </span><span class="c1"># edge TLS with the router certificate, HTTP → HTTPS</span>
+
+<span class="nt">ingress</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">false</span><span class="w">             </span><span class="c1"># the Route replaces the Ingress</span>
+
+<span class="nt">admin</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">email</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">admin@yourcompany.com</span>
+<span class="w">  </span><span class="nt">password</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">choose-a-long-password</span>
+
+<span class="nt">image</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">repository</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ghcr.io/e20e-tools/ea-hub-selfhost</span>
+<span class="w">  </span><span class="nt">tag</span><span class="p">:</span><span class="w"> </span><span class="s">"&lt;version&gt;"</span>
+
+<span class="c1"># storage:</span>
+<span class="c1">#   storageClass: thin-csi   # only if there is no default StorageClass</span>
+<span class="c1"># smtp: { host: smtp.example.com, port: 587, user: …, password: …, from: "EA-Hub &lt;…&gt;" }</span>
+</code></pre></div>
+<p>What <code>openshift.enabled=true</code> changes in the rendered resources:</p>
+<ul>
+<li>No <code>runAsUser</code>, <code>runAsGroup</code> or <code>fsGroup</code> is set, so the <strong>restricted-v2</strong> SCC assigns them. The EA-Hub image is built to run under any user ID in group 0.</li>
+<li>PostgreSQL uses <code>postgres:16</code> (Debian), which supports random user IDs. The Alpine variant is only for plain Kubernetes.</li>
+<li>A <strong>Route</strong> with edge TLS is created for the Service.</li>
+</ul>
+<h2 id="7-install">7. Install<a class="headerlink" href="#7-install" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code>helm<span class="w"> </span>upgrade<span class="w"> </span>--install<span class="w"> </span>ea-hub<span class="w"> </span>deploy/helm/ea-hub<span class="w"> </span>-n<span class="w"> </span>ea-hub<span class="w"> </span>-f<span class="w"> </span>my-values.yaml
+oc<span class="w"> </span>-n<span class="w"> </span>ea-hub<span class="w"> </span>rollout<span class="w"> </span>status<span class="w"> </span>deploy/ea-hub<span class="w"> </span>--timeout<span class="o">=</span>10m
+oc<span class="w"> </span>-n<span class="w"> </span>ea-hub<span class="w"> </span>get<span class="w"> </span>pods,route
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>NAME                          READY   STATUS    RESTARTS   AGE
+pod/ea-hub-5b7d9c6f4-8kx2p    1/1     Running   0          3m
+pod/ea-hub-postgres-0         1/1     Running   0          3m
+
+NAME                              HOST/PORT                              SERVICES   PORT   TERMINATION
+route.route.openshift.io/ea-hub   ea-hub.apps.cluster.example.com        ea-hub     http   edge/Redirect
+</code></pre></div>
+<p>Follow the database setup while the pod shows <code>Init:0/1</code>:</p>
+<div class="highlight"><pre><span></span><code>oc<span class="w"> </span>-n<span class="w"> </span>ea-hub<span class="w"> </span>logs<span class="w"> </span>deploy/ea-hub<span class="w"> </span>-c<span class="w"> </span>migrate<span class="w"> </span>-f
+</code></pre></div>
+<h3 id="alternative-the-web-console-no-helm-cli">Alternative: the web console (no Helm CLI)<a class="headerlink" href="#alternative-the-web-console-no-helm-cli" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>Add the EA-Hub chart repository once.</strong> For the whole cluster (cluster-admin):</li>
+</ol>
+<div class="highlight"><pre><span></span><code>cat<span class="w"> </span><span class="s">&lt;&lt;'EOF' | oc apply -f -</span>
+<span class="s">apiVersion: helm.openshift.io/v1beta1</span>
+<span class="s">kind: HelmChartRepository</span>
+<span class="s">metadata:</span>
+<span class="s">  name: ea-hub</span>
+<span class="s">spec:</span>
+<span class="s">  name: EA-Hub</span>
+<span class="s">  connectionConfig:</span>
+<span class="s">    url: https://e20e-tools.github.io/ea-hub-selfhost</span>
+<span class="s">EOF</span>
+</code></pre></div>
+<p>For one project only, without cluster-admin, use <code>kind: ProjectHelmChartRepository</code> with <code>metadata.namespace: ea-hub</code>.
+2. <strong>Install it.</strong> Open the <strong>Developer</strong> perspective, choose project <code>ea-hub</code>, then <strong>+Add → Helm Chart</strong> and select <strong>EA-Hub</strong> → <strong>Create</strong>. The form is built from the chart's schema. Set <code>appUrl</code>, <code>admin.email</code> and <strong><code>openshift.enabled: true</code></strong>. The chart page also has a <strong>Test</strong> action that runs <code>helm test</code> and calls <code>/healthz</code>.
+3. Or <strong>+Add → Import YAML</strong> and paste the output of
+   <code>helm template ea-hub deploy/helm/ea-hub -n ea-hub -f my-values.yaml</code>.
+   This has no upgrade tracking; the Helm CLI is preferred.</p>
+<h2 id="8-open-the-site-and-sign-in">8. Open the site and sign in<a class="headerlink" href="#8-open-the-site-and-sign-in" title="Permanent link">&para;</a></h2>
+<p>Open <code>https://ea-hub.apps.cluster.example.com/admin</code>:</p>
+<p><img alt="Admin sign-in" src="../images/admin-sign-in.jpg" /></p>
+<p><img alt="Admin dashboard" src="../images/admin-dashboard.jpg" /></p>
+<p>Health check: <code>curl https://ea-hub.apps.cluster.example.com/healthz</code> returns <code>{"ok":true,"database":"ok"}</code>.</p>
+<h2 id="9-operations">9. Operations<a class="headerlink" href="#9-operations" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Task</th>
+<th>Command</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Upgrade</td>
+<td><code>helm upgrade ea-hub deploy/helm/ea-hub -n ea-hub -f my-values.yaml --set image.tag=&lt;new&gt;</code></td>
+</tr>
+<tr>
+<td>Backup now</td>
+<td><code>oc -n ea-hub create job --from=cronjob/ea-hub-backup backup-now</code></td>
+</tr>
+<tr>
+<td>Logs</td>
+<td><code>oc -n ea-hub logs deploy/ea-hub -f</code></td>
+</tr>
+<tr>
+<td>Back up the generated secrets</td>
+<td><code>oc -n ea-hub get secret ea-hub -o yaml &gt; ea-hub-secret-backup.yaml</code> (store it safely)</td>
+</tr>
+<tr>
+<td>Uninstall (keeps data)</td>
+<td><code>helm uninstall ea-hub -n ea-hub</code></td>
+</tr>
+<tr>
+<td>Delete everything</td>
+<td><code>oc delete project ea-hub</code></td>
+</tr>
+</tbody>
+</table>
+<p>Your own certificate on the Route: install the cert-manager Operator plus the <em>openshift-routes</em> add-on, and set <code>openshift.route.annotations: {cert-manager.io/issuer-name: …}</code>. Or ask your cluster administrator for the router's wildcard certificate, which is used automatically.</p>
+<h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause / fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>unable to validate against any security context constraint</code></td>
+<td><code>openshift.enabled</code> is not <code>true</code>. The default mode sets fixed UIDs that restricted-v2 refuses</td>
+</tr>
+<tr>
+<td>PostgreSQL <code>CrashLoopBackOff</code>: <code>could not change permissions of directory</code></td>
+<td>You overrode <code>postgres.image</code> with an image that cannot run under a random UID. Use <code>postgres:16</code> (Debian) or a mirror of it</td>
+</tr>
+<tr>
+<td><code>ImagePullBackOff</code></td>
+<td>Link the pull secret (<code>oc secrets link default ghcr-pull --for=pull</code>) or mirror the images (step 4)</td>
+</tr>
+<tr>
+<td>PVC <code>Pending</code></td>
+<td>There is no default StorageClass: set <code>storage.storageClass</code>, <code>postgres.storage.storageClass</code> and <code>backup.storage.storageClass</code></td>
+</tr>
+<tr>
+<td>Route shows "Application is not available"</td>
+<td>The pod is not ready yet: <code>oc -n ea-hub get pods</code>, then read the <code>migrate</code> logs</td>
+</tr>
+<tr>
+<td>Quota exceeded</td>
+<td>Ask for a larger quota, or lower <code>resources</code> / <code>postgres.resources</code> in your values</td>
+</tr>
+</tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.sections", "navigation.top", "content.code.copy", "search.highlight"], "search": "../../assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.88dd0f4e.min.js"></script>
+      
+        <script src="../../assets/site-rtl.js"></script>
+      
+    
+  </body>
+</html>

@@ -1,0 +1,2609 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://e20e-tools.github.io/ea-hub-selfhost/docs/en/deploy-kubernetes/">
+      
+      
+        <link rel="prev" href="../deploy-docker/">
+      
+      
+        <link rel="next" href="../deploy-kubernetes-local/">
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.49">
+    
+    
+      
+        <title>Kubernetes - EA-Hub self-host</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.6f8fc17f.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/site-rtl.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#deploying-ea-hub-on-kubernetes-a-step-by-step-guide" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="EA-Hub self-host" class="md-header__button md-logo" aria-label="EA-Hub self-host" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            EA-Hub self-host
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Kubernetes
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/E20E-Tools/ea-hub-selfhost" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="EA-Hub self-host" class="md-nav__button md-logo" aria-label="EA-Hub self-host" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    EA-Hub self-host
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/E20E-Tools/ea-hub-selfhost" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Home
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    English
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            English
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deploy-docker/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Docker
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    Kubernetes
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    Kubernetes
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-what-gets-deployed" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. What gets deployed
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Requirements
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Requirements">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-hardware-cluster-capacity" class="md-nav__link">
+    <span class="md-ellipsis">
+      2.1 Hardware (cluster capacity)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-software" class="md-nav__link">
+    <span class="md-ellipsis">
+      2.2 Software
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#23-access-and-accounts" class="md-nav__link">
+    <span class="md-ellipsis">
+      2.3 Access and accounts
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#24-network" class="md-nav__link">
+    <span class="md-ellipsis">
+      2.4 Network
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-steps-at-a-glance" class="md-nav__link">
+    <span class="md-ellipsis">
+      The steps at a glance
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-1-check-your-tools-and-cluster" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 1 — Check your tools and cluster
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-2-get-the-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 2 — Get the code
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-3-make-the-container-image-available" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 3 — Make the container image available
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 3 — Make the container image available">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#option-1-use-the-published-image-simplest" class="md-nav__link">
+    <span class="md-ellipsis">
+      Option 1 — Use the published image (simplest)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-2-build-the-image-and-push-it-to-your-own-registry" class="md-nav__link">
+    <span class="md-ellipsis">
+      Option 2 — Build the image and push it to your own registry
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-3-single-node-k3s-without-a-registry" class="md-nav__link">
+    <span class="md-ellipsis">
+      Option 3 — Single-node k3s without a registry
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-4-domain-name-and-https-optional" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 4 — Domain name and HTTPS (optional)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#path-a-install-with-helm-recommended" class="md-nav__link">
+    <span class="md-ellipsis">
+      Path A — Install with Helm (recommended)
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Path A — Install with Helm (recommended)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#5a-write-your-values-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      5A. Write your values file
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6a-install" class="md-nav__link">
+    <span class="md-ellipsis">
+      6A. Install
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#7a-wait-until-it-is-ready" class="md-nav__link">
+    <span class="md-ellipsis">
+      7A. Wait until it is ready
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#path-b-install-with-the-plain-yaml-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      Path B — Install with the plain YAML file
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Path B — Install with the plain YAML file">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#5b-namespace-and-secret" class="md-nav__link">
+    <span class="md-ellipsis">
+      5B. Namespace and Secret
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6b-put-your-address-admin-e-mail-and-image-into-the-yaml" class="md-nav__link">
+    <span class="md-ellipsis">
+      6B. Put your address, admin e-mail and image into the YAML
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#7b-apply-and-wait" class="md-nav__link">
+    <span class="md-ellipsis">
+      7B. Apply and wait
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-8-open-the-site-and-sign-in" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 8 — Open the site and sign in
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#day-2-operations" class="md-nav__link">
+    <span class="md-ellipsis">
+      Day-2 operations
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Day-2 operations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#upgrade" class="md-nav__link">
+    <span class="md-ellipsis">
+      Upgrade
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rotate-secrets" class="md-nav__link">
+    <span class="md-ellipsis">
+      Rotate secrets
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#backup" class="md-nav__link">
+    <span class="md-ellipsis">
+      Backup
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#several-app-replicas-uploads-in-s3" class="md-nav__link">
+    <span class="md-ellipsis">
+      Several app replicas (uploads in S3)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#monitoring-and-network-policies" class="md-nav__link">
+    <span class="md-ellipsis">
+      Monitoring and network policies
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#autoscaling-and-tracing" class="md-nav__link">
+    <span class="md-ellipsis">
+      Autoscaling and tracing
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#high-availability-for-postgresql-cloudnativepg" class="md-nav__link">
+    <span class="md-ellipsis">
+      High availability for PostgreSQL (CloudNativePG)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#upgrading-postgresql-to-a-new-major-version" class="md-nav__link">
+    <span class="md-ellipsis">
+      Upgrading PostgreSQL to a new major version
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#restore" class="md-nav__link">
+    <span class="md-ellipsis">
+      Restore
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#change-a-setting" class="md-nav__link">
+    <span class="md-ellipsis">
+      Change a setting
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reset-the-admin-password" class="md-nav__link">
+    <span class="md-ellipsis">
+      Reset the admin password
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#uninstall" class="md-nav__link">
+    <span class="md-ellipsis">
+      Uninstall
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      Troubleshooting
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reference-all-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      Reference: all settings
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deploy-kubernetes-local/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Kubernetes (local)
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deploy-openshift/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    OpenShift
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deploy-rancher/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Rancher
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deploy-aws-ecs-fargate/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    AWS ECS Fargate
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deploy-azure-container-apps/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Azure Container Apps
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deploy-google-cloud-run/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Google Cloud Run
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../single-sign-on/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Single sign-on
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    العربية
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            العربية
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../install-docker/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Docker
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../helm/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Helm
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../kubernetes/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Kubernetes
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../kubernetes-local/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Kubernetes محلي
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../openshift/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    OpenShift
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../rancher/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Rancher
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../gitops/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    GitOps
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../aws-ecs-fargate/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    AWS ECS Fargate
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../azure-container-apps/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Azure Container Apps
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../google-cloud-run/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Google Cloud Run
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cloud-templates/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    قوالب السحابة
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../single-sign-on/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    الدخول الموحد
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../backup/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    النسخ الاحتياطي
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../updating/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    التحديث
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    البنية
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../troubleshooting/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    حل المشكلات
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-what-gets-deployed" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. What gets deployed
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Requirements
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="2. Requirements">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#21-hardware-cluster-capacity" class="md-nav__link">
+    <span class="md-ellipsis">
+      2.1 Hardware (cluster capacity)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#22-software" class="md-nav__link">
+    <span class="md-ellipsis">
+      2.2 Software
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#23-access-and-accounts" class="md-nav__link">
+    <span class="md-ellipsis">
+      2.3 Access and accounts
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#24-network" class="md-nav__link">
+    <span class="md-ellipsis">
+      2.4 Network
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-steps-at-a-glance" class="md-nav__link">
+    <span class="md-ellipsis">
+      The steps at a glance
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-1-check-your-tools-and-cluster" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 1 — Check your tools and cluster
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-2-get-the-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 2 — Get the code
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-3-make-the-container-image-available" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 3 — Make the container image available
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Step 3 — Make the container image available">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#option-1-use-the-published-image-simplest" class="md-nav__link">
+    <span class="md-ellipsis">
+      Option 1 — Use the published image (simplest)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-2-build-the-image-and-push-it-to-your-own-registry" class="md-nav__link">
+    <span class="md-ellipsis">
+      Option 2 — Build the image and push it to your own registry
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#option-3-single-node-k3s-without-a-registry" class="md-nav__link">
+    <span class="md-ellipsis">
+      Option 3 — Single-node k3s without a registry
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-4-domain-name-and-https-optional" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 4 — Domain name and HTTPS (optional)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#path-a-install-with-helm-recommended" class="md-nav__link">
+    <span class="md-ellipsis">
+      Path A — Install with Helm (recommended)
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Path A — Install with Helm (recommended)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#5a-write-your-values-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      5A. Write your values file
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6a-install" class="md-nav__link">
+    <span class="md-ellipsis">
+      6A. Install
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#7a-wait-until-it-is-ready" class="md-nav__link">
+    <span class="md-ellipsis">
+      7A. Wait until it is ready
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#path-b-install-with-the-plain-yaml-file" class="md-nav__link">
+    <span class="md-ellipsis">
+      Path B — Install with the plain YAML file
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Path B — Install with the plain YAML file">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#5b-namespace-and-secret" class="md-nav__link">
+    <span class="md-ellipsis">
+      5B. Namespace and Secret
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#6b-put-your-address-admin-e-mail-and-image-into-the-yaml" class="md-nav__link">
+    <span class="md-ellipsis">
+      6B. Put your address, admin e-mail and image into the YAML
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#7b-apply-and-wait" class="md-nav__link">
+    <span class="md-ellipsis">
+      7B. Apply and wait
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#step-8-open-the-site-and-sign-in" class="md-nav__link">
+    <span class="md-ellipsis">
+      Step 8 — Open the site and sign in
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#day-2-operations" class="md-nav__link">
+    <span class="md-ellipsis">
+      Day-2 operations
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Day-2 operations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#upgrade" class="md-nav__link">
+    <span class="md-ellipsis">
+      Upgrade
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#rotate-secrets" class="md-nav__link">
+    <span class="md-ellipsis">
+      Rotate secrets
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#backup" class="md-nav__link">
+    <span class="md-ellipsis">
+      Backup
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#several-app-replicas-uploads-in-s3" class="md-nav__link">
+    <span class="md-ellipsis">
+      Several app replicas (uploads in S3)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#monitoring-and-network-policies" class="md-nav__link">
+    <span class="md-ellipsis">
+      Monitoring and network policies
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#autoscaling-and-tracing" class="md-nav__link">
+    <span class="md-ellipsis">
+      Autoscaling and tracing
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#high-availability-for-postgresql-cloudnativepg" class="md-nav__link">
+    <span class="md-ellipsis">
+      High availability for PostgreSQL (CloudNativePG)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#upgrading-postgresql-to-a-new-major-version" class="md-nav__link">
+    <span class="md-ellipsis">
+      Upgrading PostgreSQL to a new major version
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#restore" class="md-nav__link">
+    <span class="md-ellipsis">
+      Restore
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#change-a-setting" class="md-nav__link">
+    <span class="md-ellipsis">
+      Change a setting
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#reset-the-admin-password" class="md-nav__link">
+    <span class="md-ellipsis">
+      Reset the admin password
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#uninstall" class="md-nav__link">
+    <span class="md-ellipsis">
+      Uninstall
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      Troubleshooting
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reference-all-settings" class="md-nav__link">
+    <span class="md-ellipsis">
+      Reference: all settings
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+<h1 id="deploying-ea-hub-on-kubernetes-a-step-by-step-guide">Deploying EA-Hub on Kubernetes — a step-by-step guide<a class="headerlink" href="#deploying-ea-hub-on-kubernetes-a-step-by-step-guide" title="Permanent link">&para;</a></h1>
+<p>This guide is for someone <strong>new to EA-Hub</strong> who wants to run it on their own Kubernetes cluster, using either the <strong>Helm chart</strong> (recommended) or the <strong>plain YAML file</strong> (no Helm). It starts with what you need to have, then walks through every step until you are signed in to the admin console.</p>
+<blockquote>
+<p>Other platforms (Docker, local Kubernetes, OpenShift, Rancher, Azure, AWS, Google Cloud): see the <a href="../">guide index</a>.</p>
+</blockquote>
+<p><strong>Contents</strong></p>
+<ol>
+<li><a href="#1-what-gets-deployed">What gets deployed</a></li>
+<li><a href="#2-requirements">Requirements</a></li>
+<li><a href="#step-1--check-your-tools-and-cluster">Step 1 — Check your tools and cluster</a></li>
+<li><a href="#step-2--get-the-code">Step 2 — Get the code</a></li>
+<li><a href="#step-3--make-the-container-image-available">Step 3 — Make the container image available</a></li>
+<li><a href="#step-4--domain-name-and-https-optional">Step 4 — Domain name and HTTPS (optional)</a></li>
+<li><a href="#path-a--install-with-helm-recommended">Path A — Install with Helm</a></li>
+<li><a href="#path-b--install-with-the-plain-yaml-file">Path B — Install with the plain YAML file</a></li>
+<li><a href="#step-8--open-the-site-and-sign-in">Step 8 — Open the site and sign in</a></li>
+<li><a href="#day-2-operations">Day-2 operations: upgrade, backup, restore, uninstall</a></li>
+<li><a href="#troubleshooting">Troubleshooting</a></li>
+<li><a href="#reference-all-settings">Reference: all settings</a></li>
+</ol>
+<hr />
+<h2 id="1-what-gets-deployed">1. What gets deployed<a class="headerlink" href="#1-what-gets-deployed" title="Permanent link">&para;</a></h2>
+<p><img alt="What the Helm chart creates" src="../images/architecture.svg" /></p>
+<table>
+<thead>
+<tr>
+<th>Resource</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Deployment <code>ea-hub</code></strong></td>
+<td>The web application (Node.js, port 3000). An <strong>init container</strong> prepares the database (schema, roles, first admin) every time a pod starts. Doing that more than once is safe.</td>
+</tr>
+<tr>
+<td><strong>Service <code>ea-hub</code></strong></td>
+<td>Internal address of the app on port 80.</td>
+</tr>
+<tr>
+<td><strong>Ingress <code>ea-hub</code></strong> <em>(optional)</em></td>
+<td>Makes the site reachable from outside under your domain, with HTTPS if you want it.</td>
+</tr>
+<tr>
+<td><strong>StatefulSet <code>ea-hub-postgres</code></strong></td>
+<td>PostgreSQL 16 with its own persistent volume. It can be replaced by an external database.</td>
+</tr>
+<tr>
+<td><strong>Secret <code>ea-hub</code></strong></td>
+<td>Passwords and keys. Helm generates them for you and keeps them on upgrades.</td>
+</tr>
+<tr>
+<td><strong>PVC <code>ea-hub-storage</code></strong></td>
+<td>Uploaded files (logos, product images, attachments).</td>
+</tr>
+<tr>
+<td><strong>PVC <code>ea-hub-backups</code></strong></td>
+<td>Daily backups.</td>
+</tr>
+<tr>
+<td><strong>CronJobs</strong></td>
+<td><code>newsletter</code> (06:00 UTC), <code>daily-cleanup</code> (02:30), <code>semantic-index</code> (03:15), <code>backup</code> (01:00).</td>
+</tr>
+</tbody>
+</table>
+<p>EA-Hub needs <strong>no external services</strong> to run: no Supabase, no Vercel, no cloud database. Everything lives in your cluster.</p>
+<hr />
+<h2 id="2-requirements">2. Requirements<a class="headerlink" href="#2-requirements" title="Permanent link">&para;</a></h2>
+<h3 id="21-hardware-cluster-capacity">2.1 Hardware (cluster capacity)<a class="headerlink" href="#21-hardware-cluster-capacity" title="Permanent link">&para;</a></h3>
+<p>These are the totals the chart asks for across the cluster. A single node is fine.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Minimum</th>
+<th>Recommended</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>CPU</strong></td>
+<td>2 vCPU</td>
+<td>4 vCPU</td>
+</tr>
+<tr>
+<td><strong>Memory</strong></td>
+<td>4 GB RAM</td>
+<td>8 GB RAM</td>
+</tr>
+<tr>
+<td><strong>Disk for volumes</strong></td>
+<td>35 GB (5 uploads + 10 database + 20 backups)</td>
+<td>60 GB or more, on SSD</td>
+</tr>
+<tr>
+<td><strong>Disk for images</strong></td>
+<td>~3 GB free on each node (the app image is ~1 GB)</td>
+<td></td>
+</tr>
+<tr>
+<td><strong>CPU architecture</strong></td>
+<td><code>amd64</code> (x86-64)</td>
+<td><code>arm64</code> is published for tagged releases</td>
+</tr>
+</tbody>
+</table>
+<p>What each part requests and is allowed to use (all can be changed in <code>values.yaml</code>):</p>
+<table>
+<thead>
+<tr>
+<th>Container</th>
+<th>CPU request</th>
+<th>Memory request → limit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>app</td>
+<td>100m</td>
+<td>384 Mi → 1.5 Gi</td>
+</tr>
+<tr>
+<td>PostgreSQL</td>
+<td>100m</td>
+<td>256 Mi → 1 Gi</td>
+</tr>
+<tr>
+<td>migrate (init, short-lived)</td>
+<td>50m</td>
+<td>128 Mi → 512 Mi</td>
+</tr>
+<tr>
+<td>each CronJob (short-lived)</td>
+<td>10m</td>
+<td>64 Mi → 256 Mi</td>
+</tr>
+</tbody>
+</table>
+<h3 id="22-software">2.2 Software<a class="headerlink" href="#22-software" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Software</th>
+<th>Version</th>
+<th>Needed for</th>
+<th>How to check</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Kubernetes</strong></td>
+<td><strong>1.27 or newer</strong> (CronJob <code>timeZone</code>)</td>
+<td>everything</td>
+<td><code>kubectl version</code></td>
+</tr>
+<tr>
+<td><strong>kubectl</strong></td>
+<td>matching your cluster ±1 minor</td>
+<td>everything</td>
+<td><code>kubectl version --client</code></td>
+</tr>
+<tr>
+<td><strong>Helm</strong></td>
+<td><strong>3.8+</strong> or 4.x</td>
+<td>Path A only</td>
+<td><code>helm version</code></td>
+</tr>
+<tr>
+<td><strong>git</strong></td>
+<td>any</td>
+<td>downloading the code</td>
+<td><code>git --version</code></td>
+</tr>
+<tr>
+<td><strong>A default StorageClass</strong></td>
+<td>dynamic provisioning, <code>ReadWriteOnce</code></td>
+<td>the volumes</td>
+<td><code>kubectl get storageclass</code> (one marked <code>(default)</code>)</td>
+</tr>
+<tr>
+<td><strong>An Ingress controller</strong></td>
+<td>ingress-nginx, Traefik…</td>
+<td>reaching the site by domain (optional)</td>
+<td><code>kubectl get ingressclass</code></td>
+</tr>
+<tr>
+<td><strong>cert-manager</strong></td>
+<td>1.x</td>
+<td>automatic HTTPS certificates (optional)</td>
+<td><code>kubectl get pods -n cert-manager</code></td>
+</tr>
+<tr>
+<td><strong>Docker</strong></td>
+<td>24+</td>
+<td>only if you build the image yourself</td>
+<td><code>docker version</code></td>
+</tr>
+<tr>
+<td><strong>openssl</strong></td>
+<td>any</td>
+<td>only for Path B (generating secrets)</td>
+<td><code>openssl version</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>No cluster yet?</strong> For a single machine (Ubuntu 22.04/24.04 with the hardware above), <a href="https://k3s.io">k3s</a> gives you everything in the table (Kubernetes, a default StorageClass and the Traefik ingress controller) with one command:</p>
+<div class="highlight"><pre><span></span><code>curl<span class="w"> </span>-sfL<span class="w"> </span>https://get.k3s.io<span class="w"> </span><span class="p">|</span><span class="w"> </span>sh<span class="w"> </span>-
+mkdir<span class="w"> </span>-p<span class="w"> </span>~/.kube<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>sudo<span class="w"> </span>cp<span class="w"> </span>/etc/rancher/k3s/k3s.yaml<span class="w"> </span>~/.kube/config<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>sudo<span class="w"> </span>chown<span class="w"> </span><span class="nv">$USER</span><span class="w"> </span>~/.kube/config
+kubectl<span class="w"> </span>get<span class="w"> </span>nodes<span class="w">        </span><span class="c1"># STATUS should be Ready</span>
+</code></pre></div>
+<p>Managed clusters (AKS, EKS, GKE, DigitalOcean, OpenShift…) work too.</p>
+<h3 id="23-access-and-accounts">2.3 Access and accounts<a class="headerlink" href="#23-access-and-accounts" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>What</th>
+<th>Why</th>
+<th>Required?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Access to the app image</strong></td>
+<td>The repository is private, so its image on <code>ghcr.io</code> is private too. You need a GitHub account with access to <code>E20E-Tools/ea-hub-selfhost</code> and a <strong>personal access token with <code>read:packages</code></strong>, <em>or</em> you build the image yourself (Step 3).</td>
+<td>yes</td>
+</tr>
+<tr>
+<td><strong>An e-mail address for the first admin</strong></td>
+<td>It is the sign-in name of the first administrator.</td>
+<td>yes</td>
+</tr>
+<tr>
+<td><strong>A domain name</strong> (e.g. <code>hub.example.com</code>) with access to its DNS</td>
+<td>To reach the site by name with HTTPS. Without it you can still use port-forwarding or a NodePort.</td>
+<td>optional</td>
+</tr>
+<tr>
+<td><strong>SMTP account</strong> (host, port, user, password)</td>
+<td>"Forgot password" e-mails, notifications, newsletter.</td>
+<td>optional</td>
+</tr>
+<tr>
+<td><strong>OpenAI API key</strong></td>
+<td>Search by meaning.</td>
+<td>optional</td>
+</tr>
+<tr>
+<td><strong>Cloudflare Turnstile keys</strong></td>
+<td>Bot protection on public forms.</td>
+<td>optional</td>
+</tr>
+</tbody>
+</table>
+<p>Every optional feature turns itself <strong>on only when its key is set</strong>, and stays quietly off otherwise.</p>
+<h3 id="24-network">2.4 Network<a class="headerlink" href="#24-network" title="Permanent link">&para;</a></h3>
+<ul>
+<li>Users reach the site over <strong>HTTP 80 / HTTPS 443</strong> on the ingress controller.</li>
+<li>For automatic HTTPS (Let's Encrypt), ports 80 and 443 must be reachable <strong>from the internet</strong> and the DNS name must point to the ingress controller.</li>
+<li>Outbound internet from the cluster is only needed for optional features (SMTP, OpenAI, certificates) and to pull images.</li>
+</ul>
+<hr />
+<h2 id="the-steps-at-a-glance">The steps at a glance<a class="headerlink" href="#the-steps-at-a-glance" title="Permanent link">&para;</a></h2>
+<p><img alt="Deployment steps" src="../images/deploy-flow.svg" /></p>
+<hr />
+<h2 id="step-1-check-your-tools-and-cluster">Step 1 — Check your tools and cluster<a class="headerlink" href="#step-1-check-your-tools-and-cluster" title="Permanent link">&para;</a></h2>
+<p>Run these four commands. Each should print something like the example output.</p>
+<div class="highlight"><pre><span></span><code>kubectl<span class="w"> </span>version<span class="w">            </span><span class="c1"># Server Version: v1.27 or newer</span>
+helm<span class="w"> </span>version<span class="w">               </span><span class="c1"># v3.8+ or v4.x   (Path A only)</span>
+kubectl<span class="w"> </span>get<span class="w"> </span>nodes<span class="w">          </span><span class="c1"># every node shows STATUS = Ready</span>
+kubectl<span class="w"> </span>get<span class="w"> </span>storageclass<span class="w">   </span><span class="c1"># one line ends with "(default)"</span>
+</code></pre></div>
+<p>Example of a healthy cluster:</p>
+<div class="highlight"><pre><span></span><code>$ kubectl get nodes
+NAME      STATUS   ROLES                  AGE   VERSION
+server1   Ready    control-plane,master   3d    v1.31.4+k3s1
+
+$ kubectl get storageclass
+NAME                   PROVISIONER             RECLAIMPOLICY   VOLUMEBINDINGMODE
+local-path (default)   rancher.io/local-path   Delete          WaitForFirstConsumer
+</code></pre></div>
+<blockquote>
+<p><strong>No <code>(default)</code> StorageClass?</strong> Either mark one as default
+(<code>kubectl patch storageclass &lt;name&gt; -p '{"metadata":{"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'</code>)
+or set <code>storage.storageClass</code>, <code>postgres.storage.storageClass</code> and <code>backup.storage.storageClass</code> in your values.</p>
+</blockquote>
+<h2 id="step-2-get-the-code">Step 2 — Get the code<a class="headerlink" href="#step-2-get-the-code" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code>git<span class="w"> </span>clone<span class="w"> </span>https://github.com/E20E-Tools/ea-hub-selfhost.git
+<span class="nb">cd</span><span class="w"> </span>ea-hub-selfhost
+</code></pre></div>
+<p>The two folders you need:</p>
+<div class="highlight"><pre><span></span><code>deploy/helm/ea-hub/        ← the Helm chart (Path A)
+deploy/kubernetes/         ← the plain YAML files (Path B)
+</code></pre></div>
+<h2 id="step-3-make-the-container-image-available">Step 3 — Make the container image available<a class="headerlink" href="#step-3-make-the-container-image-available" title="Permanent link">&para;</a></h2>
+<p>Pick <strong>one</strong> option.</p>
+<h3 id="option-1-use-the-published-image-simplest">Option 1 — Use the published image (simplest)<a class="headerlink" href="#option-1-use-the-published-image-simplest" title="Permanent link">&para;</a></h3>
+<p>Images are published for each release tag, e.g. <code>ghcr.io/e20e-tools/ea-hub-selfhost:1.0.0</code>, for both amd64 and arm64. They are public, so nothing needs to be set up and you can go to Step 4.</p>
+<blockquote>
+<p><strong>Quickest install, no clone at all.</strong> The chart is published as well, so this one command installs everything:</p>
+<div class="highlight"><pre><span></span><code>helm<span class="w"> </span>install<span class="w"> </span>ea-hub<span class="w"> </span>oci://ghcr.io/e20e-tools/charts/ea-hub<span class="w"> </span>-n<span class="w"> </span>ea-hub<span class="w"> </span>--create-namespace<span class="w"> </span>&gt;<span class="w">   </span>--set<span class="w"> </span><span class="nv">appUrl</span><span class="o">=</span>https://hub.example.com<span class="w"> </span>--set<span class="w"> </span>ingress.enabled<span class="o">=</span><span class="nb">true</span><span class="w"> </span>--set<span class="w"> </span>ingress.host<span class="o">=</span>hub.example.com<span class="w"> </span>&gt;<span class="w">   </span>--set<span class="w"> </span>admin.email<span class="o">=</span>you@example.com
+</code></pre></div>
+<p>The classic repository works too: <code>helm repo add ea-hub https://e20e-tools.github.io/ea-hub-selfhost</code>. The chart is also listed on <a href="https://artifacthub.io/packages/search?ts_query_web=ea-hub">Artifact Hub</a>.</p>
+</blockquote>
+<p>If your organisation mirrors the image into a private registry, create a pull secret so Kubernetes can download it:</p>
+<div class="highlight"><pre><span></span><code>kubectl<span class="w"> </span>create<span class="w"> </span>namespace<span class="w"> </span>ea-hub
+kubectl<span class="w"> </span>-n<span class="w"> </span>ea-hub<span class="w"> </span>create<span class="w"> </span>secret<span class="w"> </span>docker-registry<span class="w"> </span>ghcr-pull<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--docker-server<span class="o">=</span>ghcr.io<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--docker-username<span class="o">=</span>&lt;your-github-user&gt;<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--docker-password<span class="o">=</span>&lt;token-with-read:packages&gt;
+</code></pre></div>
+<p>You will reference <code>ghcr-pull</code> and the tag in Path A or B.</p>
+<h3 id="option-2-build-the-image-and-push-it-to-your-own-registry">Option 2 — Build the image and push it to your own registry<a class="headerlink" href="#option-2-build-the-image-and-push-it-to-your-own-registry" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>docker<span class="w"> </span>build<span class="w"> </span>-t<span class="w"> </span>registry.example.com/ea-hub-selfhost:1.0.0<span class="w"> </span>.
+docker<span class="w"> </span>push<span class="w"> </span>registry.example.com/ea-hub-selfhost:1.0.0
+</code></pre></div>
+<p>Add <code>--build-arg WITH_LOCAL_MODEL=0</code> for a ~120 MB smaller image without the local search model.</p>
+<h3 id="option-3-single-node-k3s-without-a-registry">Option 3 — Single-node k3s without a registry<a class="headerlink" href="#option-3-single-node-k3s-without-a-registry" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>docker<span class="w"> </span>build<span class="w"> </span>-t<span class="w"> </span>ea-hub-selfhost:local<span class="w"> </span>.
+docker<span class="w"> </span>save<span class="w"> </span>ea-hub-selfhost:local<span class="w"> </span><span class="p">|</span><span class="w"> </span>sudo<span class="w"> </span>k3s<span class="w"> </span>ctr<span class="w"> </span>images<span class="w"> </span>import<span class="w"> </span>-
+</code></pre></div>
+<p>Then use <code>image.repository=ea-hub-selfhost</code>, <code>image.tag=local</code> and <code>image.pullPolicy=Never</code>.</p>
+<h2 id="step-4-domain-name-and-https-optional">Step 4 — Domain name and HTTPS (optional)<a class="headerlink" href="#step-4-domain-name-and-https-optional" title="Permanent link">&para;</a></h2>
+<ol>
+<li>Find the external address of your ingress controller:
+   <div class="highlight"><pre><span></span><code>kubectl<span class="w"> </span>get<span class="w"> </span>svc<span class="w"> </span>-A<span class="w"> </span><span class="p">|</span><span class="w"> </span>grep<span class="w"> </span>-Ei<span class="w"> </span><span class="s1">'ingress|traefik'</span>
+<span class="c1"># look at the EXTERNAL-IP column (on k3s: the server's own IP)</span>
+</code></pre></div></li>
+<li>At your DNS provider create an <strong>A record</strong>: <code>hub.example.com → &lt;that IP&gt;</code>.</li>
+<li>For automatic certificates, install cert-manager and a Let's Encrypt issuer (once per cluster):
+   <div class="highlight"><pre><span></span><code>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>https://github.com/cert-manager/cert-manager/releases/download/v1.16.2/cert-manager.yaml
+cat<span class="w"> </span><span class="s">&lt;&lt;'EOF' | kubectl apply -f -</span>
+<span class="s">apiVersion: cert-manager.io/v1</span>
+<span class="s">kind: ClusterIssuer</span>
+<span class="s">metadata:</span>
+<span class="s">  name: letsencrypt</span>
+<span class="s">spec:</span>
+<span class="s">  acme:</span>
+<span class="s">    server: https://acme-v02.api.letsencrypt.org/directory</span>
+<span class="s">    email: you@example.com</span>
+<span class="s">    privateKeySecretRef:</span>
+<span class="s">      name: letsencrypt-account</span>
+<span class="s">    solvers:</span>
+<span class="s">      - http01:</span>
+<span class="s">          ingress:</span>
+<span class="s">            ingressClassName: traefik   # or nginx</span>
+<span class="s">EOF</span>
+</code></pre></div></li>
+</ol>
+<p>No domain? Skip this step and use port-forwarding in Step 8.</p>
+<hr />
+<h2 id="path-a-install-with-helm-recommended">Path A — Install with Helm (recommended)<a class="headerlink" href="#path-a-install-with-helm-recommended" title="Permanent link">&para;</a></h2>
+<h3 id="5a-write-your-values-file">5A. Write your values file<a class="headerlink" href="#5a-write-your-values-file" title="Permanent link">&para;</a></h3>
+<p>Create <code>my-values.yaml</code> <strong>outside the repository</strong> (it holds secrets). Replace the values marked <code>&lt;…&gt;</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="c1"># my-values.yaml</span>
+<span class="nt">appUrl</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">https://hub.example.com</span><span class="w">          </span><span class="c1"># exactly what people type in the browser</span>
+
+<span class="nt">admin</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">email</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">&lt;admin@yourcompany.com&gt;</span>
+<span class="w">  </span><span class="nt">password</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">&lt;a-long-password-10+-chars&gt;</span><span class="w">  </span><span class="c1"># used once to create the first admin</span>
+
+<span class="nt">image</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">repository</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ghcr.io/e20e-tools/ea-hub-selfhost</span><span class="w">   </span><span class="c1"># or your registry (Step 3)</span>
+<span class="w">  </span><span class="nt">tag</span><span class="p">:</span><span class="w"> </span><span class="s">"1.0.0"</span><span class="w">                           </span><span class="c1"># an existing release tag (see the repository's Releases/Packages)</span>
+<span class="nt">imagePullSecrets</span><span class="p">:</span>
+<span class="w">  </span><span class="p p-Indicator">-</span><span class="w"> </span><span class="nt">name</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ghcr-pull</span><span class="w">                      </span><span class="c1"># remove these two lines if the image is public/local</span>
+
+<span class="nt">ingress</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">  </span><span class="nt">className</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">traefik</span><span class="w">                     </span><span class="c1"># nginx for ingress-nginx; "" = cluster default</span>
+<span class="w">  </span><span class="nt">host</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">hub.example.com</span>
+<span class="w">  </span><span class="nt">tls</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">  </span><span class="nt">annotations</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">cert-manager.io/cluster-issuer</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">letsencrypt</span><span class="w">   </span><span class="c1"># remove if you have no cert-manager</span>
+
+<span class="c1"># Optional — delete what you do not use</span>
+<span class="nt">smtp</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">host</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">smtp.example.com</span>
+<span class="w">  </span><span class="nt">port</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">587</span>
+<span class="w">  </span><span class="nt">user</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">mailer@example.com</span>
+<span class="w">  </span><span class="nt">password</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">&lt;smtp-password&gt;</span>
+<span class="w">  </span><span class="nt">from</span><span class="p">:</span><span class="w"> </span><span class="s">"EA-Hub</span><span class="nv"> </span><span class="s">&lt;mailer@example.com&gt;"</span>
+<span class="nt">features</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">openaiApiKey</span><span class="p">:</span><span class="w"> </span><span class="s">""</span>
+<span class="w">  </span><span class="nt">turnstileSiteKey</span><span class="p">:</span><span class="w"> </span><span class="s">""</span>
+<span class="w">  </span><span class="nt">turnstileSecretKey</span><span class="p">:</span><span class="w"> </span><span class="s">""</span>
+</code></pre></div>
+<p>You <strong>do not</strong> need to invent database passwords or encryption keys: the chart generates them on the first install and keeps them on every upgrade.</p>
+<blockquote>
+<p><strong>Shortcut:</strong> <code>./setup.sh --helm</code> (Linux/macOS) or <code>.\setup.ps1 -Helm</code> (Windows) asks you these questions and writes <code>ea-hub-values.yaml</code> for you.</p>
+</blockquote>
+<p>Check the file before installing. The chart validates it against <code>values.schema.json</code>, so mistakes such as a malformed URL or a short password are reported here:</p>
+<div class="highlight"><pre><span></span><code>helm<span class="w"> </span>lint<span class="w"> </span>deploy/helm/ea-hub<span class="w"> </span>-f<span class="w"> </span>my-values.yaml
+helm<span class="w"> </span>template<span class="w"> </span>ea-hub<span class="w"> </span>deploy/helm/ea-hub<span class="w"> </span>-n<span class="w"> </span>ea-hub<span class="w"> </span>-f<span class="w"> </span>my-values.yaml<span class="w"> </span>&gt;<span class="w"> </span>/dev/null<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">echo</span><span class="w"> </span>OK
+</code></pre></div>
+<h3 id="6a-install">6A. Install<a class="headerlink" href="#6a-install" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>helm<span class="w"> </span>upgrade<span class="w"> </span>--install<span class="w"> </span>ea-hub<span class="w"> </span>deploy/helm/ea-hub<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--namespace<span class="w"> </span>ea-hub<span class="w"> </span>--create-namespace<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>-f<span class="w"> </span>my-values.yaml
+</code></pre></div>
+<p>Helm prints the next steps (the chart's <code>NOTES.txt</code>):</p>
+<div class="highlight"><pre><span></span><code>Release "ea-hub" does not exist. Installing it now.
+NAME: ea-hub
+NAMESPACE: ea-hub
+STATUS: deployed
+REVISION: 1
+NOTES:
+EA-Hub is being installed in namespace "ea-hub".
+…
+1) Wait until it is ready / … (first start runs the database setup, 1–3 minutes):
+   kubectl -n ea-hub rollout status deploy/ea-hub --timeout=10m
+
+2) Open the site / …:
+   https://hub.example.com
+   (DNS for hub.example.com must point to your ingress controller.)
+
+3) Sign in / …:  https://hub.example.com/admin
+   e-mail: admin@yourcompany.com  (password: the one you set in admin.password)
+…
+</code></pre></div>
+<h3 id="7a-wait-until-it-is-ready">7A. Wait until it is ready<a class="headerlink" href="#7a-wait-until-it-is-ready" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>kubectl<span class="w"> </span>-n<span class="w"> </span>ea-hub<span class="w"> </span>rollout<span class="w"> </span>status<span class="w"> </span>deploy/ea-hub<span class="w"> </span>--timeout<span class="o">=</span>10m
+kubectl<span class="w"> </span>-n<span class="w"> </span>ea-hub<span class="w"> </span>get<span class="w"> </span>pods
+</code></pre></div>
+<p>Expected:</p>
+<div class="highlight"><pre><span></span><code>deployment "ea-hub" successfully rolled out
+
+NAME                      READY   STATUS    RESTARTS   AGE
+ea-hub-7c9d6f8b5d-x2klm   1/1     Running   0          2m
+ea-hub-postgres-0         1/1     Running   0          2m
+</code></pre></div>
+<p>While the pod shows <code>Init:0/1</code>, the database is being prepared. Follow it with:</p>
+<div class="highlight"><pre><span></span><code>kubectl<span class="w"> </span>-n<span class="w"> </span>ea-hub<span class="w"> </span>logs<span class="w"> </span>deploy/ea-hub<span class="w"> </span>-c<span class="w"> </span>migrate<span class="w"> </span>-f
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>[migrate] waiting for database on ea-hub-postgres …
+[migrate] bootstrap (roles, auth, storage) …
+[migrate] upstream migrations …
+[migrate] 91 migrations applied in total
+[migrate] post-migrate (buckets, realtime) …
+[migrate] app role eahub_app ready
+[migrate] admin account created
+[migrate] done
+</code></pre></div>
+<p>Continue with <a href="#step-8--open-the-site-and-sign-in">Step 8</a>.</p>
+<hr />
+<h2 id="path-b-install-with-the-plain-yaml-file">Path B — Install with the plain YAML file<a class="headerlink" href="#path-b-install-with-the-plain-yaml-file" title="Permanent link">&para;</a></h2>
+<p><code>deploy/kubernetes/ea-hub.yaml</code> is generated from the Helm chart. It contains <strong>no secrets</strong>: you create them yourself.</p>
+<h3 id="5b-namespace-and-secret">5B. Namespace and Secret<a class="headerlink" href="#5b-namespace-and-secret" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>deploy/kubernetes/namespace.yaml
+cp<span class="w"> </span>deploy/kubernetes/secret.example.yaml<span class="w"> </span>~/ea-hub-secret.yaml<span class="w">    </span><span class="c1"># keep it OUTSIDE the repository</span>
+</code></pre></div>
+<p>Generate one random value for each <code>CHANGE_ME</code>:</p>
+<div class="highlight"><pre><span></span><code>openssl<span class="w"> </span>rand<span class="w"> </span>-hex<span class="w"> </span><span class="m">32</span><span class="w">     </span><span class="c1"># run once per value</span>
+</code></pre></div>
+<p>Edit <code>~/ea-hub-secret.yaml</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">stringData</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">postgres-password</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3f1c…</span><span class="w">           </span><span class="c1"># random</span>
+<span class="w">  </span><span class="nt">app-db-password</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">9ab4…</span><span class="w">             </span><span class="c1"># random</span>
+<span class="w">  </span><span class="nt">app-encryption-key</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">6d02…</span><span class="w">          </span><span class="c1"># random, at least 32 characters — NEVER change it later</span>
+<span class="w">  </span><span class="nt">cron-secret</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">51e7…</span><span class="w">                 </span><span class="c1"># random</span>
+<span class="w">  </span><span class="nt">admin-password</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">&lt;your admin password, 10+ characters&gt;</span>
+</code></pre></div>
+<p>Then apply it:</p>
+<div class="highlight"><pre><span></span><code>kubectl<span class="w"> </span>apply<span class="w"> </span>-f<span class="w"> </span>~/ea-hub-secret.yaml
+</code></pre></div>
+<h3 id="6b-put-your-address-admin-e-mail-and-image-into-the-yaml">6B. Put your address, admin e-mail and image into the YAML<a class="headerlink" href="#6b-put-your-address-admin-e-mail-and-image-into-the-yaml" title="Permanent link">&para;</a></h3>
+<p>The file uses placeholders. Replace them, here with <code>sed</code> (on macOS use <code>sed -i ''</code>):</p>
+<div class="highlight"><pre><span></span><code>cp<span class="w"> </span>deploy/kubernetes/ea-hub.yaml<span class="w"> </span>~/ea-hub.yaml
+sed<span class="w"> </span>-i<span class="w"> </span><span class="s1">'s#http://ea-hub.local#https://hub.example.com#g; s#ea-hub.local#hub.example.com#g'</span><span class="w"> </span>~/ea-hub.yaml
+sed<span class="w"> </span>-i<span class="w"> </span><span class="s1">'s#admin@example.com#admin@yourcompany.com#g'</span><span class="w"> </span>~/ea-hub.yaml
+<span class="c1"># only if you use your own registry (Step 3, option 2):</span>
+sed<span class="w"> </span>-i<span class="w"> </span><span class="s1">'s#ghcr.io/e20e-tools/ea-hub-selfhost:latest#registry.example.com/ea-hub-selfhost:1.0.0#g'</span><span class="w"> </span>~/ea-hub.yaml
+</code></pre></div>
+<p>If you need the <code>ghcr-pull</code> secret from Step 3, attach it to the namespace's default service account so every pod uses it:</p>
+<div class="highlight"><pre><span></span><code>kubectl<span class="w"> </span>-n<span class="w"> </span>ea-hub<span class="w"> </span>patch<span class="w"> </span>serviceaccount<span class="w"> </span>default<span class="w"> </span>-p<span class="w"> </span><span class="s1">'{"imagePullSecrets":[{"name":"ghcr-pull"}]}'</span>
+</code></pre></div>
+<p>The Ingress in this file has no <code>ingressClassName</code>, so it uses your cluster's default ingress class. For HTTPS, add a <code>tls:</code> section and the cert-manager annotation by hand, or use Path A.</p>
+<h3 id="7b-apply-and-wait">7B. Apply and wait<a class="headerlink" href="#7b-apply-and-wait" title="Permanent link">&para;</a></h3>
+<p>The resources in this file carry no namespace, so always pass <code>-n ea-hub</code>:</p>
+<div class="highlight"><pre><span></span><code>kubectl<span class="w"> </span>apply<span class="w"> </span>-n<span class="w"> </span>ea-hub<span class="w"> </span>-f<span class="w"> </span>~/ea-hub.yaml
+kubectl<span class="w"> </span>-n<span class="w"> </span>ea-hub<span class="w"> </span>rollout<span class="w"> </span>status<span class="w"> </span>deploy/ea-hub<span class="w"> </span>--timeout<span class="o">=</span>10m
+kubectl<span class="w"> </span>-n<span class="w"> </span>ea-hub<span class="w"> </span>get<span class="w"> </span>pods
+</code></pre></div>
+<p>The expected output is the same as in <a href="#7a-wait-until-it-is-ready">7A</a>.</p>
+<hr />
+<h2 id="step-8-open-the-site-and-sign-in">Step 8 — Open the site and sign in<a class="headerlink" href="#step-8-open-the-site-and-sign-in" title="Permanent link">&para;</a></h2>
+<p><strong>With a domain:</strong> open <code>https://hub.example.com</code>.</p>
+<p><strong>Without a domain / ingress</strong>, forward a local port:</p>
+<div class="highlight"><pre><span></span><code>kubectl<span class="w"> </span>-n<span class="w"> </span>ea-hub<span class="w"> </span>port-forward<span class="w"> </span>svc/ea-hub<span class="w"> </span><span class="m">8080</span>:80
+<span class="c1"># then open http://localhost:8080</span>
+</code></pre></div>
+<p>When testing like this, set <code>appUrl: http://localhost:8080</code> (Path A) or <code>APP_URL</code> (Path B) so links and uploaded images use the right address.</p>
+<p><strong>Health check:</strong> the app answers on <code>/healthz</code>:</p>
+<div class="highlight"><pre><span></span><code>curl<span class="w"> </span>https://hub.example.com/healthz
+<span class="o">{</span><span class="s2">"ok"</span>:true,<span class="s2">"database"</span>:<span class="s2">"ok"</span><span class="o">}</span>
+</code></pre></div>
+<p><strong>Sign in:</strong> go to <code>/admin</code> and use the admin e-mail and password from Step 5:</p>
+<p><img alt="Admin sign-in page" src="../images/admin-sign-in.jpg" /></p>
+<p>After signing in you land on the dashboard:</p>
+<p><img alt="Admin dashboard" src="../images/admin-dashboard.jpg" /></p>
+<p><strong>First things to do:</strong></p>
+<ol>
+<li><strong>My account → change password.</strong> Then remove <code>admin.password</code> from <code>my-values.yaml</code> (Path A) or <code>admin-password</code> from your Secret file. The account already exists, so the old value is no longer needed.</li>
+<li><strong>Settings → General:</strong> site name, logo and contact details.</li>
+<li><strong>Settings → Notifications</strong> (needs SMTP) and <strong>Settings → AI assistant</strong> if you use them.</li>
+<li>Back up the Secret. Without <code>app-encryption-key</code>, saved keys and sessions cannot be read after a restore:
+   <div class="highlight"><pre><span></span><code>kubectl<span class="w"> </span>-n<span class="w"> </span>ea-hub<span class="w"> </span>get<span class="w"> </span>secret<span class="w"> </span>ea-hub<span class="w"> </span>-o<span class="w"> </span>yaml<span class="w"> </span>&gt;<span class="w"> </span>ea-hub-secret-backup.yaml<span class="w">   </span><span class="c1"># store it somewhere safe</span>
+</code></pre></div></li>
+</ol>
+<hr />
+<h2 id="day-2-operations">Day-2 operations<a class="headerlink" href="#day-2-operations" title="Permanent link">&para;</a></h2>
+<h3 id="upgrade">Upgrade<a class="headerlink" href="#upgrade" title="Permanent link">&para;</a></h3>
+<p><strong>Path A:</strong></p>
+<div class="highlight"><pre><span></span><code>git<span class="w"> </span>pull
+helm<span class="w"> </span>upgrade<span class="w"> </span>ea-hub<span class="w"> </span>deploy/helm/ea-hub<span class="w"> </span>-n<span class="w"> </span>ea-hub<span class="w"> </span>-f<span class="w"> </span>my-values.yaml<span class="w"> </span>--set<span class="w"> </span>image.tag<span class="o">=</span>&lt;new-version&gt;
+</code></pre></div>
+<p><strong>Path B:</strong> take the new <code>deploy/kubernetes/ea-hub.yaml</code>, repeat 6B, then <code>kubectl apply -n ea-hub -f ~/ea-hub.yaml</code>.</p>
+<p>Database changes are applied automatically by the init container before the new version starts. Your data and files are kept.</p>
+<h3 id="rotate-secrets">Rotate secrets<a class="headerlink" href="#rotate-secrets" title="Permanent link">&para;</a></h3>
+<p>The generated passwords live in the release Secret (<code>ea-hub</code>) and are kept on upgrades, so you rotate them by changing the Secret and restarting. Never rotate <code>app-encryption-key</code>: sessions, signed links and saved keys depend on it.</p>
+<div class="highlight"><pre><span></span><code>new<span class="o">()</span><span class="w"> </span><span class="o">{</span><span class="w"> </span>openssl<span class="w"> </span>rand<span class="w"> </span>-hex<span class="w"> </span><span class="m">24</span><span class="p">;</span><span class="w"> </span><span class="o">}</span>
+<span class="c1"># app database password: the migrate init container sets it in PostgreSQL on start</span>
+kubectl<span class="w"> </span>-n<span class="w"> </span>ea-hub<span class="w"> </span>patch<span class="w"> </span>secret<span class="w"> </span>ea-hub<span class="w"> </span>-p<span class="w"> </span><span class="s2">"{\"stringData\":{\"app-db-password\":\"</span><span class="k">$(</span>new<span class="k">)</span><span class="s2">\"}}"</span>
+<span class="c1"># scheduled-jobs secret and /metrics token</span>
+kubectl<span class="w"> </span>-n<span class="w"> </span>ea-hub<span class="w"> </span>patch<span class="w"> </span>secret<span class="w"> </span>ea-hub<span class="w"> </span>-p<span class="w"> </span><span class="s2">"{\"stringData\":{\"cron-secret\":\"</span><span class="k">$(</span>new<span class="k">)</span><span class="s2">\",\"metrics-token\":\"</span><span class="k">$(</span>new<span class="k">)</span><span class="s2">\"}}"</span>
+kubectl<span class="w"> </span>-n<span class="w"> </span>ea-hub<span class="w"> </span>rollout<span class="w"> </span>restart<span class="w"> </span>deploy/ea-hub<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>kubectl<span class="w"> </span>-n<span class="w"> </span>ea-hub<span class="w"> </span>rollout<span class="w"> </span>status<span class="w"> </span>deploy/ea-hub
+
+<span class="c1"># PostgreSQL superuser (bundled database): change it in the database first, then in the Secret</span>
+<span class="nv">P</span><span class="o">=</span><span class="k">$(</span>new<span class="k">)</span>
+kubectl<span class="w"> </span>-n<span class="w"> </span>ea-hub<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>ea-hub-postgres-0<span class="w"> </span>--<span class="w"> </span>psql<span class="w"> </span>-U<span class="w"> </span>postgres<span class="w"> </span>-qc<span class="w"> </span><span class="s2">"alter role postgres with password '</span><span class="nv">$P</span><span class="s2">'"</span>
+kubectl<span class="w"> </span>-n<span class="w"> </span>ea-hub<span class="w"> </span>patch<span class="w"> </span>secret<span class="w"> </span>ea-hub<span class="w"> </span>-p<span class="w"> </span><span class="s2">"{\"stringData\":{\"postgres-password\":\"</span><span class="nv">$P</span><span class="s2">\"}}"</span>
+<span class="nb">unset</span><span class="w"> </span>P
+</code></pre></div>
+<p>CronJobs (backup, cleanup) read the Secret when they run, so they pick up new values without a restart. If you set <code>secrets.*</code> in your values file, change the value there instead and run <code>helm upgrade</code> (the pods restart on their own); for <code>secrets.postgresPassword</code>, run the <code>alter role</code> command above with the new value first. With <code>secrets.existingSecret</code>, update your own Secret (Vault, SealedSecrets…) and restart the deployment.</p>
+<h3 id="backup">Backup<a class="headerlink" href="#backup" title="Permanent link">&para;</a></h3>
+<p>A backup runs every day at 01:00 UTC and keeps 14 days (<code>backup.schedule</code>, <code>backup.keepDays</code>). Each backup holds a database dump and the uploaded files. To take one now:</p>
+<div class="highlight"><pre><span></span><code>kubectl<span class="w"> </span>-n<span class="w"> </span>ea-hub<span class="w"> </span>create<span class="w"> </span>job<span class="w"> </span>--from<span class="o">=</span>cronjob/ea-hub-backup<span class="w"> </span>backup-now
+kubectl<span class="w"> </span>-n<span class="w"> </span>ea-hub<span class="w"> </span>logs<span class="w"> </span>job/backup-now<span class="w"> </span>-f
+<span class="c1"># [backup] … saved 2026-12-01_0100 (12M)</span>
+</code></pre></div>
+<p><strong>Copy backups off the cluster.</strong> The chart can copy each backup to object storage right after it is written (rclone: S3, MinIO, Azure Blob, Google Cloud Storage and others):</p>
+<div class="highlight"><pre><span></span><code><span class="nt">backup</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">offsite</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">    </span><span class="nt">path</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">my-bucket/ea-hub</span><span class="w">            </span><span class="c1"># bucket/folder (Azure: container/folder)</span>
+<span class="w">    </span><span class="nt">config</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> type</span><span class="p">:</span><span class="w"> </span><span class="nv">s3</span><span class="p p-Indicator">,</span><span class="nt"> provider</span><span class="p">:</span><span class="w"> </span><span class="nv">AWS</span><span class="p p-Indicator">,</span><span class="nt"> region</span><span class="p">:</span><span class="w"> </span><span class="nv">eu-central-1</span><span class="w"> </span><span class="p p-Indicator">}</span>
+<span class="w">    </span><span class="nt">credentials</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span><span class="nt"> access_key_id</span><span class="p">:</span><span class="w"> </span><span class="s">"…"</span><span class="p p-Indicator">,</span><span class="nt"> secret_access_key</span><span class="p">:</span><span class="w"> </span><span class="s">"…"</span><span class="w"> </span><span class="p p-Indicator">}</span>
+<span class="w">    </span><span class="c1"># MinIO: config: { type: s3, provider: Minio, endpoint: https://minio.example.com }</span>
+<span class="w">    </span><span class="c1"># Azure: config: { type: azureblob, account: mystorage }, credentials: { key: "…" }</span>
+</code></pre></div>
+<p><strong>Encrypt the backups.</strong> Create a key pair once with <code>docker run --rm ghcr.io/e20e-tools/ea-hub-selfhost node selfhost/scripts/backup-crypt.mjs keygen</code>, keep the private key offline, and set <code>backup.encryption.publicKey</code>. Each backup is then encrypted (X25519 and AES-256-GCM, with tampering detected) before it is stored or copied offsite. To restore, first run <code>backup-crypt.mjs decrypt-dir &lt;folder&gt;</code> with <code>BACKUP_PRIVATE_KEY</code>.</p>
+<p>Old copies are never deleted from the bucket: set a lifecycle rule there (e.g. delete after 90 days). To restore from the bucket, copy one folder back with <code>rclone copy &lt;remote&gt;:my-bucket/ea-hub/&lt;name&gt; ./&lt;name&gt;</code>, put it on the <code>ea-hub-backups</code> volume, and follow the restore steps.</p>
+<h3 id="several-app-replicas-uploads-in-s3">Several app replicas (uploads in S3)<a class="headerlink" href="#several-app-replicas-uploads-in-s3" title="Permanent link">&para;</a></h3>
+<p>By default, uploads live on a ReadWriteOnce volume, so one app pod runs. To run more replicas, keep uploads in an S3-compatible bucket (AWS S3, MinIO, Ceph RGW, Cloudflare R2…):</p>
+<div class="highlight"><pre><span></span><code><span class="nt">replicaCount</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">2</span>
+<span class="nt">storage</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">backend</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">s3</span>
+<span class="w">  </span><span class="nt">s3</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">bucket</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">ea-hub-uploads</span>
+<span class="w">    </span><span class="nt">region</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">eu-central-1</span>
+<span class="w">    </span><span class="nt">endpoint</span><span class="p">:</span><span class="w"> </span><span class="s">""</span><span class="w">                  </span><span class="c1"># e.g. https://minio.example.com for non-AWS services</span>
+<span class="w">    </span><span class="nt">accessKeyId</span><span class="p">:</span><span class="w"> </span><span class="s">"…"</span>
+<span class="w">    </span><span class="nt">secretAccessKey</span><span class="p">:</span><span class="w"> </span><span class="s">"…"</span>
+</code></pre></div>
+<p>Files are still served by the app, so access rules and signed links work exactly as before. The bucket can stay private. With S3, the nightly backup contains the database only: turn on bucket versioning or replication to protect the files. Database migrations are safe with several replicas, because each pod waits for a lock.</p>
+<h3 id="monitoring-and-network-policies">Monitoring and network policies<a class="headerlink" href="#monitoring-and-network-policies" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>metrics.enabled: true</code></td>
+<td>Serves Prometheus metrics at <code>/metrics</code>. A token is generated in the release Secret (<code>metrics-token</code>), and scrapers must send it as <code>Authorization: Bearer …</code></td>
+</tr>
+<tr>
+<td><code>metrics.serviceMonitor.enabled: true</code></td>
+<td>Creates a <code>ServiceMonitor</code> for the Prometheus Operator, with the token wired in</td>
+</tr>
+<tr>
+<td><code>networkPolicy.enabled: true</code></td>
+<td>Only pods of this release may reach PostgreSQL. The app is reachable from the namespaces in <code>networkPolicy.ingressNamespaceSelectors</code> (any namespace when empty)</td>
+</tr>
+<tr>
+<td><code>podDisruptionBudget.enabled</code> (on)</td>
+<td>With <code>replicaCount</code> &gt; 1, keeps one app pod running during node drains</td>
+</tr>
+<tr>
+<td><code>metrics.prometheusRule.enabled: true</code></td>
+<td>Alerts: app down, database down or slow, high memory, a backup failed, no backup for 2 days (the backup alerts need kube-state-metrics)</td>
+</tr>
+<tr>
+<td><code>metrics.grafanaDashboard.enabled: true</code></td>
+<td>A Grafana dashboard as a ConfigMap with <code>grafana_dashboard: "1"</code>, which the kube-prometheus-stack sidecar loads</td>
+</tr>
+</tbody>
+</table>
+<h3 id="autoscaling-and-tracing">Autoscaling and tracing<a class="headerlink" href="#autoscaling-and-tracing" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>autoscaling.enabled: true</code></td>
+<td>A HorizontalPodAutoscaler (2–6 pods at 70% CPU by default). Needs <code>storage.backend: s3</code> or a ReadWriteMany volume</td>
+</tr>
+<tr>
+<td><code>tracing.otlpEndpoint: http://otel-collector:4318</code></td>
+<td>One OpenTelemetry span per request, sent over OTLP/HTTP to your collector (Jaeger, Tempo, Datadog, Azure Monitor…). Continues the caller's <code>traceparent</code>. Exporter headers go in the Secret key <code>otel-headers</code></td>
+</tr>
+</tbody>
+</table>
+<p>Every pull request also runs an <strong>OWASP ZAP</strong> baseline scan and a <strong>k6</strong> load test (25 concurrent users on a 2-vCPU runner) against the full stack.</p>
+<h3 id="high-availability-for-postgresql-cloudnativepg">High availability for PostgreSQL (CloudNativePG)<a class="headerlink" href="#high-availability-for-postgresql-cloudnativepg" title="Permanent link">&para;</a></h3>
+<p>The built-in database is a single pod. For automatic failover, install the <a href="https://cloudnative-pg.io">CloudNativePG</a> operator once per cluster, then:</p>
+<div class="highlight"><pre><span></span><code><span class="nt">postgres</span><span class="p">:</span>
+<span class="w">  </span><span class="nt">cloudnativepg</span><span class="p">:</span>
+<span class="w">    </span><span class="nt">enabled</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span>
+<span class="w">    </span><span class="nt">instances</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">3</span><span class="w">            </span><span class="c1"># 1 primary + 2 streaming replicas</span>
+<span class="w">    </span><span class="c1"># backup: { barmanObjectStore: … }   # optional: continuous WAL archiving and point-in-time recovery</span>
+</code></pre></div>
+<p>The chart then creates a <code>postgresql.cnpg.io</code> Cluster instead of the StatefulSet, and the app connects to its <code>-rw</code> service. CI tests this on kind with 2 instances, including deleting the primary while the app keeps working.</p>
+<h3 id="upgrading-postgresql-to-a-new-major-version">Upgrading PostgreSQL to a new major version<a class="headerlink" href="#upgrading-postgresql-to-a-new-major-version" title="Permanent link">&para;</a></h3>
+<p><strong>Docker Compose:</strong> run <code>selfhost/scripts/pg-major-upgrade.sh 17</code>. It takes a backup, keeps the old data volume, starts the new version on an empty volume, restores, and prints the rollback commands. CI tests 16 → 17.</p>
+<p><strong>Helm, built-in database:</strong> take a backup (<code>backup-now</code>), set <code>postgres.image</code> to the new version on a <strong>new</strong> release or a new PVC, then restore with <code>backup.sh restore</code>. Never change the major version of an existing data volume in place.</p>
+<p><strong>CloudNativePG:</strong> follow the operator's major-upgrade procedure (an import into a new Cluster).</p>
+<h3 id="restore">Restore<a class="headerlink" href="#restore" title="Permanent link">&para;</a></h3>
+<p>See <a href="../../backup/">docs/backup.md</a> for the full procedure (Arabic, with commands). In short: scale the app to 0, run <code>backup.sh restore &lt;name&gt;</code> in a pod that mounts <code>ea-hub-backups</code>, then scale back to 1.</p>
+<h3 id="change-a-setting">Change a setting<a class="headerlink" href="#change-a-setting" title="Permanent link">&para;</a></h3>
+<p>Edit <code>my-values.yaml</code> and run the same <code>helm upgrade</code> again. Secrets you did not set keep their generated values.</p>
+<h3 id="reset-the-admin-password">Reset the admin password<a class="headerlink" href="#reset-the-admin-password" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>helm<span class="w"> </span>upgrade<span class="w"> </span>ea-hub<span class="w"> </span>deploy/helm/ea-hub<span class="w"> </span>-n<span class="w"> </span>ea-hub<span class="w"> </span>-f<span class="w"> </span>my-values.yaml<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--set<span class="w"> </span>admin.password<span class="o">=</span><span class="s1">'&lt;new-password&gt;'</span><span class="w"> </span>--set<span class="w"> </span>admin.resetPassword<span class="o">=</span><span class="nb">true</span>
+<span class="c1"># after signing in, run it again with --set admin.resetPassword=false</span>
+</code></pre></div>
+<h3 id="uninstall">Uninstall<a class="headerlink" href="#uninstall" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code>helm<span class="w"> </span>uninstall<span class="w"> </span>ea-hub<span class="w"> </span>-n<span class="w"> </span>ea-hub<span class="w">          </span><span class="c1"># Path B: kubectl delete -n ea-hub -f ~/ea-hub.yaml</span>
+</code></pre></div>
+<p>The data volumes (<code>ea-hub-storage</code>, <code>ea-hub-backups</code>, <code>data-ea-hub-postgres-0</code>) and the generated Secret are <strong>kept on purpose</strong>, so an accidental uninstall loses nothing. To delete everything permanently, including all data:</p>
+<div class="highlight"><pre><span></span><code>kubectl<span class="w"> </span>delete<span class="w"> </span>namespace<span class="w"> </span>ea-hub
+</code></pre></div>
+<hr />
+<h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>What you see</th>
+<th>Likely cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pod stuck in <code>Pending</code></td>
+<td>No default StorageClass, or not enough CPU/memory</td>
+<td><code>kubectl -n ea-hub describe pod &lt;name&gt;</code> → read <em>Events</em>; see <a href="#step-1--check-your-tools-and-cluster">Step 1</a></td>
+</tr>
+<tr>
+<td><code>ErrImagePull</code> / <code>ImagePullBackOff</code></td>
+<td>No access to the private image</td>
+<td>Create <code>ghcr-pull</code> (Step 3) and reference it; check the tag exists</td>
+</tr>
+<tr>
+<td>Stuck at <code>Init:0/1</code> for minutes</td>
+<td>Database not ready yet</td>
+<td><code>kubectl -n ea-hub logs deploy/ea-hub -c migrate</code> and <code>kubectl -n ea-hub logs ea-hub-postgres-0</code></td>
+</tr>
+<tr>
+<td><code>Init:CrashLoopBackOff</code> with <code>password authentication failed</code></td>
+<td>The database was created with a different password (e.g. the Secret was recreated)</td>
+<td>Restore the original Secret values (from your Secret backup)</td>
+</tr>
+<tr>
+<td><code>ADMIN_PASSWORD must be at least 10 characters</code></td>
+<td>Admin password too short</td>
+<td>Fix it in values/Secret and upgrade again</td>
+</tr>
+<tr>
+<td>Site loads but the HTTPS certificate is invalid</td>
+<td>DNS not pointing to the ingress yet, or ports 80/443 closed</td>
+<td><code>kubectl describe certificate -n ea-hub</code>; check DNS with <code>nslookup hub.example.com</code></td>
+</tr>
+<tr>
+<td><code>404</code> from the ingress controller</td>
+<td>Wrong <code>ingress.className</code>, or the host differs from the browser address</td>
+<td><code>kubectl get ingressclass</code>; make <code>ingress.host</code> match the domain</td>
+</tr>
+<tr>
+<td>Links or images point to the wrong address</td>
+<td><code>appUrl</code> does not match what users type</td>
+<td>Set <code>appUrl</code> exactly, including <code>https://</code> and the port, then upgrade</td>
+</tr>
+<tr>
+<td>"Forgot password" sends nothing</td>
+<td>SMTP not configured</td>
+<td>Set <code>smtp.*</code>, then upgrade. Admins can use <em>Reset the admin password</em> above</td>
+</tr>
+<tr>
+<td>Sign-in refused although the password is right</td>
+<td>10 failed attempts within 15 minutes lock that e-mail for a while</td>
+<td>Wait 15 minutes</td>
+</tr>
+</tbody>
+</table>
+<p>Useful commands:</p>
+<div class="highlight"><pre><span></span><code>kubectl<span class="w"> </span>-n<span class="w"> </span>ea-hub<span class="w"> </span>get<span class="w"> </span>all
+kubectl<span class="w"> </span>-n<span class="w"> </span>ea-hub<span class="w"> </span>describe<span class="w"> </span>pod<span class="w"> </span>&lt;pod-name&gt;
+kubectl<span class="w"> </span>-n<span class="w"> </span>ea-hub<span class="w"> </span>logs<span class="w"> </span>deploy/ea-hub<span class="w"> </span>--tail<span class="o">=</span><span class="m">200</span>
+kubectl<span class="w"> </span>-n<span class="w"> </span>ea-hub<span class="w"> </span>logs<span class="w"> </span>deploy/ea-hub<span class="w"> </span>-c<span class="w"> </span>migrate
+kubectl<span class="w"> </span>-n<span class="w"> </span>ea-hub<span class="w"> </span>get<span class="w"> </span>events<span class="w"> </span>--sort-by<span class="o">=</span>.lastTimestamp<span class="w"> </span><span class="p">|</span><span class="w"> </span>tail<span class="w"> </span>-20
+</code></pre></div>
+<hr />
+<h2 id="reference-all-settings">Reference: all settings<a class="headerlink" href="#reference-all-settings" title="Permanent link">&para;</a></h2>
+<p>Every setting is documented with comments in <a href="https://github.com/E20E-Tools/ea-hub-selfhost/blob/main/deploy/helm/ea-hub/values.yaml"><code>deploy/helm/ea-hub/values.yaml</code></a> and validated by <a href="https://github.com/E20E-Tools/ea-hub-selfhost/blob/main/deploy/helm/ea-hub/values.schema.json"><code>values.schema.json</code></a>. The most used:</p>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>appUrl</code></td>
+<td><code>http://ea-hub.local</code></td>
+<td><strong>Required.</strong> Public address of the site</td>
+</tr>
+<tr>
+<td><code>admin.email</code> / <code>admin.password</code></td>
+<td>empty</td>
+<td>First admin account (created once)</td>
+</tr>
+<tr>
+<td><code>image.repository</code> / <code>image.tag</code></td>
+<td><code>ghcr.io/e20e-tools/ea-hub-selfhost</code> / <code>latest</code> (the chart's appVersion)</td>
+<td>App image — pin a release tag in production</td>
+</tr>
+<tr>
+<td><code>imagePullSecrets</code></td>
+<td><code>[]</code></td>
+<td>e.g. <code>[{name: ghcr-pull}]</code></td>
+</tr>
+<tr>
+<td><code>ingress.enabled</code> / <code>host</code> / <code>className</code> / <code>tls</code> / <code>annotations</code></td>
+<td>off</td>
+<td>External access</td>
+</tr>
+<tr>
+<td><code>smtp.host</code> / <code>port</code> / <code>secure</code> / <code>user</code> / <code>password</code> / <code>from</code></td>
+<td>empty</td>
+<td>Outgoing e-mail</td>
+</tr>
+<tr>
+<td><code>features.openaiApiKey</code></td>
+<td>empty</td>
+<td>Search by meaning</td>
+</tr>
+<tr>
+<td><code>features.turnstileSiteKey</code> / <code>turnstileSecretKey</code></td>
+<td>empty</td>
+<td>Bot protection</td>
+</tr>
+<tr>
+<td><code>storage.size</code> / <code>storageClass</code> / <code>accessMode</code></td>
+<td><code>5Gi</code> / default / <code>ReadWriteOnce</code></td>
+<td>Uploaded files</td>
+</tr>
+<tr>
+<td><code>postgres.enabled</code></td>
+<td><code>true</code></td>
+<td>Built-in database; set <code>false</code> and fill <code>externalDatabase.*</code> to use your own PostgreSQL 16+</td>
+</tr>
+<tr>
+<td><code>backup.enabled</code> / <code>schedule</code> / <code>keepDays</code></td>
+<td>on / <code>0 1 * * *</code> / <code>14</code></td>
+<td>Daily backups</td>
+</tr>
+<tr>
+<td><code>cron.schedules.*</code> / <code>cron.timeZone</code></td>
+<td>see values</td>
+<td>Scheduled jobs</td>
+</tr>
+<tr>
+<td><code>secrets.create</code> / <code>secrets.existingSecret</code></td>
+<td><code>true</code> / empty</td>
+<td>Manage secrets yourself (Vault, SealedSecrets…)</td>
+</tr>
+<tr>
+<td><code>replicaCount</code></td>
+<td><code>1</code></td>
+<td>Keep 1 unless <code>storage.accessMode</code> is <code>ReadWriteMany</code></td>
+</tr>
+<tr>
+<td><code>resources</code></td>
+<td>see values</td>
+<td>App CPU/memory</td>
+</tr>
+</tbody>
+</table>
+<p>For how the self-hosted version replaces Supabase and Vercel, see <a href="../../architecture/">docs/architecture.md</a>.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.sections", "navigation.top", "content.code.copy", "search.highlight"], "search": "../../assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.88dd0f4e.min.js"></script>
+      
+        <script src="../../assets/site-rtl.js"></script>
+      
+    
+  </body>
+</html>

@@ -1,0 +1,1704 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://e20e-tools.github.io/ea-hub-selfhost/docs/en/deploy-aws-ecs-fargate/">
+      
+      
+        <link rel="prev" href="../deploy-rancher/">
+      
+      
+        <link rel="next" href="../deploy-azure-container-apps/">
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.49">
+    
+    
+      
+        <title>AWS ECS Fargate - EA-Hub self-host</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.6f8fc17f.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/site-rtl.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#deploying-ea-hub-on-aws-ecs-on-fargate" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="EA-Hub self-host" class="md-header__button md-logo" aria-label="EA-Hub self-host" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            EA-Hub self-host
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              AWS ECS Fargate
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m17.75 4.09-2.53 1.94.91 3.06-2.63-1.81-2.63 1.81.91-3.06-2.53-1.94L12.44 4l1.06-3 1.06 3zm3.5 6.91-1.64 1.25.59 1.98-1.7-1.17-1.7 1.17.59-1.98L15.75 11l2.06-.05L18.5 9l.69 1.95zm-2.28 4.95c.83-.08 1.72 1.1 1.19 1.85-.32.45-.66.87-1.08 1.27C15.17 23 8.84 23 4.94 19.07c-3.91-3.9-3.91-10.24 0-14.14.4-.4.82-.76 1.27-1.08.75-.53 1.93.36 1.85 1.19-.27 2.86.69 5.83 2.89 8.02a9.96 9.96 0 0 0 8.02 2.89m-1.64 2.02a12.08 12.08 0 0 1-7.8-3.47c-2.17-2.19-3.33-5-3.49-7.82-2.81 3.14-2.7 7.96.31 10.98 3.02 3.01 7.84 3.12 10.98.31"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 7a5 5 0 0 1 5 5 5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5m0 2a3 3 0 0 0-3 3 3 3 0 0 0 3 3 3 3 0 0 0 3-3 3 3 0 0 0-3-3m0-7 2.39 3.42C13.65 5.15 12.84 5 12 5s-1.65.15-2.39.42zM3.34 7l4.16-.35A7.2 7.2 0 0 0 5.94 8.5c-.44.74-.69 1.5-.83 2.29zm.02 10 1.76-3.77a7.131 7.131 0 0 0 2.38 4.14zM20.65 7l-1.77 3.79a7.02 7.02 0 0 0-2.38-4.15zm-.01 10-4.14.36c.59-.51 1.12-1.14 1.54-1.86.42-.73.69-1.5.83-2.29zM12 22l-2.41-3.44c.74.27 1.55.44 2.41.44.82 0 1.63-.17 2.37-.44z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/E20E-Tools/ea-hub-selfhost" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="EA-Hub self-host" class="md-nav__button md-logo" aria-label="EA-Hub self-host" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    EA-Hub self-host
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/E20E-Tools/ea-hub-selfhost" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Home
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    English
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            English
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Overview
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deploy-docker/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Docker
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deploy-kubernetes/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Kubernetes
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deploy-kubernetes-local/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Kubernetes (local)
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deploy-openshift/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    OpenShift
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deploy-rancher/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Rancher
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  <span class="md-ellipsis">
+    AWS ECS Fargate
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  <span class="md-ellipsis">
+    AWS ECS Fargate
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. Requirements
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Requirements">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#aws-resources-and-sizing" class="md-nav__link">
+    <span class="md-ellipsis">
+      AWS resources and sizing
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tools-permissions-and-network" class="md-nav__link">
+    <span class="md-ellipsis">
+      Tools, permissions and network
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Variables
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-copy-the-image-to-ecr-recommended" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. Copy the image to ECR (recommended)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-security-groups" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. Security groups
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-database-rds-postgresql-16" class="md-nav__link">
+    <span class="md-ellipsis">
+      5. Database (RDS PostgreSQL 16)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-file-storage-efs-with-an-access-point" class="md-nav__link">
+    <span class="md-ellipsis">
+      6. File storage (EFS with an access point)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-secrets-secrets-manager" class="md-nav__link">
+    <span class="md-ellipsis">
+      7. Secrets (Secrets Manager)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-load-balancer-and-certificate" class="md-nav__link">
+    <span class="md-ellipsis">
+      8. Load balancer and certificate
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-task-definition" class="md-nav__link">
+    <span class="md-ellipsis">
+      9. Task definition
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-cluster-and-service" class="md-nav__link">
+    <span class="md-ellipsis">
+      10. Cluster and service
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-scheduled-jobs-eventbridge-scheduler" class="md-nav__link">
+    <span class="md-ellipsis">
+      11. Scheduled jobs (EventBridge Scheduler)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12-open-the-site-and-sign-in" class="md-nav__link">
+    <span class="md-ellipsis">
+      12. Open the site and sign in
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#13-operations" class="md-nav__link">
+    <span class="md-ellipsis">
+      13. Operations
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      Troubleshooting
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deploy-azure-container-apps/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Azure Container Apps
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deploy-google-cloud-run/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Google Cloud Run
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../single-sign-on/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Single sign-on
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+            
+  
+  <span class="md-ellipsis">
+    العربية
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            العربية
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../install-docker/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Docker
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../helm/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Helm
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../kubernetes/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Kubernetes
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../kubernetes-local/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Kubernetes محلي
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../openshift/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    OpenShift
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../rancher/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Rancher
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../gitops/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    GitOps
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../aws-ecs-fargate/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    AWS ECS Fargate
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../azure-container-apps/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Azure Container Apps
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../google-cloud-run/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    Google Cloud Run
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../cloud-templates/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    قوالب السحابة
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../single-sign-on/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    الدخول الموحد
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../backup/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    النسخ الاحتياطي
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../updating/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    التحديث
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    البنية
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../troubleshooting/" class="md-nav__link">
+        
+  
+  <span class="md-ellipsis">
+    حل المشكلات
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#1-requirements" class="md-nav__link">
+    <span class="md-ellipsis">
+      1. Requirements
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="1. Requirements">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#aws-resources-and-sizing" class="md-nav__link">
+    <span class="md-ellipsis">
+      AWS resources and sizing
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#tools-permissions-and-network" class="md-nav__link">
+    <span class="md-ellipsis">
+      Tools, permissions and network
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#2-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      2. Variables
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#3-copy-the-image-to-ecr-recommended" class="md-nav__link">
+    <span class="md-ellipsis">
+      3. Copy the image to ECR (recommended)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#4-security-groups" class="md-nav__link">
+    <span class="md-ellipsis">
+      4. Security groups
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#5-database-rds-postgresql-16" class="md-nav__link">
+    <span class="md-ellipsis">
+      5. Database (RDS PostgreSQL 16)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#6-file-storage-efs-with-an-access-point" class="md-nav__link">
+    <span class="md-ellipsis">
+      6. File storage (EFS with an access point)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#7-secrets-secrets-manager" class="md-nav__link">
+    <span class="md-ellipsis">
+      7. Secrets (Secrets Manager)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#8-load-balancer-and-certificate" class="md-nav__link">
+    <span class="md-ellipsis">
+      8. Load balancer and certificate
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#9-task-definition" class="md-nav__link">
+    <span class="md-ellipsis">
+      9. Task definition
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#10-cluster-and-service" class="md-nav__link">
+    <span class="md-ellipsis">
+      10. Cluster and service
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#11-scheduled-jobs-eventbridge-scheduler" class="md-nav__link">
+    <span class="md-ellipsis">
+      11. Scheduled jobs (EventBridge Scheduler)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#12-open-the-site-and-sign-in" class="md-nav__link">
+    <span class="md-ellipsis">
+      12. Open the site and sign in
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#13-operations" class="md-nav__link">
+    <span class="md-ellipsis">
+      13. Operations
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#troubleshooting" class="md-nav__link">
+    <span class="md-ellipsis">
+      Troubleshooting
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+  
+  
+
+
+<h1 id="deploying-ea-hub-on-aws-ecs-on-fargate">Deploying EA-Hub on AWS (ECS on Fargate)<a class="headerlink" href="#deploying-ea-hub-on-aws-ecs-on-fargate" title="Permanent link">&para;</a></h1>
+<p>Amazon ECS with the Fargate launch type runs the EA-Hub container without servers to manage. The full setup on AWS:</p>
+<table>
+<thead>
+<tr>
+<th>EA-Hub part</th>
+<th>AWS service</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Web app</td>
+<td><strong>ECS service on Fargate</strong></td>
+</tr>
+<tr>
+<td>HTTPS entry point</td>
+<td><strong>Application Load Balancer</strong> + <strong>ACM</strong> certificate</td>
+</tr>
+<tr>
+<td>Database</td>
+<td><strong>Amazon RDS for PostgreSQL 16</strong></td>
+</tr>
+<tr>
+<td>Uploaded files (<code>/data/storage</code>)</td>
+<td><strong>Amazon EFS</strong> with an access point</td>
+</tr>
+<tr>
+<td>Secrets</td>
+<td><strong>AWS Secrets Manager</strong></td>
+</tr>
+<tr>
+<td>Daily jobs</td>
+<td><strong>EventBridge Scheduler</strong> running ECS tasks</td>
+</tr>
+<tr>
+<td>Backups</td>
+<td>RDS automated backups + <strong>AWS Backup</strong> for EFS</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>Status:</strong> these steps follow AWS's documented CLI and console flows. The container itself, owner mode for managed PostgreSQL, and <code>MIGRATE_ON_START</code> are tested in CI on plain PostgreSQL 16. AWS itself has not been tested end-to-end yet.</p>
+<p>Want Kubernetes on AWS instead? Use <strong>EKS</strong> with the Helm chart: <a href="../deploy-kubernetes/">deploy-kubernetes.md</a> (StorageClass <code>gp3</code>, AWS Load Balancer Controller or ingress-nginx).</p>
+<p><strong>Faster:</strong> a ready-made template creates all of this in one step. See <a href="https://github.com/E20E-Tools/ea-hub-selfhost/blob/main/deploy/cloud/README.md#aws">deploy/cloud</a>. This guide explains each piece, if you prefer to build it by hand or adapt it.</p>
+</blockquote>
+<h2 id="1-requirements">1. Requirements<a class="headerlink" href="#1-requirements" title="Permanent link">&para;</a></h2>
+<h3 id="aws-resources-and-sizing">AWS resources and sizing<a class="headerlink" href="#aws-resources-and-sizing" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Resource</th>
+<th>Starting size</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Fargate task (app)</td>
+<td><strong>1 vCPU, 2 GB</strong>, 1–3 tasks</td>
+</tr>
+<tr>
+<td>Fargate task (each daily job)</td>
+<td>0.25 vCPU, 0.5 GB, a few seconds per day</td>
+</tr>
+<tr>
+<td>RDS PostgreSQL</td>
+<td><strong>db.t4g.small</strong>, 20 GB gp3, engine <strong>16.x</strong>, single-AZ (Multi-AZ for production)</td>
+</tr>
+<tr>
+<td>EFS</td>
+<td>General Purpose, Bursting; pay per GB stored</td>
+</tr>
+<tr>
+<td>Application Load Balancer</td>
+<td>1, internet-facing, in 2 public subnets</td>
+</tr>
+</tbody>
+</table>
+<p>Rough cost at these sizes: about USD 60–90 per month in most regions.</p>
+<h3 id="tools-permissions-and-network">Tools, permissions and network<a class="headerlink" href="#tools-permissions-and-network" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Need</th>
+<th>Detail</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>AWS account</td>
+<td>IAM permissions for ECS, EC2 (VPC, security groups), RDS, EFS, ELB, ACM, Secrets Manager, IAM roles, EventBridge Scheduler, CloudWatch Logs</td>
+</tr>
+<tr>
+<td>AWS CLI v2</td>
+<td>configured with <code>aws configure</code> / SSO</td>
+</tr>
+<tr>
+<td>VPC</td>
+<td>2 <strong>public</strong> subnets (load balancer) and 2 <strong>private</strong> subnets with a NAT gateway (tasks, database, EFS). The default VPC also works for a test, with public IPs on the tasks</td>
+</tr>
+<tr>
+<td>Image</td>
+<td><code>ghcr.io/e20e-tools/ea-hub-selfhost:&lt;version&gt;</code> with a GitHub token (<code>read:packages</code>) stored in Secrets Manager, <strong>or</strong> a copy in Amazon ECR (recommended)</td>
+</tr>
+<tr>
+<td>Domain + ACM certificate</td>
+<td>for HTTPS: a domain in Route 53 or any DNS provider, and a certificate in ACM for <code>hub.example.com</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="2-variables">2. Variables<a class="headerlink" href="#2-variables" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span class="nv">REGION</span><span class="o">=</span>eu-central-1
+<span class="nv">VPC</span><span class="o">=</span>vpc-xxxxxxxx
+<span class="nv">PRIV_SUBNETS</span><span class="o">=</span>subnet-aaa,subnet-bbb<span class="w">        </span><span class="c1"># tasks, RDS, EFS</span>
+<span class="nv">PUB_SUBNETS</span><span class="o">=</span>subnet-ccc,subnet-ddd<span class="w">         </span><span class="c1"># load balancer</span>
+<span class="nv">DOMAIN</span><span class="o">=</span>hub.example.com
+<span class="nv">ACCOUNT</span><span class="o">=</span><span class="k">$(</span>aws<span class="w"> </span>sts<span class="w"> </span>get-caller-identity<span class="w"> </span>--query<span class="w"> </span>Account<span class="w"> </span>--output<span class="w"> </span>text<span class="k">)</span>
+</code></pre></div>
+<h2 id="3-copy-the-image-to-ecr-recommended">3. Copy the image to ECR (recommended)<a class="headerlink" href="#3-copy-the-image-to-ecr-recommended" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code>aws<span class="w"> </span>ecr<span class="w"> </span>create-repository<span class="w"> </span>--repository-name<span class="w"> </span>ea-hub-selfhost<span class="w"> </span>--region<span class="w"> </span><span class="nv">$REGION</span>
+aws<span class="w"> </span>ecr<span class="w"> </span>get-login-password<span class="w"> </span>--region<span class="w"> </span><span class="nv">$REGION</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>docker<span class="w"> </span>login<span class="w"> </span>--username<span class="w"> </span>AWS<span class="w"> </span>--password-stdin<span class="w"> </span><span class="nv">$ACCOUNT</span>.dkr.ecr.<span class="nv">$REGION</span>.amazonaws.com
+docker<span class="w"> </span>pull<span class="w"> </span>ghcr.io/e20e-tools/ea-hub-selfhost:&lt;version&gt;<span class="w">     </span><span class="c1"># or build it: docker build -t ea-hub-selfhost .</span>
+docker<span class="w"> </span>tag<span class="w"> </span>ghcr.io/e20e-tools/ea-hub-selfhost:&lt;version&gt;<span class="w"> </span><span class="nv">$ACCOUNT</span>.dkr.ecr.<span class="nv">$REGION</span>.amazonaws.com/ea-hub-selfhost:&lt;version&gt;
+docker<span class="w"> </span>push<span class="w"> </span><span class="nv">$ACCOUNT</span>.dkr.ecr.<span class="nv">$REGION</span>.amazonaws.com/ea-hub-selfhost:&lt;version&gt;
+<span class="nv">IMAGE</span><span class="o">=</span><span class="nv">$ACCOUNT</span>.dkr.ecr.<span class="nv">$REGION</span>.amazonaws.com/ea-hub-selfhost:&lt;version&gt;
+</code></pre></div>
+<h2 id="4-security-groups">4. Security groups<a class="headerlink" href="#4-security-groups" title="Permanent link">&para;</a></h2>
+<p>Create three security groups in the VPC:</p>
+<table>
+<thead>
+<tr>
+<th>Group</th>
+<th>Inbound rule</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>ea-hub-alb</code></td>
+<td>443 and 80 from <code>0.0.0.0/0</code></td>
+</tr>
+<tr>
+<td><code>ea-hub-app</code></td>
+<td>3000 from <code>ea-hub-alb</code></td>
+</tr>
+<tr>
+<td><code>ea-hub-data</code></td>
+<td>5432 (PostgreSQL) and 2049 (NFS/EFS) from <code>ea-hub-app</code></td>
+</tr>
+</tbody>
+</table>
+<h2 id="5-database-rds-postgresql-16">5. Database (RDS PostgreSQL 16)<a class="headerlink" href="#5-database-rds-postgresql-16" title="Permanent link">&para;</a></h2>
+<p>Console: <strong>RDS → Create database → PostgreSQL 16 → Templates: Free tier/Dev-Test</strong>. Then:</p>
+<ul>
+<li>identifier <code>ea-hub-db</code>, master user <code>eahubadmin</code>, an auto-generated or strong password</li>
+<li><code>db.t4g.small</code>, 20 GB gp3, the private subnets, security group <code>ea-hub-data</code>, <strong>Public access: No</strong></li>
+<li><strong>Initial database name: <code>eahub</code></strong></li>
+</ul>
+<p>The RDS master user is not a superuser. EA-Hub detects this and runs in <strong>owner mode</strong>: the app connects as <code>eahubadmin</code>, the owner of all tables. RDS enforces TLS, so set <code>DB_SSLMODE=require</code>.</p>
+<h2 id="6-file-storage-efs-with-an-access-point">6. File storage (EFS with an access point)<a class="headerlink" href="#6-file-storage-efs-with-an-access-point" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><span class="nv">FS</span><span class="o">=</span><span class="k">$(</span>aws<span class="w"> </span>efs<span class="w"> </span>create-file-system<span class="w"> </span>--encrypted<span class="w"> </span>--tags<span class="w"> </span><span class="nv">Key</span><span class="o">=</span>Name,Value<span class="o">=</span>ea-hub-uploads<span class="w"> </span>--query<span class="w"> </span>FileSystemId<span class="w"> </span>--output<span class="w"> </span>text<span class="k">)</span>
+<span class="k">for</span><span class="w"> </span>S<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="si">${</span><span class="nv">PRIV_SUBNETS</span><span class="p">//,/ </span><span class="si">}</span><span class="p">;</span><span class="w"> </span><span class="k">do</span><span class="w"> </span>aws<span class="w"> </span>efs<span class="w"> </span>create-mount-target<span class="w"> </span>--file-system-id<span class="w"> </span><span class="nv">$FS</span><span class="w"> </span>--subnet-id<span class="w"> </span><span class="nv">$S</span><span class="w"> </span>--security-groups<span class="w"> </span>&lt;ea-hub-data-sg-id&gt;<span class="p">;</span><span class="w"> </span><span class="k">done</span>
+<span class="nv">AP</span><span class="o">=</span><span class="k">$(</span>aws<span class="w"> </span>efs<span class="w"> </span>create-access-point<span class="w"> </span>--file-system-id<span class="w"> </span><span class="nv">$FS</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--posix-user<span class="w"> </span><span class="nv">Uid</span><span class="o">=</span><span class="m">1000</span>,Gid<span class="o">=</span><span class="m">0</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--root-directory<span class="w"> </span><span class="s1">'Path=/ea-hub,CreationInfo={OwnerUid=1000,OwnerGid=0,Permissions=775}'</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--query<span class="w"> </span>AccessPointId<span class="w"> </span>--output<span class="w"> </span>text<span class="k">)</span>
+</code></pre></div>
+<p>The access point makes every file belong to uid 1000, the user the container runs as.</p>
+<h2 id="7-secrets-secrets-manager">7. Secrets (Secrets Manager)<a class="headerlink" href="#7-secrets-secrets-manager" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code>aws<span class="w"> </span>secretsmanager<span class="w"> </span>create-secret<span class="w"> </span>--name<span class="w"> </span>ea-hub/db-password<span class="w">    </span>--secret-string<span class="w"> </span><span class="s1">'&lt;RDS master password&gt;'</span>
+aws<span class="w"> </span>secretsmanager<span class="w"> </span>create-secret<span class="w"> </span>--name<span class="w"> </span>ea-hub/enc-key<span class="w">        </span>--secret-string<span class="w"> </span><span class="s2">"</span><span class="k">$(</span>openssl<span class="w"> </span>rand<span class="w"> </span>-hex<span class="w"> </span><span class="m">32</span><span class="k">)</span><span class="s2">"</span><span class="w">   </span><span class="c1"># never change it later</span>
+aws<span class="w"> </span>secretsmanager<span class="w"> </span>create-secret<span class="w"> </span>--name<span class="w"> </span>ea-hub/cron-secret<span class="w">    </span>--secret-string<span class="w"> </span><span class="s2">"</span><span class="k">$(</span>openssl<span class="w"> </span>rand<span class="w"> </span>-hex<span class="w"> </span><span class="m">24</span><span class="k">)</span><span class="s2">"</span>
+aws<span class="w"> </span>secretsmanager<span class="w"> </span>create-secret<span class="w"> </span>--name<span class="w"> </span>ea-hub/admin-password<span class="w"> </span>--secret-string<span class="w"> </span><span class="s1">'&lt;first admin password, 10+ chars&gt;'</span>
+</code></pre></div>
+<p>The <strong>task execution role</strong> (<code>ecsTaskExecutionRole</code>) needs <code>secretsmanager:GetSecretValue</code> on <code>ea-hub/*</code>, plus the standard <code>AmazonECSTaskExecutionRolePolicy</code>.</p>
+<h2 id="8-load-balancer-and-certificate">8. Load balancer and certificate<a class="headerlink" href="#8-load-balancer-and-certificate" title="Permanent link">&para;</a></h2>
+<ol>
+<li><strong>ACM → Request certificate</strong> for <code>hub.example.com</code> (DNS validation), then wait until it shows <em>Issued</em>.</li>
+<li><strong>EC2 → Target groups → Create:</strong> type <em>IP</em>, protocol HTTP, port <strong>3000</strong>, VPC; health check path <strong><code>/healthz</code></strong>, success code 200.</li>
+<li><strong>EC2 → Load balancers → Create ALB:</strong> internet-facing, the public subnets, security group <code>ea-hub-alb</code>. Add a listener on <strong>HTTPS 443</strong> with the ACM certificate that forwards to the target group, and a listener on <strong>HTTP 80</strong> that redirects to HTTPS.</li>
+<li>Raise the <strong>idle timeout</strong> to 300 seconds (ALB → Attributes). Live chat uses long-lived connections.</li>
+<li>DNS: point <code>hub.example.com</code> to the ALB, with a Route 53 alias or a CNAME.</li>
+</ol>
+<h2 id="9-task-definition">9. Task definition<a class="headerlink" href="#9-task-definition" title="Permanent link">&para;</a></h2>
+<p>Save as <code>ea-hub-task.json</code>, replacing <code>&lt;…&gt;</code>:</p>
+<div class="highlight"><pre><span></span><code><span class="p">{</span>
+<span class="w">  </span><span class="nt">"family"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ea-hub"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"requiresCompatibilities"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"FARGATE"</span><span class="p">],</span>
+<span class="w">  </span><span class="nt">"networkMode"</span><span class="p">:</span><span class="w"> </span><span class="s2">"awsvpc"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"cpu"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1024"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"memory"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2048"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"runtimePlatform"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"cpuArchitecture"</span><span class="p">:</span><span class="w"> </span><span class="s2">"X86_64"</span><span class="p">,</span><span class="w"> </span><span class="nt">"operatingSystemFamily"</span><span class="p">:</span><span class="w"> </span><span class="s2">"LINUX"</span><span class="w"> </span><span class="p">},</span>
+<span class="w">  </span><span class="nt">"executionRoleArn"</span><span class="p">:</span><span class="w"> </span><span class="s2">"arn:aws:iam::&lt;account&gt;:role/ecsTaskExecutionRole"</span><span class="p">,</span>
+<span class="w">  </span><span class="nt">"containerDefinitions"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ea-hub"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"image"</span><span class="p">:</span><span class="w"> </span><span class="s2">"&lt;IMAGE&gt;"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"essential"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"portMappings"</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nt">"containerPort"</span><span class="p">:</span><span class="w"> </span><span class="mi">3000</span><span class="p">,</span><span class="w"> </span><span class="nt">"protocol"</span><span class="p">:</span><span class="w"> </span><span class="s2">"tcp"</span><span class="w"> </span><span class="p">}],</span>
+<span class="w">      </span><span class="nt">"environment"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="p">{</span><span class="w"> </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"APP_URL"</span><span class="p">,</span><span class="w"> </span><span class="nt">"value"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://hub.example.com"</span><span class="w"> </span><span class="p">},</span>
+<span class="w">        </span><span class="p">{</span><span class="w"> </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"DB_HOST"</span><span class="p">,</span><span class="w"> </span><span class="nt">"value"</span><span class="p">:</span><span class="w"> </span><span class="s2">"&lt;rds-endpoint&gt;.rds.amazonaws.com"</span><span class="w"> </span><span class="p">},</span>
+<span class="w">        </span><span class="p">{</span><span class="w"> </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"DB_NAME"</span><span class="p">,</span><span class="w"> </span><span class="nt">"value"</span><span class="p">:</span><span class="w"> </span><span class="s2">"eahub"</span><span class="w"> </span><span class="p">},</span>
+<span class="w">        </span><span class="p">{</span><span class="w"> </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"DB_SSLMODE"</span><span class="p">,</span><span class="w"> </span><span class="nt">"value"</span><span class="p">:</span><span class="w"> </span><span class="s2">"require"</span><span class="w"> </span><span class="p">},</span>
+<span class="w">        </span><span class="p">{</span><span class="w"> </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"APP_DB_USER"</span><span class="p">,</span><span class="w"> </span><span class="nt">"value"</span><span class="p">:</span><span class="w"> </span><span class="s2">"eahubadmin"</span><span class="w"> </span><span class="p">},</span>
+<span class="w">        </span><span class="p">{</span><span class="w"> </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"MIGRATE_ON_START"</span><span class="p">,</span><span class="w"> </span><span class="nt">"value"</span><span class="p">:</span><span class="w"> </span><span class="s2">"true"</span><span class="w"> </span><span class="p">},</span>
+<span class="w">        </span><span class="p">{</span><span class="w"> </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ADMIN_EMAIL"</span><span class="p">,</span><span class="w"> </span><span class="nt">"value"</span><span class="p">:</span><span class="w"> </span><span class="s2">"admin@yourcompany.com"</span><span class="w"> </span><span class="p">},</span>
+<span class="w">        </span><span class="p">{</span><span class="w"> </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"TRUST_PROXY_HOPS"</span><span class="p">,</span><span class="w"> </span><span class="nt">"value"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1"</span><span class="w"> </span><span class="p">}</span>
+<span class="w">      </span><span class="p">],</span>
+<span class="w">      </span><span class="nt">"secrets"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">        </span><span class="p">{</span><span class="w"> </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"APP_DB_PASSWORD"</span><span class="p">,</span><span class="w"> </span><span class="nt">"valueFrom"</span><span class="p">:</span><span class="w"> </span><span class="s2">"arn:aws:secretsmanager:&lt;region&gt;:&lt;account&gt;:secret:ea-hub/db-password"</span><span class="w"> </span><span class="p">},</span>
+<span class="w">        </span><span class="p">{</span><span class="w"> </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"APP_ENCRYPTION_KEY"</span><span class="p">,</span><span class="w"> </span><span class="nt">"valueFrom"</span><span class="p">:</span><span class="w"> </span><span class="s2">"arn:aws:secretsmanager:&lt;region&gt;:&lt;account&gt;:secret:ea-hub/enc-key"</span><span class="w"> </span><span class="p">},</span>
+<span class="w">        </span><span class="p">{</span><span class="w"> </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"CRON_SECRET"</span><span class="p">,</span><span class="w"> </span><span class="nt">"valueFrom"</span><span class="p">:</span><span class="w"> </span><span class="s2">"arn:aws:secretsmanager:&lt;region&gt;:&lt;account&gt;:secret:ea-hub/cron-secret"</span><span class="w"> </span><span class="p">},</span>
+<span class="w">        </span><span class="p">{</span><span class="w"> </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ADMIN_PASSWORD"</span><span class="p">,</span><span class="w"> </span><span class="nt">"valueFrom"</span><span class="p">:</span><span class="w"> </span><span class="s2">"arn:aws:secretsmanager:&lt;region&gt;:&lt;account&gt;:secret:ea-hub/admin-password"</span><span class="w"> </span><span class="p">}</span>
+<span class="w">      </span><span class="p">],</span>
+<span class="w">      </span><span class="nt">"mountPoints"</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span><span class="w"> </span><span class="nt">"sourceVolume"</span><span class="p">:</span><span class="w"> </span><span class="s2">"uploads"</span><span class="p">,</span><span class="w"> </span><span class="nt">"containerPath"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/data/storage"</span><span class="w"> </span><span class="p">}],</span>
+<span class="w">      </span><span class="nt">"healthCheck"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"command"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"CMD"</span><span class="p">,</span><span class="w"> </span><span class="s2">"node"</span><span class="p">,</span><span class="w"> </span><span class="s2">"-e"</span><span class="p">,</span><span class="w"> </span><span class="s2">"fetch('http://127.0.0.1:3000/healthz').then(r=&gt;process.exit(r.ok?0:1),()=&gt;process.exit(1))"</span><span class="p">],</span>
+<span class="w">        </span><span class="nt">"interval"</span><span class="p">:</span><span class="w"> </span><span class="mi">30</span><span class="p">,</span><span class="w"> </span><span class="nt">"timeout"</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w"> </span><span class="nt">"retries"</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w"> </span><span class="nt">"startPeriod"</span><span class="p">:</span><span class="w"> </span><span class="mi">120</span>
+<span class="w">      </span><span class="p">},</span>
+<span class="w">      </span><span class="nt">"logConfiguration"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"logDriver"</span><span class="p">:</span><span class="w"> </span><span class="s2">"awslogs"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"options"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"awslogs-group"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/ecs/ea-hub"</span><span class="p">,</span><span class="w"> </span><span class="nt">"awslogs-region"</span><span class="p">:</span><span class="w"> </span><span class="s2">"&lt;region&gt;"</span><span class="p">,</span><span class="w"> </span><span class="nt">"awslogs-stream-prefix"</span><span class="p">:</span><span class="w"> </span><span class="s2">"app"</span><span class="p">,</span><span class="w"> </span><span class="nt">"awslogs-create-group"</span><span class="p">:</span><span class="w"> </span><span class="s2">"true"</span><span class="w"> </span><span class="p">}</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">],</span>
+<span class="w">  </span><span class="nt">"volumes"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span>
+<span class="w">    </span><span class="p">{</span>
+<span class="w">      </span><span class="nt">"name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"uploads"</span><span class="p">,</span>
+<span class="w">      </span><span class="nt">"efsVolumeConfiguration"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span>
+<span class="w">        </span><span class="nt">"fileSystemId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"&lt;FS&gt;"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"transitEncryption"</span><span class="p">:</span><span class="w"> </span><span class="s2">"ENABLED"</span><span class="p">,</span>
+<span class="w">        </span><span class="nt">"authorizationConfig"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w"> </span><span class="nt">"accessPointId"</span><span class="p">:</span><span class="w"> </span><span class="s2">"&lt;AP&gt;"</span><span class="p">,</span><span class="w"> </span><span class="nt">"iam"</span><span class="p">:</span><span class="w"> </span><span class="s2">"DISABLED"</span><span class="w"> </span><span class="p">}</span>
+<span class="w">      </span><span class="p">}</span>
+<span class="w">    </span><span class="p">}</span>
+<span class="w">  </span><span class="p">]</span>
+<span class="p">}</span>
+</code></pre></div>
+<div class="highlight"><pre><span></span><code>aws<span class="w"> </span>ecs<span class="w"> </span>register-task-definition<span class="w"> </span>--cli-input-json<span class="w"> </span>file://ea-hub-task.json
+</code></pre></div>
+<h2 id="10-cluster-and-service">10. Cluster and service<a class="headerlink" href="#10-cluster-and-service" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code>aws<span class="w"> </span>ecs<span class="w"> </span>create-cluster<span class="w"> </span>--cluster-name<span class="w"> </span>ea-hub
+aws<span class="w"> </span>ecs<span class="w"> </span>create-service<span class="w"> </span>--cluster<span class="w"> </span>ea-hub<span class="w"> </span>--service-name<span class="w"> </span>ea-hub<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--task-definition<span class="w"> </span>ea-hub<span class="w"> </span>--desired-count<span class="w"> </span><span class="m">1</span><span class="w"> </span>--launch-type<span class="w"> </span>FARGATE<span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--health-check-grace-period-seconds<span class="w"> </span><span class="m">180</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--network-configuration<span class="w"> </span><span class="s2">"awsvpcConfiguration={subnets=[</span><span class="si">${</span><span class="nv">PRIV_SUBNETS</span><span class="si">}</span><span class="s2">],securityGroups=[&lt;ea-hub-app-sg-id&gt;],assignPublicIp=DISABLED}"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">  </span>--load-balancers<span class="w"> </span><span class="s2">"targetGroupArn=&lt;target-group-arn&gt;,containerName=ea-hub,containerPort=3000"</span>
+</code></pre></div>
+<p>Watch the first start in <strong>CloudWatch Logs → /ecs/ea-hub</strong>:</p>
+<div class="highlight"><pre><span></span><code>[migrate] 91 migrations applied in total
+[migrate] owner mode: this database does not allow BYPASSRLS …
+[migrate] admin account created
+➜ Listening on: http://0.0.0.0:3000/
+</code></pre></div>
+<h2 id="11-scheduled-jobs-eventbridge-scheduler">11. Scheduled jobs (EventBridge Scheduler)<a class="headerlink" href="#11-scheduled-jobs-eventbridge-scheduler" title="Permanent link">&para;</a></h2>
+<p>Create an IAM role <code>ea-hub-scheduler</code> that EventBridge Scheduler can assume (<code>scheduler.amazonaws.com</code>), with <code>ecs:RunTask</code> on the <code>ea-hub</code> task definition and <code>iam:PassRole</code> on <code>ecsTaskExecutionRole</code>. Then create one schedule per job:</p>
+<div class="highlight"><pre><span></span><code><span class="k">for</span><span class="w"> </span>JOB<span class="w"> </span><span class="k">in</span><span class="w"> </span><span class="s2">"newsletter|cron(0 6 * * ? *)"</span><span class="w"> </span><span class="s2">"daily-cleanup|cron(30 2 * * ? *)"</span><span class="w"> </span><span class="s2">"semantic-index|cron(15 3 * * ? *)"</span><span class="p">;</span><span class="w"> </span><span class="k">do</span>
+<span class="w">  </span><span class="nv">NAME</span><span class="o">=</span><span class="si">${</span><span class="nv">JOB</span><span class="p">%%|*</span><span class="si">}</span><span class="p">;</span><span class="w"> </span><span class="nv">EXPR</span><span class="o">=</span><span class="si">${</span><span class="nv">JOB</span><span class="p">#*|</span><span class="si">}</span>
+<span class="w">  </span>aws<span class="w"> </span>scheduler<span class="w"> </span>create-schedule<span class="w"> </span>--name<span class="w"> </span>ea-hub-<span class="nv">$NAME</span><span class="w"> </span>--schedule-expression<span class="w"> </span><span class="s2">"</span><span class="nv">$EXPR</span><span class="s2">"</span><span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--flexible-time-window<span class="w"> </span><span class="nv">Mode</span><span class="o">=</span>OFF<span class="w"> </span><span class="se">\</span>
+<span class="w">    </span>--target<span class="w"> </span><span class="s2">"{</span>
+<span class="s2">      \"Arn\": \"arn:aws:ecs:</span><span class="nv">$REGION</span><span class="s2">:</span><span class="nv">$ACCOUNT</span><span class="s2">:cluster/ea-hub\",</span>
+<span class="s2">      \"RoleArn\": \"arn:aws:iam::</span><span class="nv">$ACCOUNT</span><span class="s2">:role/ea-hub-scheduler\",</span>
+<span class="s2">      \"EcsParameters\": {</span>
+<span class="s2">        \"TaskDefinitionArn\": \"arn:aws:ecs:</span><span class="nv">$REGION</span><span class="s2">:</span><span class="nv">$ACCOUNT</span><span class="s2">:task-definition/ea-hub\",</span>
+<span class="s2">        \"LaunchType\": \"FARGATE\",</span>
+<span class="s2">        \"NetworkConfiguration\": {\"awsvpcConfiguration\": {\"Subnets\": [\"subnet-aaa\",\"subnet-bbb\"], \"SecurityGroups\": [\"&lt;ea-hub-app-sg-id&gt;\"]}}</span>
+<span class="s2">      },</span>
+<span class="s2">      \"Input\": \"{\\\"containerOverrides\\\":[{\\\"name\\\":\\\"ea-hub\\\",\\\"command\\\":[\\\"node\\\",\\\"selfhost/scripts/run-job.mjs\\\",\\\"</span><span class="nv">$NAME</span><span class="s2">\\\"],\\\"environment\\\":[{\\\"name\\\":\\\"JOB_BASE_URL\\\",\\\"value\\\":\\\"https://</span><span class="nv">$DOMAIN</span><span class="s2">\\\"},{\\\"name\\\":\\\"MIGRATE_ON_START\\\",\\\"value\\\":\\\"false\\\"}]}]}\"</span>
+<span class="s2">    }"</span>
+<span class="k">done</span>
+</code></pre></div>
+<p>The job tasks reuse the app's task definition and only call the app with <code>CRON_SECRET</code>.</p>
+<h2 id="12-open-the-site-and-sign-in">12. Open the site and sign in<a class="headerlink" href="#12-open-the-site-and-sign-in" title="Permanent link">&para;</a></h2>
+<p>Open <code>https://hub.example.com/admin</code>:</p>
+<p><img alt="Admin sign-in" src="../images/admin-sign-in.jpg" /></p>
+<p><img alt="Admin dashboard" src="../images/admin-dashboard.jpg" /></p>
+<p>Afterwards, change the password in <strong>My account</strong>, and remove the <code>ADMIN_PASSWORD</code> secret from the task definition.</p>
+<h2 id="13-operations">13. Operations<a class="headerlink" href="#13-operations" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Task</th>
+<th>How</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Upgrade</td>
+<td>push the new image tag, register a new task definition revision, <code>aws ecs update-service --cluster ea-hub --service ea-hub --task-definition ea-hub --force-new-deployment</code></td>
+</tr>
+<tr>
+<td>Logs</td>
+<td>CloudWatch Logs <code>/ecs/ea-hub</code></td>
+</tr>
+<tr>
+<td>Database backups</td>
+<td>RDS automated backups (7–35 days) and snapshots</td>
+</tr>
+<tr>
+<td>File backups</td>
+<td><strong>AWS Backup</strong> plan for the EFS file system</td>
+</tr>
+<tr>
+<td>Scale</td>
+<td><code>--desired-count 2..3</code>. EFS and RDS are shared, so this is safe</td>
+</tr>
+<tr>
+<td>Remove</td>
+<td>delete the service, cluster, ALB, target group, RDS instance, EFS, schedules and secrets</td>
+</tr>
+</tbody>
+</table>
+<h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Task stops with <code>ResourceInitializationError: unable to pull secrets</code></td>
+<td>The execution role lacks <code>secretsmanager:GetSecretValue</code>, or the private subnets have no NAT / VPC endpoints</td>
+</tr>
+<tr>
+<td><code>mount.nfs4: Connection timed out</code></td>
+<td>Port 2049 is not allowed from <code>ea-hub-app</code> to <code>ea-hub-data</code>, or there is no EFS mount target in the task's subnet</td>
+</tr>
+<tr>
+<td>Target unhealthy, task keeps restarting</td>
+<td>The first start runs migrations: keep the health-check grace period at 180 s or more</td>
+</tr>
+<tr>
+<td><code>no pg_hba.conf entry … no encryption</code></td>
+<td>Set <code>DB_SSLMODE=require</code></td>
+</tr>
+<tr>
+<td>Every visitor shares one rate limit</td>
+<td>Keep <code>TRUST_PROXY_HOPS=1</code> behind one ALB; use <code>2</code> if CloudFront is in front of the ALB</td>
+</tr>
+<tr>
+<td>Live chat updates arrive late</td>
+<td>Raise the ALB idle timeout (step 8.4)</td>
+</tr>
+</tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.sections", "navigation.top", "content.code.copy", "search.highlight"], "search": "../../assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.88dd0f4e.min.js"></script>
+      
+        <script src="../../assets/site-rtl.js"></script>
+      
+    
+  </body>
+</html>
