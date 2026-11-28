@@ -1,0 +1,116 @@
+# helm-unittest suite (https://github.com/helm-unittest/helm-unittest). Run: helm unittest deploy/helm/ea-hub
+suite: EA-Hub chart
+release:
+  name: ea-hub
+  namespace: ea-hub
+set:
+  appUrl: https://hub.example.com
+tests:
+  - it: uses fixed non-root UIDs by default
+    template: templates/deployment.yaml
+    asserts:
+      - equal: { path: spec.template.spec.securityContext.runAsUser, value: 1000 }
+      - equal: { path: spec.template.spec.securityContext.runAsNonRoot, value: true }
+
+  - it: OpenShift mode leaves UIDs to the SCC
+    template: templates/deployment.yaml
+    set:
+      openshift.enabled: true
+    asserts:
+      - notExists: { path: spec.template.spec.securityContext.runAsUser }
+      - notExists: { path: spec.template.spec.securityContext.fsGroup }
+
+  - it: OpenShift mode uses the Debian postgres image
+    template: templates/postgres.yaml
+    set:
+      openshift.enabled: true
+    documentSelector: { path: kind, value: StatefulSet }
+    asserts:
+      - equal: { path: "spec.template.spec.containers[0].image", value: "postgres:16" }
+
+  - it: OpenShift mode creates a Route
+    template: templates/route.yaml
+    set:
+      openshift.enabled: true
+    asserts:
+      - isKind: { of: Route }
+
+  - it: external database removes the built-in PostgreSQL
+    template: templates/postgres.yaml
+    set:
+      postgres.enabled: false
+      externalDatabase.host: db.example.com
+    asserts:
+      - hasDocuments: { count: 0 }
+
+  - it: generates an admin password when only the e-mail is given
+    template: templates/secret.yaml
+    set:
+      admin.email: admin@example.com
+    asserts:
+      - exists: { path: data.admin-password }
+
+  - it: no admin password without an admin e-mail
+    template: templates/secret.yaml
+    asserts:
+      - notExists: { path: data.admin-password }
+
+  - it: metrics adds a generated token
+    template: templates/secret.yaml
+    set:
+      metrics.enabled: true
+    asserts:
+      - exists: { path: data.metrics-token }
+
+  - it: no PodDisruptionBudget with a single replica
+    template: templates/monitoring-policies.yaml
+    asserts:
+      - hasDocuments: { count: 0 }
+
+  - it: PodDisruptionBudget with two replicas
+    template: templates/monitoring-policies.yaml
+    set:
+      replicaCount: 2
+      storage.accessMode: ReadWriteMany
+    asserts:
+      - isKind: { of: PodDisruptionBudget }
+      - equal: { path: spec.minAvailable, value: 1 }
+
+  - it: ServiceMonitor scrapes /metrics with the token
+    template: templates/monitoring-policies.yaml
+    set:
+      metrics.enabled: true
+      metrics.serviceMonitor.enabled: true
+    asserts:
+      - isKind: { of: ServiceMonitor }
+      - equal: { path: "spec.endpoints[0].path", value: /metrics }
+      - equal: { path: "spec.endpoints[0].authorization.credentials.key", value: metrics-token }
+
+  - it: NetworkPolicy limits PostgreSQL to this release
+    template: templates/monitoring-policies.yaml
+    set:
+      networkPolicy.enabled: true
+    documentSelector: { path: metadata.name, value: ea-hub-postgres }
+    asserts:
+      - equal: { path: "spec.ingress[0].from[0].podSelector.matchLabels[\"app.kubernetes.io/instance\"]", value: ea-hub }
+
+  - it: offsite backup runs rclone after the backup
+    template: templates/backup.yaml
+    set:
+      backup.offsite.enabled: true
+      backup.offsite.path: bucket/eahub
+      backup.offsite.credentials.access_key_id: AK
+    documentSelector: { path: kind, value: CronJob }
+    asserts:
+      - equal: { path: "spec.jobTemplate.spec.template.spec.initContainers[0].name", value: backup }
+      - equal: { path: "spec.jobTemplate.spec.template.spec.containers[0].name", value: offsite }
+      - contains:
+          path: "spec.jobTemplate.spec.template.spec.containers[0].args"
+          content: "offsite:bucket/eahub"
+
+  - it: offsite backup requires a path
+    template: templates/backup.yaml
+    set:
+      backup.offsite.enabled: true
+    asserts:
+      - failedTemplate: {}

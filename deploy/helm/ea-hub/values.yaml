@@ -158,6 +158,49 @@ backup:
     size: 20Gi
     storageClass: ""
 
+  # Copy each backup to object storage outside the cluster (S3, Azure Blob, Google Cloud
+  # Storage, MinIO…) with rclone, right after it is written. Old copies are not deleted:
+  # use the bucket's lifecycle rules for retention.
+  offsite:
+    enabled: false
+    image: rclone/rclone:1.76.0
+    # -- Destination "bucket/folder" (S3, GCS) or "container/folder" (Azure Blob).
+    path: ""
+    # -- rclone remote settings without secrets, e.g. {type: s3, provider: AWS, region: eu-central-1}
+    # or {type: s3, provider: Minio, endpoint: https://minio.example.com} or
+    # {type: azureblob, account: mystorage}. Keys follow rclone's documentation.
+    config:
+      type: s3
+      provider: AWS
+    # -- Secret settings for the remote, e.g. {access_key_id: …, secret_access_key: …} for S3
+    # or {key: …} for Azure Blob. Stored in the release Secret.
+    credentials: {}
+    # -- Or a Secret you manage: each key becomes an rclone setting, written in UPPER CASE
+    # (e.g. ACCESS_KEY_ID, SECRET_ACCESS_KEY, or KEY for Azure Blob).
+    existingSecret: ""
+
+# Prometheus metrics at /metrics (token-protected; generated token kept in the Secret).
+metrics:
+  enabled: false
+  serviceMonitor:
+    # -- Create a ServiceMonitor (needs the Prometheus Operator CRDs).
+    enabled: false
+    interval: 30s
+    labels: {}
+
+# -- Keep at least one app pod during node drains. Only rendered when replicaCount > 1.
+podDisruptionBudget:
+  enabled: true
+
+# Restrict traffic to PostgreSQL (only this release's pods may connect) and to the app
+# (only the ingress controller / router namespaces you list, plus this release's jobs).
+networkPolicy:
+  enabled: false
+  # -- Namespaces whose pods may reach the app, by label. Empty = any namespace.
+  # e.g. [{kubernetes.io/metadata.name: ingress-nginx}] or, on OpenShift,
+  # [{policy-group.network.openshift.io/ingress: ""}]
+  ingressNamespaceSelectors: []
+
 resources:
   requests: { cpu: 100m, memory: 384Mi }
   limits: { memory: 1536Mi }

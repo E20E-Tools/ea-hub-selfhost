@@ -100,6 +100,13 @@ jobs:
       - uses: azure/setup-helm@2f5e7bc67f1f9972ab16657bb795f36d8f04de0e # v5.1.0
       - name: Backup script copies match
         run: cmp selfhost/backup/backup.sh deploy/helm/ea-hub/files/backup.sh
+      - name: Chart unit tests (helm-unittest, Helm 3)
+        run: |
+          mkdir -p /tmp/helm3 && cd /tmp/helm3
+          curl -fsSL https://get.helm.sh/helm-v3.22.1-linux-amd64.tar.gz | tar xz
+          H=/tmp/helm3/linux-amd64/helm
+          $H plugin install https://github.com/helm-unittest/helm-unittest --version v1.3.0
+          cd "$GITHUB_WORKSPACE" && $H unittest deploy/helm/ea-hub
       - name: helm lint
         run: |
           helm lint deploy/helm/ea-hub --strict --set appUrl=https://hub.example.com
@@ -192,6 +199,7 @@ jobs:
             echo "CRON_SECRET=$(openssl rand -hex 24)"
             echo "EA_HUB_IMAGE=ea-hub-selfhost:ci"
             echo "WITH_LOCAL_MODEL=0"
+            echo "METRICS_TOKEN=e2e-metrics-token"
           } > .env
       - name: docker compose up (from scratch)
         run: |
@@ -247,6 +255,34 @@ jobs:
           docker compose exec -T cron node selfhost/scripts/run-job.mjs daily-cleanup
           docker compose exec -T backup sh /backup/backup.sh now
           docker compose exec -T backup sh /backup/backup.sh list | grep -E '^20'
+      - name: Metrics endpoint (token required)
+        run: |
+          test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/metrics)" = 401
+          curl -fsS -H 'authorization: Bearer e2e-metrics-token' http://localhost:8080/metrics | tee /tmp/metrics.txt
+          grep -q '^eahub_database_up 1' /tmp/metrics.txt
+      - name: Offsite copy of the backups (rclone → a test S3 server)
+        run: |
+          # A throwaway S3 server ("rclone serve s3") on the compose network, reachable as "s3test".
+          docker run -d --name s3test --network ea-hub_default rclone/rclone:1.76.0 \
+            serve s3 /data --addr :9000 --auth-key ci-s3,ci-s3-password
+          sleep 5
+          cat >> .env <<'ENV'
+          COMPOSE_PROFILES=offsite
+          OFFSITE_PATH=eahub-backups/ci
+          OFFSITE_PROVIDER=Rclone
+          OFFSITE_ENDPOINT=http://s3test:9000
+          OFFSITE_ACCESS_KEY_ID=ci-s3
+          OFFSITE_SECRET_ACCESS_KEY=ci-s3-password
+          ENV
+          docker compose run --rm --no-deps --entrypoint rclone offsite mkdir offsite:eahub-backups
+          docker compose up -d offsite
+          for i in $(seq 1 24); do
+            docker compose run --rm --no-deps --entrypoint rclone offsite ls offsite:eahub-backups/ci \
+              2>/dev/null | grep -q database.dump && break
+            sleep 5
+          done
+          docker compose logs offsite | tail -5
+          docker compose run --rm --no-deps --entrypoint rclone offsite ls offsite:eahub-backups/ci | grep database.dump
       - name: Restart keeps data (migrate is idempotent)
         run: |
           docker compose up -d --force-recreate migrate app
@@ -278,6 +314,7 @@ jobs:
             --set image.repository=ea-hub-selfhost --set image.tag=ci --set image.pullPolicy=Never \
             --set appUrl=http://localhost:8080 \
             --set admin.email=kind-admin@example.com --set admin.password=kind-admin-password \
+            --set metrics.enabled=true --set networkPolicy.enabled=true \
             --timeout 10m
           # Not --wait: with WaitForFirstConsumer storage (kind, k3s local-path, many CSI) the
           # backups PVC stays Pending until the first backup runs. Wait for the workloads.
@@ -292,6 +329,8 @@ jobs:
           curl -fsS -X POST -H 'content-type: application/json' \
             -d '{"email":"kind-admin@example.com","password":"kind-admin-password"}' \
             "http://localhost:8080/api/selfhost/auth/token?grant_type=password" | jq -e '.access_token | length > 20'
+          token=$(kubectl -n ea-hub get secret ea-hub -o jsonpath='{.data.metrics-token}' | base64 -d)
+          curl -fsS -H "authorization: Bearer $token" http://localhost:8080/metrics | grep '^eahub_database_up 1'
       - name: helm test
         run: helm test ea-hub -n ea-hub --logs --timeout 3m
       - name: CronJob and backup run

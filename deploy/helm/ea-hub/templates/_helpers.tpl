@@ -103,6 +103,9 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{ include "ea-hub.secretEnv" (dict "root" . "name" "OPENAI_API_KEY" "key" "openai-api-key" "optional" true) }}
 {{ include "ea-hub.secretEnv" (dict "root" . "name" "GROQ_API_KEY" "key" "groq-api-key" "optional" true) }}
 {{ include "ea-hub.secretEnv" (dict "root" . "name" "TURNSTILE_SECRET_KEY" "key" "turnstile-secret-key" "optional" true) }}
+{{- if .Values.metrics.enabled }}
+{{ include "ea-hub.secretEnv" (dict "root" . "name" "METRICS_TOKEN" "key" "metrics-token" "optional" true) }}
+{{- end }}
 {{- end -}}
 
 {{/* Environment of the migration step. */}}

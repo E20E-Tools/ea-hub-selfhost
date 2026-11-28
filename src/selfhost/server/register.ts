@@ -9,6 +9,7 @@ import { createServerClient } from "./client";
 import { deriveServiceKey, selfhostConfig } from "./config";
 import { installResendBridge } from "./mail";
 import { handleSelfhost, withClientIp } from "./http";
+import { countRequest } from "./metrics";
 
 function setDefault(name: string, value: string | undefined) {
   if (value !== undefined && !process.env[name]?.trim())
@@ -50,6 +51,7 @@ export async function selfhostFetch(
       );
     }
   }
+  countRequest(request.method.toUpperCase());
   const response = await handleSelfhost(request);
   if (response) return { response };
   return { request: withClientIp(request) };
