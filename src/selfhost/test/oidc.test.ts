@@ -426,6 +426,34 @@ describe("provider configuration safety", () => {
     await expect(startUrl(insecure, "/")).rejects.toThrow(/https/);
   });
 
+  it("allows an http issuer only with OIDC_ALLOW_HTTP_ISSUER=true (test labs)", async () => {
+    const lab = oidcSettings({
+      OIDC_ISSUER: "http://keycloak:8180/realms/lab",
+      OIDC_CLIENT_ID: "a",
+      OIDC_CLIENT_SECRET: "b",
+    })!;
+    await expect(startUrl(lab, "/")).rejects.toThrow(/https/);
+    process.env["OIDC_ALLOW_HTTP_ISSUER"] = "true";
+    try {
+      vi.stubGlobal(
+        "fetch",
+        vi.fn(async () =>
+          Response.json({
+            issuer: "http://keycloak:8180/realms/lab",
+            authorization_endpoint: "http://keycloak:8180/realms/lab/auth",
+            token_endpoint: "http://keycloak:8180/realms/lab/token",
+            jwks_uri: "http://keycloak:8180/realms/lab/certs",
+          }),
+        ),
+      );
+      resetOidcCaches();
+      const { url } = await startUrl(lab, "/");
+      expect(url).toMatch(/^http:\/\/keycloak:8180\/realms\/lab\/auth\?/);
+    } finally {
+      delete process.env["OIDC_ALLOW_HTTP_ISSUER"];
+    }
+  });
+
   it("ignores keys of the wrong type for the token's algorithm", async () => {
     const ec = generateKeyPairSync("ec", { namedCurve: "P-256" });
     const ecJwk = { ...ec.publicKey.export({ format: "jwk" }), kid: "k1" };

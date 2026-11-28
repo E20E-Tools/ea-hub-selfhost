@@ -74,9 +74,27 @@ export function oidcSettings(
 
 const LOCAL = /^http:\/\/(localhost|127\.0\.0\.1|\[::1\])(:\d+)?(\/|$)/;
 
-/** https only, except a provider on this machine (development and tests). */
+let warnedHttp = false;
+
+/**
+ * https only, except a provider on this machine. OIDC_ALLOW_HTTP_ISSUER=true also allows
+ * plain http (test labs only: tokens would cross the network unencrypted).
+ */
 function secureUrl(u: string): boolean {
-  return u.startsWith("https://") || LOCAL.test(u);
+  if (u.startsWith("https://") || LOCAL.test(u)) return true;
+  if (
+    process.env["OIDC_ALLOW_HTTP_ISSUER"]?.trim() === "true" &&
+    u.startsWith("http://")
+  ) {
+    if (!warnedHttp) {
+      warnedHttp = true;
+      console.warn(
+        "[selfhost] OIDC_ALLOW_HTTP_ISSUER=true: talking to the identity provider over plain http",
+      );
+    }
+    return true;
+  }
+  return false;
 }
 
 // ---------- discovery and keys ----------

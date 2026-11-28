@@ -26,3 +26,6 @@ design-lab.html
 backups
 data
 deploy/compose/caddy-data
+
+# Browser tests and their test Keycloak realm are not part of the image
+selfhost/e2e
