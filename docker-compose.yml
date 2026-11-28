@@ -23,6 +23,7 @@ x-app-env: &app-env
   APP_DB_PASSWORD: ${APP_DB_PASSWORD:?APP_DB_PASSWORD is missing — run ./setup.sh}
   APP_ENCRYPTION_KEY: ${APP_ENCRYPTION_KEY:?APP_ENCRYPTION_KEY is missing — run ./setup.sh}
   CRON_SECRET: ${CRON_SECRET:?CRON_SECRET is missing — run ./setup.sh}
+  METRICS_TOKEN: ${METRICS_TOKEN:-}
   TRUST_PROXY_HOPS: "1"
   STORAGE_MAX_UPLOAD_MB: ${STORAGE_MAX_UPLOAD_MB:-10}
   # Mail (optional). SMTP works with any provider; RESEND_API_KEY is the upstream default.
@@ -141,6 +142,35 @@ services:
     depends_on:
       db:
         condition: service_healthy
+
+  # Optional: copy ./backups to object storage outside this server every hour (rclone).
+  # Turn on with COMPOSE_PROFILES=offsite and the OFFSITE_* settings in .env.
+  offsite:
+    image: rclone/rclone:1.76.0
+    profiles: [offsite]
+    restart: unless-stopped
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        while true; do
+          rclone copy /backups "offsite:$$OFFSITE_PATH" --exclude '*.partial/**' --stats-one-line -v \
+            || echo "[offsite] copy failed"
+          sleep "$$OFFSITE_INTERVAL_SECONDS"
+        done
+    environment:
+      HOME: /tmp
+      OFFSITE_PATH: ${OFFSITE_PATH:-}
+      OFFSITE_INTERVAL_SECONDS: ${OFFSITE_INTERVAL_SECONDS:-3600}
+      RCLONE_CONFIG_OFFSITE_TYPE: ${OFFSITE_TYPE:-s3}
+      RCLONE_CONFIG_OFFSITE_PROVIDER: ${OFFSITE_PROVIDER:-AWS}
+      RCLONE_CONFIG_OFFSITE_REGION: ${OFFSITE_REGION:-}
+      RCLONE_CONFIG_OFFSITE_ENDPOINT: ${OFFSITE_ENDPOINT:-}
+      RCLONE_CONFIG_OFFSITE_ACCESS_KEY_ID: ${OFFSITE_ACCESS_KEY_ID:-}
+      RCLONE_CONFIG_OFFSITE_SECRET_ACCESS_KEY: ${OFFSITE_SECRET_ACCESS_KEY:-}
+      RCLONE_CONFIG_OFFSITE_ACCOUNT: ${OFFSITE_AZURE_ACCOUNT:-}
+      RCLONE_CONFIG_OFFSITE_KEY: ${OFFSITE_AZURE_KEY:-}
+    volumes:
+      - ./backups:/backups:ro
 
 volumes:
   db-data:

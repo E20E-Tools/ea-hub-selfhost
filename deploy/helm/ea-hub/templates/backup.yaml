@@ -1,4 +1,19 @@
 {{- if .Values.backup.enabled }}
+{{- $offsite := .Values.backup.offsite }}
+{{- if and $offsite.enabled (not $offsite.existingSecret) $offsite.credentials }}
+apiVersion: v1
+kind: Secret
+metadata:
+  name: {{ include "ea-hub.fullname" . }}-offsite
+  labels:
+    {{- include "ea-hub.labels" . | nindent 4 }}
+type: Opaque
+data:
+  {{- range $k, $v := $offsite.credentials }}
+  {{ $k | upper }}: {{ $v | b64enc }}
+  {{- end }}
+---
+{{- end }}
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -61,7 +76,12 @@ spec:
                       {{- include "ea-hub.selector" . | nindent 22 }}
                       app.kubernetes.io/component: web
           {{- end }}
+          {{- if $offsite.enabled }}
+          # The backup runs first; the rclone container then copies it off the cluster.
+          initContainers:
+          {{- else }}
           containers:
+          {{- end }}
             - name: backup
               image: {{ include "ea-hub.postgresImage" . }}
               command: ["/bin/sh", "/backup/backup.sh", "now"]
@@ -89,6 +109,40 @@ spec:
                 - name: storage
                   mountPath: /data/storage
                   readOnly: true
+          {{- if $offsite.enabled }}
+          containers:
+            - name: offsite
+              image: {{ $offsite.image }}
+              command: ["rclone"]
+              args:
+                - copy
+                - /backups
+                - "offsite:{{ required "backup.offsite.path is required (bucket/folder)" $offsite.path }}"
+                - --exclude=*.partial/**
+                - --max-age=48h
+                - --stats-one-line
+                - -v
+              env:
+                - name: HOME
+                  value: /tmp
+                {{- range $k, $v := $offsite.config }}
+                - name: RCLONE_CONFIG_OFFSITE_{{ $k | upper }}
+                  value: {{ $v | toString | quote }}
+                {{- end }}
+              {{- if or $offsite.existingSecret $offsite.credentials }}
+              envFrom:
+                - prefix: RCLONE_CONFIG_OFFSITE_
+                  secretRef:
+                    name: {{ $offsite.existingSecret | default (printf "%s-offsite" (include "ea-hub.fullname" .)) }}
+              {{- end }}
+              volumeMounts:
+                - name: backups
+                  mountPath: /backups
+                  readOnly: true
+              resources:
+                requests: { cpu: 10m, memory: 64Mi }
+                limits: { memory: 512Mi }
+          {{- end }}
           volumes:
             - name: script
               configMap:

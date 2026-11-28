@@ -5,6 +5,7 @@ import { executeSpec } from "./execute";
 import * as auth from "./auth";
 import { serveObject, StorageBucket } from "./storage";
 import { realtimeStream, type Subscription } from "./realtime";
+import { metricsResponse } from "./metrics";
 
 /**
  * HTTP endpoints of the self-hosted backend, served by the app itself under /api/selfhost/*.
@@ -100,6 +101,8 @@ export async function handleSelfhost(
   const url = new URL(request.url);
   if (url.pathname === "/healthz" || url.pathname === "/api/selfhost/health")
     return health();
+  if (url.pathname === "/metrics" && request.method === "GET")
+    return metricsResponse(request);
   if (!url.pathname.startsWith(PREFIX)) return null;
   const route = url.pathname.slice(PREFIX.length);
   const method = request.method.toUpperCase();

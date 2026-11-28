@@ -68,4 +68,27 @@ kubectl -n ea-hub run restore --rm -it --restart=Never --image=postgres:16-alpin
 kubectl -n ea-hub scale deploy/ea-hub --replicas=1
 ```
 
-لنسخ ملف النسخة إلى جهازك، استخدم `kubectl cp` من حاوية تربط القرص `ea-hub-backups`، أو اربط القرص بتخزين خارجي حسب نوع العنقود.
+لنسخ ملف النسخة إلى جهازك، استخدم `kubectl cp` من حاوية تربط القرص `ea-hub-backups`.
+
+## نسخ احتياطي خارج الخادم (موصى به)
+
+النسخ المحفوظة على الخادم نفسه تضيع إذا ضاع الخادم. لذلك يمكن نسخ كل نسخة تلقائياً إلى تخزين كائنات خارجي، مثل S3 أو MinIO أو Azure Blob أو Google Cloud Storage، باستخدام أداة rclone.
+
+**Docker Compose:** أضف إلى `.env`:
+
+```bash
+COMPOSE_PROFILES=offsite
+OFFSITE_PATH=my-bucket/ea-hub
+OFFSITE_TYPE=s3
+OFFSITE_PROVIDER=AWS          # أو Minio، أو Other لأي خدمة متوافقة مع S3
+OFFSITE_REGION=eu-central-1
+OFFSITE_ENDPOINT=             # فقط لغير AWS، مثل https://minio.example.com
+OFFSITE_ACCESS_KEY_ID=...
+OFFSITE_SECRET_ACCESS_KEY=...
+```
+
+ثم شغّل `docker compose up -d`. تنسخ خدمة `offsite` مجلد `./backups` إلى الحاوية مرة كل ساعة.
+
+**Helm:** فعّل `backup.offsite`. التفاصيل في `values.yaml`، وفي الدليل الإنجليزي `docs/en/deploy-kubernetes.md` (قسم Backup).
+
+لا تُحذف النسخ القديمة من الحاوية الخارجية، فاضبط قاعدة حذف تلقائي (lifecycle) فيها، مثلاً بعد 90 يوماً. للاستعادة، انسخ مجلد النسخة من الحاوية إلى مجلد `backups` بالأمر `rclone copy`، ثم اتبع خطوات الاستعادة أعلاه.

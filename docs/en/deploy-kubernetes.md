@@ -488,7 +488,29 @@ kubectl -n ea-hub logs job/backup-now -f
 # [backup] … saved 2026-12-01_0100 (12M)
 ```
 
-Copy backups off the cluster regularly. For example, use a pod that mounts `ea-hub-backups`, then `kubectl cp`.
+**Copy backups off the cluster.** The chart can copy each backup to object storage right after it is written (rclone: S3, MinIO, Azure Blob, Google Cloud Storage and others):
+
+```yaml
+backup:
+  offsite:
+    enabled: true
+    path: my-bucket/ea-hub            # bucket/folder (Azure: container/folder)
+    config: { type: s3, provider: AWS, region: eu-central-1 }
+    credentials: { access_key_id: "…", secret_access_key: "…" }
+    # MinIO: config: { type: s3, provider: Minio, endpoint: https://minio.example.com }
+    # Azure: config: { type: azureblob, account: mystorage }, credentials: { key: "…" }
+```
+
+Old copies are never deleted from the bucket: set a lifecycle rule there (e.g. delete after 90 days). To restore from the bucket, copy one folder back with `rclone copy <remote>:my-bucket/ea-hub/<name> ./<name>`, put it on the `ea-hub-backups` volume, and follow the restore steps.
+
+### Monitoring and network policies
+
+| Value | What it does |
+|---|---|
+| `metrics.enabled: true` | Serves Prometheus metrics at `/metrics`. A token is generated in the release Secret (`metrics-token`), and scrapers must send it as `Authorization: Bearer …` |
+| `metrics.serviceMonitor.enabled: true` | Creates a `ServiceMonitor` for the Prometheus Operator, with the token wired in |
+| `networkPolicy.enabled: true` | Only pods of this release may reach PostgreSQL. The app is reachable from the namespaces in `networkPolicy.ingressNamespaceSelectors` (any namespace when empty) |
+| `podDisruptionBudget.enabled` (on) | With `replicaCount` > 1, keeps one app pod running during node drains |
 
 ### Restore
 
