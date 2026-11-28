@@ -98,6 +98,14 @@ powershell -ExecutionPolicy Bypass -File .\setup.ps1
 
 > ⚠️ **لا تغيّر أبداً** قيمتي `APP_ENCRYPTION_KEY` و`POSTGRES_PASSWORD` بعد أول تشغيل. تغيير الأول يُخرج جميع المستخدمين ويجعل المفاتيح المحفوظة غير قابلة للقراءة، وتغيير الثاني يمنع الاتصال بالقاعدة.
 
+### تدوير الأسرار
+
+```bash
+selfhost/scripts/rotate-secrets.sh all        # أو: app-db | postgres | cron | metrics
+```
+
+يكتب السكربت قيماً عشوائية جديدة في `.env` (ويحفظ نسخة من الملف القديم باسم `.env.bak-<الوقت>`)، ويغيّر كلمات مرور القاعدة داخل PostgreSQL، ثم يعيد إنشاء الحاويات التي تستخدمها، دون أن يطبع أي قيمة. بعد تدوير `metrics` انسخ `METRICS_TOKEN` الجديد من `.env` إلى إعداد Prometheus. لا يُدوَّر `APP_ENCRYPTION_KEY` أبداً.
+
 ## الميزات الاختيارية
 
 | الميزة | ما يلزم في `.env` |

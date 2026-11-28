@@ -478,6 +478,27 @@ helm upgrade ea-hub deploy/helm/ea-hub -n ea-hub -f my-values.yaml --set image.t
 
 Database changes are applied automatically by the init container before the new version starts. Your data and files are kept.
 
+### Rotate secrets
+
+The generated passwords live in the release Secret (`ea-hub`) and are kept on upgrades, so you rotate them by changing the Secret and restarting. Never rotate `app-encryption-key`: sessions, signed links and saved keys depend on it.
+
+```bash
+new() { openssl rand -hex 24; }
+# app database password: the migrate init container sets it in PostgreSQL on start
+kubectl -n ea-hub patch secret ea-hub -p "{\"stringData\":{\"app-db-password\":\"$(new)\"}}"
+# scheduled-jobs secret and /metrics token
+kubectl -n ea-hub patch secret ea-hub -p "{\"stringData\":{\"cron-secret\":\"$(new)\",\"metrics-token\":\"$(new)\"}}"
+kubectl -n ea-hub rollout restart deploy/ea-hub && kubectl -n ea-hub rollout status deploy/ea-hub
+
+# PostgreSQL superuser (bundled database): change it in the database first, then in the Secret
+P=$(new)
+kubectl -n ea-hub exec ea-hub-postgres-0 -- psql -U postgres -qc "alter role postgres with password '$P'"
+kubectl -n ea-hub patch secret ea-hub -p "{\"stringData\":{\"postgres-password\":\"$P\"}}"
+unset P
+```
+
+CronJobs (backup, cleanup) read the Secret when they run, so they pick up new values without a restart. If you set `secrets.*` in your values file, change the value there instead and run `helm upgrade` (the pods restart on their own); for `secrets.postgresPassword`, run the `alter role` command above with the new value first. With `secrets.existingSecret`, update your own Secret (Vault, SealedSecrets…) and restart the deployment.
+
 ### Backup
 
 A backup runs every day at 01:00 UTC and keeps 14 days (`backup.schedule`, `backup.keepDays`). Each backup holds a database dump and the uploaded files. To take one now:

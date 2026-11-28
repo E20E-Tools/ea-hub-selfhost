@@ -1,0 +1,58 @@
+# Documentation site (GitHub Pages, under /docs/ next to the Helm repository).
+# Local preview: pip install -r selfhost/docs-site/requirements.txt && mkdocs serve
+site_name: EA-Hub self-host
+site_url: https://e20e-tools.github.io/ea-hub-selfhost/docs/
+repo_url: https://github.com/E20E-Tools/ea-hub-selfhost
+edit_uri: edit/main/docs/
+docs_dir: docs
+site_dir: site
+hooks:
+  - selfhost/docs-site/hooks.py
+theme:
+  name: material
+  features: [navigation.sections, navigation.top, content.code.copy, search.highlight]
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle: { icon: material/weather-night, name: Dark mode }
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle: { icon: material/weather-sunny, name: Light mode }
+extra_css: [assets/site-rtl.css]
+extra_javascript: [assets/site-rtl.js]
+markdown_extensions:
+  - admonition
+  - tables
+  - toc: { permalink: true }
+  - pymdownx.superfences
+  - pymdownx.highlight
+nav:
+  - Home: index.md
+  - English:
+      - Overview: en/README.md
+      - Docker: en/deploy-docker.md
+      - Kubernetes: en/deploy-kubernetes.md
+      - Kubernetes (local): en/deploy-kubernetes-local.md
+      - OpenShift: en/deploy-openshift.md
+      - Rancher: en/deploy-rancher.md
+      - AWS ECS Fargate: en/deploy-aws-ecs-fargate.md
+      - Azure Container Apps: en/deploy-azure-container-apps.md
+      - Google Cloud Run: en/deploy-google-cloud-run.md
+      - Single sign-on: en/single-sign-on.md
+  - العربية:
+      - Docker: install-docker.md
+      - Helm: helm.md
+      - Kubernetes: kubernetes.md
+      - Kubernetes محلي: kubernetes-local.md
+      - OpenShift: openshift.md
+      - Rancher: rancher.md
+      - GitOps: gitops.md
+      - AWS ECS Fargate: aws-ecs-fargate.md
+      - Azure Container Apps: azure-container-apps.md
+      - Google Cloud Run: google-cloud-run.md
+      - قوالب السحابة: cloud-templates.md
+      - الدخول الموحد: single-sign-on.md
+      - النسخ الاحتياطي: backup.md
+      - التحديث: updating.md
+      - البنية: architecture.md
+      - حل المشكلات: troubleshooting.md

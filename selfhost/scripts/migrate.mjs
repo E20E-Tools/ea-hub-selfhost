@@ -64,7 +64,7 @@ try {
     await sql.unsafe(`grant anon, authenticated, service_role to ${ident(owner)}`);
     log(
       `owner mode: this database does not allow BYPASSRLS (normal for managed PostgreSQL). ` +
-        `Run the app with APP_DB_USER=${owner} and that account's password (see docs/en/deploy-cloud-containers.md).`,
+        `Run the app with APP_DB_USER=${owner} and that account's password (see docs/en/README.md, settings reference).`,
     );
   } else if (appPassword && appUser !== owner) {
     const role = ident(appUser);
