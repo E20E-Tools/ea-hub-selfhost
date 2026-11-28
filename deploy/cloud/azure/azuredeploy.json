@@ -1,0 +1,448 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.49.2.45890",
+      "templateHash": "3965457437853343995"
+    }
+  },
+  "parameters": {
+    "location": {
+      "type": "string",
+      "defaultValue": "[resourceGroup().location]",
+      "metadata": {
+        "description": "Location for all resources."
+      }
+    },
+    "name": {
+      "type": "string",
+      "defaultValue": "eahub",
+      "maxLength": 12,
+      "metadata": {
+        "description": "Short name used as a prefix for resource names."
+      }
+    },
+    "image": {
+      "type": "string",
+      "defaultValue": "ghcr.io/e20e-tools/ea-hub-selfhost:1.1.0",
+      "metadata": {
+        "description": "Container image of EA-Hub."
+      }
+    },
+    "adminEmail": {
+      "type": "string",
+      "metadata": {
+        "description": "E-mail of the first admin account."
+      }
+    },
+    "adminPassword": {
+      "type": "securestring",
+      "minLength": 10,
+      "metadata": {
+        "description": "Password of the first admin account (10+ characters). Change it after the first sign-in."
+      }
+    },
+    "postgresPassword": {
+      "type": "securestring",
+      "minLength": 16,
+      "metadata": {
+        "description": "Password of the PostgreSQL admin user."
+      }
+    },
+    "encryptionKey": {
+      "type": "securestring",
+      "minLength": 32,
+      "metadata": {
+        "description": "Root secret of the app (32+ characters). Never change it after the first start."
+      }
+    },
+    "cronSecret": {
+      "type": "securestring",
+      "minLength": 16,
+      "metadata": {
+        "description": "Secret the scheduled jobs send to the app."
+      }
+    },
+    "postgresSku": {
+      "type": "string",
+      "defaultValue": "Standard_B1ms",
+      "metadata": {
+        "description": "PostgreSQL compute tier and size."
+      }
+    },
+    "postgresTier": {
+      "type": "string",
+      "defaultValue": "Burstable"
+    },
+    "appUrl": {
+      "type": "string",
+      "defaultValue": "",
+      "metadata": {
+        "description": "Your own address (https://hub.example.com) once a custom domain is bound; empty = the generated address."
+      }
+    }
+  },
+  "variables": {
+    "suffix": "[uniqueString(resourceGroup().id)]",
+    "pgAdmin": "eahubadmin",
+    "dbHost": "[format('{0}.postgres.database.azure.com', format('{0}-pg-{1}', parameters('name'), variables('suffix')))]",
+    "jobs": [
+      {
+        "name": "newsletter",
+        "cron": "0 6 * * *"
+      },
+      {
+        "name": "daily-cleanup",
+        "cron": "30 2 * * *"
+      },
+      {
+        "name": "semantic-index",
+        "cron": "15 3 * * *"
+      }
+    ]
+  },
+  "resources": [
+    {
+      "type": "Microsoft.OperationalInsights/workspaces",
+      "apiVersion": "2023-09-01",
+      "name": "[format('{0}-logs-{1}', parameters('name'), variables('suffix'))]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "sku": {
+          "name": "PerGB2018"
+        },
+        "retentionInDays": 30
+      }
+    },
+    {
+      "type": "Microsoft.App/managedEnvironments",
+      "apiVersion": "2024-03-01",
+      "name": "[format('{0}-env', parameters('name'))]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "appLogsConfiguration": {
+          "destination": "log-analytics",
+          "logAnalyticsConfiguration": {
+            "customerId": "[reference(resourceId('Microsoft.OperationalInsights/workspaces', format('{0}-logs-{1}', parameters('name'), variables('suffix'))), '2023-09-01').customerId]",
+            "sharedKey": "[listKeys(resourceId('Microsoft.OperationalInsights/workspaces', format('{0}-logs-{1}', parameters('name'), variables('suffix'))), '2023-09-01').primarySharedKey]"
+          }
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.OperationalInsights/workspaces', format('{0}-logs-{1}', parameters('name'), variables('suffix')))]"
+      ]
+    },
+    {
+      "type": "Microsoft.DBforPostgreSQL/flexibleServers",
+      "apiVersion": "2023-12-01-preview",
+      "name": "[format('{0}-pg-{1}', parameters('name'), variables('suffix'))]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "[parameters('postgresSku')]",
+        "tier": "[parameters('postgresTier')]"
+      },
+      "properties": {
+        "version": "16",
+        "administratorLogin": "[variables('pgAdmin')]",
+        "administratorLoginPassword": "[parameters('postgresPassword')]",
+        "storage": {
+          "storageSizeGB": 32
+        },
+        "backup": {
+          "backupRetentionDays": 14,
+          "geoRedundantBackup": "Disabled"
+        },
+        "highAvailability": {
+          "mode": "Disabled"
+        }
+      }
+    },
+    {
+      "type": "Microsoft.DBforPostgreSQL/flexibleServers/databases",
+      "apiVersion": "2023-12-01-preview",
+      "name": "[format('{0}/{1}', format('{0}-pg-{1}', parameters('name'), variables('suffix')), 'eahub')]",
+      "dependsOn": [
+        "[resourceId('Microsoft.DBforPostgreSQL/flexibleServers', format('{0}-pg-{1}', parameters('name'), variables('suffix')))]"
+      ]
+    },
+    {
+      "type": "Microsoft.DBforPostgreSQL/flexibleServers/firewallRules",
+      "apiVersion": "2023-12-01-preview",
+      "name": "[format('{0}/{1}', format('{0}-pg-{1}', parameters('name'), variables('suffix')), 'AllowAzureServices')]",
+      "properties": {
+        "startIpAddress": "0.0.0.0",
+        "endIpAddress": "0.0.0.0"
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.DBforPostgreSQL/flexibleServers', format('{0}-pg-{1}', parameters('name'), variables('suffix')))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts",
+      "apiVersion": "2023-05-01",
+      "name": "[toLower(format('{0}files{1}', take(parameters('name'), 8), take(variables('suffix'), 8)))]",
+      "location": "[parameters('location')]",
+      "sku": {
+        "name": "Standard_LRS"
+      },
+      "kind": "StorageV2",
+      "properties": {
+        "minimumTlsVersion": "TLS1_2",
+        "allowBlobPublicAccess": false
+      }
+    },
+    {
+      "type": "Microsoft.Storage/storageAccounts/fileServices/shares",
+      "apiVersion": "2023-05-01",
+      "name": "[format('{0}/default/uploads', toLower(format('{0}files{1}', take(parameters('name'), 8), take(variables('suffix'), 8))))]",
+      "properties": {
+        "shareQuota": 5
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.Storage/storageAccounts', toLower(format('{0}files{1}', take(parameters('name'), 8), take(variables('suffix'), 8))))]"
+      ]
+    },
+    {
+      "type": "Microsoft.App/managedEnvironments/storages",
+      "apiVersion": "2024-03-01",
+      "name": "[format('{0}/{1}', format('{0}-env', parameters('name')), 'uploads')]",
+      "properties": {
+        "azureFile": {
+          "accountName": "[toLower(format('{0}files{1}', take(parameters('name'), 8), take(variables('suffix'), 8)))]",
+          "accountKey": "[listKeys(resourceId('Microsoft.Storage/storageAccounts', toLower(format('{0}files{1}', take(parameters('name'), 8), take(variables('suffix'), 8)))), '2023-05-01').keys[0].value]",
+          "shareName": "uploads",
+          "accessMode": "ReadWrite"
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.App/managedEnvironments', format('{0}-env', parameters('name')))]",
+        "[resourceId('Microsoft.Storage/storageAccounts/fileServices/shares', split(format('{0}/default/uploads', toLower(format('{0}files{1}', take(parameters('name'), 8), take(variables('suffix'), 8)))), '/')[0], split(format('{0}/default/uploads', toLower(format('{0}files{1}', take(parameters('name'), 8), take(variables('suffix'), 8)))), '/')[1], split(format('{0}/default/uploads', toLower(format('{0}files{1}', take(parameters('name'), 8), take(variables('suffix'), 8)))), '/')[2])]",
+        "[resourceId('Microsoft.Storage/storageAccounts', toLower(format('{0}files{1}', take(parameters('name'), 8), take(variables('suffix'), 8))))]"
+      ]
+    },
+    {
+      "type": "Microsoft.App/containerApps",
+      "apiVersion": "2024-03-01",
+      "name": "[parameters('name')]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "managedEnvironmentId": "[resourceId('Microsoft.App/managedEnvironments', format('{0}-env', parameters('name')))]",
+        "configuration": {
+          "ingress": {
+            "external": true,
+            "targetPort": 3000,
+            "transport": "auto",
+            "allowInsecure": false
+          },
+          "secrets": [
+            {
+              "name": "db-password",
+              "value": "[parameters('postgresPassword')]"
+            },
+            {
+              "name": "enc-key",
+              "value": "[parameters('encryptionKey')]"
+            },
+            {
+              "name": "cron-secret",
+              "value": "[parameters('cronSecret')]"
+            },
+            {
+              "name": "admin-password",
+              "value": "[parameters('adminPassword')]"
+            }
+          ]
+        },
+        "template": {
+          "containers": [
+            {
+              "name": "ea-hub",
+              "image": "[parameters('image')]",
+              "resources": {
+                "cpu": "[json('1.0')]",
+                "memory": "2Gi"
+              },
+              "env": [
+                {
+                  "name": "APP_URL",
+                  "value": "[if(empty(parameters('appUrl')), format('https://{0}.{1}', parameters('name'), reference(resourceId('Microsoft.App/managedEnvironments', format('{0}-env', parameters('name'))), '2024-03-01').defaultDomain), parameters('appUrl'))]"
+                },
+                {
+                  "name": "DB_HOST",
+                  "value": "[variables('dbHost')]"
+                },
+                {
+                  "name": "DB_NAME",
+                  "value": "eahub"
+                },
+                {
+                  "name": "DB_SSLMODE",
+                  "value": "require"
+                },
+                {
+                  "name": "APP_DB_USER",
+                  "value": "[variables('pgAdmin')]"
+                },
+                {
+                  "name": "APP_DB_PASSWORD",
+                  "secretRef": "db-password"
+                },
+                {
+                  "name": "APP_ENCRYPTION_KEY",
+                  "secretRef": "enc-key"
+                },
+                {
+                  "name": "CRON_SECRET",
+                  "secretRef": "cron-secret"
+                },
+                {
+                  "name": "MIGRATE_ON_START",
+                  "value": "true"
+                },
+                {
+                  "name": "ADMIN_EMAIL",
+                  "value": "[parameters('adminEmail')]"
+                },
+                {
+                  "name": "ADMIN_PASSWORD",
+                  "secretRef": "admin-password"
+                },
+                {
+                  "name": "TRUST_PROXY_HOPS",
+                  "value": "1"
+                }
+              ],
+              "volumeMounts": [
+                {
+                  "volumeName": "uploads",
+                  "mountPath": "/data/storage"
+                }
+              ],
+              "probes": [
+                {
+                  "type": "Liveness",
+                  "httpGet": {
+                    "path": "/healthz",
+                    "port": 3000
+                  },
+                  "periodSeconds": 30
+                },
+                {
+                  "type": "Readiness",
+                  "httpGet": {
+                    "path": "/healthz",
+                    "port": 3000
+                  },
+                  "periodSeconds": 10
+                },
+                {
+                  "type": "Startup",
+                  "httpGet": {
+                    "path": "/healthz",
+                    "port": 3000
+                  },
+                  "periodSeconds": 10,
+                  "failureThreshold": 30
+                }
+              ]
+            }
+          ],
+          "scale": {
+            "minReplicas": 1,
+            "maxReplicas": 3
+          },
+          "volumes": [
+            {
+              "name": "uploads",
+              "storageType": "AzureFile",
+              "storageName": "uploads",
+              "mountOptions": "uid=1000,gid=0,dir_mode=0775,file_mode=0664"
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.App/managedEnvironments', format('{0}-env', parameters('name')))]",
+        "[resourceId('Microsoft.App/managedEnvironments/storages', format('{0}-env', parameters('name')), 'uploads')]",
+        "[resourceId('Microsoft.DBforPostgreSQL/flexibleServers', format('{0}-pg-{1}', parameters('name'), variables('suffix')))]",
+        "[resourceId('Microsoft.DBforPostgreSQL/flexibleServers/firewallRules', format('{0}-pg-{1}', parameters('name'), variables('suffix')), 'AllowAzureServices')]",
+        "[resourceId('Microsoft.DBforPostgreSQL/flexibleServers/databases', format('{0}-pg-{1}', parameters('name'), variables('suffix')), 'eahub')]"
+      ]
+    },
+    {
+      "copy": {
+        "name": "scheduled",
+        "count": "[length(variables('jobs'))]"
+      },
+      "type": "Microsoft.App/jobs",
+      "apiVersion": "2024-03-01",
+      "name": "[format('{0}-{1}', parameters('name'), variables('jobs')[copyIndex()].name)]",
+      "location": "[parameters('location')]",
+      "properties": {
+        "environmentId": "[resourceId('Microsoft.App/managedEnvironments', format('{0}-env', parameters('name')))]",
+        "configuration": {
+          "triggerType": "Schedule",
+          "replicaTimeout": 900,
+          "replicaRetryLimit": 1,
+          "scheduleTriggerConfig": {
+            "cronExpression": "[variables('jobs')[copyIndex()].cron]",
+            "parallelism": 1,
+            "replicaCompletionCount": 1
+          },
+          "secrets": [
+            {
+              "name": "cron-secret",
+              "value": "[parameters('cronSecret')]"
+            }
+          ]
+        },
+        "template": {
+          "containers": [
+            {
+              "name": "job",
+              "image": "[parameters('image')]",
+              "command": [
+                "node",
+                "selfhost/scripts/run-job.mjs",
+                "[variables('jobs')[copyIndex()].name]"
+              ],
+              "resources": {
+                "cpu": "[json('0.25')]",
+                "memory": "0.5Gi"
+              },
+              "env": [
+                {
+                  "name": "JOB_BASE_URL",
+                  "value": "[if(empty(parameters('appUrl')), format('https://{0}.{1}', parameters('name'), reference(resourceId('Microsoft.App/managedEnvironments', format('{0}-env', parameters('name'))), '2024-03-01').defaultDomain), parameters('appUrl'))]"
+                },
+                {
+                  "name": "CRON_SECRET",
+                  "secretRef": "cron-secret"
+                }
+              ]
+            }
+          ]
+        }
+      },
+      "dependsOn": [
+        "[resourceId('Microsoft.App/containerApps', parameters('name'))]",
+        "[resourceId('Microsoft.App/managedEnvironments', format('{0}-env', parameters('name')))]"
+      ]
+    }
+  ],
+  "outputs": {
+    "url": {
+      "type": "string",
+      "metadata": {
+        "description": "Open this address and sign in at /admin."
+      },
+      "value": "[if(empty(parameters('appUrl')), format('https://{0}.{1}', parameters('name'), reference(resourceId('Microsoft.App/managedEnvironments', format('{0}-env', parameters('name'))), '2024-03-01').defaultDomain), parameters('appUrl'))]"
+    },
+    "postgresServer": {
+      "type": "string",
+      "value": "[variables('dbHost')]"
+    }
+  }
+}
