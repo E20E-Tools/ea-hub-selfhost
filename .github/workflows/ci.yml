@@ -139,6 +139,10 @@ jobs:
           H=/tmp/helm3/linux-amd64/helm
           $H plugin install https://github.com/helm-unittest/helm-unittest --version v1.3.0
           cd "$GITHUB_WORKSPACE" && $H unittest deploy/helm/ea-hub
+      - name: checksum/secret matches the rendered Secret (no pod restart on the first upgrade)
+        run: |
+          helm template t deploy/helm/ea-hub --set appUrl=https://x.example.com --set admin.email=a@b.c > /tmp/r.yaml
+          python3 selfhost/ci/check-secret-checksum.py /tmp/r.yaml chart | tee /dev/stderr | grep -q True
       - name: helm lint
         run: |
           helm lint deploy/helm/ea-hub --strict --set appUrl=https://hub.example.com
