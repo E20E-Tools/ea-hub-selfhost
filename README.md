@@ -53,12 +53,19 @@ cd ea-hub-selfhost
 | Docker Compose | خادم واحد، الأسهل للجميع | [docs/install-docker.md](docs/install-docker.md) |
 | Helm | من لديه Kubernetes (k3s، أو AKS/EKS/GKE…) | [docs/helm.md](docs/helm.md) |
 | ملفات Kubernetes خام | Kubernetes بدون Helm | [docs/kubernetes.md](docs/kubernetes.md) |
-| **English guides**: Docker, local Kubernetes, Kubernetes (Helm/YAML), OpenShift, Rancher, Azure Container Apps, AWS ECS Fargate, Google Cloud Run | for new teams | [docs/en/README.md](docs/en/README.md) |
+| Kubernetes محلي | التجربة على جهازك: Docker Desktop وkind وminikube وk3s | [docs/kubernetes-local.md](docs/kubernetes-local.md) |
+| Red Hat OpenShift | المؤسسات التي تعتمد OpenShift أو OKD | [docs/openshift.md](docs/openshift.md) |
+| Rancher | العناقيد التي يديرها Rancher، مع تثبيت من كتالوج التطبيقات | [docs/rancher.md](docs/rancher.md) |
+| Azure Container Apps | حاويات بلا خوادم على Azure | [docs/azure-container-apps.md](docs/azure-container-apps.md) |
+| AWS ECS على Fargate | حاويات بلا خوادم على AWS | [docs/aws-ecs-fargate.md](docs/aws-ecs-fargate.md) |
+| Google Cloud Run | حاويات بلا خوادم على Google Cloud | [docs/google-cloud-run.md](docs/google-cloud-run.md) |
+| **English guides** (كل ما سبق بالإنجليزية، مع PDF وWord) | for new teams | [docs/en/README.md](docs/en/README.md) |
 
 ## إدارة التشغيل اليومي
 
 - **التحديث إلى نسخة أحدث:** [docs/updating.md](docs/updating.md)
 - **النسخ الاحتياطي والاستعادة والنقل إلى خادم آخر:** [docs/backup.md](docs/backup.md)
+- **الدخول الموحد (Entra ID وKeycloak وOkta وGoogle…):** [docs/single-sign-on.md](docs/single-sign-on.md)
 - **حل المشكلات الشائعة:** [docs/troubleshooting.md](docs/troubleshooting.md)
 - **كيف استُبدل Supabase، وما الذي تغيّر تقنياً:** [docs/architecture.md](docs/architecture.md)
 
