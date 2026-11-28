@@ -296,7 +296,7 @@ jobs:
             echo "## Install or upgrade"
             echo
             echo '```bash'
-            echo "helm upgrade --install ea-hub ${chart} --version ${version} -n ea-hub --create-namespace --reuse-values"
+            echo "helm upgrade --install ea-hub ${chart} --version ${version} -n ea-hub --create-namespace --reset-then-reuse-values"
             echo '```'
             echo
             echo "- Image: \`${image}:${version}\` (linux/amd64, linux/arm64), signed with cosign (keyless)."

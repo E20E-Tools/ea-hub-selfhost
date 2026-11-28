@@ -31,9 +31,11 @@ printf '%s\n' "${IMAGES[@]}" > "$WORK/images/list.txt"
 
 echo "[bundle] chart and files"
 helm package deploy/helm/ea-hub --version "$VERSION" --app-version "$VERSION" -d "$WORK" >/dev/null
-cp -r docker-compose.yml .env.example setup.sh setup.ps1 deploy/compose selfhost/backup "$WORK/"
-mkdir -p "$WORK/selfhost/scripts" && cp selfhost/scripts/pg-major-upgrade.sh "$WORK/selfhost/scripts/"
-mkdir -p "$WORK/selfhost" && mv "$WORK/backup" "$WORK/selfhost/backup"
+cp docker-compose.yml .env.example setup.sh setup.ps1 "$WORK/"
+mkdir -p "$WORK/deploy" "$WORK/selfhost/scripts"
+cp -r deploy/compose "$WORK/deploy/"              # same paths as in the repository
+cp -r selfhost/backup "$WORK/selfhost/"
+cp selfhost/scripts/pg-major-upgrade.sh "$WORK/selfhost/scripts/"
 cp selfhost/airgap/load.sh selfhost/airgap/README.md "$WORK/"
 sed -i "s#^EA_HUB_IMAGE=.*#EA_HUB_IMAGE=ghcr.io/e20e-tools/ea-hub-selfhost:${VERSION}#" "$WORK/.env.example"
 echo "$VERSION $ARCH $(date -u +%FT%TZ)" > "$WORK/BUNDLE"

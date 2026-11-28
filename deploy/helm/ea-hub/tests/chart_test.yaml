@@ -193,3 +193,10 @@ tests:
         documentIndex: 0
       - equal: { path: 'metadata.labels.grafana_dashboard', value: "1" }
         documentIndex: 1
+
+  - it: works with values saved by an older release (helm upgrade --reuse-values)
+    template: templates/backup.yaml
+    set:
+      backup.encryption: null
+    asserts:
+      - hasDocuments: { count: 4 }

@@ -134,7 +134,7 @@ kubectl -n ea-hub logs job/backup-now
 
 ```bash
 # after rebuilding the image with a new tag (e.g. local2) and loading it again:
-helm upgrade ea-hub deploy/helm/ea-hub -n ea-hub --reuse-values --set image.tag=local2
+helm upgrade ea-hub deploy/helm/ea-hub -n ea-hub --reset-then-reuse-values --set image.tag=local2
 
 # remove everything, including the data
 helm uninstall ea-hub -n ea-hub

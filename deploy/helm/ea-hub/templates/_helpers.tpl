@@ -198,7 +198,8 @@ capabilities:
 {{/* Pod spec of a backup run: shared by the daily CronJob and the pre-upgrade hook. */}}
 {{- define "ea-hub.backupJobSpec" -}}
 {{- $offsite := .Values.backup.offsite }}
-{{- $encrypt := .Values.backup.encryption.publicKey }}
+{{- /* dig: values saved by an older release (helm upgrade --reuse-values) lack this key. */}}
+{{- $encrypt := dig "encryption" "publicKey" "" .Values.backup }}
 backoffLimit: 1
 template:
   metadata:
