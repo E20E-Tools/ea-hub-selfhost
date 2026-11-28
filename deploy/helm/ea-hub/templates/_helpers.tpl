@@ -113,11 +113,11 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- end }}
 - name: STORAGE_BACKEND
   value: {{ .Values.storage.backend | quote }}
-{{- with .Values.tracing.otlpEndpoint }}
+{{- with (.Values.tracing | default dict).otlpEndpoint }}
 - name: OTEL_EXPORTER_OTLP_ENDPOINT
   value: {{ . | quote }}
 - name: OTEL_TRACES_SAMPLER_ARG
-  value: {{ $.Values.tracing.samplingRatio | quote }}
+  value: {{ $.Values.tracing.samplingRatio | default 1 | quote }}
 - name: OTEL_SERVICE_NAME
   value: {{ include "ea-hub.fullname" $ | quote }}
 {{ include "ea-hub.secretEnv" (dict "root" $ "name" "OTEL_EXPORTER_OTLP_HEADERS" "key" "otel-headers" "optional" true) }}
