@@ -260,20 +260,19 @@ jobs:
           test "$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8080/metrics)" = 401
           curl -fsS -H 'authorization: Bearer e2e-metrics-token' http://localhost:8080/metrics | tee /tmp/metrics.txt
           grep -q '^eahub_database_up 1' /tmp/metrics.txt
-      - name: Offsite copy of the backups (rclone → MinIO)
+      - name: Offsite copy of the backups (rclone → a test S3 server)
         run: |
-          # MinIO joins the compose network, so every compose container can reach "minio".
-          docker run -d --name minio --network ea-hub_default \
-            -e MINIO_ROOT_USER=ci-minio -e MINIO_ROOT_PASSWORD=ci-minio-password \
-            minio/minio:latest server /data
+          # A throwaway S3 server ("rclone serve s3") on the compose network, reachable as "s3test".
+          docker run -d --name s3test --network ea-hub_default rclone/rclone:1.76.0 \
+            serve s3 /data --addr :9000 --auth-key ci-s3,ci-s3-password
           sleep 5
           cat >> .env <<'ENV'
           COMPOSE_PROFILES=offsite
           OFFSITE_PATH=eahub-backups/ci
-          OFFSITE_PROVIDER=Minio
-          OFFSITE_ENDPOINT=http://minio:9000
-          OFFSITE_ACCESS_KEY_ID=ci-minio
-          OFFSITE_SECRET_ACCESS_KEY=ci-minio-password
+          OFFSITE_PROVIDER=Rclone
+          OFFSITE_ENDPOINT=http://s3test:9000
+          OFFSITE_ACCESS_KEY_ID=ci-s3
+          OFFSITE_SECRET_ACCESS_KEY=ci-s3-password
           ENV
           docker compose run --rm --no-deps --entrypoint rclone offsite mkdir offsite:eahub-backups
           docker compose up -d offsite
