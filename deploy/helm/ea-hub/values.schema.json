@@ -186,6 +186,12 @@
       "type": "object",
       "properties": {
         "beforeUpgrade": { "type": "boolean" },
+        "encryption": {
+          "type": "object",
+          "properties": {
+            "publicKey": { "type": "string", "pattern": "^$|^ea-hub-backup-pub:[A-Za-z0-9_-]{43}$" }
+          }
+        },
         "offsite": {
           "type": "object",
           "properties": {

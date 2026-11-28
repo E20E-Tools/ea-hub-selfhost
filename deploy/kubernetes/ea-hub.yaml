@@ -63,6 +63,9 @@ data:
       restore)
         name=${2:?usage: backup.sh restore <backup-folder-name>}
         dir="$BACKUPS/$name"
+        if [ ! -f "$dir/database.dump" ] && [ -f "$dir/database.dump.enc" ]; then
+          echo "backup $name is encrypted: decrypt it first (docs/backup.md, backup-crypt.mjs decrypt-dir)"; exit 1
+        fi
         [ -f "$dir/database.dump" ] || { echo "no such backup: $dir"; exit 1; }
         log "restoring database from $name …"
         # --clean replaces existing objects; roles and the Supabase-compatible schemas are

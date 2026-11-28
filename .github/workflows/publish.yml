@@ -79,7 +79,8 @@ jobs:
     permissions:
       contents: read
       packages: write
-      id-token: write # keyless cosign signature (Sigstore)
+      id-token: write # keyless cosign signature (Sigstore) and attestations
+      attestations: write
     steps:
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
@@ -118,6 +119,51 @@ jobs:
           ref="$(jq -r '.tags[0]' <<< "$DOCKER_METADATA_OUTPUT_JSON")"
           digest="$(docker buildx imagetools inspect "$ref" --format '{{json .Manifest}}' | jq -r .digest)"
           cosign sign --yes "${{ steps.name.outputs.image }}@${digest}"
+          echo "DIGEST=${digest}" >> "$GITHUB_ENV"
+      - name: Build provenance (SLSA, GitHub attestation)
+        uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-name: ${{ steps.name.outputs.image }}
+          subject-digest: ${{ env.DIGEST }}
+          push-to-registry: true
+      - name: Software bill of materials (SPDX)
+        uses: anchore/sbom-action@dfcb83b97731532d72be422cbc51ee64adb6fd56 # v0.24.4
+        with:
+          image: ${{ steps.name.outputs.image }}@${{ env.DIGEST }}
+          format: spdx-json
+          output-file: ea-hub-selfhost.spdx.json
+          upload-artifact: false
+          upload-release-assets: false
+      - name: SBOM attestation
+        uses: actions/attest-sbom@c604332985a26aa8cf1bdc465b92731239ec6b9e # v4.1.0
+        with:
+          subject-name: ${{ steps.name.outputs.image }}
+          subject-digest: ${{ env.DIGEST }}
+          sbom-path: ea-hub-selfhost.spdx.json
+          push-to-registry: true
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: sbom
+          path: ea-hub-selfhost.spdx.json
+
+  # Offline (air-gapped) installation bundles, one per architecture, attached to the release.
+  airgap:
+    if: startsWith(github.ref, 'refs/tags/v')
+    needs: [image, chart]
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        arch: [amd64, arm64]
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: azure/setup-helm@2f5e7bc67f1f9972ab16657bb795f36d8f04de0e # v5.1.0
+      - name: Build the bundle
+        run: bash selfhost/airgap/build-bundle.sh "${GITHUB_REF_NAME#v}" ${{ matrix.arch }} dist
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: airgap-${{ matrix.arch }}
+          path: dist/*
+          retention-days: 3
 
   chart:
     if: startsWith(github.ref, 'refs/tags/v')
@@ -223,7 +269,7 @@ jobs:
   # GitHub Release with generated notes and the packaged chart attached.
   release:
     if: startsWith(github.ref, 'refs/tags/v')
-    needs: [chart, helm-repo]
+    needs: [chart, helm-repo, airgap]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -231,6 +277,14 @@ jobs:
       - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: chart
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: sbom
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          pattern: airgap-*
+          merge-multiple: true
+          path: airgap
       - name: Create the release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -248,7 +302,9 @@ jobs:
             echo "- Image: \`${image}:${version}\` (linux/amd64, linux/arm64), signed with cosign (keyless)."
             echo "- Docker Compose: set \`EA_HUB_IMAGE=${image}:${version}\` in \`.env\`, then \`docker compose pull && docker compose up -d\`."
             echo "- Verify the signature: \`cosign verify ${image}:${version} --certificate-identity-regexp 'https://github.com/${GITHUB_REPOSITORY}/' --certificate-oidc-issuer https://token.actions.githubusercontent.com\`"
+            echo "- Verify the build provenance: \`gh attestation verify oci://${image}:${version} --repo ${GITHUB_REPOSITORY}\`"
+            echo "- SBOM (SPDX): \`ea-hub-selfhost.spdx.json\`. Offline install: \`ea-hub-airgap-${version}-<arch>.tar.gz\` (see selfhost/airgap/README.md)."
           } > notes.md
           gh release create "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --verify-tag \
             --title "EA-Hub self-hosted ${GITHUB_REF_NAME}" --notes-file notes.md --generate-notes \
-            ea-hub-*.tgz
+            ea-hub-*.tgz ea-hub-selfhost.spdx.json airgap/*

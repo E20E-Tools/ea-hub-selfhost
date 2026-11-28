@@ -67,6 +67,7 @@ cd ea-hub-selfhost
 
 - **التحديث إلى نسخة أحدث:** [docs/updating.md](docs/updating.md)
 - **النسخ الاحتياطي والاستعادة والنقل إلى خادم آخر:** [docs/backup.md](docs/backup.md)
+- **تثبيت دون إنترنت:** مع كل إصدار حزمة فيها كل الصور والـ chart وملفات Compose، انظر [selfhost/airgap](selfhost/airgap/README.md).
 - **الدخول الموحد (Entra ID وKeycloak وOkta وGoogle…):** [docs/single-sign-on.md](docs/single-sign-on.md)
 - **حل المشكلات الشائعة:** [docs/troubleshooting.md](docs/troubleshooting.md)
 - **كيف استُبدل Supabase، وما الذي تغيّر تقنياً:** [docs/architecture.md](docs/architecture.md)

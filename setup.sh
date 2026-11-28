@@ -243,7 +243,9 @@ echo
 if yes_no "تشغيل EA-Hub الآن؟ / Start EA-Hub now?" y; then
   info "تنزيل الصور أو بناؤها (قد يستغرق دقائق في أول مرة)… Getting images (first time takes a few minutes)…"
   IMAGE=$(old EA_HUB_IMAGE ghcr.io/e20e-tools/ea-hub-selfhost:latest)
-  if ! docker pull "$IMAGE"; then
+  if docker image inspect "$IMAGE" >/dev/null 2>&1 && ! docker pull "$IMAGE" >/dev/null 2>&1; then
+    info "استخدام الصورة الموجودة محلياً (تثبيت دون إنترنت). Using the local image (offline install)."
+  elif ! docker pull "$IMAGE"; then
     info "لا يمكن تنزيل صورة التطبيق، سيتم بناؤها محلياً. Building the app image locally…"
     docker compose build
   fi

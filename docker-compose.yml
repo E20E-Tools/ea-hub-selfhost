@@ -193,6 +193,19 @@ services:
 
   # Optional: copy ./backups to object storage outside this server every hour (rclone).
   # Turn on with COMPOSE_PROFILES=offsite and the OFFSITE_* settings in .env.
+  # Optional: encrypt every finished backup in ./backups with BACKUP_PUBLIC_KEY (within a
+  # minute) and remove the plain files. Turn on with COMPOSE_PROFILES=encrypt (or offsite,encrypt).
+  backup-crypt:
+    <<: *image
+    profiles: [encrypt]
+    restart: unless-stopped
+    user: "0:0" # the backup service writes ./backups as root
+    command: ["node", "selfhost/scripts/backup-crypt.mjs", "watch", "/backups"]
+    environment:
+      BACKUP_PUBLIC_KEY: ${BACKUP_PUBLIC_KEY:-}
+    volumes:
+      - ./backups:/backups
+
   offsite:
     image: rclone/rclone:1.76.0
     profiles: [offsite]
@@ -201,12 +214,15 @@ services:
     command:
       - |
         while true; do
-          rclone copy /backups "offsite:$$OFFSITE_PATH" --exclude '*.partial/**' --stats-one-line -v \
+          # With backup encryption on, only the encrypted files ever leave this server.
+          if [ -n "$$BACKUP_PUBLIC_KEY" ]; then ONLY="--exclude database.dump --exclude storage.tar.gz --exclude *.partial"; else ONLY=""; fi
+          rclone copy /backups "offsite:$$OFFSITE_PATH" --exclude '*.partial/**' $$ONLY --stats-one-line -v \
             || echo "[offsite] copy failed"
           sleep "$$OFFSITE_INTERVAL_SECONDS"
         done
     environment:
       HOME: /tmp
+      BACKUP_PUBLIC_KEY: ${BACKUP_PUBLIC_KEY:-}
       OFFSITE_PATH: ${OFFSITE_PATH:-}
       OFFSITE_INTERVAL_SECONDS: ${OFFSITE_INTERVAL_SECONDS:-3600}
       RCLONE_CONFIG_OFFSITE_TYPE: ${OFFSITE_TYPE:-s3}
