@@ -1,0 +1,11 @@
+apiVersion: v2
+name: ea-hub
+description: EA-Hub (self-hosted) — web app + PostgreSQL, no Supabase or Vercel needed
+type: application
+# Chart version: bump on every chart change.
+version: 0.1.0
+# Default image tag (ghcr.io/e20e-tools/ea-hub-selfhost:<appVersion>).
+appVersion: "latest"
+keywords: [ea-hub, enterprise-architecture, postgres]
+home: https://github.com/E20E-Tools/ea-hub-selfhost
+sources: [https://github.com/E20E-Tools/ea-hub-selfhost]

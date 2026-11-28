@@ -1,0 +1,18 @@
+# EA-Hub front web server (Caddy).
+#
+# SITE_ADDRESS comes from .env:
+#   hub.example.com        real domain → Caddy gets and renews a free HTTPS certificate
+#                          (ports 80 and 443 must reach this machine, DNS must point here)
+#   :80                    plain HTTP on any address (local network / testing)
+#   https://hub.internal   internal name → add "tls internal" below for a self-signed certificate
+{
+	# Leave email empty to use Let's Encrypt anonymously; set one to get expiry notices.
+	# email you@example.com
+}
+
+{$SITE_ADDRESS} {
+	encode zstd gzip
+	# The app trusts exactly one proxy hop (TRUST_PROXY_HOPS=1): this one.
+	reverse_proxy app:3000
+	# tls internal
+}

@@ -1,0 +1,107 @@
+# Keeps this self-host repository up to date with the original EA-Hub (the "upstream").
+# Every day it merges upstream/main into a branch and opens (or updates) a pull request.
+# Nothing is merged automatically: review the PR, let CI pass, then merge it.
+#
+# The upstream repository is private, so this needs a token:
+#   Settings → Secrets and variables → Actions → New repository secret
+#   UPSTREAM_TOKEN = a fine-grained token with "Contents: read" on E20E-Tools/ea-hub-v2
+#                    and "Contents", "Pull requests", "Workflows: read and write" on this repo.
+# Without the secret the job is skipped with a notice. See docs/updating.md.
+name: Upstream sync
+
+on:
+  schedule:
+    - cron: "17 4 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: upstream-sync
+  cancel-in-progress: false
+
+env:
+  UPSTREAM_REPO: E20E-Tools/ea-hub-v2
+  UPSTREAM_BRANCH: main
+  SYNC_BRANCH: upstream-sync
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check token
+        id: token
+        env:
+          UPSTREAM_TOKEN: ${{ secrets.UPSTREAM_TOKEN }}
+        run: |
+          if [ -z "$UPSTREAM_TOKEN" ]; then
+            echo "::notice::Skipped: secret UPSTREAM_TOKEN is not set (read access to $UPSTREAM_REPO). See docs/updating.md."
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v4
+        if: steps.token.outputs.ready == 'true'
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.UPSTREAM_TOKEN }}
+
+      - name: Fetch upstream
+        if: steps.token.outputs.ready == 'true'
+        env:
+          UPSTREAM_TOKEN: ${{ secrets.UPSTREAM_TOKEN }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          # Files listed with merge=ours in .gitattributes keep the self-host version.
+          git config merge.ours.driver true
+          git remote add upstream "https://x-access-token:${UPSTREAM_TOKEN}@github.com/${UPSTREAM_REPO}.git"
+          git fetch --no-tags upstream "$UPSTREAM_BRANCH"
+          echo "UPSTREAM_SHA=$(git rev-parse --short FETCH_HEAD)" >> "$GITHUB_ENV"
+          if git merge-base --is-ancestor FETCH_HEAD HEAD; then
+            echo "Already up to date with upstream."
+            echo "NOTHING=1" >> "$GITHUB_ENV"
+          fi
+
+      - name: Merge into the sync branch
+        if: steps.token.outputs.ready == 'true' && env.NOTHING != '1'
+        run: |
+          git checkout -B "$SYNC_BRANCH"
+          if git merge --no-edit -m "Merge upstream ${UPSTREAM_REPO}@${UPSTREAM_SHA}" FETCH_HEAD; then
+            echo "CONFLICTS=0" >> "$GITHUB_ENV"
+          else
+            # Never offer a mergeable PR here: the plain upstream snapshot would delete the
+            # self-host layer. Push it to a separate branch and open a DRAFT that says so;
+            # a person resolves the conflicts locally (docs/updating.md).
+            git merge --abort
+            SYNC_BRANCH="${SYNC_BRANCH}-conflicts"
+            echo "SYNC_BRANCH=$SYNC_BRANCH" >> "$GITHUB_ENV"
+            git checkout -B "$SYNC_BRANCH" FETCH_HEAD
+            echo "CONFLICTS=1" >> "$GITHUB_ENV"
+          fi
+          git push --force origin "$SYNC_BRANCH"
+
+      - name: Open or update the pull request
+        if: steps.token.outputs.ready == 'true' && env.NOTHING != '1'
+        env:
+          GH_TOKEN: ${{ secrets.UPSTREAM_TOKEN }}
+        run: |
+          if [ "$CONFLICTS" = 1 ]; then
+            note="⛔ DO NOT MERGE THIS PR. It is the plain upstream snapshot: merging it would remove the self-host layer. Resolve the conflicts locally as described in docs/updating.md, then close this PR. (لا تدمج هذا الطلب: حُلّ التعارض محلياً كما في docs/updating.md)"
+            title="DO NOT MERGE – upstream ${UPSTREAM_SHA} has conflicts"
+            draft="--draft"
+          else
+            note="✅ Merged cleanly. Review the changes and wait for CI before merging."
+            title="Sync with upstream ${UPSTREAM_SHA}"
+            draft=""
+          fi
+          body=$(printf '%s\n\nUpstream: %s@%s\n\nAutomated by .github/workflows/upstream-sync.yml' "$note" "$UPSTREAM_REPO" "$UPSTREAM_SHA")
+          existing=$(gh pr list --head "$SYNC_BRANCH" --state open --json number --jq '.[0].number')
+          if [ -n "$existing" ]; then
+            gh pr edit "$existing" --title "$title" --body "$body"
+          else
+            gh pr create $draft --head "$SYNC_BRANCH" --base main --title "$title" --body "$body"
+          fi

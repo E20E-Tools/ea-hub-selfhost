@@ -1,4 +1,6 @@
 import "./lib/error-capture";
+// Self-host: Postgres-backed replacement for Supabase (auth, data, storage, realtime).
+import { selfhostFetch } from "./selfhost/server/register";
 
 import { consumeLastCapturedError } from "./lib/error-capture";
 import { renderErrorPage } from "./lib/error-page";
@@ -61,7 +63,10 @@ function isH3SwallowedErrorBody(body: string): boolean {
 }
 
 export default {
-  async fetch(request: Request, env: unknown, ctx: unknown) {
+  async fetch(incoming: Request, env: unknown, ctx: unknown) {
+    const selfhost = await selfhostFetch(incoming);
+    if ("response" in selfhost) return selfhost.response;
+    const request = selfhost.request;
     const bounded = limitRequestBody(request);
     if ("response" in bounded) return bounded.response;
     try {

@@ -1,0 +1,19 @@
+# Values used by CI to lint/template the "real domain" case.
+appUrl: https://hub.example.com
+ingress:
+  enabled: true
+  className: nginx
+  host: hub.example.com
+  tls: true
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+admin:
+  email: admin@example.com
+  password: a-long-test-password
+smtp:
+  host: smtp.example.com
+  user: mailer
+  password: not-a-real-password
+features:
+  turnstileSiteKey: site-key
+  turnstileSecretKey: secret-key

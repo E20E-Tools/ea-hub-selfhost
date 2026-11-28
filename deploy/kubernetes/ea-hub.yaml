@@ -1,0 +1,735 @@
+# GENERATED from deploy/helm/ea-hub by deploy/kubernetes/render.sh — do not edit by hand.
+# Apply:  kubectl apply -f deploy/kubernetes/namespace.yaml
+#         kubectl apply -f my-secret.yaml        (copy of secret.example.yaml with your values)
+#         kubectl apply -n ea-hub -f deploy/kubernetes/ea-hub.yaml   (resources carry no namespace: use -n)
+# Then edit APP_URL / the Ingress host below, or better: use Helm (docs/helm.md).
+---
+# Source: ea-hub/templates/backup.yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ea-hub-backup
+  labels:
+    app.kubernetes.io/name: ea-hub
+    app.kubernetes.io/instance: ea-hub
+    app.kubernetes.io/version: "latest"
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: ea-hub-0.1.0
+data:
+  # Same file as selfhost/backup/backup.sh (CI checks they match).
+  backup.sh: |
+    #!/bin/sh
+    # EA-Hub backups (runs inside the postgres:16 image; PG* variables come from compose/Helm).
+    #
+    #   backup.sh loop              daily backup at BACKUP_HOUR_UTC, keeps BACKUP_KEEP_DAYS days
+    #   backup.sh now               one backup right now
+    #   backup.sh list              list backups
+    #   backup.sh restore <name>    restore database (+ uploads if present) from /backups/<name>
+    #
+    # A backup is a folder /backups/<YYYY-MM-DD_HHMM>/ with:
+    #   database.dump   pg_dump custom format (pg_restore can read it)
+    #   storage.tar.gz  uploaded files (when /data/storage is mounted)
+    set -eu
+    
+    BACKUPS=${BACKUP_DIR:-/backups}
+    STORAGE=${STORAGE_DIR:-/data/storage}
+    KEEP=${BACKUP_KEEP_DAYS:-14}
+    HOUR=${BACKUP_HOUR_UTC:-1}
+    
+    log() { echo "[backup] $(date -u +%FT%TZ) $*"; }
+    
+    backup_now() {
+      name=$(date -u +%Y-%m-%d_%H%M)
+      dir="$BACKUPS/$name"
+      mkdir -p "$dir.partial"
+      pg_dump --format=custom --no-owner --file="$dir.partial/database.dump"
+      if [ -d "$STORAGE" ]; then
+        tar -czf "$dir.partial/storage.tar.gz" -C "$STORAGE" .
+      fi
+      rm -rf "$dir"
+      mv "$dir.partial" "$dir"
+      log "saved $name ($(du -sh "$dir" | cut -f1))"
+      # Keep the newest backups only.
+      find "$BACKUPS" -mindepth 1 -maxdepth 1 -type d -name '20*' -mtime +"$KEEP" -exec rm -rf {} + || true
+    }
+    
+    case "${1:-now}" in
+      now)
+        backup_now
+        ;;
+      list)
+        ls -1 "$BACKUPS" | grep -v partial || echo "(no backups yet)"
+        ;;
+      restore)
+        name=${2:?usage: backup.sh restore <backup-folder-name>}
+        dir="$BACKUPS/$name"
+        [ -f "$dir/database.dump" ] || { echo "no such backup: $dir"; exit 1; }
+        log "restoring database from $name …"
+        # --clean replaces existing objects; roles and the Supabase-compatible schemas are
+        # recreated by the migrate step, so run `migrate` first on a brand-new server.
+        pg_restore --clean --if-exists --no-owner --dbname="$PGDATABASE" "$dir/database.dump" || \
+          log "pg_restore reported warnings (usually harmless 'does not exist' notices)"
+        if [ -f "$dir/storage.tar.gz" ]; then
+          if [ -w "$STORAGE" ]; then
+            log "restoring uploads …"
+            find "$STORAGE" -mindepth 1 -delete
+            tar -xzf "$dir/storage.tar.gz" -C "$STORAGE"
+          else
+            log "uploads volume is read-only here; skipped (see docs/backup.md)"
+          fi
+        fi
+        log "restore finished"
+        ;;
+      loop)
+        log "daily backups at ${HOUR}:00 UTC, keeping ${KEEP} days, into $BACKUPS"
+        last=""
+        while true; do
+          today=$(date -u +%F)
+          if [ "$(date -u +%H | sed 's/^0//')" = "$HOUR" ] && [ "$last" != "$today" ]; then
+            backup_now || log "backup failed"
+            last=$today
+          fi
+          sleep 60
+        done
+        ;;
+      *)
+        echo "usage: backup.sh loop|now|list|restore <name>"
+        exit 2
+        ;;
+    esac
+    
+
+---
+# Source: ea-hub/templates/backup.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ea-hub-backups
+  labels:
+    app.kubernetes.io/name: ea-hub
+    app.kubernetes.io/instance: ea-hub
+    app.kubernetes.io/version: "latest"
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: ea-hub-0.1.0
+  annotations:
+    helm.sh/resource-policy: keep
+spec:
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests:
+      storage: 20Gi
+
+---
+# Source: ea-hub/templates/service-ingress-pvc.yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: ea-hub-storage
+  labels:
+    app.kubernetes.io/name: ea-hub
+    app.kubernetes.io/instance: ea-hub
+    app.kubernetes.io/version: "latest"
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: ea-hub-0.1.0
+  annotations:
+    helm.sh/resource-policy: keep
+spec:
+  accessModes: [ReadWriteOnce]
+  resources:
+    requests:
+      storage: 5Gi
+
+---
+# Source: ea-hub/templates/postgres.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: ea-hub-postgres
+  labels:
+    app.kubernetes.io/name: ea-hub
+    app.kubernetes.io/instance: ea-hub
+    app.kubernetes.io/version: "latest"
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: ea-hub-0.1.0
+    app.kubernetes.io/component: database
+spec:
+  selector:
+    app.kubernetes.io/name: ea-hub
+    app.kubernetes.io/instance: ea-hub
+    app.kubernetes.io/component: database
+  ports:
+    - name: postgres
+      port: 5432
+      targetPort: postgres
+
+---
+# Source: ea-hub/templates/service-ingress-pvc.yaml
+apiVersion: v1
+kind: Service
+metadata:
+  name: ea-hub
+  labels:
+    app.kubernetes.io/name: ea-hub
+    app.kubernetes.io/instance: ea-hub
+    app.kubernetes.io/version: "latest"
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: ea-hub-0.1.0
+spec:
+  type: ClusterIP
+  selector:
+    app.kubernetes.io/name: ea-hub
+    app.kubernetes.io/instance: ea-hub
+    app.kubernetes.io/component: web
+  ports:
+    - name: http
+      port: 80
+      targetPort: http
+
+---
+# Source: ea-hub/templates/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ea-hub
+  labels:
+    app.kubernetes.io/name: ea-hub
+    app.kubernetes.io/instance: ea-hub
+    app.kubernetes.io/version: "latest"
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: ea-hub-0.1.0
+    app.kubernetes.io/component: web
+spec:
+  replicas: 1
+  # A ReadWriteOnce upload volume can only be mounted by one pod at a time.
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ea-hub
+      app.kubernetes.io/instance: ea-hub
+      app.kubernetes.io/component: web
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: ea-hub
+        app.kubernetes.io/instance: ea-hub
+        app.kubernetes.io/component: web
+      annotations:
+        checksum/secret: 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      initContainers:
+        - name: migrate
+          image: ghcr.io/e20e-tools/ea-hub-selfhost:latest
+          imagePullPolicy: IfNotPresent
+          command: ["node", "selfhost/scripts/migrate.mjs"]
+          env:
+            - name: DB_HOST
+              value: "ea-hub-postgres"
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_NAME
+              value: "eahub"
+            - name: POSTGRES_USER
+              value: "postgres"
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ea-hub
+                  key: postgres-password
+            - name: APP_DB_USER
+              value: eahub_app
+            - name: APP_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ea-hub
+                  key: app-db-password
+            - name: ADMIN_EMAIL
+              value: "admin@example.com"
+            - name: ADMIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ea-hub
+                  key: admin-password
+                  optional: true
+            - name: ADMIN_RESET_PASSWORD
+              value: "false"
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            requests: { cpu: 50m, memory: 128Mi }
+            limits: { memory: 512Mi }
+      containers:
+        - name: app
+          image: ghcr.io/e20e-tools/ea-hub-selfhost:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: http
+              containerPort: 3000
+          env:
+            - name: DB_HOST
+              value: "ea-hub-postgres"
+            - name: DB_PORT
+              value: "5432"
+            - name: DB_NAME
+              value: "eahub"
+            - name: APP_DB_USER
+              value: eahub_app
+            - name: APP_DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ea-hub
+                  key: app-db-password
+            - name: APP_ENCRYPTION_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: ea-hub
+                  key: app-encryption-key
+            - name: CRON_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: ea-hub
+                  key: cron-secret
+            - name: APP_URL
+              value: "http://ea-hub.local"
+            - name: TRUST_PROXY_HOPS
+              value: "1"
+            - name: STORAGE_MAX_UPLOAD_MB
+              value: "10"
+            - name: SMTP_HOST
+              value: ""
+            - name: SMTP_PORT
+              value: "587"
+            - name: SMTP_SECURE
+              value: "false"
+            - name: SMTP_USER
+              value: ""
+            - name: SMTP_FROM
+              value: ""
+            - name: NOTIFY_FROM
+              value: ""
+            - name: NEWSLETTER_FROM
+              value: ""
+            - name: TURNSTILE_SITE_KEY
+              value: ""
+            - name: SMTP_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ea-hub
+                  key: smtp-password
+                  optional: true
+            - name: RESEND_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: ea-hub
+                  key: resend-api-key
+                  optional: true
+            - name: OPENAI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: ea-hub
+                  key: openai-api-key
+                  optional: true
+            - name: GROQ_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: ea-hub
+                  key: groq-api-key
+                  optional: true
+            - name: TURNSTILE_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: ea-hub
+                  key: turnstile-secret-key
+                  optional: true
+          volumeMounts:
+            - name: storage
+              mountPath: /data/storage
+          startupProbe:
+            httpGet: { path: /healthz, port: http }
+            periodSeconds: 5
+            failureThreshold: 60
+          readinessProbe:
+            httpGet: { path: /healthz, port: http }
+            periodSeconds: 10
+            timeoutSeconds: 5
+          livenessProbe:
+            httpGet: { path: /healthz, port: http }
+            periodSeconds: 30
+            timeoutSeconds: 5
+            failureThreshold: 5
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+          resources:
+            limits:
+              memory: 1536Mi
+            requests:
+              cpu: 100m
+              memory: 384Mi
+      volumes:
+        - name: storage
+          persistentVolumeClaim:
+            claimName: ea-hub-storage
+
+---
+# Source: ea-hub/templates/postgres.yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: ea-hub-postgres
+  labels:
+    app.kubernetes.io/name: ea-hub
+    app.kubernetes.io/instance: ea-hub
+    app.kubernetes.io/version: "latest"
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: ea-hub-0.1.0
+    app.kubernetes.io/component: database
+spec:
+  serviceName: ea-hub-postgres
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ea-hub
+      app.kubernetes.io/instance: ea-hub
+      app.kubernetes.io/component: database
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: ea-hub
+        app.kubernetes.io/instance: ea-hub
+        app.kubernetes.io/component: database
+    spec:
+      securityContext:
+        # postgres:16-alpine runs as uid/gid 70
+        fsGroup: 70
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: postgres
+          image: postgres:16-alpine
+          ports:
+            - name: postgres
+              containerPort: 5432
+          env:
+            - name: POSTGRES_USER
+              value: postgres
+            - name: POSTGRES_DB
+              value: "eahub"
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: ea-hub
+                  key: postgres-password
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql/data
+          readinessProbe:
+            exec:
+              command: ["sh", "-c", "pg_isready -U postgres -d \"$POSTGRES_DB\""]
+            periodSeconds: 5
+          livenessProbe:
+            exec:
+              command: ["sh", "-c", "pg_isready -U postgres -d \"$POSTGRES_DB\""]
+            periodSeconds: 30
+            failureThreshold: 6
+          resources:
+            limits:
+              memory: 1Gi
+            requests:
+              cpu: 100m
+              memory: 256Mi
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: [ReadWriteOnce]
+        resources:
+          requests:
+            storage: 10Gi
+
+---
+# Source: ea-hub/templates/backup.yaml
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: ea-hub-backup
+  labels:
+    app.kubernetes.io/name: ea-hub
+    app.kubernetes.io/instance: ea-hub
+    app.kubernetes.io/version: "latest"
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: ea-hub-0.1.0
+    app.kubernetes.io/component: backup
+spec:
+  schedule: "0 1 * * *"
+  timeZone: "Etc/UTC"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: ea-hub
+            app.kubernetes.io/instance: ea-hub
+            app.kubernetes.io/component: backup
+        spec:
+          restartPolicy: Never
+          # The uploads volume is ReadWriteOnce: run next to the web pod to read it.
+          affinity:
+            podAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                - topologyKey: kubernetes.io/hostname
+                  labelSelector:
+                    matchLabels:
+                      app.kubernetes.io/name: ea-hub
+                      app.kubernetes.io/instance: ea-hub
+                      app.kubernetes.io/component: web
+          containers:
+            - name: backup
+              image: postgres:16-alpine
+              command: ["/bin/sh", "/backup/backup.sh", "now"]
+              env:
+                - name: PGHOST
+                  value: "ea-hub-postgres"
+                - name: PGPORT
+                  value: "5432"
+                - name: PGDATABASE
+                  value: "eahub"
+                - name: PGUSER
+                  value: "postgres"
+                - name: PGPASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: ea-hub
+                      key: postgres-password
+                - name: BACKUP_KEEP_DAYS
+                  value: "14"
+              volumeMounts:
+                - name: script
+                  mountPath: /backup
+                - name: backups
+                  mountPath: /backups
+                - name: storage
+                  mountPath: /data/storage
+                  readOnly: true
+          volumes:
+            - name: script
+              configMap:
+                name: ea-hub-backup
+            - name: backups
+              persistentVolumeClaim:
+                claimName: ea-hub-backups
+            - name: storage
+              persistentVolumeClaim:
+                claimName: ea-hub-storage
+
+---
+# Source: ea-hub/templates/jobs.yaml
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: ea-hub-daily-cleanup
+  labels:
+    app.kubernetes.io/name: ea-hub
+    app.kubernetes.io/instance: ea-hub
+    app.kubernetes.io/version: "latest"
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: ea-hub-0.1.0
+    app.kubernetes.io/component: cron
+spec:
+  schedule: "30 2 * * *"
+  timeZone: "Etc/UTC"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      activeDeadlineSeconds: 900
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: ea-hub
+            app.kubernetes.io/instance: ea-hub
+            app.kubernetes.io/component: cron
+        spec:
+          restartPolicy: Never
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            seccompProfile:
+              type: RuntimeDefault
+          containers:
+            - name: job
+              image: ghcr.io/e20e-tools/ea-hub-selfhost:latest
+              imagePullPolicy: IfNotPresent
+              command: ["node", "selfhost/scripts/run-job.mjs", "daily-cleanup"]
+              env:
+                - name: JOB_BASE_URL
+                  value: http://ea-hub:80
+                - name: CRON_SECRET
+                  valueFrom:
+                    secretKeyRef:
+                      name: ea-hub
+                      key: cron-secret
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop: ["ALL"]
+              resources:
+                requests: { cpu: 10m, memory: 64Mi }
+                limits: { memory: 256Mi }
+
+---
+# Source: ea-hub/templates/jobs.yaml
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: ea-hub-newsletter
+  labels:
+    app.kubernetes.io/name: ea-hub
+    app.kubernetes.io/instance: ea-hub
+    app.kubernetes.io/version: "latest"
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: ea-hub-0.1.0
+    app.kubernetes.io/component: cron
+spec:
+  schedule: "0 6 * * *"
+  timeZone: "Etc/UTC"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      activeDeadlineSeconds: 900
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: ea-hub
+            app.kubernetes.io/instance: ea-hub
+            app.kubernetes.io/component: cron
+        spec:
+          restartPolicy: Never
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            seccompProfile:
+              type: RuntimeDefault
+          containers:
+            - name: job
+              image: ghcr.io/e20e-tools/ea-hub-selfhost:latest
+              imagePullPolicy: IfNotPresent
+              command: ["node", "selfhost/scripts/run-job.mjs", "newsletter"]
+              env:
+                - name: JOB_BASE_URL
+                  value: http://ea-hub:80
+                - name: CRON_SECRET
+                  valueFrom:
+                    secretKeyRef:
+                      name: ea-hub
+                      key: cron-secret
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop: ["ALL"]
+              resources:
+                requests: { cpu: 10m, memory: 64Mi }
+                limits: { memory: 256Mi }
+
+---
+# Source: ea-hub/templates/jobs.yaml
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: ea-hub-semantic-index
+  labels:
+    app.kubernetes.io/name: ea-hub
+    app.kubernetes.io/instance: ea-hub
+    app.kubernetes.io/version: "latest"
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: ea-hub-0.1.0
+    app.kubernetes.io/component: cron
+spec:
+  schedule: "15 3 * * *"
+  timeZone: "Etc/UTC"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      activeDeadlineSeconds: 900
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/name: ea-hub
+            app.kubernetes.io/instance: ea-hub
+            app.kubernetes.io/component: cron
+        spec:
+          restartPolicy: Never
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            seccompProfile:
+              type: RuntimeDefault
+          containers:
+            - name: job
+              image: ghcr.io/e20e-tools/ea-hub-selfhost:latest
+              imagePullPolicy: IfNotPresent
+              command: ["node", "selfhost/scripts/run-job.mjs", "semantic-index"]
+              env:
+                - name: JOB_BASE_URL
+                  value: http://ea-hub:80
+                - name: CRON_SECRET
+                  valueFrom:
+                    secretKeyRef:
+                      name: ea-hub
+                      key: cron-secret
+              securityContext:
+                allowPrivilegeEscalation: false
+                capabilities:
+                  drop: ["ALL"]
+              resources:
+                requests: { cpu: 10m, memory: 64Mi }
+                limits: { memory: 256Mi }
+
+---
+# Source: ea-hub/templates/service-ingress-pvc.yaml
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ea-hub
+  labels:
+    app.kubernetes.io/name: ea-hub
+    app.kubernetes.io/instance: ea-hub
+    app.kubernetes.io/version: "latest"
+    app.kubernetes.io/managed-by: Helm
+    helm.sh/chart: ea-hub-0.1.0
+spec:
+  rules:
+    - host: "ea-hub.local"
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: ea-hub
+                port:
+                  name: http

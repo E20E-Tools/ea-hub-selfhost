@@ -1,0 +1,46 @@
+EA-Hub is being installed in namespace "{{ .Release.Namespace }}".
+تم تثبيت EA-Hub. الخطوات التالية:
+
+1) Wait until it is ready / انتظر حتى يجهز (first start runs the database setup, 1–3 minutes):
+
+   kubectl -n {{ .Release.Namespace }} rollout status deploy/{{ include "ea-hub.fullname" . }} --timeout=10m
+
+2) Open the site / افتح الموقع:
+{{- if and .Values.openshift.enabled .Values.openshift.route.enabled }}
+
+   oc -n {{ .Release.Namespace }} get route {{ include "ea-hub.fullname" . }} -o jsonpath='{.spec.host}'
+   appUrl must be https://<that host>; if it differs from "{{ .Values.appUrl }}", run helm upgrade with --set appUrl=…
+{{- else if .Values.ingress.enabled }}
+
+   {{ .Values.appUrl }}
+   (DNS for {{ .Values.ingress.host }} must point to your ingress controller.)
+{{- else }}
+
+   No ingress is enabled. To try it from your computer:
+   kubectl -n {{ .Release.Namespace }} port-forward svc/{{ include "ea-hub.fullname" . }} 8080:{{ .Values.service.port }}
+   then open http://localhost:8080   (set appUrl=http://localhost:8080 for correct links)
+{{- end }}
+
+3) Sign in / سجّل الدخول:  {{ .Values.appUrl }}/admin
+{{- if .Values.admin.email }}
+   e-mail: {{ .Values.admin.email }}  (password: the one you set in admin.password)
+{{- else }}
+   ! No admin account yet. Set admin.email and admin.password, then run `helm upgrade` again.
+   ! لا يوجد حساب مدير بعد: اضبط admin.email و admin.password ثم أعد تشغيل helm upgrade.
+{{- end }}
+
+Useful commands / أوامر مفيدة:
+   kubectl -n {{ .Release.Namespace }} logs deploy/{{ include "ea-hub.fullname" . }} -c migrate   # database setup log
+   kubectl -n {{ .Release.Namespace }} logs deploy/{{ include "ea-hub.fullname" . }} -f           # app log
+{{- if .Values.backup.enabled }}
+   kubectl -n {{ .Release.Namespace }} create job --from=cronjob/{{ include "ea-hub.fullname" . }}-backup backup-now   # backup now
+{{- end }}
+{{- if .Values.secrets.create }}
+
+Generated secrets are stored in Secret "{{ include "ea-hub.fullname" . }}" and kept on upgrade and uninstall.
+Back it up: without app-encryption-key, saved keys and sessions cannot be read.
+{{- end }}
+{{- if and .Values.storage (gt (int .Values.replicaCount) 1) (eq .Values.storage.accessMode "ReadWriteOnce") }}
+
+! replicaCount > 1 needs storage.accessMode=ReadWriteMany (uploads are shared files).
+{{- end }}

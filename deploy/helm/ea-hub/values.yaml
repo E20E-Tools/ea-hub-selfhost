@@ -1,0 +1,168 @@
+# EA-Hub Helm values. Every key is optional unless marked REQUIRED.
+# Quick start (all secrets are generated for you and kept across upgrades):
+#
+#   helm upgrade --install ea-hub ./deploy/helm/ea-hub -n ea-hub --create-namespace \
+#     --set appUrl=https://hub.example.com \
+#     --set ingress.enabled=true --set ingress.host=hub.example.com \
+#     --set admin.email=you@example.com --set admin.password='a-long-password'
+#
+# Or run ./setup.sh --helm, which asks questions and writes ea-hub-values.yaml.
+# الشرح بالعربية: docs/helm.md
+
+# -- REQUIRED. The address people open in the browser (no trailing slash). Used in links,
+# e-mails and signed file URLs.
+appUrl: "http://ea-hub.local"
+
+image:
+  repository: ghcr.io/e20e-tools/ea-hub-selfhost
+  # -- Defaults to the chart's appVersion.
+  tag: ""
+  pullPolicy: IfNotPresent
+# -- Needed when the image is private, e.g. [{name: ghcr-pull}]. See docs/helm.md.
+imagePullSecrets: []
+
+# -- Keep 1 unless storage.accessMode is ReadWriteMany (uploads are files on a volume).
+replicaCount: 1
+
+# First admin account. Created on first install only; later changes are ignored unless
+# admin.resetPassword=true (then set it back to false).
+admin:
+  email: ""
+  password: ""
+  resetPassword: false
+
+secrets:
+  # -- false = use secrets.existingSecret instead (keys listed in docs/helm.md).
+  create: true
+  # -- Name of a Secret you manage yourself (when create=false).
+  existingSecret: ""
+  # Leave empty to generate random values on first install; they are kept on upgrades.
+  postgresPassword: ""
+  appDbPassword: ""
+  # -- Never change after the first install (sessions and saved keys depend on it).
+  appEncryptionKey: ""
+  cronSecret: ""
+
+# Outgoing e-mail (password reset, notifications, newsletter). Optional.
+smtp:
+  host: ""
+  port: 587
+  # -- true for port 465 (implicit TLS)
+  secure: false
+  user: ""
+  password: ""
+  from: ""
+mail:
+  # -- Alternative to SMTP: a Resend API key.
+  resendApiKey: ""
+  notifyFrom: ""
+  newsletterFrom: ""
+
+# Optional features — each one turns on only when its key is set.
+features:
+  # -- Search by meaning (OpenAI embeddings).
+  openaiApiKey: ""
+  # -- AI assistant provider (can also be set in the admin console).
+  groqApiKey: ""
+  # -- Cloudflare Turnstile bot protection: set both or neither.
+  turnstileSiteKey: ""
+  turnstileSecretKey: ""
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: false
+  # -- e.g. nginx, traefik. Empty = cluster default.
+  className: ""
+  host: ""
+  # -- Serve HTTPS. With cert-manager add the issuer annotation below.
+  tls: false
+  # -- Defaults to <release>-tls.
+  tlsSecretName: ""
+  annotations: {}
+    # cert-manager.io/cluster-issuer: letsencrypt
+    # nginx.ingress.kubernetes.io/proxy-body-size: 12m
+
+openshift:
+  # -- Red Hat OpenShift / OKD: let the restricted SCC choose user and group IDs (no fixed
+  # UIDs in the pods), use the Debian postgres image (works with random UIDs), and publish
+  # the site with a Route. Leave ingress.enabled=false when you use the Route.
+  enabled: false
+  route:
+    enabled: true
+    # -- Empty = OpenShift generates <release>-<namespace>.<apps domain>.
+    host: ""
+    # -- Edge TLS with the router certificate; HTTP redirects to HTTPS.
+    tls: true
+    annotations: {}
+
+# -- Number of trusted reverse-proxy hops in front of the app (the ingress controller = 1).
+# Used to read the visitor IP from X-Forwarded-For for rate limiting.
+trustProxyHops: 1
+
+# Uploaded files (logos, product images, attachments).
+storage:
+  size: 5Gi
+  storageClass: ""
+  accessMode: ReadWriteOnce
+  # -- Use an existing PVC instead of creating one.
+  existingClaim: ""
+  maxUploadMb: 10
+
+# Built-in PostgreSQL (a StatefulSet with its own volume).
+postgres:
+  enabled: true
+  image: postgres:16-alpine
+  database: eahub
+  storage:
+    size: 10Gi
+    storageClass: ""
+  resources:
+    requests: { cpu: 100m, memory: 256Mi }
+    limits: { memory: 1Gi }
+
+# Your own PostgreSQL 16+ (when postgres.enabled=false). The admin user must be able to
+# create roles (the app gets its own least-privilege login role).
+externalDatabase:
+  host: ""
+  port: 5432
+  database: eahub
+  adminUser: postgres
+  # -- e.g. require
+  sslmode: ""
+
+migrate:
+  # -- Run database migrations in an init container before each app pod starts (safe to repeat).
+  initContainer: true
+  # -- Also run them as a Helm hook Job on every install/upgrade.
+  job:
+    enabled: false
+
+# Scheduled jobs (replace Vercel Cron). Times are UTC.
+cron:
+  enabled: true
+  timeZone: "Etc/UTC"
+  schedules:
+    newsletter: "0 6 * * *"
+    dailyCleanup: "30 2 * * *"
+    semanticIndex: "15 3 * * *"
+
+# Daily database + uploads backup to its own volume (built-in PostgreSQL or external).
+backup:
+  enabled: true
+  schedule: "0 1 * * *"
+  keepDays: 14
+  storage:
+    size: 20Gi
+    storageClass: ""
+
+resources:
+  requests: { cpu: 100m, memory: 384Mi }
+  limits: { memory: 1536Mi }
+
+podAnnotations: {}
+nodeSelector: {}
+tolerations: []
+affinity: {}

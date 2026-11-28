@@ -1,0 +1,96 @@
+{{- if .Values.migrate.job.enabled }}
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "ea-hub.fullname" . }}-migrate
+  labels:
+    {{- include "ea-hub.labels" . | nindent 4 }}
+    app.kubernetes.io/component: migrate
+  annotations:
+    "helm.sh/hook": post-install,post-upgrade
+    "helm.sh/hook-weight": "-5"
+    "helm.sh/hook-delete-policy": before-hook-creation,hook-succeeded
+spec:
+  backoffLimit: 6
+  template:
+    metadata:
+      labels:
+        {{- include "ea-hub.selector" . | nindent 8 }}
+        app.kubernetes.io/component: migrate
+    spec:
+      restartPolicy: OnFailure
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      securityContext:
+        runAsNonRoot: true
+        {{- if not .Values.openshift.enabled }}
+        runAsUser: 1000
+        {{- end }}
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: migrate
+          image: {{ include "ea-hub.image" . }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command: ["node", "selfhost/scripts/migrate.mjs"]
+          env:
+            {{- include "ea-hub.migrateEnv" . | nindent 12 }}
+          securityContext:
+            {{- include "ea-hub.containerSecurity" . | nindent 12 }}
+{{- end }}
+{{- if .Values.cron.enabled }}
+{{- range $job, $schedule := dict "newsletter" .Values.cron.schedules.newsletter "daily-cleanup" .Values.cron.schedules.dailyCleanup "semantic-index" .Values.cron.schedules.semanticIndex }}
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: {{ include "ea-hub.fullname" $ }}-{{ $job }}
+  labels:
+    {{- include "ea-hub.labels" $ | nindent 4 }}
+    app.kubernetes.io/component: cron
+spec:
+  schedule: {{ $schedule | quote }}
+  timeZone: {{ $.Values.cron.timeZone | quote }}
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      activeDeadlineSeconds: 900
+      template:
+        metadata:
+          labels:
+            {{- include "ea-hub.selector" $ | nindent 12 }}
+            app.kubernetes.io/component: cron
+        spec:
+          restartPolicy: Never
+          {{- with $.Values.imagePullSecrets }}
+          imagePullSecrets:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
+          securityContext:
+            runAsNonRoot: true
+            {{- if not $.Values.openshift.enabled }}
+            runAsUser: 1000
+            {{- end }}
+            seccompProfile:
+              type: RuntimeDefault
+          containers:
+            - name: job
+              image: {{ include "ea-hub.image" $ }}
+              imagePullPolicy: {{ $.Values.image.pullPolicy }}
+              command: ["node", "selfhost/scripts/run-job.mjs", {{ $job | quote }}]
+              env:
+                - name: JOB_BASE_URL
+                  value: http://{{ include "ea-hub.fullname" $ }}:{{ $.Values.service.port }}
+                {{- include "ea-hub.secretEnv" (dict "root" $ "name" "CRON_SECRET" "key" "cron-secret") | nindent 16 }}
+              securityContext:
+                {{- include "ea-hub.containerSecurity" $ | nindent 16 }}
+              resources:
+                requests: { cpu: 10m, memory: 64Mi }
+                limits: { memory: 256Mi }
+{{- end }}
+{{- end }}
