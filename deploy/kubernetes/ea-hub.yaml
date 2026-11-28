@@ -215,7 +215,7 @@ spec:
         app.kubernetes.io/instance: ea-hub
         app.kubernetes.io/component: web
       annotations:
-        checksum/secret: 7eb70257593da06f682a3ddda54a9d260d4fc514f645237f5ca74b08f8da61a6
+        checksum/secret: 01ba4719c80b6fe911b091a7c05124b64eeece964e09c058ef8f9805daca546b
     spec:
       securityContext:
         runAsNonRoot: true
