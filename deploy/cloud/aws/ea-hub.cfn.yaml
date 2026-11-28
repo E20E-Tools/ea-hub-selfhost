@@ -86,6 +86,11 @@ Resources:
       SubnetIds: !Ref PrivateSubnets
   Database:
     Type: AWS::RDS::DBInstance
+    Metadata:
+      cfn-lint:
+        config:
+          # A major version only: RDS picks the newest minor release of PostgreSQL 17.
+          ignore_checks: [W3691]
     DeletionPolicy: Snapshot
     UpdateReplacePolicy: Snapshot
     Properties:
