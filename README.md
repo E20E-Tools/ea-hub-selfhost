@@ -59,6 +59,8 @@ cd ea-hub-selfhost
 | Azure Container Apps | حاويات بلا خوادم على Azure | [docs/azure-container-apps.md](docs/azure-container-apps.md) |
 | AWS ECS على Fargate | حاويات بلا خوادم على AWS | [docs/aws-ecs-fargate.md](docs/aws-ecs-fargate.md) |
 | Google Cloud Run | حاويات بلا خوادم على Google Cloud | [docs/google-cloud-run.md](docs/google-cloud-run.md) |
+| قوالب السحابة بخطوة واحدة | Azure (زر Deploy to Azure) وAWS وGoogle | [docs/cloud-templates.md](docs/cloud-templates.md) |
+| عدة بيئات عبر GitOps | Argo CD وRancher Fleet لبيئتي الاختبار والإنتاج | [docs/gitops.md](docs/gitops.md) |
 | **English guides** (كل ما سبق بالإنجليزية، مع PDF وWord) | for new teams | [docs/en/README.md](docs/en/README.md) |
 
 ## إدارة التشغيل اليومي
