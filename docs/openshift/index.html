@@ -824,6 +824,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#ea-hub-operator" class="md-nav__link">
+    <span class="md-ellipsis">
+      بديل: مشغّل EA-Hub (Operator)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
       حل المشكلات
@@ -1226,6 +1235,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#ea-hub-operator" class="md-nav__link">
+    <span class="md-ellipsis">
+      بديل: مشغّل EA-Hub (Operator)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
       حل المشكلات
@@ -1480,6 +1498,26 @@ route.route.openshift.io/ea-hub   ea-hub.apps.cluster.example.com        ea-hub 
 <p>لاستخدام شهادتك الخاصة على الـ Route، لديك طريقتان:
 - ثبّت cert-manager Operator مع إضافة <em>openshift-routes</em>، واضبط <code>openshift.route.annotations: {cert-manager.io/issuer-name: …}</code>.
 - أو اطلب من مدير العنقود الشهادة العامة (wildcard) الخاصة بالموجّه، فتُستخدم تلقائياً.</p>
+<h2 id="ea-hub-operator">بديل: مشغّل EA-Hub (Operator)<a class="headerlink" href="#ea-hub-operator" title="Permanent link">&para;</a></h2>
+<p>بدلاً من Helm يمكنك تثبيت <strong>مشغّل EA-Hub</strong> عبر Operator Lifecycle Manager. يستخدم الـ chart نفسه: كل مورد <code>EAHub</code> تثبيت واحد، و<code>spec</code> فيه قيم الـ chart من الخطوة 6.</p>
+<p>إلى أن يُدرج المشغّل في OperatorHub، ثبّته من صورة الحزمة (bundle) لأي إصدار (يحتاج <code>operator-sdk</code>):</p>
+<div class="highlight"><pre><span></span><code>operator-sdk<span class="w"> </span>run<span class="w"> </span>bundle<span class="w"> </span>ghcr.io/e20e-tools/ea-hub-operator-bundle:&lt;version&gt;<span class="w"> </span>-n<span class="w"> </span>ea-hub-operator
+</code></pre></div>
+<p>ثم أنشئ التثبيت (لا تضع كلمات مرور في <code>spec</code>، فهي تُولَّد في الـ Secret <code>ea-hub</code>):</p>
+<div class="highlight"><pre><span></span><code>cat<span class="w"> </span><span class="s">&lt;&lt;'EOF' | oc apply -n ea-hub -f -</span>
+<span class="s">apiVersion: ea-hub.e20e-tools.github.io/v1alpha1</span>
+<span class="s">kind: EAHub</span>
+<span class="s">metadata:</span>
+<span class="s">  name: ea-hub</span>
+<span class="s">spec:</span>
+<span class="s">  appUrl: https://ea-hub.apps.example.com</span>
+<span class="s">  admin: { email: admin@example.com }</span>
+<span class="s">  openshift: { enabled: true }</span>
+<span class="s">EOF</span>
+oc<span class="w"> </span>-n<span class="w"> </span>ea-hub<span class="w"> </span>get<span class="w"> </span>eahub<span class="w">                      </span><span class="c1"># DEPLOYED True</span>
+oc<span class="w"> </span>-n<span class="w"> </span>ea-hub<span class="w"> </span>get<span class="w"> </span>secret<span class="w"> </span>ea-hub<span class="w"> </span>-o<span class="w"> </span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">'{.data.admin-password}'</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>base64<span class="w"> </span>-d
+</code></pre></div>
+<p>لتغيير إعداد استخدم <code>oc -n ea-hub edit eahub ea-hub</code> فيرقّي المشغّل التثبيت. حذف <code>EAHub</code> يزيل التثبيت، ويبقى الـ Secret الذي فيه كلمات المرور المولَّدة.</p>
 <h2 id="_3">حل المشكلات<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
 <table>
 <thead>

@@ -567,6 +567,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#alternative-the-ea-hub-operator" class="md-nav__link">
+    <span class="md-ellipsis">
+      Alternative: the EA-Hub operator
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#troubleshooting" class="md-nav__link">
     <span class="md-ellipsis">
       Troubleshooting
@@ -1226,6 +1235,15 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#alternative-the-ea-hub-operator" class="md-nav__link">
+    <span class="md-ellipsis">
+      Alternative: the EA-Hub operator
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#troubleshooting" class="md-nav__link">
     <span class="md-ellipsis">
       Troubleshooting
@@ -1473,6 +1491,26 @@ route.route.openshift.io/ea-hub   ea-hub.apps.cluster.example.com        ea-hub 
 </tbody>
 </table>
 <p>Your own certificate on the Route: install the cert-manager Operator plus the <em>openshift-routes</em> add-on, and set <code>openshift.route.annotations: {cert-manager.io/issuer-name: …}</code>. Or ask your cluster administrator for the router's wildcard certificate, which is used automatically.</p>
+<h2 id="alternative-the-ea-hub-operator">Alternative: the EA-Hub operator<a class="headerlink" href="#alternative-the-ea-hub-operator" title="Permanent link">&para;</a></h2>
+<p>Instead of Helm you can install the <strong>EA-Hub operator</strong> (Operator Lifecycle Manager). It runs the same chart: each <code>EAHub</code> resource is one installation and its <code>spec</code> holds the chart values from step 6.</p>
+<p>Until the operator is listed in OperatorHub, install it from the bundle image of a release (needs <code>operator-sdk</code>):</p>
+<div class="highlight"><pre><span></span><code>operator-sdk<span class="w"> </span>run<span class="w"> </span>bundle<span class="w"> </span>ghcr.io/e20e-tools/ea-hub-operator-bundle:&lt;version&gt;<span class="w"> </span>-n<span class="w"> </span>ea-hub-operator
+</code></pre></div>
+<p>Then create the installation (no passwords in the spec: they are generated into the Secret <code>ea-hub</code>):</p>
+<div class="highlight"><pre><span></span><code>cat<span class="w"> </span><span class="s">&lt;&lt;'EOF' | oc apply -n ea-hub -f -</span>
+<span class="s">apiVersion: ea-hub.e20e-tools.github.io/v1alpha1</span>
+<span class="s">kind: EAHub</span>
+<span class="s">metadata:</span>
+<span class="s">  name: ea-hub</span>
+<span class="s">spec:</span>
+<span class="s">  appUrl: https://ea-hub.apps.example.com</span>
+<span class="s">  admin: { email: admin@example.com }</span>
+<span class="s">  openshift: { enabled: true }</span>
+<span class="s">EOF</span>
+oc<span class="w"> </span>-n<span class="w"> </span>ea-hub<span class="w"> </span>get<span class="w"> </span>eahub<span class="w">                      </span><span class="c1"># DEPLOYED True</span>
+oc<span class="w"> </span>-n<span class="w"> </span>ea-hub<span class="w"> </span>get<span class="w"> </span>secret<span class="w"> </span>ea-hub<span class="w"> </span>-o<span class="w"> </span><span class="nv">jsonpath</span><span class="o">=</span><span class="s1">'{.data.admin-password}'</span><span class="w"> </span><span class="p">|</span><span class="w"> </span>base64<span class="w"> </span>-d
+</code></pre></div>
+<p>Change a setting with <code>oc -n ea-hub edit eahub ea-hub</code>; the operator upgrades the release. Deleting the <code>EAHub</code> removes the installation; the Secret with the generated passwords is kept.</p>
 <h2 id="troubleshooting">Troubleshooting<a class="headerlink" href="#troubleshooting" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
