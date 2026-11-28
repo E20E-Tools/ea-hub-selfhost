@@ -161,7 +161,7 @@ kubectl -n ea-hub patch secret ea-hub -p "{\"stringData\":{\"postgres-password\"
 unset P
 ```
 
-مهام CronJob (النسخ الاحتياطي والتنظيف) تقرأ الـ Secret عند كل تشغيل، فلا تحتاج إعادة تشغيل. إن كنت تضع `secrets.*` في ملف القيم فغيّرها هناك ثم شغّل `helm upgrade`. ومع `secrets.existingSecret` حدّث الـ Secret الخاص بك ثم أعد تشغيل الـ deployment.
+مهام CronJob (النسخ الاحتياطي والتنظيف) تقرأ الـ Secret عند كل تشغيل، فلا تحتاج إعادة تشغيل. إن كنت تضع `secrets.*` في ملف القيم فغيّرها هناك ثم شغّل `helm upgrade` (تُعاد الحاويات تلقائياً)؛ ومع `secrets.postgresPassword` نفّذ أمر `alter role` السابق بالقيمة الجديدة أولاً. ومع `secrets.existingSecret` حدّث الـ Secret الخاص بك ثم أعد تشغيل الـ deployment.
 
 ## الترقية
 

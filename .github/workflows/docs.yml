@@ -34,7 +34,7 @@ jobs:
     permissions:
       contents: write
     concurrency:
-      group: gh-pages
+      group: docs-pages # newer docs builds replace waiting ones; the Helm repo job retries on its own
       cancel-in-progress: false
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -54,4 +54,10 @@ jobs:
           git add -A docs
           git diff --cached --quiet && { echo "no changes"; exit 0; }
           git commit -m "Docs site ${GITHUB_SHA::7}"
-          git push "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git" HEAD:refs/heads/gh-pages
+          remote="https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${GITHUB_REPOSITORY}.git"
+          for i in 1 2 3 4 5; do   # a release may push the Helm index at the same time
+            git push "$remote" HEAD:refs/heads/gh-pages && exit 0
+            git pull --rebase "$remote" gh-pages || exit 1
+            sleep $((i * 5))
+          done
+          exit 1

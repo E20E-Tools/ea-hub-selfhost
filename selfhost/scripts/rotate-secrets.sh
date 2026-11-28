@@ -4,7 +4,7 @@
 #   selfhost/scripts/rotate-secrets.sh app-db      the app's database password (eahub_app)
 #   selfhost/scripts/rotate-secrets.sh postgres    the PostgreSQL superuser password
 #   selfhost/scripts/rotate-secrets.sh cron        the scheduled-jobs secret
-#   selfhost/scripts/rotate-secrets.sh metrics     the /metrics token (prints the new one)
+#   selfhost/scripts/rotate-secrets.sh metrics     the /metrics token (new value in .env)
 #   selfhost/scripts/rotate-secrets.sh all         all of the above
 #
 # APP_ENCRYPTION_KEY is never rotated: sessions, signed links and saved keys depend on it.
@@ -65,8 +65,11 @@ case "$WHAT" in
   all) rotate_postgres; rotate_app_db; rotate_cron; rotate_metrics ;;
   *) echo "unknown secret: $WHAT"; exit 2 ;;
 esac
-for i in $(seq 1 30); do
-  docker compose exec -T app node -e "fetch('http://127.0.0.1:3000/healthz').then(r=>process.exit(r.ok?0:1),()=>process.exit(1))" 2>/dev/null && break
+for i in $(seq 1 40); do
+  if docker compose exec -T app node -e "fetch('http://127.0.0.1:3000/healthz').then(r=>process.exit(r.ok?0:1),()=>process.exit(1))" 2>/dev/null; then
+    log "the site is healthy again"; exit 0
+  fi
   sleep 3
 done
-log "the site is healthy again"
+log "the site did not become healthy: check 'docker compose logs app' (old settings: the newest .env.bak-*)"
+exit 1

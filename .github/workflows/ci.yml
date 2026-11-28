@@ -829,6 +829,37 @@ jobs:
           # The pre-upgrade hook took a backup.
           test "$(kubectl -n ea-hub get job ea-hub-backup-before-upgrade -o jsonpath='{.status.succeeded}')" = 1
           kubectl -n ea-hub logs job/ea-hub-backup-before-upgrade -c backup | grep '\[backup\].*saved'
+      - name: Rotate secrets as documented (docs/en/deploy-kubernetes.md)
+        run: |
+          get() { kubectl -n ea-hub get secret ea-hub -o jsonpath="{.data.$1}"; }
+          old_db=$(get app-db-password); old_pg=$(get postgres-password); old_metrics=$(get metrics-token)
+          # --- the documented commands, verbatim ---
+          new() { openssl rand -hex 24; }
+          kubectl -n ea-hub patch secret ea-hub -p "{\"stringData\":{\"app-db-password\":\"$(new)\"}}"
+          kubectl -n ea-hub patch secret ea-hub -p "{\"stringData\":{\"cron-secret\":\"$(new)\",\"metrics-token\":\"$(new)\"}}"
+          kubectl -n ea-hub rollout restart deploy/ea-hub && kubectl -n ea-hub rollout status deploy/ea-hub
+          P=$(new)
+          kubectl -n ea-hub exec ea-hub-postgres-0 -- psql -U postgres -qc "alter role postgres with password '$P'"
+          kubectl -n ea-hub patch secret ea-hub -p "{\"stringData\":{\"postgres-password\":\"$P\"}}"
+          unset P
+          # --- checks ---
+          test "$(get app-db-password)" != "$old_db"; test "$(get postgres-password)" != "$old_pg"
+          kubectl -n ea-hub port-forward svc/ea-hub 8081:80 >/dev/null 2>&1 &
+          sleep 5
+          curl -fsS -X POST -H 'content-type: application/json' \
+            -d '{"email":"kind-admin@example.com","password":"kind-admin-password"}' \
+            "http://localhost:8081/api/selfhost/auth/token?grant_type=password" | jq -e '.access_token | length > 20'
+          curl -fsS -H "authorization: Bearer $(get metrics-token | base64 -d)" http://localhost:8081/metrics | grep '^eahub_database_up 1'
+          test "$(curl -s -o /dev/null -w '%{http_code}' -H "authorization: Bearer $(echo "$old_metrics" | base64 -d)" http://localhost:8081/metrics)" = 401
+          # CronJobs pick up the new values: a backup with the new superuser password, a job with the new cron secret.
+          kubectl -n ea-hub create job --from=cronjob/ea-hub-backup backup-rotated
+          kubectl -n ea-hub create job --from=cronjob/ea-hub-daily-cleanup cleanup-rotated
+          kubectl -n ea-hub wait --for=condition=complete job/backup-rotated job/cleanup-rotated --timeout=5m
+          # A later upgrade keeps the rotated values.
+          db=$(get app-db-password); pg=$(get postgres-password)
+          helm upgrade ea-hub deploy/helm/ea-hub -n ea-hub --reset-then-reuse-values --timeout 10m
+          kubectl -n ea-hub rollout status deploy/ea-hub --timeout=10m
+          test "$(get app-db-password)" = "$db"; test "$(get postgres-password)" = "$pg"
       - name: Diagnostics on failure
         if: failure()
         run: |

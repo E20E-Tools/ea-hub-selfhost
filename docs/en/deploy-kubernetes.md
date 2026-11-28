@@ -497,7 +497,7 @@ kubectl -n ea-hub patch secret ea-hub -p "{\"stringData\":{\"postgres-password\"
 unset P
 ```
 
-CronJobs (backup, cleanup) read the Secret when they run, so they pick up new values without a restart. If you set `secrets.*` in your values file, change the value there instead and run `helm upgrade`. With `secrets.existingSecret`, update your own Secret (Vault, SealedSecrets…) and restart the deployment.
+CronJobs (backup, cleanup) read the Secret when they run, so they pick up new values without a restart. If you set `secrets.*` in your values file, change the value there instead and run `helm upgrade` (the pods restart on their own); for `secrets.postgresPassword`, run the `alter role` command above with the new value first. With `secrets.existingSecret`, update your own Secret (Vault, SealedSecrets…) and restart the deployment.
 
 ### Backup
 
