@@ -51,7 +51,7 @@ x-image: &image
 
 services:
   db:
-    image: postgres:16-alpine
+    image: postgres:19-alpine
     restart: unless-stopped
     environment:
       POSTGRES_USER: postgres
@@ -124,7 +124,7 @@ services:
         condition: service_healthy
 
   backup:
-    image: postgres:16-alpine
+    image: postgres:19-alpine
     restart: unless-stopped
     entrypoint: ["/bin/sh", "/backup/backup.sh", "loop"]
     environment:
