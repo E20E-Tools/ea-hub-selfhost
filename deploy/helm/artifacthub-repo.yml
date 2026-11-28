@@ -1,5 +1,5 @@
 # Artifact Hub repository metadata (https://artifacthub.io/docs/topics/repositories/).
 # Published next to index.yaml on GitHub Pages and as the "artifacthub.io" tag of the OCI chart.
-# repositoryID comes from Artifact Hub after the repository is added there; it gives the
+# repositoryID = the "EA-Hub" repository of the e20e-tools organization on Artifact Hub; it gives the
 # "Verified publisher" badge.
-repositoryID: REPLACE_WITH_ARTIFACT_HUB_REPOSITORY_ID
+repositoryID: badef837-c4f7-4b6a-906b-8afe3752fcc7
