@@ -35,8 +35,9 @@ spec:
     name: {{ if .Values.secrets.create }}{{ $name }}-pg-superuser{{ else }}{{ .Values.secrets.existingSecret }}-pg-superuser{{ end }}
   bootstrap:
     initdb:
+      # The operator's own "app" role owns the empty database; EA-Hub's setup runs as the
+      # superuser (owner "postgres" here would make the operator reset postgres's password).
       database: {{ .Values.postgres.database }}
-      owner: postgres
   storage:
     size: {{ .Values.postgres.storage.size }}
     {{- with .Values.postgres.storage.storageClass }}
