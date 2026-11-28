@@ -1,0 +1,299 @@
+# EA-Hub operator bundle. On a release, the publish workflow sets version, name, containerImage
+# and the manager image to the released version.
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  name: ea-hub.v1.3.0
+  namespace: placeholder
+  annotations:
+    alm-examples: |-
+      [
+        {
+          "apiVersion": "ea-hub.e20e-tools.github.io/v1alpha1",
+          "kind": "EAHub",
+          "metadata": {
+            "name": "ea-hub"
+          },
+          "spec": {
+            "appUrl": "https://hub.example.com",
+            "admin": {
+              "email": "admin@example.com"
+            },
+            "openshift": {
+              "enabled": false
+            }
+          }
+        }
+      ]
+    capabilities: Seamless Upgrades
+    categories: Developer Tools,Application Runtime
+    containerImage: ghcr.io/e20e-tools/ea-hub-operator:1.3.0
+    createdAt: '2026-11-28T00:00:00Z'
+    description: Self-hosted EA-Hub (enterprise architecture hub) with its own PostgreSQL, backups and monitoring.
+    repository: https://github.com/E20E-Tools/ea-hub-selfhost
+    support: E20E-Tools
+    operators.operatorframework.io/builder: operator-sdk-v1.42.3
+    operators.operatorframework.io/project_layout: helm.sdk.operatorframework.io/v1
+    features.operators.openshift.io/disconnected: 'false'
+    features.operators.openshift.io/fips-compliant: 'false'
+    features.operators.openshift.io/proxy-aware: 'false'
+    features.operators.openshift.io/tls-profiles: 'false'
+    features.operators.openshift.io/token-auth-aws: 'false'
+    features.operators.openshift.io/token-auth-azure: 'false'
+    features.operators.openshift.io/token-auth-gcp: 'false'
+    features.operators.openshift.io/cnf: 'false'
+    features.operators.openshift.io/cni: 'false'
+    features.operators.openshift.io/csi: 'false'
+spec:
+  displayName: EA-Hub
+  description: |
+    EA-Hub is an enterprise architecture hub that runs entirely on your cluster with its own
+    PostgreSQL: no external services are needed.
+
+    The operator installs and keeps up to date the official EA-Hub Helm chart. Each `EAHub` resource is
+    one installation; its `spec` holds the chart values
+    ([values reference](https://github.com/E20E-Tools/ea-hub-selfhost/blob/main/deploy/helm/ea-hub/values.yaml)).
+
+    ### What gets deployed
+    * the EA-Hub web app (database changes are applied automatically on start)
+    * PostgreSQL 16 (or CloudNativePG with `postgres.mode: cloudnativepg`, or an external database)
+    * daily backups with optional encryption and off-site copy, scheduled jobs, metrics and alerts
+    * on OpenShift (`openshift.enabled: true`): random UIDs and a Route with edge TLS
+
+    ### Quick start
+    ```yaml
+    apiVersion: ea-hub.e20e-tools.github.io/v1alpha1
+    kind: EAHub
+    metadata:
+      name: ea-hub
+    spec:
+      appUrl: https://hub.example.com
+      admin:
+        email: admin@example.com
+    ```
+    Passwords are generated into the Secret `ea-hub`. Read the first admin password with
+    `kubectl get secret ea-hub -o jsonpath='{.data.admin-password}' | base64 -d`. Do not put passwords in
+    the `spec` (it is stored in plain text): use `secrets.create: false` with `secrets.existingSecret`
+    for a Secret you manage yourself.
+
+    Documentation: https://e20e-tools.github.io/ea-hub-selfhost/docs/
+  version: 1.3.0
+  minKubeVersion: 1.25.0
+  maturity: stable
+  provider:
+    name: E20E-Tools
+    url: https://github.com/E20E-Tools
+  maintainers:
+  - name: E20E-Tools
+    email: noreply@github.com
+  links:
+  - name: Source
+    url: https://github.com/E20E-Tools/ea-hub-selfhost
+  - name: Documentation
+    url: https://e20e-tools.github.io/ea-hub-selfhost/docs/
+  keywords:
+  - ea-hub
+  - enterprise architecture
+  - architecture
+  - postgresql
+  - self-hosted
+  icon:
+  - base64data: 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
+    mediatype: image/png
+  installModes:
+  - type: OwnNamespace
+    supported: true
+  - type: SingleNamespace
+    supported: true
+  - type: MultiNamespace
+    supported: false
+  - type: AllNamespaces
+    supported: true
+  customresourcedefinitions:
+    owned:
+    - name: eahubs.ea-hub.e20e-tools.github.io
+      version: v1alpha1
+      kind: EAHub
+      displayName: EA-Hub
+      description: An EA-Hub installation (the spec holds the Helm chart values).
+      resources:
+      - kind: Deployment
+        name: ''
+        version: v1
+      - kind: StatefulSet
+        name: ''
+        version: v1
+      - kind: Service
+        name: ''
+        version: v1
+      - kind: Secret
+        name: ''
+        version: v1
+      - kind: CronJob
+        name: ''
+        version: v1
+      specDescriptors:
+      - path: appUrl
+        displayName: Site address
+        description: Public address, e.g. https://hub.example.com
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:text
+      - path: admin.email
+        displayName: First admin e-mail
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:text
+      - path: openshift.enabled
+        displayName: OpenShift mode
+        x-descriptors:
+        - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+  install:
+    strategy: deployment
+    spec:
+      clusterPermissions:
+      - serviceAccountName: ea-hub-operator
+        rules:
+        - apiGroups:
+          - ea-hub.e20e-tools.github.io
+          resources:
+          - eahubs
+          - eahubs/status
+          - eahubs/finalizers
+          verbs: &id001
+          - create
+          - delete
+          - get
+          - list
+          - patch
+          - update
+          - watch
+        - apiGroups:
+          - ''
+          resources:
+          - secrets
+          - configmaps
+          - services
+          - persistentvolumeclaims
+          - pods
+          - serviceaccounts
+          verbs: *id001
+        - apiGroups:
+          - ''
+          resources:
+          - events
+          verbs:
+          - create
+          - patch
+        - apiGroups:
+          - ''
+          resources:
+          - namespaces
+          verbs:
+          - get
+        - apiGroups:
+          - apps
+          resources:
+          - deployments
+          - statefulsets
+          verbs: *id001
+        - apiGroups:
+          - batch
+          resources:
+          - jobs
+          - cronjobs
+          verbs: *id001
+        - apiGroups:
+          - networking.k8s.io
+          resources:
+          - ingresses
+          - networkpolicies
+          verbs: *id001
+        - apiGroups:
+          - policy
+          resources:
+          - poddisruptionbudgets
+          verbs: *id001
+        - apiGroups:
+          - autoscaling
+          resources:
+          - horizontalpodautoscalers
+          verbs: *id001
+        - apiGroups:
+          - route.openshift.io
+          resources:
+          - routes
+          - routes/custom-host
+          verbs: *id001
+        - apiGroups:
+          - monitoring.coreos.com
+          resources:
+          - servicemonitors
+          - prometheusrules
+          verbs: *id001
+        - apiGroups:
+          - postgresql.cnpg.io
+          resources:
+          - clusters
+          verbs: *id001
+        - apiGroups:
+          - coordination.k8s.io
+          resources:
+          - leases
+          verbs: *id001
+      deployments:
+      - name: ea-hub-operator
+        label: &id002
+          app.kubernetes.io/name: ea-hub-operator
+        spec:
+          replicas: 1
+          selector:
+            matchLabels: *id002
+          template:
+            metadata:
+              labels: *id002
+            spec:
+              serviceAccountName: ea-hub-operator
+              securityContext:
+                runAsNonRoot: true
+                seccompProfile:
+                  type: RuntimeDefault
+              terminationGracePeriodSeconds: 10
+              containers:
+              - name: manager
+                image: ghcr.io/e20e-tools/ea-hub-operator:1.3.0
+                args:
+                - --leader-elect
+                - --leader-election-id=ea-hub-operator
+                - --health-probe-bind-address=:8081
+                - --metrics-bind-address=:8080
+                env:
+                - name: WATCH_NAMESPACE
+                  valueFrom:
+                    fieldRef:
+                      fieldPath: metadata.annotations['olm.targetNamespaces']
+                ports:
+                - name: metrics
+                  containerPort: 8080
+                livenessProbe:
+                  httpGet:
+                    path: /healthz
+                    port: 8081
+                  initialDelaySeconds: 15
+                  periodSeconds: 20
+                readinessProbe:
+                  httpGet:
+                    path: /readyz
+                    port: 8081
+                  initialDelaySeconds: 5
+                  periodSeconds: 10
+                resources:
+                  requests:
+                    cpu: 50m
+                    memory: 128Mi
+                  limits:
+                    cpu: '1'
+                    memory: 768Mi
+                securityContext:
+                  allowPrivilegeEscalation: false
+                  capabilities:
+                    drop:
+                    - ALL

@@ -190,6 +190,35 @@ oc -n ea-hub logs deploy/ea-hub -c migrate -f
 - ثبّت cert-manager Operator مع إضافة *openshift-routes*، واضبط `openshift.route.annotations: {cert-manager.io/issuer-name: …}`.
 - أو اطلب من مدير العنقود الشهادة العامة (wildcard) الخاصة بالموجّه، فتُستخدم تلقائياً.
 
+## بديل: مشغّل EA-Hub (Operator)
+
+بدلاً من Helm يمكنك تثبيت **مشغّل EA-Hub** عبر Operator Lifecycle Manager. يستخدم الـ chart نفسه: كل مورد `EAHub` تثبيت واحد، و`spec` فيه قيم الـ chart من الخطوة 6.
+
+إلى أن يُدرج المشغّل في OperatorHub، ثبّته من صورة الحزمة (bundle) لأي إصدار (يحتاج `operator-sdk`):
+
+```bash
+operator-sdk run bundle ghcr.io/e20e-tools/ea-hub-operator-bundle:<version> -n ea-hub-operator
+```
+
+ثم أنشئ التثبيت (لا تضع كلمات مرور في `spec`، فهي تُولَّد في الـ Secret `ea-hub`):
+
+```bash
+cat <<'EOF' | oc apply -n ea-hub -f -
+apiVersion: ea-hub.e20e-tools.github.io/v1alpha1
+kind: EAHub
+metadata:
+  name: ea-hub
+spec:
+  appUrl: https://ea-hub.apps.example.com
+  admin: { email: admin@example.com }
+  openshift: { enabled: true }
+EOF
+oc -n ea-hub get eahub                      # DEPLOYED True
+oc -n ea-hub get secret ea-hub -o jsonpath='{.data.admin-password}' | base64 -d
+```
+
+لتغيير إعداد استخدم `oc -n ea-hub edit eahub ea-hub` فيرقّي المشغّل التثبيت. حذف `EAHub` يزيل التثبيت، ويبقى الـ Secret الذي فيه كلمات المرور المولَّدة.
+
 ## حل المشكلات
 
 | العَرَض | السبب والحل |

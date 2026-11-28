@@ -273,10 +273,72 @@ jobs:
           done
           exit 1
 
+  # OperatorHub operator (Helm-based, wraps the same chart): multi-arch image, signed, with
+  # provenance; plus the OLM bundle stamped with this version (attached to the release, and as
+  # a bundle image for `operator-sdk run bundle`).
+  operator:
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      id-token: write
+      attestations: write
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Stamp the version into the chart and the bundle
+        run: |
+          v="${GITHUB_REF_NAME#v}"
+          owner="${GITHUB_REPOSITORY_OWNER,,}"
+          echo "VERSION=$v" >> "$GITHUB_ENV"
+          echo "OPERATOR=ghcr.io/${owner}/ea-hub-operator" >> "$GITHUB_ENV"
+          echo "BUNDLE=ghcr.io/${owner}/ea-hub-operator-bundle" >> "$GITHUB_ENV"
+          sed -i "s/^version: .*/version: $v/; s/^appVersion: .*/appVersion: \"$v\"/" deploy/helm/ea-hub/Chart.yaml
+          csv=deploy/operator/bundle/manifests/ea-hub.clusterserviceversion.yaml
+          img="ghcr.io/${owner}/ea-hub-operator:$v"
+          yq -i ".metadata.name = \"ea-hub.v$v\" | .spec.version = \"$v\"
+                 | .metadata.annotations.containerImage = \"$img\"
+                 | .metadata.annotations.createdAt = \"$(date -u +%FT%TZ)\"
+                 | .spec.install.spec.deployments[0].spec.template.spec.containers[0].image = \"$img\"" "$csv"
+          tar -C deploy/operator -czf "ea-hub-operator-bundle-$v.tar.gz" bundle
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+      - uses: docker/login-action@8aa5831fb8d48d8f76594c7ddde61ae58019f550 # v4.8.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      # The Dockerfile only copies files onto the multi-arch helm-operator base: no emulation needed.
+      - name: Build and push the operator image (linux/amd64, linux/arm64)
+        id: push
+        run: |
+          docker buildx build --platform linux/amd64,linux/arm64 -f deploy/operator/Dockerfile \
+            -t "$OPERATOR:$VERSION" -t "$OPERATOR:latest" --metadata-file meta.json --push .
+          echo "digest=$(jq -r '."containerimage.digest"' meta.json)" >> "$GITHUB_OUTPUT"
+      - name: Build and push the bundle image
+        id: bundle
+        run: |
+          docker buildx build -f deploy/operator/bundle.Dockerfile -t "$BUNDLE:$VERSION" \
+            --metadata-file bundle-meta.json --push deploy/operator
+          echo "digest=$(jq -r '."containerimage.digest"' bundle-meta.json)" >> "$GITHUB_OUTPUT"
+      - uses: sigstore/cosign-installer@881c63bd87e38389154debd8331404ce7ca8a3ab # v4.1.4
+      - name: Sign (keyless, by digest)
+        run: |
+          cosign sign --yes "$OPERATOR@${{ steps.push.outputs.digest }}"
+          cosign sign --yes "$BUNDLE@${{ steps.bundle.outputs.digest }}"
+      - uses: actions/attest-build-provenance@4d101475d8b20a2381f78447822ac1eab6504dd8 # v4.2.2
+        with:
+          subject-name: ${{ env.OPERATOR }}
+          subject-digest: ${{ steps.push.outputs.digest }}
+          push-to-registry: true
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: operator-bundle
+          path: ea-hub-operator-bundle-*.tar.gz
+
   # GitHub Release with generated notes and the packaged chart attached.
   release:
     if: startsWith(github.ref, 'refs/tags/v')
-    needs: [chart, helm-repo, airgap]
+    needs: [chart, helm-repo, airgap, operator]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -292,6 +354,9 @@ jobs:
           pattern: airgap-*
           merge-multiple: true
           path: airgap
+      - uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
+        with:
+          name: operator-bundle
       - name: Create the release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -310,8 +375,9 @@ jobs:
             echo "- Docker Compose: set \`EA_HUB_IMAGE=${image}:${version}\` in \`.env\`, then \`docker compose pull && docker compose up -d\`."
             echo "- Verify the signature: \`cosign verify ${image}:${version} --certificate-identity-regexp 'https://github.com/${GITHUB_REPOSITORY}/' --certificate-oidc-issuer https://token.actions.githubusercontent.com\`"
             echo "- Verify the build provenance: \`gh attestation verify oci://${image}:${version} --repo ${GITHUB_REPOSITORY}\`"
+            echo "- Operator (OperatorHub / OLM): \`ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/ea-hub-operator:${version}\`, bundle \`ea-hub-operator-bundle-${version}.tar.gz\` (see docs/en/deploy-openshift.md)."
             echo "- SBOM (SPDX): \`ea-hub-selfhost.spdx.json\`. Offline install: \`ea-hub-airgap-${version}-<arch>.tar.gz\` (see selfhost/airgap/README.md)."
           } > notes.md
           gh release create "$GITHUB_REF_NAME" --repo "$GITHUB_REPOSITORY" --verify-tag \
             --title "EA-Hub self-hosted ${GITHUB_REF_NAME}" --notes-file notes.md --generate-notes \
-            ea-hub-*.tgz ea-hub-selfhost.spdx.json airgap/*
+            ea-hub-*.tgz ea-hub-selfhost.spdx.json airgap/* ea-hub-operator-bundle-*.tar.gz

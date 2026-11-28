@@ -1,0 +1,47 @@
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  name: eahubs.ea-hub.e20e-tools.github.io
+spec:
+  group: ea-hub.e20e-tools.github.io
+  names:
+    kind: EAHub
+    listKind: EAHubList
+    plural: eahubs
+    singular: eahub
+  scope: Namespaced
+  versions:
+    - name: v1alpha1
+      served: true
+      storage: true
+      subresources:
+        status: {}
+      additionalPrinterColumns:
+        - name: URL
+          type: string
+          jsonPath: .spec.appUrl
+        - name: Deployed
+          type: string
+          jsonPath: .status.conditions[?(@.type=="Deployed")].status
+        - name: Age
+          type: date
+          jsonPath: .metadata.creationTimestamp
+      schema:
+        openAPIV3Schema:
+          type: object
+          description: An EA-Hub installation. The spec holds the values of the ea-hub Helm chart.
+          properties:
+            apiVersion: { type: string }
+            kind: { type: string }
+            metadata: { type: object }
+            spec:
+              type: object
+              description: Values of the ea-hub Helm chart (validated by its values.schema.json).
+              x-kubernetes-preserve-unknown-fields: true
+              properties:
+                appUrl:
+                  type: string
+                  description: Public address of the site, e.g. https://hub.example.com
+            status:
+              type: object
+              x-kubernetes-preserve-unknown-fields: true
