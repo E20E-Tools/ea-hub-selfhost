@@ -27,8 +27,13 @@ app.kubernetes.io/instance: {{ .Release.Name }}
 {{- if .Values.secrets.create -}}{{ include "ea-hub.fullname" . }}{{- else -}}{{ required "secrets.existingSecret is required when secrets.create=false" .Values.secrets.existingSecret }}{{- end -}}
 {{- end -}}
 
+{{- define "ea-hub.cnpg" -}}
+{{- if and .Values.postgres.enabled .Values.postgres.cloudnativepg.enabled -}}true{{- end -}}
+{{- end -}}
+
 {{- define "ea-hub.dbHost" -}}
-{{- if .Values.postgres.enabled -}}{{ include "ea-hub.fullname" . }}-postgres{{- else -}}{{ required "externalDatabase.host is required when postgres.enabled=false" .Values.externalDatabase.host }}{{- end -}}
+{{- if include "ea-hub.cnpg" . -}}{{ include "ea-hub.fullname" . }}-pg-rw
+{{- else if .Values.postgres.enabled -}}{{ include "ea-hub.fullname" . }}-postgres{{- else -}}{{ required "externalDatabase.host is required when postgres.enabled=false" .Values.externalDatabase.host }}{{- end -}}
 {{- end -}}
 
 {{- define "ea-hub.dbPort" -}}
@@ -294,3 +299,18 @@ template:
           claimName: {{ .Values.storage.existingClaim | default (printf "%s-storage" (include "ea-hub.fullname" .)) }}
       {{- end }}
 {{- end -}}
+
+{{/* The PostgreSQL superuser password (base64), the same in every template of one render:
+     the value you set, else the one already in the Secret, else one generated once. */}}
+{{- define "ea-hub.postgresPasswordB64" -}}
+{{- $root := .root -}}
+{{- if $root.Values.secrets.postgresPassword -}}{{ $root.Values.secrets.postgresPassword | b64enc }}
+{{- else if hasKey .old "postgres-password" -}}{{ index .old "postgres-password" }}
+{{- else -}}
+{{- if not (hasKey $root.Values.secrets "generatedPostgresPassword") -}}
+{{- $_ := set $root.Values.secrets "generatedPostgresPassword" (randAlphaNum 32) -}}
+{{- end -}}
+{{ $root.Values.secrets.generatedPostgresPassword | b64enc }}
+{{- end -}}
+{{- end -}}
+

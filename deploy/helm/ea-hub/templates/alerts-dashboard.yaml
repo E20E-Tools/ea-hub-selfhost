@@ -1,0 +1,74 @@
+{{- if and .Values.metrics.enabled .Values.metrics.prometheusRule.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: {{ include "ea-hub.fullname" . }}
+  labels:
+    {{- include "ea-hub.labels" . | nindent 4 }}
+    {{- with .Values.metrics.prometheusRule.labels }}
+    {{- toYaml . | nindent 4 }}
+    {{- end }}
+spec:
+  groups:
+    - name: ea-hub
+      rules:
+        - alert: EAHubDown
+          expr: absent(eahub_up{namespace="{{ .Release.Namespace }}"}) or min(eahub_up{namespace="{{ .Release.Namespace }}"}) < 1
+          for: 5m
+          labels: { severity: critical }
+          annotations:
+            summary: EA-Hub in {{ .Release.Namespace }} is not serving
+            description: No app pod has answered the metrics scrape for 5 minutes.
+        - alert: EAHubDatabaseDown
+          expr: max(eahub_database_up{namespace="{{ .Release.Namespace }}"}) < 1
+          for: 3m
+          labels: { severity: critical }
+          annotations:
+            summary: EA-Hub cannot reach PostgreSQL ({{ .Release.Namespace }})
+            description: The database health query of the app has failed for 3 minutes.
+        - alert: EAHubSlowDatabase
+          expr: max(eahub_database_ping_seconds{namespace="{{ .Release.Namespace }}"}) > 0.5
+          for: 10m
+          labels: { severity: warning }
+          annotations:
+            summary: EA-Hub database answers slowly ({{ .Release.Namespace }})
+            description: A trivial query takes more than 0.5 s for 10 minutes.
+        - alert: EAHubHighMemory
+          expr: max(process_resident_memory_bytes{namespace="{{ .Release.Namespace }}"}) > {{ .Values.metrics.prometheusRule.memoryBytes | int64 }}
+          for: 15m
+          labels: { severity: warning }
+          annotations:
+            summary: EA-Hub uses a lot of memory ({{ .Release.Namespace }})
+            description: An app pod has used more than the configured threshold for 15 minutes.
+        {{- if .Values.backup.enabled }}
+        - alert: EAHubBackupFailed
+          # Needs kube-state-metrics (part of kube-prometheus-stack).
+          expr: max(kube_job_status_failed{namespace="{{ .Release.Namespace }}", job_name=~"{{ include "ea-hub.fullname" . }}-backup.*"}) > 0
+          for: 5m
+          labels: { severity: warning }
+          annotations:
+            summary: An EA-Hub backup failed ({{ .Release.Namespace }})
+            description: Check the logs of the failed {{ include "ea-hub.fullname" . }}-backup job.
+        - alert: EAHubNoRecentBackup
+          expr: time() - max(kube_job_status_completion_time{namespace="{{ .Release.Namespace }}", job_name=~"{{ include "ea-hub.fullname" . }}-backup.*"}) > 2 * 86400
+          for: 1h
+          labels: { severity: warning }
+          annotations:
+            summary: No EA-Hub backup in the last 2 days ({{ .Release.Namespace }})
+            description: The daily backup CronJob has not completed for more than 48 hours.
+        {{- end }}
+---
+{{- end }}
+{{- if and .Values.metrics.enabled .Values.metrics.grafanaDashboard.enabled }}
+# Picked up by the Grafana sidecar of kube-prometheus-stack (label grafana_dashboard).
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "ea-hub.fullname" . }}-dashboard
+  labels:
+    {{- include "ea-hub.labels" . | nindent 4 }}
+    grafana_dashboard: "1"
+data:
+  ea-hub.json: |
+    {{- .Files.Get "files/grafana-dashboard.json" | nindent 4 }}
+{{- end }}

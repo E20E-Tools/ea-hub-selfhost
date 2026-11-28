@@ -87,6 +87,22 @@ kubectl -n ea-hub rollout status deploy/ea-hub
 
 تظل الملفات تُقدَّم عبر التطبيق، فتبقى صلاحيات الوصول والروابط الموقعة كما هي، ويمكن أن تبقى الحاوية خاصة. في هذا الوضع لا تشمل النسخة الاحتياطية الليلية إلا قاعدة البيانات، لذا فعّل خاصية الإصدارات (versioning) أو النسخ المتماثل في الحاوية لحماية الملفات.
 
+### توفر عالٍ لقاعدة البيانات (CloudNativePG)
+
+القاعدة المدمجة حاوية واحدة. للانتقال التلقائي إلى نسخة احتياطية عند تعطل القاعدة، ثبّت مشغّل [CloudNativePG](https://cloudnative-pg.io) مرة واحدة في العنقود، ثم:
+
+```bash
+--set postgres.cloudnativepg.enabled=true --set postgres.cloudnativepg.instances=3
+```
+
+ينشئ الـ chart عندها Cluster من نوع CloudNativePG فيه نسخة رئيسية ونسختان متزامنتان، ويتصل التطبيق تلقائياً بالنسخة الرئيسية الحالية. يُختبر ذلك في CI، بما في ذلك حذف النسخة الرئيسية أثناء عمل التطبيق.
+
+### المراقبة والتنبيهات
+
+- **`metrics.enabled=true`:** يفعّل مقاييس Prometheus.
+- **`metrics.prometheusRule.enabled=true`:** يضيف تنبيهات لتوقف التطبيق، وتوقف القاعدة أو بطئها، وارتفاع الذاكرة، وفشل النسخ الاحتياطي، وغيابه يومين.
+- **`metrics.grafanaDashboard.enabled=true`:** يضيف لوحة Grafana جاهزة.
+
 ### HTTPS تلقائي عبر cert-manager
 
 إذا كان [cert-manager](https://cert-manager.io) مثبتاً ولديك ClusterIssuer:

@@ -529,6 +529,30 @@ Files are still served by the app, so access rules and signed links work exactly
 | `metrics.serviceMonitor.enabled: true` | Creates a `ServiceMonitor` for the Prometheus Operator, with the token wired in |
 | `networkPolicy.enabled: true` | Only pods of this release may reach PostgreSQL. The app is reachable from the namespaces in `networkPolicy.ingressNamespaceSelectors` (any namespace when empty) |
 | `podDisruptionBudget.enabled` (on) | With `replicaCount` > 1, keeps one app pod running during node drains |
+| `metrics.prometheusRule.enabled: true` | Alerts: app down, database down or slow, high memory, a backup failed, no backup for 2 days (the backup alerts need kube-state-metrics) |
+| `metrics.grafanaDashboard.enabled: true` | A Grafana dashboard as a ConfigMap with `grafana_dashboard: "1"`, which the kube-prometheus-stack sidecar loads |
+
+### High availability for PostgreSQL (CloudNativePG)
+
+The built-in database is a single pod. For automatic failover, install the [CloudNativePG](https://cloudnative-pg.io) operator once per cluster, then:
+
+```yaml
+postgres:
+  cloudnativepg:
+    enabled: true
+    instances: 3            # 1 primary + 2 streaming replicas
+    # backup: { barmanObjectStore: … }   # optional: continuous WAL archiving and point-in-time recovery
+```
+
+The chart then creates a `postgresql.cnpg.io` Cluster instead of the StatefulSet, and the app connects to its `-rw` service. CI tests this on kind with 2 instances, including deleting the primary while the app keeps working.
+
+### Upgrading PostgreSQL to a new major version
+
+**Docker Compose:** run `selfhost/scripts/pg-major-upgrade.sh 17`. It takes a backup, keeps the old data volume, starts the new version on an empty volume, restores, and prints the rollback commands. CI tests 16 → 17.
+
+**Helm, built-in database:** take a backup (`backup-now`), set `postgres.image` to the new version on a **new** release or a new PVC, then restore with `backup.sh restore`. Never change the major version of an existing data volume in place.
+
+**CloudNativePG:** follow the operator's major-upgrade procedure (an import into a new Cluster).
 
 ### Restore
 
