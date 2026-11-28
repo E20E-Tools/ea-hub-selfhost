@@ -1,0 +1,69 @@
+{
+  "realm": "ea-hub",
+  "enabled": true,
+  "sslRequired": "none",
+  "registrationAllowed": false,
+  "groups": [{ "name": "ea-admins" }, { "name": "staff" }],
+  "clients": [
+    {
+      "clientId": "ea-hub",
+      "name": "EA-Hub (CI)",
+      "enabled": true,
+      "protocol": "openid-connect",
+      "publicClient": false,
+      "clientAuthenticatorType": "client-secret",
+      "secret": "ci-oidc-client-secret",
+      "standardFlowEnabled": true,
+      "directAccessGrantsEnabled": false,
+      "redirectUris": ["http://localhost:8080/api/selfhost/auth/oidc/callback"],
+      "webOrigins": ["http://localhost:8080"],
+      "attributes": { "pkce.code.challenge.method": "S256" },
+      "protocolMappers": [
+        {
+          "name": "groups",
+          "protocol": "openid-connect",
+          "protocolMapper": "oidc-group-membership-mapper",
+          "config": {
+            "claim.name": "groups",
+            "full.path": "false",
+            "id.token.claim": "true",
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true"
+          }
+        }
+      ]
+    }
+  ],
+  "users": [
+    {
+      "username": "alice",
+      "enabled": true,
+      "email": "alice@acme.example",
+      "emailVerified": true,
+      "firstName": "Alice",
+      "lastName": "Admin",
+      "groups": ["/ea-admins"],
+      "credentials": [{ "type": "password", "value": "ci-alice-password", "temporary": false }]
+    },
+    {
+      "username": "bob",
+      "enabled": true,
+      "email": "bob@acme.example",
+      "emailVerified": true,
+      "firstName": "Bob",
+      "lastName": "Staff",
+      "groups": ["/staff"],
+      "credentials": [{ "type": "password", "value": "ci-bob-password", "temporary": false }]
+    },
+    {
+      "username": "eve",
+      "enabled": true,
+      "email": "eve@evil.example",
+      "emailVerified": true,
+      "firstName": "Eve",
+      "lastName": "Outsider",
+      "groups": ["/ea-admins"],
+      "credentials": [{ "type": "password", "value": "ci-eve-password", "temporary": false }]
+    }
+  ]
+}
