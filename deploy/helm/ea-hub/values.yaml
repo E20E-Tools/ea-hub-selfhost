@@ -175,7 +175,8 @@ backup:
     # -- Secret settings for the remote, e.g. {access_key_id: …, secret_access_key: …} for S3
     # or {key: …} for Azure Blob. Stored in the release Secret.
     credentials: {}
-    # -- Or a Secret you manage: each key becomes an rclone setting (e.g. access_key_id).
+    # -- Or a Secret you manage: each key becomes an rclone setting, written in UPPER CASE
+    # (e.g. ACCESS_KEY_ID, SECRET_ACCESS_KEY, or KEY for Azure Blob).
     existingSecret: ""
 
 # Prometheus metrics at /metrics (token-protected; generated token kept in the Secret).
