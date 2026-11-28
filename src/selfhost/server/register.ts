@@ -56,6 +56,31 @@ export async function selfhostFetch(
   // and must never trust a cf-connecting-ip header sent by the client itself.
   const trusted = withClientIp(request);
   const response = await handleSelfhost(trusted);
-  if (response) return { response };
+  if (response) return { response: withApiSecurityHeaders(response) };
   return { request: trusted };
+}
+
+/**
+ * Headers for the self-host API, health and metrics responses (the upstream middleware sets
+ * them for pages; stored files set their own sandboxing CSP in storage.ts).
+ */
+export function withApiSecurityHeaders(response: Response): Response {
+  const h = response.headers;
+  const set = (name: string, value: string) => {
+    if (!h.has(name)) h.set(name, value);
+  };
+  try {
+    set("x-content-type-options", "nosniff");
+    set("referrer-policy", "no-referrer");
+    set("x-frame-options", "DENY");
+    set("strict-transport-security", "max-age=31536000; includeSubDomains");
+    set(
+      "content-security-policy",
+      "default-src 'none'; frame-ancestors 'none'",
+    );
+    set("cross-origin-resource-policy", "same-origin");
+  } catch {
+    // Immutable headers (a proxied response): leave them as they are.
+  }
+  return response;
 }

@@ -1,3 +1,29 @@
+{{- if .Values.autoscaling.enabled }}
+{{- if and (include "ea-hub.fileStorage" .) (eq .Values.storage.accessMode "ReadWriteOnce") }}
+{{- fail "autoscaling needs uploads every pod can reach: storage.backend=s3 or storage.accessMode=ReadWriteMany" }}
+{{- end }}
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: {{ include "ea-hub.fullname" . }}
+  labels:
+    {{- include "ea-hub.labels" . | nindent 4 }}
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: {{ include "ea-hub.fullname" . }}
+  minReplicas: {{ .Values.autoscaling.minReplicas }}
+  maxReplicas: {{ .Values.autoscaling.maxReplicas }}
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: {{ .Values.autoscaling.targetCPUUtilizationPercentage }}
+---
+{{- end }}
 {{- if and .Values.metrics.enabled .Values.metrics.serviceMonitor.enabled }}
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
@@ -23,7 +49,7 @@ spec:
           key: metrics-token
 ---
 {{- end }}
-{{- if and .Values.podDisruptionBudget.enabled (gt (int .Values.replicaCount) 1) }}
+{{- if and .Values.podDisruptionBudget.enabled (or .Values.autoscaling.enabled (gt (int .Values.replicaCount) 1)) }}
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:

@@ -6,7 +6,9 @@ metadata:
     {{- include "ea-hub.labels" . | nindent 4 }}
     app.kubernetes.io/component: web
 spec:
+  {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
+  {{- end }}
   {{- if and (include "ea-hub.fileStorage" .) (eq .Values.storage.accessMode "ReadWriteOnce") }}
   # A ReadWriteOnce upload volume can only be mounted by one pod at a time.
   strategy:

@@ -534,6 +534,15 @@ Files are still served by the app, so access rules and signed links work exactly
 | `metrics.prometheusRule.enabled: true` | Alerts: app down, database down or slow, high memory, a backup failed, no backup for 2 days (the backup alerts need kube-state-metrics) |
 | `metrics.grafanaDashboard.enabled: true` | A Grafana dashboard as a ConfigMap with `grafana_dashboard: "1"`, which the kube-prometheus-stack sidecar loads |
 
+### Autoscaling and tracing
+
+| Value | What it does |
+|---|---|
+| `autoscaling.enabled: true` | A HorizontalPodAutoscaler (2–6 pods at 70% CPU by default). Needs `storage.backend: s3` or a ReadWriteMany volume |
+| `tracing.otlpEndpoint: http://otel-collector:4318` | One OpenTelemetry span per request, sent over OTLP/HTTP to your collector (Jaeger, Tempo, Datadog, Azure Monitor…). Continues the caller's `traceparent`. Exporter headers go in the Secret key `otel-headers` |
+
+Every pull request also runs an **OWASP ZAP** baseline scan and a **k6** load test (25 concurrent users on a 2-vCPU runner) against the full stack.
+
 ### High availability for PostgreSQL (CloudNativePG)
 
 The built-in database is a single pod. For automatic failover, install the [CloudNativePG](https://cloudnative-pg.io) operator once per cluster, then:

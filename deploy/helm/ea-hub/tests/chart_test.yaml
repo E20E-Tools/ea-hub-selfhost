@@ -200,3 +200,23 @@ tests:
       backup.encryption: null
     asserts:
       - hasDocuments: { count: 4 }
+  - it: autoscaling needs shared uploads
+    template: templates/monitoring-policies.yaml
+    set:
+      autoscaling.enabled: true
+    asserts:
+      - failedTemplate:
+          errorMessage: "autoscaling needs uploads every pod can reach: storage.backend=s3 or storage.accessMode=ReadWriteMany"
+
+  - it: autoscaling with S3 uploads creates an HPA and leaves replicas to it
+    templates: [templates/monitoring-policies.yaml, templates/deployment.yaml]
+    set:
+      autoscaling.enabled: true
+      storage.backend: s3
+      storage.s3.bucket: uploads
+    asserts:
+      - isKind: { of: HorizontalPodAutoscaler }
+        template: templates/monitoring-policies.yaml
+        documentIndex: 0
+      - notExists: { path: spec.replicas }
+        template: templates/deployment.yaml

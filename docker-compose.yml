@@ -28,6 +28,10 @@ x-app-env: &app-env
   STORAGE_MAX_UPLOAD_MB: ${STORAGE_MAX_UPLOAD_MB:-10}
   # Uploads: "filesystem" (the storage-data volume) or "s3" (an S3-compatible bucket).
   STORAGE_BACKEND: ${STORAGE_BACKEND:-filesystem}
+  # OpenTelemetry traces to an OTLP/HTTP collector (empty = off).
+  OTEL_EXPORTER_OTLP_ENDPOINT: ${OTEL_EXPORTER_OTLP_ENDPOINT:-}
+  OTEL_EXPORTER_OTLP_HEADERS: ${OTEL_EXPORTER_OTLP_HEADERS:-}
+  OTEL_TRACES_SAMPLER_ARG: ${OTEL_TRACES_SAMPLER_ARG:-1}
   # Single sign-on (OpenID Connect). Off unless OIDC_ISSUER, OIDC_CLIENT_ID and OIDC_CLIENT_SECRET are set.
   OIDC_ISSUER: ${OIDC_ISSUER:-}
   OIDC_CLIENT_ID: ${OIDC_CLIENT_ID:-}
