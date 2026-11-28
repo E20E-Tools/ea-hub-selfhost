@@ -120,6 +120,11 @@ jobs:
       - uses: azure/setup-helm@2f5e7bc67f1f9972ab16657bb795f36d8f04de0e # v5.1.0
       - name: Backup script copies match
         run: cmp selfhost/backup/backup.sh deploy/helm/ea-hub/files/backup.sh
+      - name: Alert rules are valid PromQL (promtool)
+        run: |
+          helm template ea-hub deploy/helm/ea-hub --set appUrl=https://hub.example.com             --set metrics.enabled=true --set metrics.prometheusRule.enabled=true             -s templates/alerts-dashboard.yaml > /tmp/rule.yaml
+          python3 -c "import yaml; d=yaml.safe_load(open('/tmp/rule.yaml')); yaml.safe_dump(d['spec'], open('/tmp/rules.yaml','w'))"
+          docker run --rm -v /tmp/rules.yaml:/rules.yaml:ro --entrypoint promtool prom/prometheus:v3.16.0 check rules /rules.yaml
       - name: Chart unit tests (helm-unittest, Helm 3)
         run: |
           mkdir -p /tmp/helm3 && cd /tmp/helm3
@@ -321,6 +326,14 @@ jobs:
           done
           docker compose logs offsite | tail -5
           docker compose run --rm --no-deps --entrypoint rclone offsite ls offsite:eahub-backups/ci | grep database.dump
+      - name: PostgreSQL major upgrade 16 -> 17 keeps the data
+        run: |
+          bash selfhost/scripts/pg-major-upgrade.sh 17 --yes
+          docker compose exec -T db psql -U postgres -tAc 'show server_version' | grep '^17\.'
+          test "$(docker compose exec -T db psql -U postgres -d eahub -tAc 'select v from public.ci_restore_marker')" = "before-backup"
+          for i in $(seq 1 30); do curl -fsS http://localhost:8080/healthz && break; sleep 3; done
+          curl -fsS -X POST -H 'content-type: application/json'             -d '{"email":"e2e-admin@example.com","password":"e2e-admin-password"}'             "http://localhost:8080/api/selfhost/auth/token?grant_type=password" | jq -e '.access_token | length > 20'
+          docker volume inspect ea-hub_db-data-pg16 >/dev/null   # the old data is kept
       - name: Restart keeps data (migrate is idempotent)
         run: |
           docker compose up -d --force-recreate migrate app
@@ -401,6 +414,59 @@ jobs:
           name: browser-e2e-screenshots
           path: e2e-*.png
           if-no-files-found: ignore
+
+  # PostgreSQL high availability: the chart with the CloudNativePG operator, 2 instances,
+  # including a failover of the primary while the app keeps working.
+  kind-cloudnativepg:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: azure/setup-helm@2f5e7bc67f1f9972ab16657bb795f36d8f04de0e # v5.1.0
+      - uses: helm/kind-action@ea822c7bf1874f08e5a491df991c228edffc3376 # v1.15.2
+        with:
+          cluster_name: ea-hub
+      - name: CloudNativePG operator
+        run: |
+          kubectl apply --server-side -f https://github.com/cloudnative-pg/cloudnative-pg/releases/download/v1.30.2/cnpg-1.30.2.yaml
+          kubectl -n cnpg-system rollout status deploy/cnpg-controller-manager --timeout=5m
+      - name: Build image and load it into kind
+        run: |
+          docker build --build-arg WITH_LOCAL_MODEL=0 -t ea-hub-selfhost:ci .
+          kind load docker-image ea-hub-selfhost:ci --name ea-hub
+      - name: helm install with CloudNativePG (2 instances)
+        run: |
+          helm upgrade --install ea-hub deploy/helm/ea-hub -n ea-hub --create-namespace             --set image.repository=ea-hub-selfhost --set image.tag=ci --set image.pullPolicy=Never             --set appUrl=http://localhost:8080             --set admin.email=kind-admin@example.com --set admin.password=kind-admin-password             --set postgres.cloudnativepg.enabled=true --set postgres.cloudnativepg.instances=2             --set postgres.storage.size=1Gi --set storage.size=1Gi --set backup.storage.size=1Gi             --timeout 10m
+          kubectl -n ea-hub wait cluster/ea-hub-pg --for=condition=Ready --timeout=10m
+          kubectl -n ea-hub rollout status deploy/ea-hub --timeout=10m
+          kubectl -n ea-hub get pods
+      - name: Sign-in, backup, then failover of the primary
+        run: |
+          kubectl -n ea-hub port-forward svc/ea-hub 8080:80 >/dev/null 2>&1 &
+          sleep 5
+          login() { curl -fsS -X POST -H 'content-type: application/json'             -d '{"email":"kind-admin@example.com","password":"kind-admin-password"}'             "http://localhost:8080/api/selfhost/auth/token?grant_type=password" | jq -e '.access_token | length > 20'; }
+          login
+          kubectl -n ea-hub create job --from=cronjob/ea-hub-backup backup-now
+          kubectl -n ea-hub wait --for=condition=complete job/backup-now --timeout=5m
+          PRIMARY=$(kubectl -n ea-hub get cluster ea-hub-pg -o jsonpath='{.status.currentPrimary}')
+          echo "deleting primary $PRIMARY"
+          kubectl -n ea-hub delete pod "$PRIMARY" --wait=false
+          for i in $(seq 1 60); do
+            NEW=$(kubectl -n ea-hub get cluster ea-hub-pg -o jsonpath='{.status.currentPrimary}')
+            [ -n "$NEW" ] && [ "$NEW" != "$PRIMARY" ] && break
+            sleep 5
+          done
+          echo "new primary: $NEW"; test "$NEW" != "$PRIMARY"
+          for i in $(seq 1 30); do curl -fsS http://localhost:8080/healthz | grep -q '"ok":true' && break; sleep 5; done
+          login
+      - name: Diagnostics on failure
+        if: failure()
+        run: |
+          kubectl -n ea-hub get all,cluster || true
+          kubectl -n ea-hub describe cluster ea-hub-pg | tail -40 || true
+          kubectl -n ea-hub logs deploy/ea-hub -c migrate --tail=50 || true
+          kubectl -n ea-hub logs deploy/ea-hub -c migrate --previous --tail=50 || true
+          kubectl -n ea-hub logs ea-hub-pg-1 --tail=30 || true
+          kubectl -n ea-hub logs deploy/ea-hub --tail=100 || true
 
   # The release image (with the local search model) on the distroless base: the native
   # libraries of the model must load, and the image must stay free of fixable criticals/highs.

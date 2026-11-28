@@ -69,7 +69,7 @@ spec:
         {{- else }}
         - namespaceSelector: {}
         {{- end }}
-{{- if .Values.postgres.enabled }}
+{{- if and .Values.postgres.enabled (not .Values.postgres.cloudnativepg.enabled) }}
 ---
 # PostgreSQL: only pods of this release (app, migrations, jobs, backups) may connect.
 apiVersion: networking.k8s.io/v1

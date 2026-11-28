@@ -159,3 +159,37 @@ tests:
       backup.beforeUpgrade: false
     asserts:
       - hasDocuments: { count: 3 }   # ConfigMap, PVC and CronJob only
+
+  - it: CloudNativePG replaces the built-in StatefulSet
+    template: templates/postgres.yaml
+    set:
+      postgres.cloudnativepg.enabled: true
+    asserts:
+      - hasDocuments: { count: 0 }
+
+  - it: CloudNativePG cluster and app point at the -rw service
+    templates: [templates/cloudnativepg.yaml, templates/deployment.yaml]
+    set:
+      postgres.cloudnativepg.enabled: true
+      postgres.cloudnativepg.instances: 2
+    asserts:
+      - equal: { path: spec.instances, value: 2 }
+        template: templates/cloudnativepg.yaml
+        documentSelector: { path: kind, value: Cluster }
+      - contains:
+          path: "spec.template.spec.containers[0].env"
+          content: { name: DB_HOST, value: ea-hub-pg-rw }
+        template: templates/deployment.yaml
+
+  - it: alert rules and dashboard only when asked for
+    template: templates/alerts-dashboard.yaml
+    set:
+      metrics.enabled: true
+      metrics.prometheusRule.enabled: true
+      metrics.grafanaDashboard.enabled: true
+    asserts:
+      - hasDocuments: { count: 2 }
+      - isKind: { of: PrometheusRule }
+        documentIndex: 0
+      - equal: { path: 'metadata.labels.grafana_dashboard', value: "1" }
+        documentIndex: 1

@@ -157,6 +157,21 @@ storage:
 # Built-in PostgreSQL (a StatefulSet with its own volume).
 postgres:
   enabled: true
+  # High availability with the CloudNativePG operator (install it first:
+  # https://cloudnative-pg.io). Instead of the single StatefulSet, the chart creates a
+  # postgresql.cnpg.io Cluster with streaming replicas and automatic failover. The superuser
+  # password is the release's postgres-password, so migrations and backups work unchanged.
+  cloudnativepg:
+    enabled: false
+    instances: 3
+    # -- Empty = ghcr.io/cloudnative-pg/postgresql:16, the same major version as postgres.image
+    # (used by the backup jobs: pg_dump cannot dump a newer server). Change both together.
+    imageName: ""
+    # -- Raw CloudNativePG "backup" section (barmanObjectStore etc.) for continuous WAL
+    # archiving and point-in-time recovery; see the CloudNativePG documentation.
+    backup: {}
+    # -- Create a PodMonitor for the Prometheus Operator.
+    podMonitor: false
   image: postgres:16-alpine
   database: eahub
   storage:
@@ -233,6 +248,15 @@ metrics:
     enabled: false
     interval: 30s
     labels: {}
+  # Alerts: app down, database down/slow, high memory, backup failed / missing.
+  prometheusRule:
+    enabled: false
+    labels: {}
+    # -- EAHubHighMemory threshold (bytes).
+    memoryBytes: 1288490188
+  # -- Grafana dashboard as a ConfigMap labelled grafana_dashboard=1 (kube-prometheus-stack sidecar).
+  grafanaDashboard:
+    enabled: false
 
 # -- Keep at least one app pod during node drains. Only rendered when replicaCount > 1.
 podDisruptionBudget:

@@ -83,12 +83,18 @@ export async function ensureAdmin(sql, email, password, { reset = false } = {}) 
 
 export async function waitForDatabase(sql, seconds = 90) {
   const until = Date.now() + seconds * 1000;
+  let lastLog = 0;
   for (;;) {
     try {
       await sql`select 1`;
       return;
     } catch (error) {
       if (Date.now() > until) throw error;
+      // Say why every 15 s (the message names the problem, never the password).
+      if (Date.now() - lastLog > 15_000) {
+        lastLog = Date.now();
+        console.log(`[migrate] database not ready yet: ${error?.code ?? ""} ${error?.message ?? error}`);
+      }
       await new Promise((r) => setTimeout(r, 2000));
     }
   }

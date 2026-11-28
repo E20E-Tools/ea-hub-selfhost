@@ -73,12 +73,14 @@ x-image: &image
 
 services:
   db:
-    image: postgres:16-alpine
+    image: ${POSTGRES_IMAGE:-postgres:16-alpine}
     restart: unless-stopped
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is missing — run ./setup.sh}
       POSTGRES_DB: ${POSTGRES_DB:-eahub}
+      # Explicit, so the data stays in the volume on every major version (18+ moved the default).
+      PGDATA: /var/lib/postgresql/data
     volumes:
       - db-data:/var/lib/postgresql/data
     healthcheck:
@@ -110,7 +112,7 @@ services:
   # A backup into ./backups right before the database migrations of every start/upgrade, so a
   # failed upgrade can be undone (backup.sh restore). BACKUP_BEFORE_MIGRATE=0 turns it off.
   backup-before-migrate:
-    image: postgres:16-alpine
+    image: ${POSTGRES_IMAGE:-postgres:16-alpine}
     restart: "no"
     entrypoint: ["/bin/sh", "-c"]
     command:
@@ -171,7 +173,7 @@ services:
         condition: service_healthy
 
   backup:
-    image: postgres:16-alpine
+    image: ${POSTGRES_IMAGE:-postgres:16-alpine}
     restart: unless-stopped
     entrypoint: ["/bin/sh", "/backup/backup.sh", "loop"]
     environment:

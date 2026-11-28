@@ -40,6 +40,12 @@ helm upgrade ea-hub ./deploy/helm/ea-hub -n ea-hub --reuse-values
 - **Docker Compose:** في كل `docker compose up` تحفظ الخدمة `backup-before-migrate` نسخة في `./backups` قبل خدمة `migrate`. لإيقافها اضبط `BACKUP_BEFORE_MIGRATE=0` في `.env`.
 - **Helm:** في كل `helm upgrade` تأخذ مهمة `ea-hub-backup-before-upgrade` نسخة قبل الترقية. لإيقافها اضبط `backup.beforeUpgrade=false`.
 
+### ترقية PostgreSQL إلى إصدار رئيسي جديد
+
+- **Docker Compose:** شغّل `selfhost/scripts/pg-major-upgrade.sh 17`. يأخذ السكربت نسخة احتياطية، ويحتفظ بقرص البيانات القديم كما هو، ويشغّل الإصدار الجديد على قرص فارغ، ثم يستعيد البيانات، ويطبع أوامر التراجع. يُختبر الانتقال من 16 إلى 17 في CI.
+- **Helm مع القاعدة المدمجة:** خذ نسخة احتياطية، ثم ثبّت الإصدار الجديد على قرص **جديد**، واستعد البيانات بـ `backup.sh restore`. لا تغيّر الإصدار الرئيسي على قرص بيانات موجود.
+- **CloudNativePG:** اتبع طريقة المشغّل (operator) للترقية الرئيسية، وهي استيراد البيانات إلى Cluster جديد.
+
 **للتراجع عن ترقية فاشلة:**
 1. أعد الصورة إلى وسمها السابق (`EA_HUB_IMAGE` في `.env`، أو `helm rollback ea-hub`).
 2. استعد آخر نسخة كما في [backup.md](backup.md): `backup.sh list` ثم `backup.sh restore <اسم-النسخة>`.
