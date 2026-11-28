@@ -110,6 +110,9 @@ app.kubernetes.io/instance: {{ .Release.Name }}
   value: {{ .Values.storage.backend | quote }}
 {{- with .Values.sso.oidc }}
 {{- if and .issuer .clientId }}
+{{- if and $.Values.secrets.create (not .clientSecret) }}
+{{- fail "sso.oidc.clientSecret is required when sso.oidc.issuer and clientId are set" }}
+{{- end }}
 - name: OIDC_ISSUER
   value: {{ .issuer | quote }}
 - name: OIDC_CLIENT_ID
@@ -124,6 +127,8 @@ app.kubernetes.io/instance: {{ .Release.Name }}
   value: {{ .adminGroups | quote }}
 - name: OIDC_GROUPS_CLAIM
   value: {{ .groupsClaim | quote }}
+- name: OIDC_ALLOWED_DOMAINS
+  value: {{ .allowedDomains | quote }}
 - name: OIDC_AUTO_CREATE
   value: {{ .autoCreate | quote }}
 - name: OIDC_REQUIRE_VERIFIED_EMAIL

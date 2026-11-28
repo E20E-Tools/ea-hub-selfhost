@@ -60,9 +60,12 @@ sso:
     # -- Group names/IDs (from groupsClaim) whose members become admins (comma-separated).
     adminGroups: ""
     groupsClaim: groups
-    # -- false: only people with an existing account (or listed admins) may sign in.
+    # -- Comma-separated e-mail domains allowed to sign in, e.g. "acme.com,acme.de".
+    # Strongly recommended; required for autoCreate and for requireVerifiedEmail=false.
+    allowedDomains: ""
+    # -- true: create accounts (without roles) for anyone from allowedDomains.
     autoCreate: false
-    # -- Microsoft Entra ID does not send email_verified: set false there.
+    # -- Keep true. For Microsoft Entra ID add the optional claim xms_edov (see the guide).
     requireVerifiedEmail: true
 
 # Outgoing e-mail (password reset, notifications, newsletter). Optional.

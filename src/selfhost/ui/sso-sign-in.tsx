@@ -12,6 +12,10 @@ const MESSAGES: Record<string, { en: string; ar: string }> = {
     en: "Your organisation account has no access to EA-Hub yet. Ask an administrator.",
     ar: "حساب مؤسستك لا يملك صلاحية دخول EA-Hub بعد. اطلب ذلك من المسؤول.",
   },
+  unverified_email: {
+    en: "Your organisation did not confirm your e-mail address, so it cannot be used to sign in here. Ask an administrator.",
+    ar: "لم تؤكد مؤسستك عنوان بريدك، فلا يمكن استخدامه للدخول هنا. راجع المسؤول.",
+  },
   banned: {
     en: "This account is blocked.",
     ar: "هذا الحساب موقوف.",

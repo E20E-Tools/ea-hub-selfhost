@@ -56,6 +56,7 @@
             "adminEmails": { "type": "string" },
             "adminGroups": { "type": "string" },
             "groupsClaim": { "type": "string" },
+            "allowedDomains": { "type": "string" },
             "autoCreate": { "type": "boolean" },
             "requireVerifiedEmail": { "type": "boolean" }
           }

@@ -4,6 +4,8 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { resetSelfhostConfig } from "../server/config";
 import {
   finish,
+  identityFrom,
+  SsoRefused,
   openPending,
   oidcSettings,
   readCookie,
@@ -252,6 +254,7 @@ describe("authorization code flow", () => {
     expect(who).toEqual({
       email: "someone@acme.example",
       name: "Sam",
+      emailVerified: true,
       isAdmin: true,
       redirect: "https://hub.example.com/admin",
     });
@@ -317,5 +320,121 @@ describe("authorization code flow", () => {
         second.value,
       ),
     ).rejects.toThrow(/nonce/);
+  });
+});
+
+describe("access rules (identityFrom)", () => {
+  const base = { email: "a@acme.example", email_verified: true };
+  const s = (extra: Record<string, string>) =>
+    oidcSettings({
+      OIDC_ISSUER: ISSUER,
+      OIDC_CLIENT_ID: "ea-hub",
+      OIDC_CLIENT_SECRET: "x",
+      OIDC_ADMIN_EMAILS: "a@acme.example",
+      ...extra,
+    })!;
+  const refused = (fn: () => unknown, code: string) => {
+    try {
+      fn();
+    } catch (e) {
+      expect(e).toBeInstanceOf(SsoRefused);
+      expect((e as SsoRefused).code).toBe(code);
+      return;
+    }
+    throw new Error("expected a refusal");
+  };
+
+  it("limits sign-in to the allowed domains", () => {
+    const only = s({ OIDC_ALLOWED_DOMAINS: "acme.example, @acme.org" });
+    expect(identityFrom(only, base, "/").email).toBe("a@acme.example");
+    expect(
+      identityFrom(only, { ...base, email: "b@ACME.org" }, "/").email,
+    ).toBe("b@acme.org");
+    refused(
+      () => identityFrom(only, { ...base, email: "x@evil.example" }, "/"),
+      "not_allowed",
+    );
+    refused(
+      () => identityFrom(only, { ...base, email: "x@sub.acme.example" }, "/"),
+      "not_allowed",
+    );
+  });
+
+  it("treats Entra's xms_edov as a verified e-mail", () => {
+    const who = identityFrom(
+      s({}),
+      { email: "a@acme.example", xms_edov: true },
+      "/",
+    );
+    expect(who).toMatchObject({ emailVerified: true, isAdmin: true });
+  });
+
+  it("refuses unverified e-mails unless allowed AND domains are limited", () => {
+    refused(
+      () => identityFrom(s({}), { email: "a@acme.example" }, "/"),
+      "unverified_email",
+    );
+    refused(
+      () =>
+        identityFrom(
+          s({ OIDC_REQUIRE_VERIFIED_EMAIL: "false" }),
+          { email: "a@acme.example" },
+          "/",
+        ),
+      "unverified_email",
+    );
+    const relaxed = s({
+      OIDC_REQUIRE_VERIFIED_EMAIL: "false",
+      OIDC_ALLOWED_DOMAINS: "acme.example",
+      OIDC_ADMIN_GROUPS: "g1",
+    });
+    // Accepted, but a listed admin e-mail does not count without verification…
+    expect(
+      identityFrom(relaxed, { email: "a@acme.example" }, "/"),
+    ).toMatchObject({
+      emailVerified: false,
+      isAdmin: false,
+    });
+    // …only a group does.
+    expect(
+      identityFrom(relaxed, { email: "a@acme.example", groups: ["g1"] }, "/")
+        .isAdmin,
+    ).toBe(true);
+  });
+
+  it("needs a real e-mail address", () => {
+    expect(() => identityFrom(s({}), { email_verified: true }, "/")).toThrow(
+      /no e-mail/,
+    );
+    expect(() =>
+      identityFrom(
+        s({}),
+        { email: "@acme.example", email_verified: true },
+        "/",
+      ),
+    ).toThrow(/no e-mail/);
+  });
+});
+
+describe("provider configuration safety", () => {
+  it("refuses an http issuer (except localhost)", async () => {
+    const insecure = oidcSettings({
+      OIDC_ISSUER: "http://idp.example.com",
+      OIDC_CLIENT_ID: "a",
+      OIDC_CLIENT_SECRET: "b",
+    })!;
+    await expect(startUrl(insecure, "/")).rejects.toThrow(/https/);
+  });
+
+  it("ignores keys of the wrong type for the token's algorithm", async () => {
+    const ec = generateKeyPairSync("ec", { namedCurve: "P-256" });
+    const ecJwk = { ...ec.publicKey.export({ format: "jwk" }), kid: "k1" };
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => Response.json({ keys: [ecJwk] })),
+    );
+    await expect(
+      verifyIdToken(idToken(good()), settings, `${ISSUER}/certs`, "n-1", now),
+    ).rejects.toThrow(/signing key/);
   });
 });

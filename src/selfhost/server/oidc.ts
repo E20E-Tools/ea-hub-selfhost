@@ -20,9 +20,10 @@ import { hmac, safeEqual } from "./crypto";
  *    as are iss, aud (+ azp), exp, iat and nonce
  *  - the redirect URI is fixed to APP_URL; post-login redirects stay on APP_URL's origin
  *  - accounts are linked by e-mail only when the provider says the e-mail is verified
+ *    (see identityFrom); OIDC_ALLOWED_DOMAINS limits sign-in to your own domains
  *  - the admin role is granted only to e-mails / groups listed in OIDC_ADMIN_EMAILS /
  *    OIDC_ADMIN_GROUPS; other people may sign in only if they already have an account
- *    (or OIDC_AUTO_CREATE=true)
+ *    (or OIDC_AUTO_CREATE=true together with OIDC_ALLOWED_DOMAINS)
  */
 
 export type OidcSettings = {
@@ -36,6 +37,8 @@ export type OidcSettings = {
   groupsClaim: string;
   autoCreate: boolean;
   requireVerifiedEmail: boolean;
+  /** Lower-case e-mail domains allowed to sign in; empty = any (see emailAllowed). */
+  allowedDomains: string[];
 };
 
 const list = (v: string | undefined) =>
@@ -63,7 +66,17 @@ export function oidcSettings(
     autoCreate: env["OIDC_AUTO_CREATE"]?.trim() === "true",
     requireVerifiedEmail:
       env["OIDC_REQUIRE_VERIFIED_EMAIL"]?.trim() !== "false",
+    allowedDomains: list(env["OIDC_ALLOWED_DOMAINS"]).map((d) =>
+      d.toLowerCase().replace(/^@/, ""),
+    ),
   };
+}
+
+const LOCAL = /^http:\/\/(localhost|127\.0\.0\.1|\[::1\])(:\d+)?(\/|$)/;
+
+/** https only, except a provider on this machine (development and tests). */
+function secureUrl(u: string): boolean {
+  return u.startsWith("https://") || LOCAL.test(u);
 }
 
 // ---------- discovery and keys ----------
@@ -95,6 +108,7 @@ export async function discover(s: OidcSettings): Promise<Discovery> {
     Date.now() - discovery.at < 3_600_000
   )
     return discovery.doc;
+  if (!secureUrl(s.issuer)) throw new Error("OIDC_ISSUER must be an https URL");
   const doc = (await getJson(
     `${s.issuer}/.well-known/openid-configuration`,
   )) as Discovery;
@@ -105,23 +119,24 @@ export async function discover(s: OidcSettings): Promise<Discovery> {
     "token_endpoint",
     "jwks_uri",
   ] as const)
-    if (
-      typeof doc[k] !== "string" ||
-      (!doc[k].startsWith("https://") && !s.issuer.startsWith("http://"))
-    )
+    if (typeof doc[k] !== "string" || !secureUrl(doc[k]))
       throw new Error(`OIDC discovery: ${k} must be an https URL`);
   discovery = { at: Date.now(), issuer: s.issuer, doc };
   return doc;
 }
+
+const KTY = { rsa: "RSA", pss: "RSA", ec: "EC" } as const;
 
 async function keyFor(
   uri: string,
   kid: string | undefined,
   alg: string,
 ): Promise<KeyObject> {
+  const kty = KTY[ALGS[alg]!.kind];
   const pick = (keys: JsonWebKey[]) =>
     keys.filter(
       (k) =>
+        k.kty === kty &&
         (k as { use?: string }).use !== "enc" &&
         (kid ? (k as { kid?: string }).kid === kid : true) &&
         (!(k as { alg?: string }).alg || (k as { alg?: string }).alg === alg),
@@ -314,6 +329,7 @@ export async function startUrl(
 export type SsoIdentity = {
   email: string;
   name: string | undefined;
+  emailVerified: boolean;
   isAdmin: boolean;
   redirect: string;
 };
@@ -360,20 +376,46 @@ export async function finish(
     pending.nonce,
   );
 
+  return identityFrom(s, claims, pending.redirect);
+}
+
+/** Refusals the sign-in page explains to the user (other failures show a generic message). */
+export class SsoRefused extends Error {
+  constructor(readonly code: "not_allowed" | "unverified_email") {
+    super(code);
+  }
+}
+
+const yes = (v: unknown) => v === true || v === "true";
+
+/**
+ * Turns verified ID token claims into an identity and applies the access rules:
+ *  - the e-mail counts as verified when email_verified is true, or (Microsoft Entra ID)
+ *    xms_edov is true: the e-mail's domain is verified by the tenant
+ *  - OIDC_ALLOWED_DOMAINS, when set, limits who may sign in at all
+ *  - an unverified e-mail is accepted only with OIDC_REQUIRE_VERIFIED_EMAIL=false AND an
+ *    allowed-domain list; it can never match OIDC_ADMIN_EMAILS (only groups) and ssoSignIn
+ *    never links it to an existing account
+ */
+export function identityFrom(
+  s: OidcSettings,
+  claims: IdClaims,
+  redirect: string,
+): SsoIdentity {
   const email =
     typeof claims["email"] === "string"
       ? claims["email"].trim().toLowerCase()
       : "";
-  if (!email || !email.includes("@"))
+  const at = email.lastIndexOf("@");
+  if (at < 1 || at === email.length - 1)
     throw new Error("the provider sent no e-mail address");
-  if (
-    s.requireVerifiedEmail &&
-    claims["email_verified"] !== true &&
-    claims["email_verified"] !== "true"
-  )
-    throw new Error(
-      "the provider did not confirm the e-mail address is verified",
-    );
+  const domain = email.slice(at + 1);
+  if (s.allowedDomains.length && !s.allowedDomains.includes(domain))
+    throw new SsoRefused("not_allowed");
+  const emailVerified =
+    yes(claims["email_verified"]) || yes(claims["xms_edov"]);
+  if (!emailVerified && (s.requireVerifiedEmail || !s.allowedDomains.length))
+    throw new SsoRefused("unverified_email");
   const raw = claims[s.groupsClaim];
   const groups = Array.isArray(raw)
     ? raw.map(String)
@@ -381,10 +423,10 @@ export async function finish(
       ? [raw]
       : [];
   const isAdmin =
-    s.adminEmails.includes(email) ||
+    (emailVerified && s.adminEmails.includes(email)) ||
     groups.some((g) => s.adminGroups.includes(g));
   const name = typeof claims["name"] === "string" ? claims["name"] : undefined;
-  return { email, name, isAdmin, redirect: pending.redirect };
+  return { email, name, emailVerified, isAdmin, redirect };
 }
 
 /** Test hook. */

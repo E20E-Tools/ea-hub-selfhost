@@ -283,11 +283,17 @@ export async function signInWithPassword(
 export async function ssoSignIn(params: {
   email: string;
   name: string | undefined;
+  /** false = the provider did not confirm the address: never link it to an existing account. */
+  emailVerified: boolean;
   isAdmin: boolean;
   autoCreate: boolean;
-}): Promise<{ session: Session } | { error: "not_allowed" | "banned" }> {
+}): Promise<
+  | { session: Session }
+  | { error: "not_allowed" | "banned" | "unverified_email" }
+> {
   const email = params.email.trim().toLowerCase();
   let row = await userByEmail(email);
+  if (row && !params.emailVerified) return { error: "unverified_email" };
   if (!row) {
     if (!params.isAdmin && !params.autoCreate) return { error: "not_allowed" };
     const rows = await db().unsafe<UserRow[]>(

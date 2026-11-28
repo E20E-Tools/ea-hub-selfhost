@@ -12,6 +12,7 @@ import {
   finish as oidcFinish,
   oidcSettings,
   readCookie as oidcReadCookie,
+  SsoRefused,
   startUrl as oidcStartUrl,
 } from "./oidc";
 
@@ -134,8 +135,10 @@ async function oidcCallback(request: Request, url: URL): Promise<Response> {
     const result = await auth.ssoSignIn({
       email: who.email,
       name: who.name,
+      emailVerified: who.emailVerified,
       isAdmin: who.isAdmin,
-      autoCreate: s.autoCreate,
+      // Creating accounts for anyone is only safe when the domains are limited.
+      autoCreate: s.autoCreate && s.allowedDomains.length > 0,
     });
     if ("error" in result) {
       console.warn(
@@ -148,6 +151,10 @@ async function oidcCallback(request: Request, url: URL): Promise<Response> {
       clear,
     );
   } catch (e) {
+    if (e instanceof SsoRefused) {
+      console.warn(`[selfhost] SSO sign-in refused (${e.code})`);
+      return redirect(`${appUrl}/admin?sso_error=${e.code}`, clear);
+    }
     console.error("[selfhost] SSO sign-in failed:", (e as Error).message);
     return redirect(`${appUrl}/admin?sso_error=failed`, clear);
   }
