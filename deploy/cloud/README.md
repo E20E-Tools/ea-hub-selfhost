@@ -58,7 +58,7 @@ terraform output url
 terraform output -raw admin_password
 ```
 
-The `terraform apply` step needs `gcloud` signed in, because it sets the app address after the service is created. Keep the Terraform state safe, because it contains the generated secrets.
+Keep the Terraform state safe, because it contains the generated secrets.
 
 ## After the first sign-in
 

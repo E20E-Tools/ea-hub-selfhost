@@ -48,6 +48,8 @@ provider "google" {
   region  = var.region
 }
 
+data "google_project" "this" {}
+
 locals {
   services = [
     "run.googleapis.com", "sqladmin.googleapis.com", "artifactregistry.googleapis.com",
@@ -55,7 +57,8 @@ locals {
     "servicenetworking.googleapis.com", "compute.googleapis.com",
   ]
   image = "${var.region}-docker.pkg.dev/${var.project}/${google_artifact_registry_repository.ghcr.repository_id}/e20e-tools/ea-hub-selfhost:${var.image_tag}"
-  url   = var.app_url != "" ? var.app_url : google_cloud_run_v2_service.app.uri
+  # Cloud Run's deterministic address: https://<service>-<project number>.<region>.run.app
+  url = var.app_url != "" ? var.app_url : "https://${var.name}-${data.google_project.this.number}.${var.region}.run.app"
   jobs = {
     newsletter       = "0 6 * * *"
     "daily-cleanup"  = "30 2 * * *"
@@ -248,7 +251,7 @@ resource "google_cloud_run_v2_service" "app" {
       }
       env {
         name  = "APP_URL"
-        value = var.app_url
+        value = local.url
       }
       env {
         name  = "DB_HOST"
@@ -307,11 +310,6 @@ resource "google_cloud_run_v2_service" "app" {
     }
   }
 
-  lifecycle {
-    # APP_URL is set by the null_resource below once the run.app address is known.
-    ignore_changes = [template[0].containers[0].env[0]]
-  }
-
   depends_on = [
     google_secret_manager_secret_version.s,
     google_secret_manager_secret_iam_member.s,
@@ -325,15 +323,6 @@ resource "google_cloud_run_v2_service_iam_member" "public" {
   location = var.region
   role     = "roles/run.invoker"
   member   = "allUsers"
-}
-
-# The generated address is only known after the service exists: set APP_URL afterwards.
-resource "terraform_data" "app_url" {
-  triggers_replace = [local.url]
-  provisioner "local-exec" {
-    command = "gcloud run services update ${var.name} --project ${var.project} --region ${var.region} --update-env-vars APP_URL=${local.url}"
-  }
-  depends_on = [google_cloud_run_v2_service.app]
 }
 
 # ---------- scheduled jobs ----------
