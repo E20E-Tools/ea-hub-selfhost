@@ -16,6 +16,9 @@ Amazon ECS with the Fargate launch type runs the EA-Hub container without server
 
 > Want Kubernetes on AWS instead? Use **EKS** with the Helm chart: [deploy-kubernetes.md](deploy-kubernetes.md) (StorageClass `gp3`, AWS Load Balancer Controller or ingress-nginx).
 
+
+> **Faster:** a ready-made template creates all of this in one step. See [deploy/cloud](../../deploy/cloud/README.md#aws). This guide explains each piece, if you prefer to build it by hand or adapt it.
+
 ## 1. Requirements
 
 ### AWS resources and sizing

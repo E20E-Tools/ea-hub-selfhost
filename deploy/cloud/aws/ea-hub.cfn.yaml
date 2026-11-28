@@ -1,0 +1,344 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Description: >-
+  EA-Hub (self-hosted) on ECS Fargate with RDS PostgreSQL 16, EFS for uploads, an HTTPS
+  Application Load Balancer, Secrets Manager and EventBridge Scheduler jobs. Deploy into an
+  existing VPC with 2 public and 2 private subnets (the private ones need a NAT gateway).
+  aws cloudformation deploy --stack-name ea-hub --template-file deploy/cloud/aws/ea-hub.cfn.yaml
+    --capabilities CAPABILITY_IAM --parameter-overrides VpcId=… PublicSubnets=a,b PrivateSubnets=c,d
+    CertificateArn=… DomainName=hub.example.com AdminEmail=…
+
+Parameters:
+  VpcId:
+    Type: AWS::EC2::VPC::Id
+  PublicSubnets:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: Two public subnets (load balancer).
+  PrivateSubnets:
+    Type: List<AWS::EC2::Subnet::Id>
+    Description: Two private subnets with a NAT gateway (tasks, database, EFS).
+  CertificateArn:
+    Type: String
+    Description: ACM certificate for DomainName (in this region).
+  DomainName:
+    Type: String
+    Description: Address people will use, e.g. hub.example.com (point it to the load balancer).
+  Image:
+    Type: String
+    Default: ghcr.io/e20e-tools/ea-hub-selfhost:1.1.0
+  AdminEmail:
+    Type: String
+  DbInstanceClass:
+    Type: String
+    Default: db.t4g.small
+  DesiredCount:
+    Type: Number
+    Default: 1
+    MinValue: 1
+    MaxValue: 6
+
+Resources:
+  # ---------- secrets ----------
+  EncryptionKey:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Description: EA-Hub root secret (never change it after the first start)
+      GenerateSecretString: { PasswordLength: 64, ExcludePunctuation: true }
+  CronSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      GenerateSecretString: { PasswordLength: 48, ExcludePunctuation: true }
+  AdminPasswordSecret:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Description: First EA-Hub admin password (read it once, change it after signing in)
+      GenerateSecretString: { PasswordLength: 20, ExcludePunctuation: true }
+
+  # ---------- network ----------
+  AlbSg:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: EA-Hub load balancer
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        - { IpProtocol: tcp, FromPort: 443, ToPort: 443, CidrIp: 0.0.0.0/0 }
+        - { IpProtocol: tcp, FromPort: 80, ToPort: 80, CidrIp: 0.0.0.0/0 }
+  AppSg:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: EA-Hub tasks
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        - { IpProtocol: tcp, FromPort: 3000, ToPort: 3000, SourceSecurityGroupId: !Ref AlbSg }
+  DataSg:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: EA-Hub database and EFS
+      VpcId: !Ref VpcId
+      SecurityGroupIngress:
+        - { IpProtocol: tcp, FromPort: 5432, ToPort: 5432, SourceSecurityGroupId: !Ref AppSg }
+        - { IpProtocol: tcp, FromPort: 2049, ToPort: 2049, SourceSecurityGroupId: !Ref AppSg }
+
+  # ---------- database ----------
+  DbSubnets:
+    Type: AWS::RDS::DBSubnetGroup
+    Properties:
+      DBSubnetGroupDescription: EA-Hub
+      SubnetIds: !Ref PrivateSubnets
+  Database:
+    Type: AWS::RDS::DBInstance
+    Metadata:
+      cfn-lint:
+        config:
+          # A major version only: RDS picks the newest minor release of PostgreSQL 17.
+          ignore_checks: [W3691]
+    DeletionPolicy: Snapshot
+    UpdateReplacePolicy: Snapshot
+    Properties:
+      Engine: postgres
+      EngineVersion: "17"
+      DBInstanceClass: !Ref DbInstanceClass
+      AllocatedStorage: "20"
+      StorageType: gp3
+      StorageEncrypted: true
+      DBName: eahub
+      MasterUsername: eahubadmin
+      # RDS generates the password and keeps it in Secrets Manager.
+      ManageMasterUserPassword: true
+      DBSubnetGroupName: !Ref DbSubnets
+      VPCSecurityGroups: [!Ref DataSg]
+      PubliclyAccessible: false
+      BackupRetentionPeriod: 14
+      DeletionProtection: true
+
+  # ---------- uploads ----------
+  Files:
+    Type: AWS::EFS::FileSystem
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      Encrypted: true
+      BackupPolicy: { Status: ENABLED }
+  FilesMountA:
+    Type: AWS::EFS::MountTarget
+    Properties:
+      FileSystemId: !Ref Files
+      SubnetId: !Select [0, !Ref PrivateSubnets]
+      SecurityGroups: [!Ref DataSg]
+  FilesMountB:
+    Type: AWS::EFS::MountTarget
+    Properties:
+      FileSystemId: !Ref Files
+      SubnetId: !Select [1, !Ref PrivateSubnets]
+      SecurityGroups: [!Ref DataSg]
+  FilesAccessPoint:
+    Type: AWS::EFS::AccessPoint
+    Properties:
+      FileSystemId: !Ref Files
+      PosixUser: { Uid: "1000", Gid: "0" }
+      RootDirectory:
+        Path: /ea-hub
+        CreationInfo: { OwnerUid: "1000", OwnerGid: "0", Permissions: "775" }
+
+  # ---------- load balancer ----------
+  Alb:
+    Type: AWS::ElasticLoadBalancingV2::LoadBalancer
+    Properties:
+      Scheme: internet-facing
+      Subnets: !Ref PublicSubnets
+      SecurityGroups: [!Ref AlbSg]
+      LoadBalancerAttributes:
+        - { Key: idle_timeout.timeout_seconds, Value: "300" }
+  TargetGroup:
+    Type: AWS::ElasticLoadBalancingV2::TargetGroup
+    Properties:
+      VpcId: !Ref VpcId
+      TargetType: ip
+      Protocol: HTTP
+      Port: 3000
+      HealthCheckPath: /healthz
+      Matcher: { HttpCode: "200" }
+  HttpsListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref Alb
+      Port: 443
+      Protocol: HTTPS
+      Certificates: [{ CertificateArn: !Ref CertificateArn }]
+      DefaultActions: [{ Type: forward, TargetGroupArn: !Ref TargetGroup }]
+  HttpListener:
+    Type: AWS::ElasticLoadBalancingV2::Listener
+    Properties:
+      LoadBalancerArn: !Ref Alb
+      Port: 80
+      Protocol: HTTP
+      DefaultActions:
+        - Type: redirect
+          RedirectConfig: { Protocol: HTTPS, Port: "443", StatusCode: HTTP_301 }
+
+  # ---------- ECS ----------
+  Logs:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /ecs/${AWS::StackName}
+      RetentionInDays: 30
+  Cluster:
+    Type: AWS::ECS::Cluster
+  ExecutionRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - { Effect: Allow, Principal: { Service: ecs-tasks.amazonaws.com }, Action: sts:AssumeRole }
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy
+      Policies:
+        - PolicyName: read-ea-hub-secrets
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - Effect: Allow
+                Action: secretsmanager:GetSecretValue
+                Resource: [!Ref EncryptionKey, !Ref CronSecret, !Ref AdminPasswordSecret, !GetAtt Database.MasterUserSecret.SecretArn]
+  TaskDefinition:
+    Type: AWS::ECS::TaskDefinition
+    Properties:
+      Family: !Ref AWS::StackName
+      RequiresCompatibilities: [FARGATE]
+      NetworkMode: awsvpc
+      Cpu: "1024"
+      Memory: "2048"
+      ExecutionRoleArn: !GetAtt ExecutionRole.Arn
+      RuntimePlatform: { CpuArchitecture: X86_64, OperatingSystemFamily: LINUX }
+      Volumes:
+        - Name: uploads
+          EFSVolumeConfiguration:
+            FilesystemId: !Ref Files
+            TransitEncryption: ENABLED
+            AuthorizationConfig: { AccessPointId: !Ref FilesAccessPoint, IAM: DISABLED }
+      ContainerDefinitions:
+        - Name: ea-hub
+          Image: !Ref Image
+          Essential: true
+          PortMappings: [{ ContainerPort: 3000, Protocol: tcp }]
+          MountPoints: [{ SourceVolume: uploads, ContainerPath: /data/storage }]
+          Environment:
+            - { Name: APP_URL, Value: !Sub "https://${DomainName}" }
+            - { Name: DB_HOST, Value: !GetAtt Database.Endpoint.Address }
+            - { Name: DB_NAME, Value: eahub }
+            - { Name: DB_SSLMODE, Value: require }
+            - { Name: APP_DB_USER, Value: eahubadmin }
+            - { Name: MIGRATE_ON_START, Value: "true" }
+            - { Name: ADMIN_EMAIL, Value: !Ref AdminEmail }
+            - { Name: TRUST_PROXY_HOPS, Value: "1" }
+          Secrets:
+            - { Name: APP_DB_PASSWORD, ValueFrom: !Sub "${Database.MasterUserSecret.SecretArn}:password::" }
+            - { Name: APP_ENCRYPTION_KEY, ValueFrom: !Ref EncryptionKey }
+            - { Name: CRON_SECRET, ValueFrom: !Ref CronSecret }
+            - { Name: ADMIN_PASSWORD, ValueFrom: !Ref AdminPasswordSecret }
+          HealthCheck:
+            Command: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/healthz').then(r=>process.exit(r.ok?0:1),()=>process.exit(1))"]
+            Interval: 30
+            Timeout: 5
+            Retries: 3
+            StartPeriod: 120
+          LogConfiguration:
+            LogDriver: awslogs
+            Options:
+              awslogs-group: !Ref Logs
+              awslogs-region: !Ref AWS::Region
+              awslogs-stream-prefix: app
+  Service:
+    Type: AWS::ECS::Service
+    DependsOn: [HttpsListener, FilesMountA, FilesMountB]
+    Properties:
+      Cluster: !Ref Cluster
+      TaskDefinition: !Ref TaskDefinition
+      DesiredCount: !Ref DesiredCount
+      LaunchType: FARGATE
+      HealthCheckGracePeriodSeconds: 180
+      NetworkConfiguration:
+        AwsvpcConfiguration:
+          Subnets: !Ref PrivateSubnets
+          SecurityGroups: [!Ref AppSg]
+          AssignPublicIp: DISABLED
+      LoadBalancers:
+        - { ContainerName: ea-hub, ContainerPort: 3000, TargetGroupArn: !Ref TargetGroup }
+
+  # ---------- scheduled jobs ----------
+  SchedulerRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          - { Effect: Allow, Principal: { Service: scheduler.amazonaws.com }, Action: sts:AssumeRole }
+      Policies:
+        - PolicyName: run-ea-hub-jobs
+          PolicyDocument:
+            Version: "2012-10-17"
+            Statement:
+              - { Effect: Allow, Action: ecs:RunTask, Resource: !Ref TaskDefinition }
+              - { Effect: Allow, Action: iam:PassRole, Resource: !GetAtt ExecutionRole.Arn }
+  NewsletterJob:
+    Type: AWS::Scheduler::Schedule
+    Properties:
+      ScheduleExpression: cron(0 6 * * ? *)
+      FlexibleTimeWindow: { Mode: "OFF" }
+      Target:
+        Arn: !GetAtt Cluster.Arn
+        RoleArn: !GetAtt SchedulerRole.Arn
+        EcsParameters:
+          TaskDefinitionArn: !Ref TaskDefinition
+          LaunchType: FARGATE
+          NetworkConfiguration:
+            AwsvpcConfiguration:
+              Subnets: !Ref PrivateSubnets
+              SecurityGroups: [!Ref AppSg]
+              AssignPublicIp: DISABLED
+        Input: !Sub '{"containerOverrides":[{"name":"ea-hub","command":["node","selfhost/scripts/run-job.mjs","newsletter"],"environment":[{"name":"JOB_BASE_URL","value":"https://${DomainName}"},{"name":"MIGRATE_ON_START","value":"false"}]}]}'
+  CleanupJob:
+    Type: AWS::Scheduler::Schedule
+    Properties:
+      ScheduleExpression: cron(30 2 * * ? *)
+      FlexibleTimeWindow: { Mode: "OFF" }
+      Target:
+        Arn: !GetAtt Cluster.Arn
+        RoleArn: !GetAtt SchedulerRole.Arn
+        EcsParameters:
+          TaskDefinitionArn: !Ref TaskDefinition
+          LaunchType: FARGATE
+          NetworkConfiguration:
+            AwsvpcConfiguration:
+              Subnets: !Ref PrivateSubnets
+              SecurityGroups: [!Ref AppSg]
+              AssignPublicIp: DISABLED
+        Input: !Sub '{"containerOverrides":[{"name":"ea-hub","command":["node","selfhost/scripts/run-job.mjs","daily-cleanup"],"environment":[{"name":"JOB_BASE_URL","value":"https://${DomainName}"},{"name":"MIGRATE_ON_START","value":"false"}]}]}'
+  SemanticIndexJob:
+    Type: AWS::Scheduler::Schedule
+    Properties:
+      ScheduleExpression: cron(15 3 * * ? *)
+      FlexibleTimeWindow: { Mode: "OFF" }
+      Target:
+        Arn: !GetAtt Cluster.Arn
+        RoleArn: !GetAtt SchedulerRole.Arn
+        EcsParameters:
+          TaskDefinitionArn: !Ref TaskDefinition
+          LaunchType: FARGATE
+          NetworkConfiguration:
+            AwsvpcConfiguration:
+              Subnets: !Ref PrivateSubnets
+              SecurityGroups: [!Ref AppSg]
+              AssignPublicIp: DISABLED
+        Input: !Sub '{"containerOverrides":[{"name":"ea-hub","command":["node","selfhost/scripts/run-job.mjs","semantic-index"],"environment":[{"name":"JOB_BASE_URL","value":"https://${DomainName}"},{"name":"MIGRATE_ON_START","value":"false"}]}]}'
+
+Outputs:
+  LoadBalancerDns:
+    Description: Point DomainName (CNAME or Route 53 alias) to this address.
+    Value: !GetAtt Alb.DNSName
+  Url:
+    Value: !Sub "https://${DomainName}/admin"
+  AdminPassword:
+    Description: >-
+      Read the first admin password with: aws secretsmanager get-secret-value --secret-id <this> --query SecretString --output text
+    Value: !Ref AdminPasswordSecret

@@ -18,6 +18,9 @@
 
 > تفضّل Kubernetes على AWS؟ استخدم **EKS** مع الـ Helm chart كما في [helm.md](helm.md)، مع StorageClass `gp3` وAWS Load Balancer Controller أو ingress-nginx.
 
+
+> **أسرع:** قالب جاهز ينشئ كل ذلك بخطوة واحدة، انظر [deploy/cloud](../deploy/cloud/README.md). أما هذا الدليل فيشرح كل جزء لمن يريد البناء يدوياً أو التعديل.
+
 ## 1. المتطلبات
 
 ### موارد AWS وأحجامها
