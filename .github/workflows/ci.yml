@@ -574,7 +574,7 @@ jobs:
           kubectl -n ea-hub get eahub,pods
       - name: Reconciles without changes keep the release and its secrets
         run: |
-          revisions() { kubectl -n ea-hub get secret -l owner=helm,name=ea-hub -o name | wc -l; }
+          revisions() { kubectl -n ea-hub get secret -l owner=helm,name=ea-hub,status=deployed -o jsonpath='{.items[0].metadata.labels.version}'; }
           secrets() { kubectl -n ea-hub get secret ea-hub -o jsonpath='{.data}' | sha256sum; }
           r0=$(revisions); s0=$(secrets)
           for i in 1 2 3; do
@@ -589,7 +589,7 @@ jobs:
           test "$(secrets)" = "$s0"
       - name: A spec change upgrades once and keeps the secrets
         run: |
-          revisions() { kubectl -n ea-hub get secret -l owner=helm,name=ea-hub -o name | wc -l; }
+          revisions() { kubectl -n ea-hub get secret -l owner=helm,name=ea-hub,status=deployed -o jsonpath='{.items[0].metadata.labels.version}'; }
           secrets() { kubectl -n ea-hub get secret ea-hub -o jsonpath='{.data}' | sha256sum; }
           r0=$(revisions); s0=$(secrets)
           kubectl -n ea-hub patch eahub/ea-hub --type merge -p '{"spec":{"backup":{"keepDays":7}}}'
