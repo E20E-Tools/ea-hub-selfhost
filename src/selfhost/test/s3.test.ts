@@ -69,7 +69,7 @@ describe("S3 SigV4 signer", () => {
   });
 });
 
-// Runs against a real S3-compatible server when SELFHOST_TEST_S3_ENDPOINT is set (CI: MinIO).
+// Runs against a real S3-compatible server when SELFHOST_TEST_S3_ENDPOINT is set (CI: rclone serve s3).
 const endpoint = process.env["SELFHOST_TEST_S3_ENDPOINT"];
 describe.skipIf(!endpoint)("S3 blob store against a real server", () => {
   it("creates the bucket, then puts, reads, streams and deletes an object", async () => {
