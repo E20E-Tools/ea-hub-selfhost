@@ -15,6 +15,8 @@ EA-Hub runs anywhere that can run a Linux container and a PostgreSQL 16 database
 | **AWS ECS on Fargate** | Serverless containers on AWS | [deploy-aws-ecs-fargate.md](deploy-aws-ecs-fargate.md) |
 | **Google Cloud Run** | Serverless containers on Google Cloud | [deploy-google-cloud-run.md](deploy-google-cloud-run.md) |
 
+**One-click cloud templates** (Azure Bicep with a "Deploy to Azure" button, AWS CloudFormation, Google Cloud Terraform): [deploy/cloud](../../deploy/cloud/README.md).
+
 **Single sign-on** (Microsoft Entra ID, Keycloak, Okta, Google…) works on every platform: see [single-sign-on.md](single-sign-on.md).
 
 ## What every installation is made of

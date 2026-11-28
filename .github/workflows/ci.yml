@@ -468,6 +468,40 @@ jobs:
           kubectl -n ea-hub logs ea-hub-pg-1 --tail=30 || true
           kubectl -n ea-hub logs deploy/ea-hub --tail=100 || true
 
+  # One-click cloud templates: Bicep compiles (and the ARM file for the "Deploy to Azure"
+  # button is regenerated on main), CloudFormation passes cfn-lint, Terraform validates.
+  cloud-templates:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # commits the regenerated azuredeploy.json on main
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Azure Bicep -> ARM
+        run: |
+          az bicep install
+          az bicep build --file deploy/cloud/azure/main.bicep --outfile deploy/cloud/azure/azuredeploy.json
+      - name: AWS CloudFormation (cfn-lint)
+        run: |
+          pip install --quiet cfn-lint
+          cfn-lint deploy/cloud/aws/ea-hub.cfn.yaml
+      - uses: hashicorp/setup-terraform@dfe3c3f87815947d99a8997f908cb6525fc44e9e # v4.0.1
+      - name: Google Cloud Terraform (fmt, validate)
+        working-directory: deploy/cloud/gcp
+        run: |
+          terraform fmt -check -diff
+          terraform init -backend=false -input=false
+          terraform validate
+      - name: Commit the regenerated ARM template (main only)
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          if git diff --quiet -- deploy/cloud/azure/azuredeploy.json && git ls-files --error-unmatch deploy/cloud/azure/azuredeploy.json >/dev/null 2>&1; then
+            echo "azuredeploy.json up to date"; exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add deploy/cloud/azure/azuredeploy.json
+          git commit -m "chore: regenerate deploy/cloud/azure/azuredeploy.json from main.bicep"
+          git push
+
   # The release image (with the local search model) on the distroless base: the native
   # libraries of the model must load, and the image must stay free of fixable criticals/highs.
   image-full:

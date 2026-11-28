@@ -12,6 +12,9 @@ Container Apps runs the EA-Hub container without servers or Kubernetes to manage
 
 > **Status:** these steps follow Azure's documented CLI. The container itself, owner mode for managed PostgreSQL, and `MIGRATE_ON_START` are tested in CI on plain PostgreSQL 16. Azure itself has not been tested end-to-end yet. If something differs in your subscription, please open an issue.
 
+
+> **Faster:** a ready-made template creates all of this in one step. See [deploy/cloud](../../deploy/cloud/README.md#azure). This guide explains each piece, if you prefer to build it by hand or adapt it.
+
 ## 1. Requirements
 
 ### Azure resources and sizing

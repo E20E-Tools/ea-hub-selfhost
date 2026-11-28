@@ -16,6 +16,9 @@ Cloud Run runs the EA-Hub container with automatic HTTPS and no servers to manag
 
 > Prefer Kubernetes? Use **GKE** with the Helm chart: [deploy-kubernetes.md](deploy-kubernetes.md).
 
+
+> **Faster:** a ready-made template creates all of this in one step. See [deploy/cloud](../../deploy/cloud/README.md#google-cloud). This guide explains each piece, if you prefer to build it by hand or adapt it.
+
 ## 1. Requirements
 
 ### Resources and sizing
