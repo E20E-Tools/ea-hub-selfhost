@@ -17,7 +17,7 @@ param location string = resourceGroup().location
 param name string = 'eahub'
 
 @description('Container image of EA-Hub.')
-param image string = 'ghcr.io/e20e-tools/ea-hub-selfhost:1.1.0'
+param image string = 'ghcr.io/e20e-tools/ea-hub-selfhost:1.2.0'
 
 @description('E-mail of the first admin account.')
 param adminEmail string

@@ -30,7 +30,7 @@ variable "name" {
 }
 variable "image_tag" {
   type    = string
-  default = "1.1.0"
+  default = "1.2.0"
 }
 variable "admin_email" { type = string }
 variable "sql_tier" {

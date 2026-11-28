@@ -24,7 +24,7 @@ Parameters:
     Description: Address people will use, e.g. hub.example.com (point it to the load balancer).
   Image:
     Type: String
-    Default: ghcr.io/e20e-tools/ea-hub-selfhost:1.1.0
+    Default: ghcr.io/e20e-tools/ea-hub-selfhost:1.2.0
   AdminEmail:
     Type: String
   DbInstanceClass:
