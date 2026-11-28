@@ -1,0 +1,9 @@
+# Rancher Fleet bundle: EA-Hub staging. Point a GitRepo at this folder (in your config repo).
+defaultNamespace: ea-hub-staging
+helm:
+  releaseName: ea-hub
+  repo: https://e20e-tools.github.io/ea-hub-selfhost
+  chart: ea-hub
+  version: 1.1.0
+  valuesFiles:
+    - ../../values/staging.yaml

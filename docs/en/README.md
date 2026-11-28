@@ -17,6 +17,10 @@ EA-Hub runs anywhere that can run a Linux container and a PostgreSQL 16 database
 
 **One-click cloud templates** (Azure Bicep with a "Deploy to Azure" button, AWS CloudFormation, Google Cloud Terraform): [deploy/cloud](../../deploy/cloud/README.md).
 
+**Several environments with GitOps** (Argo CD, Rancher Fleet; staging and production values): [deploy/gitops](../../deploy/gitops/README.md).
+
+**Server status:** the admin console's **Settings → Application health** page shows the version, database, migrations, storage, e-mail, SSO, jobs, metrics and search status.
+
 **Single sign-on** (Microsoft Entra ID, Keycloak, Okta, Google…) works on every platform: see [single-sign-on.md](single-sign-on.md).
 
 ## What every installation is made of

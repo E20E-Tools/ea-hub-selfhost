@@ -44,7 +44,7 @@ let ownerMode: Promise<boolean> | undefined;
  * service requests keep the login role, which must own the tables (owners are not
  * restricted by RLS); migrate.mjs explains the setup. Detected once per process.
  */
-function serviceRunsAsOwner(): Promise<boolean> {
+export function serviceRunsAsOwner(): Promise<boolean> {
   if (!ownerMode) {
     ownerMode = db()
       .unsafe<{ bypass: boolean }[]>(

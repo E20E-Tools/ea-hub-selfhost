@@ -392,6 +392,37 @@ suite("self-host adapter (live database)", () => {
     }
   });
 
+  it("serves the server status to admins only", async () => {
+    const anonRes = await handleSelfhost(
+      new Request("http://app.test/api/selfhost/status"),
+    );
+    expect(anonRes!.status).toBe(403);
+    const { signInWithPassword } = await import("../server/auth");
+    const signed = await signInWithPassword(email, password);
+    const res = await handleSelfhost(
+      new Request("http://app.test/api/selfhost/status", {
+        headers: { authorization: `Bearer ${signed.session!.access_token}` },
+      }),
+    );
+    expect(res!.status).toBe(200);
+    const body = (await res!.json()) as {
+      version: string;
+      checks: Record<string, { ok: boolean | null; detail: string }>;
+    };
+    expect(body.checks["database"]?.ok).toBe(true);
+    expect(body.checks["database"]?.detail).toMatch(/PostgreSQL/);
+    expect(Object.keys(body.checks)).toEqual(
+      expect.arrayContaining([
+        "migrations",
+        "storage",
+        "mail",
+        "sso",
+        "scheduledJobs",
+      ]),
+    );
+    expect(JSON.stringify(body)).not.toMatch(/test-root-secret/);
+  });
+
   it("stores files with signed URLs", async () => {
     const bucket = admin.storage.from("library-assets");
     const up = await bucket.upload(

@@ -120,6 +120,13 @@ jobs:
       - uses: azure/setup-helm@2f5e7bc67f1f9972ab16657bb795f36d8f04de0e # v5.1.0
       - name: Backup script copies match
         run: cmp selfhost/backup/backup.sh deploy/helm/ea-hub/files/backup.sh
+      - name: GitOps example values render
+        run: |
+          for env in staging production; do
+            helm template ea-hub deploy/helm/ea-hub -f deploy/gitops/values/$env.yaml > /tmp/gitops-$env.yaml
+            echo "$env: $(grep -c '^kind:' /tmp/gitops-$env.yaml) resources"
+          done
+          grep -q "kind: Cluster" /tmp/gitops-production.yaml
       - name: Alert rules are valid PromQL (promtool)
         run: |
           helm template ea-hub deploy/helm/ea-hub --set appUrl=https://hub.example.com             --set metrics.enabled=true --set metrics.prometheusRule.enabled=true             -s templates/alerts-dashboard.yaml > /tmp/rule.yaml

@@ -1,0 +1,15 @@
+# Staging: one app pod, the built-in PostgreSQL, a staging host name.
+appUrl: https://hub-staging.example.com
+admin:
+  email: admin@example.com          # password: generated, see "helm status" notes
+secrets:
+  create: false
+  existingSecret: ea-hub-secrets    # created by Sealed Secrets / External Secrets (see README)
+ingress:
+  enabled: true
+  host: hub-staging.example.com
+  tls: true
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt
+metrics:
+  enabled: true
