@@ -5,7 +5,7 @@ Description: >-
   existing VPC with 2 public and 2 private subnets (the private ones need a NAT gateway).
   aws cloudformation deploy --stack-name ea-hub --template-file deploy/cloud/aws/ea-hub.cfn.yaml
     --capabilities CAPABILITY_IAM --parameter-overrides VpcId=… PublicSubnets=a,b PrivateSubnets=c,d
-    CertificateArn=… DomainName=hub.example.com AdminEmail=… AdminPassword=… DbPassword=…
+    CertificateArn=… DomainName=hub.example.com AdminEmail=…
 
 Parameters:
   VpcId:
@@ -27,16 +27,6 @@ Parameters:
     Default: ghcr.io/e20e-tools/ea-hub-selfhost:1.1.0
   AdminEmail:
     Type: String
-  AdminPassword:
-    Type: String
-    NoEcho: true
-    MinLength: 10
-  DbPassword:
-    Type: String
-    NoEcho: true
-    MinLength: 16
-    AllowedPattern: "[A-Za-z0-9]+"
-    Description: RDS master password (letters and digits).
   DbInstanceClass:
     Type: String
     Default: db.t4g.small
@@ -57,14 +47,11 @@ Resources:
     Type: AWS::SecretsManager::Secret
     Properties:
       GenerateSecretString: { PasswordLength: 48, ExcludePunctuation: true }
-  DbPasswordSecret:
-    Type: AWS::SecretsManager::Secret
-    Properties:
-      SecretString: !Ref DbPassword
   AdminPasswordSecret:
     Type: AWS::SecretsManager::Secret
     Properties:
-      SecretString: !Ref AdminPassword
+      Description: First EA-Hub admin password (read it once, change it after signing in)
+      GenerateSecretString: { PasswordLength: 20, ExcludePunctuation: true }
 
   # ---------- network ----------
   AlbSg:
@@ -103,14 +90,15 @@ Resources:
     UpdateReplacePolicy: Snapshot
     Properties:
       Engine: postgres
-      EngineVersion: "16"
+      EngineVersion: "17"
       DBInstanceClass: !Ref DbInstanceClass
       AllocatedStorage: "20"
       StorageType: gp3
       StorageEncrypted: true
       DBName: eahub
       MasterUsername: eahubadmin
-      MasterUserPassword: !Ref DbPassword
+      # RDS generates the password and keeps it in Secrets Manager.
+      ManageMasterUserPassword: true
       DBSubnetGroupName: !Ref DbSubnets
       VPCSecurityGroups: [!Ref DataSg]
       PubliclyAccessible: false
@@ -121,6 +109,7 @@ Resources:
   Files:
     Type: AWS::EFS::FileSystem
     DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
     Properties:
       Encrypted: true
       BackupPolicy: { Status: ENABLED }
@@ -205,7 +194,7 @@ Resources:
             Statement:
               - Effect: Allow
                 Action: secretsmanager:GetSecretValue
-                Resource: [!Ref EncryptionKey, !Ref CronSecret, !Ref DbPasswordSecret, !Ref AdminPasswordSecret]
+                Resource: [!Ref EncryptionKey, !Ref CronSecret, !Ref AdminPasswordSecret, !GetAtt Database.MasterUserSecret.SecretArn]
   TaskDefinition:
     Type: AWS::ECS::TaskDefinition
     Properties:
@@ -238,7 +227,7 @@ Resources:
             - { Name: ADMIN_EMAIL, Value: !Ref AdminEmail }
             - { Name: TRUST_PROXY_HOPS, Value: "1" }
           Secrets:
-            - { Name: APP_DB_PASSWORD, ValueFrom: !Ref DbPasswordSecret }
+            - { Name: APP_DB_PASSWORD, ValueFrom: !Sub "${Database.MasterUserSecret.SecretArn}:password::" }
             - { Name: APP_ENCRYPTION_KEY, ValueFrom: !Ref EncryptionKey }
             - { Name: CRON_SECRET, ValueFrom: !Ref CronSecret }
             - { Name: ADMIN_PASSWORD, ValueFrom: !Ref AdminPasswordSecret }
@@ -344,3 +333,7 @@ Outputs:
     Value: !GetAtt Alb.DNSName
   Url:
     Value: !Sub "https://${DomainName}/admin"
+  AdminPassword:
+    Description: >-
+      Read the first admin password with: aws secretsmanager get-secret-value --secret-id <this> --query SecretString --output text
+    Value: !Ref AdminPasswordSecret
