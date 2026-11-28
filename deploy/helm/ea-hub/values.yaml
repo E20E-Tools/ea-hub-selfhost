@@ -21,7 +21,7 @@ image:
 # -- Needed when the image is private, e.g. [{name: ghcr-pull}]. See docs/helm.md.
 imagePullSecrets: []
 
-# -- Keep 1 unless storage.accessMode is ReadWriteMany (uploads are files on a volume).
+# -- Keep 1 unless uploads are shared: storage.backend=s3, or storage.accessMode=ReadWriteMany.
 replicaCount: 1
 
 # First admin account. Created on first install only; later changes are ignored unless
@@ -104,6 +104,24 @@ trustProxyHops: 1
 
 # Uploaded files (logos, product images, attachments).
 storage:
+  # -- filesystem = a volume (PVC); s3 = an S3-compatible bucket (AWS S3, MinIO, Ceph, R2…),
+  # which lets several app replicas share uploads. Files are still served through the app.
+  backend: filesystem
+  s3:
+    bucket: ""
+    # -- e.g. eu-central-1 (any value for MinIO).
+    region: us-east-1
+    # -- Empty for AWS; e.g. https://minio.example.com for S3-compatible services.
+    endpoint: ""
+    # -- "true"/"false"; empty = path-style when an endpoint is set.
+    forcePathStyle: ""
+    # -- Folder inside the bucket.
+    prefix: ""
+    # Credentials, stored in the release Secret (or set s3-access-key-id and
+    # s3-secret-access-key in secrets.existingSecret).
+    accessKeyId: ""
+    secretAccessKey: ""
+  # The settings below are for backend=filesystem.
   size: 5Gi
   storageClass: ""
   accessMode: ReadWriteOnce

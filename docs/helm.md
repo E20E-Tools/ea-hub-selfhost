@@ -76,6 +76,17 @@ kubectl -n ea-hub rollout status deploy/ea-hub
 | `backup.schedule` / `keepDays` | النسخ الاحتياطي |
 | `secrets.create=false` + `secrets.existingSecret` | إدارة الأسرار بنفسك (Vault أو SealedSecrets…) |
 
+### تشغيل أكثر من نسخة من التطبيق (الملفات على S3)
+
+افتراضياً تُحفظ الملفات المرفوعة على قرص لا يُربط إلا بحاوية واحدة، فيعمل التطبيق بنسخة واحدة. لتشغيل أكثر من نسخة، احفظ الملفات في حاوية تخزين متوافقة مع S3، مثل AWS S3 أو MinIO أو Ceph:
+
+```bash
+--set replicaCount=2 --set storage.backend=s3 --set storage.s3.bucket=ea-hub-uploads --set storage.s3.region=eu-central-1 --set storage.s3.accessKeyId=… --set storage.s3.secretAccessKey=…
+# لغير AWS:  --set storage.s3.endpoint=https://minio.example.com
+```
+
+تظل الملفات تُقدَّم عبر التطبيق، فتبقى صلاحيات الوصول والروابط الموقعة كما هي، ويمكن أن تبقى الحاوية خاصة. في هذا الوضع لا تشمل النسخة الاحتياطية الليلية إلا قاعدة البيانات، لذا فعّل خاصية الإصدارات (versioning) أو النسخ المتماثل في الحاوية لحماية الملفات.
+
 ### HTTPS تلقائي عبر cert-manager
 
 إذا كان [cert-manager](https://cert-manager.io) مثبتاً ولديك ClusterIssuer:

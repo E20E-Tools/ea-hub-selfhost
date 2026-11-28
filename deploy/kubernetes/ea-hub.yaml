@@ -350,6 +350,8 @@ spec:
                   name: ea-hub
                   key: turnstile-secret-key
                   optional: true
+            - name: STORAGE_BACKEND
+              value: "filesystem"
           volumeMounts:
             - name: storage
               mountPath: /data/storage

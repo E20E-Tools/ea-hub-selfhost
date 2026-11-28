@@ -1,22 +1,13 @@
-import { createReadStream } from "node:fs";
-import {
-  mkdir,
-  readFile,
-  rename,
-  stat,
-  unlink,
-  writeFile,
-} from "node:fs/promises";
 import path from "node:path";
-import { Readable } from "node:stream";
-import { randomUUID } from "node:crypto";
+import { blobStore } from "./blobs";
 import { selfhostConfig } from "./config";
 import { asRole, SERVICE, type RequestAuth } from "./db";
 import { hmac, safeEqual } from "./crypto";
 
 /**
- * File storage on the local disk (a Docker volume or a Kubernetes PVC). Metadata lives in
- * storage.objects so the upstream storage RLS policies still decide who may read or write.
+ * File storage: bytes on the local disk (a Docker volume or PVC) or in an S3 bucket (see
+ * blobs.ts). Metadata lives in storage.objects so the upstream storage RLS policies still
+ * decide who may read or write, and files are always served through the app.
  */
 
 type StorageError = { message: string; statusCode: string; name: string };
@@ -34,14 +25,6 @@ export function safeObjectPath(name: string): string | null {
   const parts = p.split("/");
   if (parts.some((s) => !s || s === "." || s === "..")) return null;
   return parts.join("/");
-}
-
-function filePath(bucket: string, name: string): string {
-  const root = path.resolve(selfhostConfig().storageDir);
-  const full = path.resolve(root, bucket, ...name.split("/"));
-  if (!full.startsWith(root + path.sep))
-    throw new Error("path escapes storage root");
-  return full;
 }
 
 async function toBuffer(body: unknown): Promise<Buffer> {
@@ -133,11 +116,8 @@ export class StorageBucket {
           [this.bucket, key, owner, JSON.stringify(metadata)],
         );
         if (!rows[0]) return null;
-        const target = filePath(this.bucket, key);
-        await mkdir(path.dirname(target), { recursive: true });
-        const tmp = `${target}.${randomUUID()}.tmp`;
-        await writeFile(tmp, data, { mode: 0o640 });
-        await rename(tmp, target);
+        // Written inside the transaction: if the write fails, the metadata row is rolled back.
+        await blobStore().put(this.bucket, key, data, contentType);
         return rows[0].id;
       });
       if (!id)
@@ -188,9 +168,15 @@ export class StorageBucket {
     if (!meta)
       return { data: null, error: storageError("Object not found", "404") };
     try {
-      const bytes = await readFile(filePath(this.bucket, key));
-      return { data: new Blob([bytes], { type: meta.mimetype }), error: null };
-    } catch {
+      const bytes = await blobStore().get(this.bucket, key);
+      if (!bytes)
+        return { data: null, error: storageError("Object not found", "404") };
+      return {
+        data: new Blob([new Uint8Array(bytes)], { type: meta.mimetype }),
+        error: null,
+      };
+    } catch (e) {
+      console.error("[selfhost] download failed", (e as Error).message);
       return { data: null, error: storageError("Object not found", "404") };
     }
   }
@@ -208,7 +194,11 @@ export class StorageBucket {
       ),
     );
     for (const row of removed)
-      await unlink(filePath(this.bucket, row.name)).catch(() => undefined);
+      await blobStore()
+        .remove(this.bucket, row.name)
+        .catch((e: Error) =>
+          console.error("[selfhost] could not delete file", e.message),
+        );
     return { data: removed.map((r) => ({ ...r })), error: null };
   }
 
@@ -363,13 +353,15 @@ export async function serveObject(
     meta = await new StorageBucket(bucket, SERVICE).visible(key);
   }
   if (!meta) return notFound();
-  const file = filePath(bucket, key);
-  let size: number;
+  let object: { body: ReadableStream<Uint8Array>; size: number } | null;
   try {
-    size = (await stat(file)).size;
-  } catch {
+    object = await blobStore().open(bucket, key);
+  } catch (e) {
+    console.error("[selfhost] could not read file", (e as Error).message);
     return notFound();
   }
+  if (!object) return notFound();
+  const size = object.size;
   const download = url.searchParams.get("download");
   const inlineSafe =
     /^image\/(png|jpeg|webp|gif|avif)$|^application\/pdf$|^text\/plain/.test(
@@ -392,8 +384,5 @@ export async function serveObject(
     );
     headers.set("content-disposition", `attachment; filename="${fname}"`);
   }
-  return new Response(
-    Readable.toWeb(createReadStream(file)) as ReadableStream,
-    { status: 200, headers },
-  );
+  return new Response(object.body, { status: 200, headers });
 }
